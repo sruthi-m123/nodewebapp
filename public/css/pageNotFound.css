@@ -1,0 +1,141 @@
+/* 404 Page Styles - Matching CHETTINADU Theme */
+:root {
+  --primary-color: #9e6d4e;
+  --secondary-color: #e8d5c0;
+  --accent-color: #c7a17a;
+  --dark-color: #333;
+  --light-color: #f9f4f1;
+  --text-color: #555;
+  --white: #fff;
+  --black: #000;
+  --font-primary: 'Playfair Display', serif;
+  --font-secondary: 'Poppins', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--text-color);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+.outer-wrapper {
+  background: var(--light-color);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('saree-pattern-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+}
+
+.error-box {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 3rem 4rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid var(--secondary-color);
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.error-code {
+  font-family: var(--font-primary);
+  font-size: 5rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  margin: 1.5rem 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+  font-family: var(--font-secondary);
+  line-height: 1.8;
+}
+
+.error-suggestion {
+  margin: 1.5rem 0;
+  font-size: 1rem;
+  color: var(--text-color);
+  font-family: var(--font-secondary);
+}
+
+.error-message a, 
+.error-suggestion a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.error-message a:after,
+.error-suggestion a:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  background: var(--primary-color);
+  bottom: -2px;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.error-message a:hover:after,
+.error-suggestion a:hover:after {
+  width: 100%;
+}
+
+/* Buttons */
+.primary-btn {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 12px 30px;
+  border: none;
+  border-radius: 30px;
+  font-family: var(--font-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  margin-top: 1.5rem;
+}
+
+.primary-btn:hover {
+  background: var(--dark-color);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .error-box {
+    padding: 2rem;
+  }
+  
+  .error-code {
+    font-size: 4rem;
+  }
+  
+  .error-message {
+    font-size: 1rem;
+  }
+}
