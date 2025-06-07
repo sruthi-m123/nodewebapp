@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chettinad Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin/admin.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="/images/admin-logo.png" alt="Chettinad Logo">
+        <span>Chettinad</span>
+      </div>
+      <i class="fas fa-chevron-left toggle-sidebar"></i>
+    </div>
+    
+    <div class="sidebar-menu">
+      <div class="menu-title">Main</div>
+      <a href="/admin/dashboard" class="menu-item">
+        <i class="fas fa-tachometer-alt"></i>
+        <span class="menu-text">Dashboard</span>
+      </a>
+      
+      <div class="menu-title">Management</div>
+      <div class="has-submenu">
+        <a href="#" class="menu-item active">
+          <i class="fas fa-th-large"></i>
+          <span class="menu-text">Categories</span>
+          <i class="fas fa-chevron-right submenu-toggle"></i>
+        </a>
+        <div class="submenu active">
+          <a href="/admin/categories" class="menu-item">
+            <span class="menu-text">All Categories</span>
+          </a>
+          <a href="/admin/categories/add" class="menu-item">
+            <span class="menu-text">Add New</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="has-submenu">
+        <a href="#" class="menu-item">
+          <i class="fas fa-box"></i>
+          <span class="menu-text">Products</span>
+          <i class="fas fa-chevron-right submenu-toggle"></i>
+        </a>
+        <div class="submenu">
+          <a href="/admin/products" class="menu-item">
+            <span class="menu-text">All Products</span>
+          </a>
+          <a href="/admin/products/add" class="menu-item">
+            <span class="menu-text">Add New</span>
+          </a>
+          <a href="/admin/products/inventory" class="menu-item">
+            <span class="menu-text">Inventory</span>
+          </a>
+        </div>
+      </div>
+      
+      <a href="/admin/orders" class="menu-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="menu-text">Orders</span>
+        <span class="menu-badge">5</span>
+      </a>
+      
+      <a href="/admin/users" class="menu-item">
+        <i class="fas fa-users"></i>
+        <span class="menu-text">Users</span>
+      </a>
+      
+      <div class="menu-title">Marketing</div>
+      <a href="/admin/coupons" class="menu-item">
+        <i class="fas fa-ticket-alt"></i>
+        <span class="menu-text">Coupons</span>
+      </a>
+      
+      <a href="/admin/offers" class="menu-item">
+        <i class="fas fa-gift"></i>
+        <span class="menu-text">Offers</span>
+      </a>
+      
+      <div class="menu-title">System</div>
+      <a href="/admin/settings" class="menu-item">
+        <i class="fas fa-cog"></i>
+        <span class="menu-text">Settings</span>
+      </a>
+      
+      <a href="/admin/logout" class="menu-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="menu-text">Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Admin Header -->
+    <header class="admin-header">
+      <div class="hamburger">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+      <div class="admin-logo">
+        <img src="/images/admin-icon.png" alt="Admin Icon">
+        <span>Admin Panel</span>
+      </div>
+      
+      <div class="admin-actions">
+        <div class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </div>
+        
+        <div class="user-profile">
+          <img src="/images/admin-avatar.jpg" alt="Admin Avatar" class="user-avatar">
+          <span class="user-name">Admin</span>
+          <div class="user-dropdown">
+            <a href="/admin/profile"><i class="fas fa-user"></i> My Profile</a>
+            <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Categories</h1>
+          <p>Manage your product categories</p>
+        </div>
+        
+        <div class="breadcrumb">
+          <a href="/admin/dashboard">Home</a>
+          <span class="divider">/</span>
+          <a href="/admin/categories">Categories</a>
+          <span class="divider">/</span>
+          <span>All Categories</span>
+        </div>
+      </div>
