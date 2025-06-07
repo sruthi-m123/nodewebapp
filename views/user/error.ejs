@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Error | Chettinad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></head>
+<link rel="stylesheet" href="/css/error.css">
+  <body>
+  <div class="error-container">
+    <div class="brand-logo">
+      <h1>CHETTINAD</h1>
+      <p>A Fort of Timeless Weaves</p>
+    </div>
+    
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <h2 class="error-title">Something Went Wrong</h2>
+    
+    <div class="error-message">
+      <%= message %>
+    </div>
+    
+    <p class="error-description">
+      We apologize for the inconvenience. Our team has been notified and we're working to fix this issue.
+    </p>
+    <div class="action-buttons">
+      <a href="/" class="btn btn-primary">
+        <i class="fas fa-home"></i> Return Home
+      </a>
+     <button id="tryAgainBtn" class="btn btn-secondary">
+  <i class="fas fa-sync-alt"></i> Try Again
+</button>
+
+    </div>
+    
+    <div class="contact-info">
+      Need immediate assistance? <a href="mailto:support@chettinad.com">Contact our support team</a>
+    </div>
+  </div>
+ <script>
+    document.getElementById('tryAgainBtn').addEventListener('click', function() {
+      window.location.reload(true); // Explicit window object and force reload
+    });
+  </script>
+</body>
+</html>

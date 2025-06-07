@@ -192,11 +192,12 @@ body {
 
 .form-group input {
   width: 100%;
-  padding: 12px 15px 12px 40px;
+  padding: 12px 12px 12px 40px;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-family: var(--font-secondary);
   transition: all 0.3s ease;
+ 
 }
 
 .form-group input:focus {
@@ -216,10 +217,13 @@ body {
 .show-password {
   position: absolute;
   right: 15px;
-  top: 40px;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
   color: var(--text-color);
   opacity: 0.7;
+   font-size: 1.1rem;
+   z-index: 2;
 }
 
 .terms {
@@ -285,6 +289,36 @@ body {
   text-decoration: underline;
 }
 
+  .error-message {
+  color: #e74c3c;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  min-height: 1em;
+  line-height: 1.3;
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.error-message:not(:empty) {
+  visibility: visible; 
+  opacity: 1;
+}
+.server-error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  text-align: center;
+  visibility: visible;
+  opacity: 1;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  position: relative; 
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
   .signup-container {
@@ -299,6 +333,7 @@ body {
     padding: 40px 30px;
   }
 }
+
 
 @media (max-width: 576px) {
   .form-header h1 {

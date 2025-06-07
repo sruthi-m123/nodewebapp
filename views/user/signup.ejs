@@ -1,103 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHETTINAD - Create Your Account</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="signup.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHETTINAD - Create Your Account</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/signup.css" />
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <div class="signup-container">
+      <div class="signup-image">
+        <div class="image-overlay">
+          <h2>Welcome to Chettinad</h2>
+          <p>
+            Join our community of traditional saree lovers and get exclusive
+            access to our collections.
+          </p>
+          <div class="benefits">
+            <p>
+              <i class="fas fa-check-circle"></i> Exclusive member discounts
+            </p>
+            <p>
+              <i class="fas fa-check-circle"></i> Early access to new
+              collections
+            </p>
+            <p>
+              <i class="fas fa-check-circle"></i> Personalized recommendations
+            </p>
+            <p><i class="fas fa-check-circle"></i> Free styling advice</p>
+          </div>
+        </div>
+      </div>
 
-  <div class="signup-container">
-    <div class="signup-image">
-      <div class="image-overlay">
-        <h2>Welcome to Chettinad</h2>
-        <p>Join our community of traditional saree lovers and get exclusive access to our collections.</p>
-        <div class="benefits">
-          <p><i class="fas fa-check-circle"></i> Exclusive member discounts</p>
-          <p><i class="fas fa-check-circle"></i> Early access to new collections</p>
-          <p><i class="fas fa-check-circle"></i> Personalized recommendations</p>
-          <p><i class="fas fa-check-circle"></i> Free styling advice</p>
+      <div class="signup-form">
+        <div class="form-header">
+          <h1>CHETTINAD</h1>
+          <p class="tagline">A Piece of Heritage & Grace</p>
+        </div>
+
+        <div class="social-login">
+          <button class="google-btn">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+        </div>
+
+        <div class="divider">
+          <span>or sign up with email</span>
+        </div>
+<%if(typeof message!=='undefined'){%>
+  <div class="error-message server-error"><%= message %></div>
+  <%}%>
+        <form
+          id="signform"
+          class="registration-form"
+          action="/user/signup"
+          method="post"
+        >
+          <div class="form-group">
+            <label for="fullname">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              id="fullname"
+              placeholder="Enter your full name"
+              value="<%= typeof formData !== 'undefined' ? formData.name : '' %>"
+            
+            />
+            <i class="fas fa-user"></i>
+                   <div id="error1" class="error-message"></div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Enter your email"
+              value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+            />
+            <i class="fas fa-envelope"></i>
+                   <div id="error2" class="error-message"></div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              placeholder="Enter your Phone Number"
+              value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>"
+              style="padding-left: 30px"
+            />
+            <i
+              class="fa fa-phone"
+              style="position: absolute; top: 40px; left: 10px; color: gray"
+            ></i>
+                    <div id="error3" class="error-message"></div>
+
+          </div>
+          <!-- 
+<div class="form-group" style="position: relative;">
+  <label for="referral">Referral Code</label>
+  <i class="fa fa-tag" style="position: absolute; top: 36px; left: 10px; color: gray;"></i>
+  <input type="text" name="referral" id="referral" placeholder="Optional" style="padding-left: 30px;">
+</div> -->
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Create a password"
+            />
+            <i class="fas fa-lock"></i>
+            <span class="show-password" onclick="togglePassword()">
+              <i class="fas fa-eye"></i>
+            </span>
+                   <div id="error4" class="error-message"></div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              id="confirmPassword"
+              placeholder="Confirm your password"
+            />
+            <i class="fas fa-lock"></i>
+            <span class="show-password" onclick="toggleConfirmPassword()">
+              <i class="fas fa-eye"></i>
+            </span>
+                   <div id="error5" class="error-message"></div>
+
+          </div>
+
+          <div class="terms">
+            <input type="checkbox" id="agree-terms" required/>
+            <label for="agree-terms"
+              >I agree to the <a href="#">Terms of Service</a> and
+              <a href="#">Privacy Policy</a></label
+            >
+          </div>
+
+          <button type="submit" class="signup-btn">Create Account</button>
+        </form>
+
+        <div class="login-link">
+          Already have an account? <a href="/user/login">Log in</a>
         </div>
       </div>
     </div>
-    
-    <div class="signup-form">
-      <div class="form-header">
-        <h1>CHETTINAD</h1>
-        <p class="tagline">A Piece of Heritage & Grace</p>
-      </div>
-      
-      <div class="social-login">
-        <button class="google-btn">
-          <i class="fab fa-google"></i> Continue with Google
-        </button>
-        <button class="facebook-btn">
-          <i class="fab fa-facebook-f"></i> Continue with Facebook
-        </button>
-      </div>
-      
-      <div class="divider">
-        <span>or sign up with email</span>
-      </div>
-      
-      <form class="registration-form">
-        <div class="form-group">
-          <label for="fullname">Full Name</label>
-          <input type="text" id="fullname" placeholder="Enter your full name" required>
-          <i class="fas fa-user"></i>
-        </div>
-        
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="Enter your email" required>
-          <i class="fas fa-envelope"></i>
-        </div>
-        
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Create a password" required>
-          <i class="fas fa-lock"></i>
-          <span class="show-password" onclick="togglePassword()">
-            <i class="fas fa-eye"></i>
-          </span>
-        </div>
-        
-        <div class="form-group">
-          <label for="confirm-password">Confirm Password</label>
-          <input type="password" id="confirm-password" placeholder="Confirm your password" required>
-          <i class="fas fa-lock"></i>
-        </div>
-        
-        <div class="terms">
-          <input type="checkbox" id="agree-terms" required>
-          <label for="agree-terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
-        </div>
-        
-        <button type="submit" class="signup-btn">Create Account</button>
-      </form>
-      
-      <div class="login-link">
-        Already have an account? <a href="signup.html">Log in</a>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    function togglePassword() {
-      const passwordInput = document.getElementById('password');
-      const eyeIcon = document.querySelector('.show-password i');
-      
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
+<script>
+  const nameid = document.getElementById("fullname");
+  const emailid = document.getElementById("email");
+  const phoneid = document.getElementById("phone");
+  const passwordid = document.getElementById("password");
+  const cpasswordid = document.getElementById("confirmPassword");
+  const error1 = document.getElementById("error1");
+  const error2 = document.getElementById("error2");
+  const error3 = document.getElementById("error3");
+  const error4 = document.getElementById("error4");
+  const error5 = document.getElementById("error5");
+  const signform = document.getElementById("signform");
+
+  function nameValidateChecking() {
+    const nameval = nameid.value;
+    const namepattern = /^[A-Za-z\s]+$/;
+    if (nameval.trim() === "") {
+      error1.innerHTML = "Please enter a valid name";
+      return false;
+    } else if (!namepattern.test(nameval)) {
+      error1.innerHTML = "Name can only contain alphabets and spaces";
+      return false;
+    } else {
+      error1.innerHTML = "";
+      return true;
     }
-  </script>
-</body>
+  }
+
+  function emailValidateChecking() {
+    const emailval = emailid.value;
+    const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailpattern.test(emailval)) {
+      error2.innerHTML = "Invalid email format";
+      return false;
+    } else {
+      error2.innerHTML = "";
+      return true;
+    }
+  }
+
+  function phoneValidateChecking() {
+    const phoneval = phoneid.value;
+    if (phoneval.trim() === "" || phoneval.length !== 10 || isNaN(phoneval)) {
+      error3.innerHTML = "Enter a valid 10-digit phone number";
+      return false;
+    } else {
+      error3.innerHTML = "";
+      return true;
+    }
+  }
+
+  function passwordValidateChecking() {
+    const passwordval = passwordid.value;
+    const confirmPasswordval = cpasswordid.value;
+    const alpha = /[a-zA-Z]/;
+    const digit = /\d/;
+    let isValid = true;
+
+    if (passwordval.length < 8) {
+      error4.innerHTML = "Password must be at least 8 characters";
+      isValid = false;
+    } else if (!alpha.test(passwordval) || !digit.test(passwordval)) {
+      error4.innerHTML = "Password must contain letters and numbers";
+      isValid = false;
+    } else {
+      error4.innerHTML = "";
+    }
+
+    if (passwordval !== confirmPasswordval && confirmPasswordval !== "") {
+      error5.innerHTML = "Passwords do not match";
+      isValid = false;
+    } else {
+      error5.innerHTML = "";
+    }
+    return isValid;
+  }
+
+  if (nameid) nameid.addEventListener("input", nameValidateChecking);
+  if (emailid) emailid.addEventListener("input", emailValidateChecking);
+  if (phoneid) phoneid.addEventListener("input", phoneValidateChecking);
+  if (passwordid) passwordid.addEventListener("input", passwordValidateChecking);
+  if (cpasswordid) cpasswordid.addEventListener("input", passwordValidateChecking);
+
+  if (signform) {
+    signform.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const submitBtn = signform.querySelector(".signup-btn");
+      submitBtn.disabled = true;
+
+      const nameValid = nameValidateChecking();
+      const emailValid = emailValidateChecking();
+      const phoneValid = phoneValidateChecking();
+      const passwordValid = passwordValidateChecking();
+      const termsChecked = document.getElementById("agree-terms").checked;
+
+      if (!termsChecked) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Terms Not Accepted',
+          text: 'You must agree to the Terms of Service and Privacy Policy',
+          confirmButtonColor: '#8B4513',
+        });
+        submitBtn.disabled = false;
+        return;
+      }
+
+      if (!nameValid || !emailValid || !phoneValid || !passwordValid) {
+        const errorMessages = document.querySelectorAll('.error-message');
+        let firstError = null;
+        for (let error of errorMessages) {
+          if (error.textContent.trim() !== '') {
+            firstError = error;
+            break;
+          }
+        }
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: firstError.textContent,
+            confirmButtonColor: '#8B4513',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill all required fields correctly',
+            confirmButtonColor: '#8B4513',
+          });
+        }
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // Submit form to server
+      Swal.fire({
+        title: 'Creating Account',
+        html: 'Please wait while we create your account...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          signform.submit(); // Submit the form directly
+        },
+      });
+    });
+  }
+
+  function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    const eyeIcon = document.querySelector(".show-password i");
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+      passwordInput.type = "password";
+      eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+  }
+
+  function toggleConfirmPassword() {
+    const confirmInput = document.getElementById("confirmPassword");
+    const icon = document.querySelectorAll(".show-password i")[1];
+    if (confirmInput.type === "password") {
+      confirmInput.type = "text";
+      icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+      confirmInput.type = "password";
+      icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+  }
+</script>
+
+  </body>
 </html>

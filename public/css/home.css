@@ -147,6 +147,11 @@ nav a:after {
 nav a:hover:after {
   width: 100%;
 }
+.auth-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
 
 .icons i {
   margin-left: 20px;

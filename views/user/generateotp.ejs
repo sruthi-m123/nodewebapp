@@ -6,7 +6,9 @@
   <title>Chettivan - OTP Verification</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="generateotp.css">
+  <link rel="stylesheet" href="/css/generateotp.css">
+
+
 </head>
 <body>
 
@@ -45,7 +47,7 @@
         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
       </div>
-      
+      <input type="hidden" id="user-email" value="">
       <button class="verify-btn">Verify OTP</button>
       
       <div class="resend-otp">
@@ -54,90 +56,199 @@
       </div>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    // 5-minute countdown timer
-    let minutes = 4;
-    let seconds = 59;
-    const timer = document.getElementById('timer');
-    const resendLink = document.getElementById('resend-link');
-    let timerActive = true;
-    
-    const interval = setInterval(() => {
-      if (seconds === 0) {
-        if (minutes === 0) {
-          clearInterval(interval);
-          timerActive = false;
-          resendLink.style.color = "var(--primary-color)";
-          resendLink.style.cursor = "pointer";
-          resendLink.style.textDecoration = "underline";
-          return;
-        }
-        minutes--;
-        seconds = 59;
+<script>
+  // 5-minute countdown timer
+  let minutes = 4;
+  let seconds = 59;
+  const timer = document.getElementById('timer');
+  const resendLink = document.getElementById('resend-link');
+  let timerActive = true;
+
+  const interval = setInterval(() => {
+    if (seconds === 0) {
+      if (minutes === 0) {
+        clearInterval(interval);
+        timerActive = false;
+        resendLink.style.color = "var(--primary-color)";
+        resendLink.style.cursor = "pointer";
+        resendLink.style.textDecoration = "underline";
+        return;
+      }
+      minutes--;
+      seconds = 59;
+    } else {
+      seconds--;
+    }
+
+    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+    timer.textContent = `0${minutes}:${formattedSeconds}`;
+  }, 1000);
+
+  const inputs = document.querySelectorAll('.otp-inputs input');
+  const verifyBtn = document.querySelector('.verify-btn');
+  const userEmail = sessionStorage.getItem('otpEmail') || '<%= email %>';
+  document.getElementById('user-email').value = userEmail;
+
+  // Redirect to signup if no email is found
+  if (!userEmail) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Session Expired',
+      text: 'Please start the verification process again',
+      confirmButtonColor: '#8B4513',
+    }).then(() => {
+      window.location.href = '/user/signup';
+    });
+  }
+
+  // Enable/disable verify button based on OTP input
+  function getOTP() {
+    let otp = '';
+    inputs.forEach((input) => {
+      otp += input.value;
+    });
+    return otp;
+  }
+
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+      verifyBtn.disabled = getOTP().length !== 6;
+      if (input.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+
+  // Auto-submit OTP when the last digit is entered
+  inputs[5].addEventListener('input', (e) => {
+    if (e.target.value.length === 1 && getOTP().length === 6) {
+      verifyBtn.click();
+    }
+  });
+
+  // Verify OTP
+  verifyBtn.addEventListener('click', async () => {
+    const otp = getOTP();
+    if (otp.length !== 6) return;
+
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Verifying...";
+
+    try {
+      const response = await fetch('/user/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, otp }),
+      });
+
+      const data = await response.json();
+      console.log('Response data:', data); 
+
+      if (data.success) {
+        sessionStorage.removeItem('otpEmail');
+        Swal.fire({
+          icon: 'success',
+          title: 'Verified!',
+          text: 'Redirecting to your account...',
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.href = data.redirect || '/user/login';
+        });
       } else {
-        seconds--;
+        throw new Error(data.message || 'Verification failed');
       }
-      
-      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-      timer.textContent = `0${minutes}:${formattedSeconds}`;
-    }, 1000);
-    
-    // Auto-focus and move between OTP inputs
-    const inputs = document.querySelectorAll('.otp-inputs input');
-    
-    inputs.forEach((input, index) => {
-      input.addEventListener('input', (e) => {
-        if (e.target.value.length === 1) {
-          if (index < inputs.length - 1) {
-            inputs[index + 1].focus();
-          }
-        }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Verification Failed',
+        text: error.message,
+        confirmButtonColor: '#8B4513',
       });
-      
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && e.target.value.length === 0) {
-          if (index > 0) {
-            inputs[index - 1].focus();
-          }
-        }
-      });
-    });
-    
-    // Resend OTP functionality
-    resendLink.addEventListener('click', (e) => {
-      if (!timerActive) {
-        e.preventDefault();
-        minutes = 4;
-        seconds = 59;
-        timerActive = true;
-        resendLink.style.color = "var(--text-color)";
-        resendLink.style.cursor = "default";
-        resendLink.style.textDecoration = "none";
-        
-        // In a real app, you would resend the OTP here
-        
-        const newInterval = setInterval(() => {
-          if (seconds === 0) {
-            if (minutes === 0) {
-              clearInterval(newInterval);
-              timerActive = false;
-              resendLink.style.color = "var(--primary-color)";
-              resendLink.style.cursor = "pointer";
-              resendLink.style.textDecoration = "underline";
-              return;
+      inputs.forEach((input) => (input.value = ''));
+      inputs[0].focus();
+    } finally {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify OTP';
+    }
+  });
+
+  // Resend OTP
+  resendLink.addEventListener('click', async (e) => {
+    if (!timerActive) {
+      e.preventDefault();
+      try {
+        const response = await fetch('/user/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'OTP Resent',
+            text: 'A new OTP has been sent to your email',
+            confirmButtonColor: '#8B4513',
+          });
+          minutes = 4;
+          seconds = 59;
+          timerActive = true;
+          resendLink.style.color = "var(--text-color)";
+          resendLink.style.cursor = "default";
+          resendLink.style.textDecoration = "none";
+
+          const newInterval = setInterval(() => {
+            if (seconds === 0) {
+              if (minutes === 0) {
+                clearInterval(newInterval);
+                timerActive = false;
+                resendLink.style.color = "var(--primary-color)";
+                resendLink.style.cursor = "pointer";
+                resendLink.style.textDecoration = "underline";
+                return;
+              }
+              minutes--;
+              seconds = 59;
+            } else {
+              seconds--;
             }
-            minutes--;
-            seconds = 59;
-          } else {
-            seconds--;
-          }
-          
-          const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-          timer.textContent = `0${minutes}:${formattedSeconds}`;
-        }, 1000);
+            const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+            timer.textContent = `0${minutes}:${formattedSeconds}`;
+          }, 1000);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Resend Failed',
+            text: data.message || 'Failed to resend OTP',
+            confirmButtonColor: '#8B4513',
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Resend Failed',
+          text: 'Internal server error',
+          confirmButtonColor: '#8B4513',
+        });
       }
-    });
-  </script>
-</body>
-</html>
+    }
+  });
+
+  // Set email on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const serverEmail = '<%= email %>';
+    if (serverEmail && !sessionStorage.getItem('otpEmail')) {
+      sessionStorage.setItem('otpEmail', serverEmail);
+      document.getElementById('user-email').value = serverEmail;
+    }
+  });
+</script>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="validate-otp.css">
+  <link rel="stylesheet" href="/css/validationotp.css">
 </head>
 <body>
 
@@ -37,18 +37,18 @@
           <span id="otp-timer" class="timer">00:30</span>
           <span>remaining</span>
         </div>
-        
-        <div class="otp-inputs">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <form action="/validationotp" method="POST" id="otp-form">
+        <div  class="otp-inputs">
+          <input type="text" name="otp1" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code">
+          <input type="text" name="otp2" maxlength="1" pattern="[0-9]" inputmode="numeric">
+          <input type="text"name="otp3" maxlength="1" pattern="[0-9]" inputmode="numeric">
+          <input type="text"name="otp4" maxlength="1" pattern="[0-9]" inputmode="numeric">
+          <input type="text"name="otp5" maxlength="1" pattern="[0-9]" inputmode="numeric">
+          <input type="text" name="otp6"maxlength="1" pattern="[0-9]" inputmode="numeric">
         </div>
-        
-        <button class="verify-btn">Verify Code</button>
-        
+        <input type="hidden" name="otp" id="combined-otp">
+        <button  type="submit" class="verify-btn">Verify <code></code></button>
+      </form>
         <p class="resend-text">Didn't receive the code? <a href="#" id="resend-link">Resend OTP</a></p>
       </div>
     </div>
@@ -107,7 +107,24 @@
         resendLink.style.cursor = "default";
         resendLink.style.textDecoration = "none";
         
-        // In a real app, you would resend the OTP here
+       fetch("/user/resend-forgot-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert("OTP resent successfully");
+      } else {
+        alert("Failed to resend OTP");
+      }
+    })
+    .catch(error => {
+      console.error("Error resending OTP:", error);
+      alert("An error occurred while resending OTP.");
+    });
         
         const newInterval = setInterval(() => {
           seconds--;
@@ -124,6 +141,20 @@
         }, 1000);
       }
     });
+const form=document.getElementById('otp-form');
+const otpInputs =document.querySelectorAll('.otp-inputs input');
+const combinedOtpField=document.getElementById('combined-otp');
+   form.addEventListener('submit',function(e){
+    let otp='';
+    otpInputs.forEach(input=>{
+      otp+=input.value;
+
+    })
+    combinedOtpField.value=otp;
+   });
+
+
+
   </script>
 </body>
 </html>

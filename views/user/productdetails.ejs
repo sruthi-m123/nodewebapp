@@ -1,0 +1,194 @@
+<%- include("partials/user/header") %>
+
+
+  <!-- Product Details -->
+  <section class="product-details">
+    <div class="product-container">
+      <div class="product-gallery">
+        <div class="main-image">
+          <img src="https://via.placeholder.com/800x1000" alt="Pink Handloom Kanchipuram Silk Saree">
+        </div>
+        <div class="thumbnail-images">
+          <div class="thumbnail active">
+            <img src="https://via.placeholder.com/100x120" alt="Thumbnail 1">
+          </div>
+          <div class="thumbnail">
+            <img src="https://via.placeholder.com/100x120" alt="Thumbnail 2">
+          </div>
+          <div class="thumbnail">
+            <img src="https://via.placeholder.com/100x120" alt="Thumbnail 3">
+          </div>
+          <div class="thumbnail">
+            <img src="https://via.placeholder.com/100x120" alt="Thumbnail 4">
+          </div>
+        </div>
+      </div>
+      <div class="product-info">
+        <h1>Pink Handloom Kanchipuram Silk Saree</h1>
+        <div class="rating">
+          <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <span class="review-count">4.5 (60 reviews)</span>
+        </div>
+        <p class="price">₹56,600</p>
+        <p class="availability"><i class="fas fa-check-circle"></i> In Stock</p>
+        
+        <div class="color-options">
+          <h3>Color Options</h3>
+          <div class="colors">
+            <div class="color-option active">
+              <div class="color-swatch pink"></div>
+              <span>Rose Pink</span>
+            </div>
+            <div class="color-option">
+              <div class="color-swatch lavender"></div>
+              <span>Lavender</span>
+            </div>
+            <div class="color-option">
+              <div class="color-swatch gold"></div>
+              <span>Gold</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="quantity-selector">
+          <label for="quantity">Quantity:</label>
+          <div class="qty-control">
+            <button class="qty-btn minus" onclick="updateQuantity(-1)">-</button>
+            <input type="text" id="quantity" value="1" readonly>
+            <button class="qty-btn plus" onclick="updateQuantity(1)">+</button>
+          </div>
+        </div>
+        
+        <div class="actions">
+          <button class="add-to-cart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+          <button class="buy-now"><i class="fas fa-bolt"></i> Buy Now</button>
+        </div>
+        
+        <div class="product-tabs">
+          <div class="tab-header">
+            <div class="tab-link active" data-tab="description">Description</div>
+            <div class="tab-link" data-tab="details">Details</div>
+            <div class="tab-link" data-tab="shipping">Shipping</div>
+          </div>
+          <div class="tab-content active" id="description">
+            <p>This exquisite Kanchipuram silk saree is handwoven by master weavers using pure mulberry silk and real gold zari. The rich pink base is adorned with traditional temple motifs and intricate zari borders, making it perfect for weddings and special occasions.</p>
+          </div>
+          <div class="tab-content" id="details">
+            <ul>
+              <li><strong>Fabric:</strong> Pure Kanchipuram Silk</li>
+              <li><strong>Blouse:</strong> Included (0.8m)</li>
+              <li><strong>Length:</strong> 5.5m (Saree) + 0.8m (Blouse)</li>
+              <li><strong>Border:</strong> Heavy Zari Work</li>
+              <li><strong>Pattern:</strong> Traditional Temple Motifs</li>
+              <li><strong>Weight:</strong> 850 grams</li>
+              <li><strong>Care:</strong> Dry Clean Only</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="shipping">
+            <ul>
+              <li><strong>Delivery:</strong> 3-5 business days</li>
+              <li><strong>Shipping:</strong> Free across India</li>
+              <li><strong>Returns:</strong> 7-day easy returns</li>
+              <li><strong>Packaging:</strong> Premium gift box</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Products -->
+  <section class="related-products">
+    <div class="section-header">
+      <h2>You May Also Like</h2>
+      <p>Complement your collection with these exquisite pieces</p>
+    </div>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-image">
+          <img src="https://via.placeholder.com/300x400" alt="Maroon Kancheepuram Silk">
+          <div class="product-actions">
+            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3>Maroon Zari Border Silk</h3>
+          <p class="price">₹26,000</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <img src="https://via.placeholder.com/300x400" alt="Gold Kancheepuram Silk">
+          <div class="product-actions">
+            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3>Gold Temple Border Silk</h3>
+          <p class="price">₹32,000</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <img src="https://via.placeholder.com/300x400" alt="Green Kancheepuram Silk">
+          <div class="product-actions">
+            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3>Green Kancheepuram Silk</h3>
+          <p class="price">₹28,500</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+  <script>
+    // Quantity Selector
+    function updateQuantity(change) {
+      const qtyInput = document.getElementById('quantity');
+      let qty = parseInt(qtyInput.value);
+      qty = Math.max(1, qty + change);
+      qtyInput.value = qty;
+    }
+
+    // Tab System
+    const tabLinks = document.querySelectorAll('.tab-link');
+    tabLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        link.classList.add('active');
+        const tabId = link.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Thumbnail Click
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainImage = document.querySelector('.main-image img');
+    thumbnails.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        // In a real implementation, you would change the main image src
+        // mainImage.src = thumb.querySelector('img').src;
+      });
+    });
+
+    // Mobile Menu Toggle
+    document.querySelector('.menu-toggle').addEventListener('click', function() {
+      document.querySelector('.main-nav').classList.toggle('active');
+    });
+  </script>
+  <%- include("partials/user/footer") %>
