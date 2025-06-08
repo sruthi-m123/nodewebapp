@@ -1,0 +1,96 @@
+<%- include('../partials/admin/admin-header') %>
+<div class="page-header">
+  <div class="page-title">
+    <h1>Users</h1>
+    <p>Manage your store's users</p>
+  </div>
+  
+  <div class="breadcrumb">
+    <a href="/admin/dashboard">Home</a>
+    <span class="divider">/</span>
+    <span>Users</span>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="table-container">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>User Image</th>
+          <th>User Name</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Date of Creation</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>
+            <td><img src="<%= user.image || '/images/default-avatar.png' %>" alt="User Image" class="user-image"></td>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.address %></td>
+            <td><%= user.dateOfCreation %></td>
+            <td>
+              <% if (user.isBlocked) { %>
+                <button class="action-btn unblock-btn" data-id="<%= user.id %>">Unblock</button>
+              <% } else { %>
+                <button class="action-btn block-btn" data-id="<%= user.id %>">Block</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <span>Showing 1 of 10</span>
+    <div class="pagination-controls">
+      <button class="pagination-btn prev-btn disabled">&lt;</button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">4</button>
+      <button class="pagination-btn next-btn">&gt;</button>
+    </div>
+  </div>
+</div>
+<style>
+  /* Page Header */
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-title h1 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.page-title p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 10px;
+}
+
+.breadcrumb a {
+  color: #666;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #ff6f61;
+}
+
+.divider {
+  margin: 0 5px;
+}
+</style>
+<%- include('../partials/admin/admin-footer') %>
