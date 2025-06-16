@@ -14,7 +14,7 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
-    console.log("hiii");
+
     return res.render("user/home", {
       pageCSS: "home.css",
       currentPath: req.path,
@@ -157,6 +157,7 @@ const verifyOtp = async (req, res) => {
       password: hashedPassword,
     });
     await newUser.save();
+
     req.session.userOtp = null;
     req.session.userData = null;
     req.session.otpExpires = null;
@@ -201,12 +202,9 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
-    if (!req.session.user) {
-      return res.render("user/login");
-    } else {
-      res.redirect("/");
-    }
+    res.render("user/login");
   } catch (error) {
+     console.error("Error rendering login page:", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -274,7 +272,7 @@ const resetPassword = async (req, res) => {
     if (newPassword !== confirmPassword) {
       return res.render("user/resetPassword", {
         error: "Paswords do match",
-        email,
+        email
       });
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);

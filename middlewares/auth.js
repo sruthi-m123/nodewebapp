@@ -34,7 +34,22 @@ const adminAuth=(req,res,next)=>{
     })
 }
 
+const ifAuthenticated=(req,res,next)=>{
+    if(req.session.user){
+        return res.redirect('/user/home');
+    }
+    next();
+}
+
+const redirectIfLoggedIn=(req,res,next)=>{
+    if(req.session.user){
+        res.redirect("/user/home");
+    }
+    next()
+}
 module.exports={
     userAuth,
-    adminAuth
+    adminAuth,
+    ifAuthenticated,
+    redirectIfLoggedIn
 }

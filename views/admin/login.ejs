@@ -1,94 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chettinad Admin Login</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="/css/admin/login.css" />
-</head>
-<body>
-  <div class="admin-login-container">
-    <div class="admin-login-left">
-      <div class="branding">
-        <h1>CHETTINAD</h1>
-        <p class="subtitle">A Fort of Timeless Weaves</p>
-      </div>
-
-      <div class="login-options">
-        <!-- Regular Login Form -->
-        <form class="admin-form" method="POST" action="/admin/login">
-          <div class="form-group">
-            <div class="input-wrapper">
-              <i class="fas fa-envelope"></i>
-              <input type="email" id="email" name="email" required placeholder="Enter your email" />
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="input-wrapper">
-              <i class="fas fa-lock"></i>
-              <input type="password" id="password" name="password" required placeholder="Enter your password" />
-              <span class="show-password" onclick="togglePassword('password')">
-                <i class="fas fa-eye-slash"></i>
-              </span>
-            </div>
-          </div>
-          <div class="form-options">
-            <input type="checkbox" id="remember" />
-            <label for="remember">Remember for 30 days</label>
-            <a href="/admin/forgot-password" class="forgot-password">Forgot password?</a>
-          </div>
-          <button type="submit" class="login-btn">
-            <i class="fas fa-sign-in-alt"></i> Login
-          </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="divider">
-          <span>or</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chettinad Admin Login</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin/login.css" />
+  </head>
+  <body>
+    <div class="admin-login-container">
+      <div class="admin-login-left">
+        <div class="branding">
+          <h1>CHETTINAD</h1>
+          <p class="subtitle">A Fort of Timeless Weaves</p>
         </div>
 
-        <!-- Google Login Button -->
-        <a href="/auth/google/admin" class="google-login-btn">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo">
-          Continue with Google
-        </a>
-      </div>
-    </div>
-    <div class="admin-login-right">
-      <div class="image-overlay">
-        <h2>Admin Portal</h2>
-        <p>Manage your Chettinad store with elegance and efficiency</p>
-        <div class="admin-features">
-          <p><i class="fas fa-chart-line"></i> Real-time analytics</p>
-          <p><i class="fas fa-box-open"></i> Inventory management</p>
-          <p><i class="fas fa-users"></i> Customer insights</p>
+        <div class="login-options">
+          <!-- Regular Login Form -->
+          <form class="admin-form" method="POST" action="/admin/login">
+            <div class="form-group">
+              <div class="input-wrapper">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  placeholder="Enter your password"
+                />
+                <span
+                  class="show-password"
+                  onclick="togglePassword('password')"
+                >
+                  <i class="fas fa-eye-slash"></i>
+                </span>
+              </div>
+            </div>
+            <div class="form-options">
+              <input type="checkbox" id="remember" />
+              <label for="remember">Remember for 30 days</label>
+              <a href="/admin/forgot-password" class="forgot-password"
+                >Forgot password?</a
+              >
+            </div>
+            <button type="submit" class="login-btn">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <!-- Google Login Button -->
+          <a href="/auth/google/admin" class="google-login-btn">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+              alt="Google logo"
+            />
+            Continue with Google
+          </a>
         </div>
       </div>
-      <img src="/images/admin-weaver.jpg" alt="Admin Portal" />
+      <div class="admin-login-right">
+        <div class="image-overlay">
+          <h2>Grace and Heritage</h2>
+          <p>Manage your Chettinad store with elegance and efficiency</p>
+          <div class="admin-features">
+            <p><i class="fas fa-chart-line"></i> Real-time analytics</p>
+            <p><i class="fas fa-box-open"></i> Inventory management</p>
+            <p><i class="fas fa-users"></i> Customer insights</p>
+          </div>
+        </div>
+        <img src="/img/admin-weaver.jpg" alt="Admin Portal" />
+      </div>
     </div>
-  </div>
 
-  <script>
-    function togglePassword(fieldId) {
-      const passwordInput = document.getElementById(fieldId);
-      const eyeIcon = passwordInput.nextElementSibling.querySelector('i');
-      
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
-      } else {
-        passwordInput.type = "password";
-        eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+    <script>
+      function togglePassword(fieldId) {
+        const passwordInput = document.getElementById(fieldId);
+        const eyeIcon = passwordInput.nextElementSibling.querySelector("i");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+        } else {
+          passwordInput.type = "password";
+          eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

@@ -1,0 +1,221 @@
+// import { findPackageJSON } from 'module';
+
+const Category = require('../../models/categorySchema');
+const Product = require('../../models/productSchema');
+// const fs = require('fs'); // Added for file system operations
+// const path = require('path'); // Added for path operations
+const formatResponse = (success, message, data = null) => {
+  return {
+    success,
+    alert: {
+      title: success ? 'Success' : 'Error',
+      text: message,
+      icon: success ? 'success' : 'error'
+    },
+    data
+  };
+};
+const getAllCategories=async(req,res)=>{
+    try {
+      const page=parseInt(req.query.page)||1;
+      const limit=10;
+      const skip=(page-1)*limit;
+      
+      const totalCategories=await Category.countDocuments();
+      const categories=await Category.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({createdAt:-1});
+
+      res.render('admin/categories',{
+        categories,
+        currentPage:page,
+        totalPages:Math.ceil(totalCategories/limit),
+totalCategories,
+startItem:skip+1,
+endItem:Math.min(skip+limit,totalCategories)
+      })
+
+    } catch (err) {
+    console.error(err);
+    res.redirect('/admin/categories?alert=' + 
+      encodeURIComponent(JSON.stringify({
+        title: 'Error',
+        text: 'Failed to load categories',
+        icon: 'error'
+      }))
+  )}
+}
+//get single category for editing
+const getCategory=async (req,res)=>{
+    try {
+     const category=await Category.findById(req.params.id);   
+     if(!category){
+        return res.status(404).json({success:false,message:'Categrory not found'});
+     }
+    //  res.json('admin/category',{category});
+     res.status(200).json({success:true,data:category});
+} catch (error) {
+        console.error(error);
+        res.status(500).json({success:false,message:'Server Error'});
+    }
+
+}
+const getCategoryDetails=async(req,res)=>{
+    try {
+        const category=await Category.findById(req.params.id);
+        if(!category){
+return res.status(404).json(formatResponse(false, 'Category not found'));
+                    }
+
+const productCount=await Product.countDocuments({category:req.params.id});
+const viewCount=0;
+const salesCount=0;
+
+res.json({
+    success:true,
+    category,
+    stats:{
+        productCount,
+        viewCount,
+        salesCount
+    }
+
+});
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({success:false,message:'server error'});
+    }
+}
+const addCategory=async(req,res)=>{
+    try {
+     const{name,code,description,status}=req.body;
+     const existingCategory = await Category.findOne({ name: name.trim().toLowerCase() }); 
+     if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+alert: {
+      title: 'Error',
+      text: 'Category with this name already exists',
+      icon: 'error'
+    }      });
+    }
+     
+     let imagePath=''  ;
+     if(req.file){
+        imagePath='/img/admin/category/'+req.file.filename;
+
+     } 
+     const newCategory=new Category({
+        name :name.trim().toLowerCase(),
+        code,
+        description,
+                status,
+        image:imagePath
+     });
+     await newCategory.save();
+return res.status(201).json({
+      success: true,
+      alert: {
+        title: 'Success',
+        text: 'Category added successfully!',
+        icon: 'success'
+      }
+    });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({success:false,message:'error adding category'});
+    }
+};
+
+const updateCategoryStatus=async(req,res)=>{
+   try {
+   const {status}=req.body;
+   const category=await Category.findByIdAndUpdate(
+    req.params.id,
+    {status},
+    {new:true}
+   ) ;
+    if (!category) {
+      return res.status(404).json({ success: false, message: 'Category not found' });
+    }
+    
+    res.json( formatResponse(true, 'Status updated successfully', { category }));
+
+   } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error updating status' });
+  
+   }
+}
+
+const updateCategory=async(req,res)=>{
+    try {
+        const{name,code,description,status}=req.body;
+        const updateData={
+            name,
+            code,
+            description,
+             status:status||'active'
+        };
+        if(req.file){
+            updateData.image='/img/category/'+req.file.filename;
+        }
+        const category=await Category.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            {new:true}
+        );
+if(!category){
+    return res.status(404).json({success:false,message:'Error updating category'});
+
+}
+return res.json(
+  formatResponse(true, 'Category updated successfully', { category })
+);
+
+    } catch (error) {
+       console.log(error);
+       res.status(500).json({success:false,message:'error updating category'});
+
+    }
+}
+const deleteCategory=async(req,res)=>{
+    try {
+       const productCount=await Product.countDocuments({category:req.params.id});
+       if(productCount>0){
+        return res.status(400).json(
+  formatResponse(false, 'Cannot delete category with associated products', {
+    productCount
+  })
+);
+       } 
+
+const category=await Category.findByIdAndDelete(req.params.id);
+if(!category){
+return res.status(404).json(
+        formatResponse(false, 'Category not found')
+      );
+}
+return res.json(
+  formatResponse(true, 'Category deleted successfully')
+);
+
+    } catch (error) {
+        console.error(error);
+res.status(500).json(
+      formatResponse(false, error.message || 'Error deleting category')
+    );    }
+}
+
+module.exports={
+  getAllCategories,
+    getCategory,
+   addCategory,
+    updateCategoryStatus,
+    updateCategory,
+    deleteCategory,
+    getCategoryDetails,
+    formatResponse 
+}

@@ -26,6 +26,7 @@ const customerInfo = async (req, res) => {
         { email: { $regex: ".*" + search + ".*", $options: "i" } },
       ],
     })
+    .sort({createdAt:-1})
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
@@ -65,4 +66,26 @@ const customerInfo = async (req, res) => {
   }
 };
 
-module.exports = { customerInfo };
+const toggleBlockStatus= async(req,res)=>{
+  try {
+    const {userId,isBlocked}=req.body;
+    await User.updateOne(
+      {_id:userId},
+      {$set:{isBlocked}}
+    )
+    res.status(200).json({
+  success: true,
+  message: `User ${isBlocked ? "blocked" : "unblocked"} successfully` // Fix: isBlocked
+});
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      message:"Failed to update user status",
+    })
+  }
+}
+
+module.exports = { customerInfo,
+  toggleBlockStatus
+
+ };

@@ -6,6 +6,9 @@ const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const adminRouter = require("./routes/adminRouter");
 const session = require("express-session");
+const methodOverride = require('method-override');
+
+
 db();
 
 app.use((req, res, next) => {
@@ -37,6 +40,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(methodOverride('_method'));
 
 app.set("view engine", "ejs");
 // app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin'),path.join(__dirname,"views/partials")])

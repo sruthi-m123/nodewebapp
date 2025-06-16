@@ -1,5 +1,5 @@
 <%- include('../partials/admin/admin-header') %>
-
+<link rel="stylesheet" href="/public/css/admin/category.css">
 <section class="category-page">
   <div class="section-header">
     <div class="header-content">
@@ -23,10 +23,10 @@
         <option value="inactive">Inactive</option>
       </select>
     </div>
-    <div class="table-actions">
+    <!-- <div class="table-actions">
       <button class="action-btn export-btn"><i class="fas fa-file-export"></i> Export</button>
       <button class="action-btn refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
-    </div>
+    </div> -->
   </div>
 
   <div class="category-table-container">
@@ -38,8 +38,7 @@
             <th class="sortable">Category Name <i class="fas fa-sort"></i></th>
             <th>Image</th>
             <th>Description</th>
-            <th class="sortable">Offer <i class="fas fa-sort"></i></th>
-            <th>Characteristics</th>
+           
             <th class="sortable">Status <i class="fas fa-sort"></i></th>
             <th>Actions</th>
           </tr>
@@ -51,29 +50,16 @@
             <td>
               <div class="category-name">
                 <strong><%= category.name %></strong>
-                <span class="category-code"><%= category.code %></span>
+                <!-- <span class="category-code"><%= category.code %></span> -->
               </div>
             </td>
             <td>
               <div class="category-image">
-                <img src="<%= category.image || '/images/default-category.jpg' %>" alt="<%= category.name %>" onerror="this.src='/images/default-category.jpg'">
+                <img src="<%= category.image || '/img/category' %>" alt="<%= category.name %>" onerror="this.src='/img/default-category.jpg'">
               </div>
             </td>
             <td class="description-cell"><%= category.description %></td>
-            <td>
-              <% if (category.offer) { %>
-                <span class="offer-badge"><%= category.offer %>% OFF</span>
-              <% } else { %>
-                <span class="no-offer">-</span>
-              <% } %>
-            </td>
-            <td>
-              <div class="characteristics">
-                <% category.characteristics.forEach(char => { %>
-                  <span class="char-tag"><%= char %></span>
-                <% }); %>
-              </div>
-            </td>
+           
             <td>
               <label class="status-toggle">
                 <input type="checkbox" <%= category.status === 'active' ? 'checked' : '' %> data-id="<%= category._id %>">
@@ -101,7 +87,7 @@
     
     <div class="table-footer">
       <div class="table-info">
-        Showing <%= startItem %> to <%= endItem %> of <%= totalItems %> entries
+        Showing <%= startItem %> to <%= endItem %> of <%= totalCategories %> entries
       </div>
       <div class="pagination">
         <% if (currentPage > 1) { %>
@@ -142,14 +128,7 @@
           <input type="text" id="categoryName" name="name" placeholder="Enter category name" required>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label for="categoryCode">Category Code</label>
-            <input type="text" id="categoryCode" name="code" placeholder="Auto-generated" readonly>
-          </div>
-          <div class="form-group">
-            <label for="categoryOffer">Offer (%)</label>
-            <input type="number" id="categoryOffer" name="offer" placeholder="Enter offer percentage" min="0" max="100">
-          </div>
+         
         </div>
         <div class="form-group">
           <label for="categoryImage">Category Image</label>
@@ -165,14 +144,8 @@
           <label for="categoryDesc">Description</label>
           <textarea id="categoryDesc" name="description" placeholder="Enter category description"></textarea>
         </div>
-        <div class="form-group">
-          <label>Characteristics</label>
-          <div class="tags-input">
-            <input type="text" id="categoryTags" placeholder="Add characteristics (press enter to add)">
-            <div class="tags-container"></div>
-            <input type="hidden" id="characteristics" name="characteristics">
-          </div>
-        </div>
+       
+        </div> -->
         <div class="form-group switch-group">
           <label>Status</label>
           <label class="switch">
@@ -189,5 +162,5 @@
     </div>
   </div>
 </div>
-
+<script src="/js/admin/categories.js"></script>
 <%- include('../partials/admin/admin-footer') %>

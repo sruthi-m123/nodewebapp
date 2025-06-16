@@ -1,28 +1,42 @@
-const mongoose=require("mongoose");
-const{Schema}=mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const categorySchema=new Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true
-    },
-    description:{
-        type:String,
-        required:true
-    },
-    isListed:{
-type:Boolean,
-default:true
-    },
-    categoryOffer:{
-        type:Number,
-        default:0
-    },
-    createdAt:{
-        type:Date,
-        default:Date.now
+const categorySchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  code: {
+    type: String,
+    unique: true,
+    trim: true,
+    default: "",
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive","on","off"],
+    default: "active",
+    set: function(value) { // Add setter to normalize values
+      if (value === 'on') return 'active';
+      if (value === 'off') return 'inactive';
+      return value;
     }
-})
-const Category= mongoose.model("Category",categorySchema)
-module.exports=Category;
+  },
+
+  categoryOffer: {
+    type: Number,
+    default: 0,
+  },
+  image: {
+    type: String, // Path to image (like "/uploads/categories/filename.jpg")
+    default: null,
+  },
+  
+});
+const Category = mongoose.model("Category", categorySchema);
+module.exports = Category;

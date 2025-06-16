@@ -9,7 +9,7 @@ bcrypt.hash(newPassword, saltRounds, (err, hash) => {
   console.log(hash); 
 });
 
-const pageerror=async(req,res)=>{
+const page_error=async(req,res)=>{
   res.render("admin/admin-error")
 }
 
@@ -37,7 +37,7 @@ if(passwordMatch){
 }
   }catch(error){
 console.log("login error",error);
-return res.redirect("/pageerror")
+return res.redirect("/page_error")
   }
 }
 
@@ -58,13 +58,13 @@ const logout=async(req,res)=>{
     req.session.destroy(err=>{
       if(err){
         console.log("error destroying session",err);
-        return res.redirect("/pageerror")
+        return res.redirect("/page_error")
       }
       res.redirect("/admin/login")
     })
   } catch (error) {
     console.log("unexpected error during logout",error);
-    res.redirect("/pageerror")
+    res.redirect("/page_error")
   }
 }
 
@@ -72,6 +72,6 @@ module.exports = {
   loadAdminLogin,
   login,
   loadDashboard,
-  pageerror,
+  page_error,
   logout
 };

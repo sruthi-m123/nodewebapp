@@ -1,4 +1,5 @@
 <%- include('../partials/admin/admin-header') %>
+
 <div class="page-header">
   <div class="page-title">
     <h1>Users</h1>
@@ -13,31 +14,37 @@
 </div>
 
 <div class="page-content">
+  <div class="search-container">
+    <form action="/admin/users" method="GET">
+      <input type="text" name="search" placeholder="Search users..." value="<%= search || '' %>">
+      <button type="submit"><i class="fas fa-search"></i></button>
+    </form>
+  </div>
+
   <div class="table-container">
     <table class="users-table">
       <thead>
         <tr>
-          <th>User Image</th>
+          
           <th>User Name</th>
           <th>Email</th>
-          <th>Address</th>
-          <th>Date of Creation</th>
+          <th>Phone No</th>
+          <!-- <th>Date of Creation</th> -->
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <% users.forEach(user => { %>
           <tr>
-            <td><img src="<%= user.image || '/images/default-avatar.png' %>" alt="User Image" class="user-image"></td>
             <td><%= user.name %></td>
             <td><%= user.email %></td>
-            <td><%= user.address %></td>
-            <td><%= user.dateOfCreation %></td>
+            <td><%= user.phone %></td>
+            <!-- <td><%= new Date(user.createdAt).toLocaleDateString() %></td> -->
             <td>
               <% if (user.isBlocked) { %>
-                <button class="action-btn unblock-btn" data-id="<%= user.id %>">Unblock</button>
+                <button class="action-btn unblock-btn" data-id="<%= user._id %>" onclick="toggleUserStatus('<%=user._id%>',false)" >Unblock</button>
               <% } else { %>
-                <button class="action-btn block-btn" data-id="<%= user.id %>">Block</button>
+                <button class="action-btn block-btn" data-id="<%= user._id %>" onclick="toggleUserStatus('<%=user._id%>',true)">Block</button>
               <% } %>
             </td>
           </tr>
@@ -45,52 +52,34 @@
       </tbody>
     </table>
   </div>
-  <div class="pagination">
-    <span>Showing 1 of 10</span>
-    <div class="pagination-controls">
-      <button class="pagination-btn prev-btn disabled">&lt;</button>
-      <button class="pagination-btn active">1</button>
-      <button class="pagination-btn">2</button>
-      <button class="pagination-btn">3</button>
-      <button class="pagination-btn">4</button>
-      <button class="pagination-btn next-btn">&gt;</button>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <span>Page <%= currentPage %> of <%= totalPages %></span>
+      <div class="pagination-controls">
+        <% if (currentPage > 1) { %>
+          <a href="/admin/users?page=<%= currentPage-1 %><%= search ? `&search=${search}` : '' %>" class="pagination-btn prev-btn">&lt;</a>
+        <% } else { %>
+          <span class="pagination-btn prev-btn disabled">&lt;</span>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="pagination-btn active"><%= i %></span>
+          <% } else { %>
+            <a href="/admin/users?page=<%= i %><%= search ? `&search=${search}` : '' %>" class="pagination-btn"><%= i %></a>
+          <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/admin/users?page=<%= currentPage+1 %><%= search ? `&search=${search}` : '' %>" class="pagination-btn next-btn">&gt;</a>
+        <% } else { %>
+          <span class="pagination-btn next-btn disabled">&gt;</span>
+        <% } %>
+      </div>
     </div>
-  </div>
+  <% } %>
 </div>
-<style>
-  /* Page Header */
-.page-header {
-  margin-bottom: 20px;
-}
+<script src="/js/admin/users.js"></script>
 
-.page-title h1 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 5px;
-}
-
-.page-title p {
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.breadcrumb {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 10px;
-}
-
-.breadcrumb a {
-  color: #666;
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  color: #ff6f61;
-}
-
-.divider {
-  margin: 0 5px;
-}
-</style>
 <%- include('../partials/admin/admin-footer') %>
