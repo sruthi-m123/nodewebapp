@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/user/userController");
 const passport =require("passport");
-const { ifAuthenticated ,redirectIfLoggedIn} = require("../middlewares/auth");
+const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require("../middlewares/auth");
+const {singleUpload, multiUpload}=require('../config/multer')
+
 
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -29,4 +31,10 @@ router.get('/auth/google',passport.authenticate('google',{scope:['profile','emai
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
   res.redirect('/')
 });
+//profile page
+router.get('/profile', isLoggedIn, userController.getProfile);
+
+// //product page
+// router.post('/add-product',singleUpload,userControllerController.addProduct);
+// router.post('/add-products', upload.products, userControllerController.addProducts);
 module.exports = router;

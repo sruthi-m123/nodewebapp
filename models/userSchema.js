@@ -7,6 +7,16 @@ const userSchema=new Schema({
         type:String,
         required:true
     },
+    firstname:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    lastname:{
+        type:String,
+        trim:true
+    },
+
     email :{
         type:String,
         required:true,
@@ -20,12 +30,25 @@ const userSchema=new Schema({
         default:null
       
     },
+    gender:{
+        type:String,
+       enum:['Male','Female','Other','Prefer not to say'],
+       default:'Prefer not to say '
+    },
+    avatar:{
+        type:String,
+        default:'/img/profile.jpg'
+    },
 googleId:{
     type:String,
     unique:true,
         sparse:true,
     required:false
     },
+    lastUpdated:{
+        type:Date,
+        default:'/img/profile.jpg'
+        },
     password:{
         type:String,
         required:false
@@ -80,5 +103,16 @@ searchHistory:[{
 }]
 
 })
+
+userSchema.pre('save',function(next){
+    if(this.isModified('name')){
+        const nameParts=this.name.split(' ');
+        this.firstName=nameParts[0]||'';
+        this.lastName=nameParts.slice(1).join(' ')||'';
+
+    }
+    next();
+})
+
 const User=mongoose.model("User",userSchema);
 module.exports= User;

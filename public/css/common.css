@@ -1,0 +1,152 @@
+/* Base Styles */
+:root {
+  --primary-color: #9e6d4e;
+  --secondary-color: #e8d5c0;
+  --accent-color: #c7a17a;
+  --dark-color: #333;
+  --light-color: #f9f4f1;
+  --text-color: #555;
+  --white: #fff;
+  --black: #000;
+  --font-primary: 'Playfair Display', serif;
+  --font-secondary: 'Poppins', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--text-color);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+p {
+  font-family: var(--font-secondary);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Buttons */
+.primary-btn {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 12px 30px;
+  border: none;
+  border-radius: 30px;
+  font-family: var(--font-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+.primary-btn:hover {
+  background: var(--dark-color);
+  transform: translateY(-2px);
+}
+
+.primary-btn.outline {
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.primary-btn.outline:hover {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--primary-color);
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secondary-btn:hover {
+  background: var(--white);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 5px;
+}
+
+.icon-btn:hover {
+  color: var(--dark-color);
+}
+
+/* Section Header */
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-size: 36px;
+  margin-bottom: 15px;
+  position: relative;
+  display: inline-block;
+}
+
+.section-header h2:after {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 3px;
+  background: var(--primary-color);
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section-header p {
+  color: var(--text-color);
+  font-size: 16px;
+}
+/* Add this to your common.css */
+:root {
+  /* ... existing variables ... */
+  --transition: all 0.3s ease;
+}
+
+/* Add smooth transitions for all interactive elements */
+a, button, i, .menu-toggle {
+  transition: var(--transition);
+}

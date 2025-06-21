@@ -1,44 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CHETTINAD- Premium Saree Botique</title>
-  <link rel="stylesheet" href="/css/common.css"> <!-- common for all pages -->
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CHETTINAD- Premium Saree Botique</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/header.css">
+    
+    <% if (typeof pageCSS !== "undefined") { %>
+      <link rel="stylesheet" href="/css/<%= pageCSS %>">
+    <% } %>
+  
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="navbar">
+      <div class="logo">CHETTINAD</div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="main-nav">
+        <a href="" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Collections</a>
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">Contact</a>
+      </nav>
+      
+      <%if (currentPath==="/"){%>
+        <div class="auth-links">
+          <a href="/signup" class="nav-link">Sign Up</a>
+          <a href="/login" class="nav-link">Log In</a>
+        </div>
+      <%}%>
 
-<% if (typeof pageCSS !== "undefined") { %>
-  <link rel="stylesheet" href="/css/<%= pageCSS %>">
-<% } %>
- 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-
-  <!-- Header -->
-  <header class="navbar">
-    <div class="logo">CHETTINAD</div>
-    <nav class="main-nav">
-      <a href="" class="nav-link">Home</a>
-      <a href="#" class="nav-link">Collections</a>
-      <a href="#" class="nav-link">About</a>
-      <a href="#" class="nav-link">Contact</a>
-    </nav>
-    <%if (currentPath==="/"){%>
-
-<div class="auth-links">
-  <a href="/signup" class="nav-link">Sign Up</a>
-  <a href="/login" class="nav-link">Log In</a>
-</div>
-    <%}%>
-
-    <div class="icons">
-      <i class="fas fa-search"></i>
-      <i class="far fa-heart"></i>
-      <i class="fas fa-user"></i>
-      <i class="fas fa-shopping-bag"></i>
+      <div class="desktop-icons">
+        <a href="#" class="icon-link"><i class="fas fa-search"></i></a>
+        <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
+        <a href="#" class="icon-link"><i class="fas fa-user"></i></a>
+        <a href="#" class="icon-link"><i class="fas fa-shopping-bag"></i></a>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle" aria-label="Toggle menu">
+        <span class="hamburger"></span>
+      </button>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+      <nav class="mobile-nav">
+        <a href="" class="nav-link mobile-nav-link">Home</a>
+        <a href="#" class="nav-link mobile-nav-link">Collections</a>
+        <a href="#" class="nav-link mobile-nav-link">About</a>
+        <a href="#" class="nav-link mobile-nav-link">Contact</a>
+        
+        <%if (currentPath==="/"){%>
+          <a href="/signup" class="nav-link mobile-nav-link">Sign Up</a>
+          <a href="/login" class="nav-link mobile-nav-link">Log In</a>
+        <%}%>
+      </nav>
+      
+      <div class="mobile-icons">
+        <a href="#" class="mobile-icon-link"><i class="fas fa-search"></i> Search</a>
+        <a href="#" class="mobile-icon-link"><i class="far fa-heart"></i> Wishlist</a>
+        <a href="#" class="mobile-icon-link"><i class="fas fa-user"></i> Profile</a>
+        <a href="#" class="mobile-icon-link"><i class="fas fa-shopping-bag"></i> Cart</a>
+      </div>
     </div>
-    <div class="menu-toggle">
-      <i class="fas fa-bars"></i>
-    </div>
-  </header>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const body = document.body;
+        
+        menuToggle.addEventListener('click', function() {
+          this.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+          body.classList.toggle('no-scroll');
+        });
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.mobile-nav-link, .mobile-icon-link').forEach(link => {
+          link.addEventListener('click', function() {
+            menuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            body.classList.remove('no-scroll');
+          });
+        });
+      });
+    </script>

@@ -1,5 +1,5 @@
 const User = require("../models/userSchema");
-const user=require("../models/userSchema");
+
 const userAuth= (req,res,next)=>{
     if(req.session.user){
         User.findById(req.session.user)
@@ -40,16 +40,32 @@ const ifAuthenticated=(req,res,next)=>{
     }
     next();
 }
-
-const redirectIfLoggedIn=(req,res,next)=>{
-    if(req.session.user){
-        res.redirect("/user/home");
+const redirectIfLoggedIn = (req, res, next) => {
+    if (req.session && req.session.user) {
+        return res.redirect("/user/home");
     }
-    next()
+    next();
+};
+const isLoggedIn=(req,res,next)=>{
+     // Check if session exists and has user data
+    if (req.session && req.session.user && req.session.user._id) {
+      return next();
+    }
+    // Redirect to login with message
+    return res.redirect('/login?error=not_logged_in');
 }
+const isNotLoggedIn=(req,res,next)=>{
+     if (!req.session || !req.session.user) {
+      return next();
+    }
+    res.redirect('/');
+  }
+
 module.exports={
     userAuth,
     adminAuth,
     ifAuthenticated,
-    redirectIfLoggedIn
+    redirectIfLoggedIn,
+    isLoggedIn,
+    isNotLoggedIn
 }

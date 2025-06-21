@@ -223,8 +223,22 @@ const login = async (req, res) => {
     if (!passwordMatch) {
       return res.render("login", { message: "Incorrect password" });
     }
-    req.session.user = findUser._id;
-    res.redirect("/");
+// Properly set session with user details
+    req.session.user = {
+      _id: findUser._id,
+      email: findUser.email,
+      isAdmin: findUser.isAdmin
+      // Add other user details you need in the session
+    };
+     // Explicitly save the session
+    req.session.save(err => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.render("user/login", { message: "Login failed. Please try again." });
+      }
+      res.redirect("/");
+    });
+    
   } catch (error) {
     console.error("login error", error);
     res.render("user/login", {
@@ -408,6 +422,27 @@ const resetforgotPassword = async (req, res) => {
   }
 };
 
+const getProfile=async(req,res)=>{
+  try {
+    const user=await User.findById(req.user._id)
+    .select('-password -googleId -isBlocked -isAdmin');
+    res.render('profile',{
+      user:{
+        firstName:user.firstName||'',
+        lastName:user.lastname||'',
+        email:user.email,
+        phone:user.email,
+        gender:user.gender||'Prefer not say',
+        avatar:user.avatar||'/img/profile.jpg'
+      }
+    })
+  } catch (error) {
+    console.error('Profile load error:',error);
+    res.redirect('/error')
+  };
+
+}
+
 module.exports = {
   loadHomepage,
   pageNotFound,
@@ -428,4 +463,5 @@ module.exports = {
   verifyOTP,
   resendForgotOtp,
   resetforgotPassword,
+  getProfile
 };

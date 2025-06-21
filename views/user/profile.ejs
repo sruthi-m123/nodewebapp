@@ -1,0 +1,100 @@
+<%- include('../partials/user/header') %>
+<link rel="stylesheet" href="/css/profile.css">
+
+<section class="profile-container">
+  <div class="settings-sidebar">
+    <div class="sidebar-header">
+      <div class="user-avatar">
+        <img src="/images/user-avatar.jpg" alt="User Avatar">
+      </div>
+      <h3>Sruthi M</h3>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="active">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </li>
+      <li>
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Addresses</span>
+      </li>
+      <li>
+        <i class="fas fa-shopping-bag"></i>
+        <span>Orders</span>
+      </li>
+      <li>
+        <i class="fas fa-heart"></i>
+        <span>Wishlist</span>
+      </li>
+    </ul>
+    <button class="logout-btn">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-header">
+      <h2>My Profile</h2>
+      <a href="#" class="edit-btn">
+        <i class="fas fa-pencil-alt"></i>
+        <span>Edit Profile</span>
+      </a>
+    </div>
+    
+    <div class="profile-box">
+      <div class="form-group profile-image">
+        <label>Profile Image</label>
+        <div class="image-upload">
+          <img src="/images/user-avatar.jpg" alt="Profile Image" class="profile-img">
+          <div class="upload-overlay">
+            <i class="fas fa-camera"></i>
+            <span>Change Photo</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>First Name</label>
+        <div class="input-field">
+          <input type="text" value="Sruthi" readonly>
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Last Name</label>
+        <div class="input-field">
+          <input type="text" value="M" readonly>
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Phone Number</label>
+        <div class="input-field">
+          <input type="text" value="+91-1234567890" readonly>
+          <i class="fas fa-phone"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Gender</label>
+        <div class="input-field">
+          <input type="text" value="Female" readonly>
+          <i class="fas fa-venus"></i>
+        </div>
+      </div>
+      
+      <div class="form-group email-box">
+        <label>Email Address</label>
+        <div class="input-field">
+          <input type="email" value="sruthi@example.com" readonly>
+          <i class="fas fa-envelope"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/user/footer') %>
