@@ -217,5 +217,5 @@ module.exports={
     updateCategory,
     deleteCategory,
     getCategoryDetails,
-    formatResponse 
+    // formatResponse 
 }

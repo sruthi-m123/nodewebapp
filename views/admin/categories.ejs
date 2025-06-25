@@ -1,10 +1,10 @@
 <%- include('../partials/admin/admin-header') %>
-<link rel="stylesheet" href="/public/css/admin/category.css">
+<link rel="stylesheet" href="/css/admin/category.css">
 <section class="category-page">
   <div class="section-header">
     <div class="header-content">
       <h2>Category Management</h2>
-      <p>Organize and manage your saree collections efficiently</p>
+      <p>Organize and manage your product categories</p>
     </div>
     <button class="primary-btn add-btn" id="addCategoryBtn">
       <i class="fas fa-plus-circle"></i> Add New Category
@@ -23,10 +23,6 @@
         <option value="inactive">Inactive</option>
       </select>
     </div>
-    <!-- <div class="table-actions">
-      <button class="action-btn export-btn"><i class="fas fa-file-export"></i> Export</button>
-      <button class="action-btn refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
-    </div> -->
   </div>
 
   <div class="category-table-container">
@@ -35,10 +31,9 @@
         <thead>
           <tr>
             <th class="sortable">No <i class="fas fa-sort"></i></th>
-            <th class="sortable">Category Name <i class="fas fa-sort"></i></th>
             <th>Image</th>
+            <th class="sortable">Category Name <i class="fas fa-sort"></i></th>
             <th>Description</th>
-           
             <th class="sortable">Status <i class="fas fa-sort"></i></th>
             <th>Actions</th>
           </tr>
@@ -48,31 +43,31 @@
           <tr>
             <td><%= index + 1 %></td>
             <td>
-              <div class="category-name">
-                <strong><%= category.name %></strong>
-                <!-- <span class="category-code"><%= category.code %></span> -->
+              <div class="category-image">
+<img src="<%= category.image || '/img/category/default-category.jpg' %>" alt="<%= category.name %>" onerror="this.src='/img/category/default-category.jpg'">
               </div>
             </td>
             <td>
-              <div class="category-image">
-                <img src="<%= category.image || '/img/category' %>" alt="<%= category.name %>" onerror="this.src='/img/default-category.jpg'">
+              <div class="category-name">
+                <strong><%= category.name %></strong>
+                <% if (category.code) { %>
+                  <span class="category-code"><%= category.code %></span>
+                <% } %>
               </div>
             </td>
             <td class="description-cell"><%= category.description %></td>
-           
             <td>
               <label class="status-toggle">
                 <input type="checkbox" <%= category.status === 'active' ? 'checked' : '' %> data-id="<%= category._id %>">
-                <span class="slider round <%= category.status === 'active' ? 'active' : 'inactive' %>"><%= category.status === 'active' ? 'Active' : 'Inactive' %></span>
+                <span class="slider-slider<%= category.status === 'active' ? 'active' : 'inactive' %>">
+                  <%= category.status === 'active' ? 'Active' : 'Inactive' %>
+                </span>
               </label>
             </td>
             <td>
               <div class="action-buttons">
                 <button class="icon-btn edit-btn" title="Edit" data-id="<%= category._id %>">
                   <i class="fas fa-edit"></i>
-                </button>
-                <button class="icon-btn view-btn" title="View" data-id="<%= category._id %>">
-                  <i class="fas fa-eye"></i>
                 </button>
                 <button class="icon-btn delete-btn" title="Delete" data-id="<%= category._id %>">
                   <i class="fas fa-trash-alt"></i>
@@ -127,9 +122,7 @@
           <label for="categoryName">Category Name</label>
           <input type="text" id="categoryName" name="name" placeholder="Enter category name" required>
         </div>
-        <div class="form-row">
-         
-        </div>
+
         <div class="form-group">
           <label for="categoryImage">Category Image</label>
           <div class="image-upload">
@@ -140,12 +133,12 @@
             <div class="image-preview"></div>
           </div>
         </div>
+
         <div class="form-group">
           <label for="categoryDesc">Description</label>
           <textarea id="categoryDesc" name="description" placeholder="Enter category description"></textarea>
         </div>
-       
-        </div> -->
+
         <div class="form-group switch-group">
           <label>Status</label>
           <label class="switch">
@@ -154,6 +147,7 @@
             <span class="switch-label">Active</span>
           </label>
         </div>
+
         <div class="form-actions">
           <button type="button" class="cancel-btn">Cancel</button>
           <button type="submit" class="submit-btn">Save Category</button>
@@ -162,5 +156,5 @@
     </div>
   </div>
 </div>
-<script src="/js/admin/categories.js"></script>
+<script src="/js/admin/category.js"></script>
 <%- include('../partials/admin/admin-footer') %>
