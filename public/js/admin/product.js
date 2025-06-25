@@ -20,7 +20,7 @@ const uploadArea = document.querySelector('.image-upload-area');
 let products = [
     {
         id: 1,
-        image: '/images/sample-product1.jpg',
+        image: '/img/admin-products.png',
         name: 'Gold Silk Saree',
         category: 'clothing',
         description: 'Beautiful traditional gold silk saree with intricate designs.',
@@ -34,7 +34,7 @@ let products = [
     },
     {
         id: 2,
-        image: '/images/sample-product2.jpg',
+        image: '/img/admin-products.png',
         name: 'Smartphone',
         category: 'electronics',
         description: 'Latest smartphone with advanced features.',
