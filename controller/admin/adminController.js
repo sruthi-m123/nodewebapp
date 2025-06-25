@@ -28,6 +28,13 @@ if(admin){
     const passwordMatch= await bcrypt.compare(password,admin.password);
 if(passwordMatch){
     req.session.admin=true;
+    req.session.admin = {
+          id: admin._id,
+          email: admin.email,
+          name: admin.name
+        };
+
+        // console.log('Session after login:', req.session); // ✅ Debug
     return res.redirect("/admin/dashboard")
 }else{
     return res.redirect("/login");
@@ -35,6 +42,7 @@ if(passwordMatch){
 }else{
     return res.redirect("/login")
 }
+
   }catch(error){
 console.log("login error",error);
 return res.redirect("/page_error")

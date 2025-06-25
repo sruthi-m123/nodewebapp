@@ -1,0 +1,157 @@
+<%- include('../partials/admin/admin-header') %>
+
+<div class="product-page">
+  <div class="product-header">
+    <h2>Products</h2>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for products" id="searchBox">
+      <button id="searchBtn">Search</button>
+      <button id="resetBtn">Reset</button>
+ <button class="demo-button" onclick="openModal()">Add Product +</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Image</th>
+          <th>Product Name</th>
+          <th>Amount</th>
+          <th>Price</th>
+          <th>Last Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTable">
+        <!-- Rows will be populated dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <button id="prevPage">&laquo;</button>
+    <button class="active">1</button>
+    <button>2</button>
+    <button>3</button>
+    <button id="nextPage">&raquo;</button>
+  </div>
+</div>
+ <!-- Enhanced Modal -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Product</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="productForm">
+                    <div class="form-grid">
+                        <!-- Basic Information -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Product Name *</label>
+                                <input type="text" name="productName" class="form-input" placeholder="Enter product name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select name="category" class="form-select">
+                                    <option value="">Select category</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="home">Home & Garden</option>
+                                    <option value="books">Books</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Product Image -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Product Image</label>
+                            <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
+                                <div class="upload-icon">📷</div>
+                                <div class="upload-text">Click to upload image</div>
+                                <div class="upload-subtext">Supports JPG, PNG, GIF up to 5MB</div>
+                                <input type="file" id="imageInput" name="image" class="file-input" accept="image/*">
+                            </div>
+                            <div class="image-preview" id="imagePreview">
+                                <img class="preview-image" id="previewImg" alt="Preview">
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Product Description</label>
+                            <textarea name="description" class="form-textarea" placeholder="Enter detailed product description..."></textarea>
+                        </div>
+
+                        <!-- Price and Stock -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Price (₹) *</label>
+                                <input type="number" name="price" class="form-input" placeholder="0.00" required min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stock Count *</label>
+                                <input type="number" name="stock" class="form-input" placeholder="0" required min="0">
+                            </div>
+                        </div>
+
+                        <!-- Color Variants -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Color Variants</label>
+                            <div class="color-variants">
+                                <div class="color-option" data-color="red">
+                                    <div class="color-circle" style="background: #ff3b30;"></div>
+                                    <span>Red</span>
+                                </div>
+                                <div class="color-option" data-color="blue">
+                                    <div class="color-circle" style="background: #007aff;"></div>
+                                    <span>Blue</span>
+                                </div>
+                                <div class="color-option" data-color="green">
+                                    <div class="color-circle" style="background: #34c759;"></div>
+                                    <span>Green</span>
+                                </div>
+                                <div class="color-option" data-color="black">
+                                    <div class="color-circle" style="background: #1c1c1e;"></div>
+                                    <span>Black</span>
+                                </div>
+                                <div class="color-option" data-color="white">
+                                    <div class="color-circle" style="background: #ffffff;"></div>
+                                    <span>White</span>
+                                </div>
+                                <div class="color-option" data-color="yellow">
+                                    <div class="color-circle" style="background: #ffcc00;"></div>
+                                    <span>Yellow</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Offer Section -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Special Offer</label>
+                            <div class="offer-section">
+                                <div class="offer-toggle" id="offerToggle"></div>
+                                <span>Enable offer</span>
+                                <input type="number" name="offerPercentage" class="form-input offer-input" id="offerInput" placeholder="%" min="0" max="100">
+                                <span>% off</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="submit-btn">Add Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script src="/js/admin/product.js"></script>
+<%- include('../partials/admin/admin-footer') %>

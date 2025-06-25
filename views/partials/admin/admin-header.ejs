@@ -18,7 +18,7 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="/images/admin-logo.png" alt="Chettinad Logo">
+        <img src="/img/logo.png" alt="Chettinad Logo">
         <!-- <span>Chettinad</span> -->
       </div>
       <i class="fas fa-chevron-left toggle-sidebar"></i>
@@ -58,12 +58,12 @@
           <a href="/admin/products" class="menu-item">
             <span class="menu-text">All Products</span>
           </a>
-          <a href="/admin/products/add" class="menu-item">
+          <!-- <a href="/admin/products/add" class="menu-item">
             <span class="menu-text">Add New</span>
           </a>
           <a href="/admin/products/inventory" class="menu-item">
             <span class="menu-text">Inventory</span>
-          </a>
+          </a> -->
         </div>
       </div>
       
@@ -111,7 +111,7 @@
       </div>
       
       <div class="admin-logo">
-        <img src="/img/admin/admin-logo" >
+        <img src="/img/admin/logo" >
         <!-- <span>Admin Panel</span> -->
       </div>
       
@@ -142,7 +142,7 @@
         </div>
         
         <div class="breadcrumb">
-          <a href="/admin/dashboard">Home</a>
+          <a href="/admin">Home</a>
           <span class="divider">/</span>
           <a href="/admin/categories">Categories</a>
           <span class="divider">/</span>
@@ -150,3 +150,9 @@
         </div>
       </div>
       </html>
+      <style>
+        @media (max-width: 768px) {
+  .hamburger { display: block !important; }
+  .sidebar:not(.mobile-show) { transform: translateX(-100%); }
+}
+      </style>

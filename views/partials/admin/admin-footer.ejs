@@ -1,6 +1,51 @@
     </div> <!-- Close content-wrapper -->
   </div> <!-- Close main-content -->
+//sidebar Toggle
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Sidebar toggle
+  const toggleSidebar = document.querySelector('.toggle-sidebar');
+  const sidebar = document.querySelector('.sidebar');
+  
+  toggleSidebar.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+    this.classList.toggle('fa-chevron-left');
+    this.classList.toggle('fa-chevron-right');
+  });
+  
+  // Hamburger menu for mobile
+  document.querySelector('.hamburger').addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-show');
+  });
+});
+</script>
+//submenu toggle(categories/products)
+<script>
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  toggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    const submenu = this.closest('.has-submenu').querySelector('.submenu');
+    submenu.classList.toggle('active');
+    this.classList.toggle('fa-chevron-right');
+    this.classList.toggle('fa-chevron-down');
+  });
+});
+</script>
+//user dropdown
+<script>
+const userProfile = document.querySelector('.user-profile');
+userProfile.addEventListener('click', function() {
+  this.querySelector('.user-dropdown').classList.toggle('show');
+});
 
-  <script src="/js/admin/categories.js"></script>
+// Close when clicking outside
+document.addEventListener('click', function(e) {
+  if (!userProfile.contains(e.target)) {
+    userProfile.querySelector('.user-dropdown').classList.remove('show');
+  }
+});
+</script>
+//
+  <!-- <script src="/js/admin/categories.js"></script> -->
 </body>
 </html>

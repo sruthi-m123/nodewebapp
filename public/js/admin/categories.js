@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const deleteButtons = document.querySelectorAll('.delete-btn');
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
   const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-  const categoryIdToDelete = document.getElementById('categoryIdToDelete');
+  const categoryIdInput = document.getElementById('deleteCategoryId');
+// const searchInput = document.querySelector('.search-input');
+  // const categoryIdToDelete = document.getElementById('categoryIdToDelete');
   const sortableHeaders = document.querySelectorAll('th.sortable');
 
   // === Initialize ===

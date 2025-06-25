@@ -6,11 +6,12 @@ const { v4: uuidv4 } = require('uuid');
 // Configure storage destinations
 const getUploadPath = (uploadType) => {
   const paths = {
-    avatar: 'public/uploads/avatars',
-    product: 'public/uploads/products',
-    category: 'public/uploads/categories',
-    banner: 'public/uploads/banners',
-    review: 'public/uploads/reviews'
+     avatar: 'public/img/admin/admin-avatar',
+    product: 'public/img/admin/products',
+    category: 'public/img/category',  
+     review: 'public/img/admin/reviews',
+    admin: 'public/img/admin',
+    logo:'public/img/admin/logo'
   };
   
   // Create directory if it doesn't exist
@@ -49,7 +50,6 @@ const storage = multer.diskStorage({
     if (file.fieldname === 'avatar') uploadType = 'avatar';
     else if (file.fieldname === 'productImages') uploadType = 'product';
     else if (file.fieldname === 'categoryImage') uploadType = 'category';
-    else if (file.fieldname === 'bannerImage') uploadType = 'banner';
     
     cb(null, `${uploadType}-${uniqueId}${fileExt}`);
   }
