@@ -1,221 +1,207 @@
-// import { findPackageJSON } from 'module';
-
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-// const fs = require('fs'); // Added for file system operations
-// const path = require('path'); // Added for path operations
-const formatResponse = (success, message, data = null) => {
-  return {
-    success,
-    alert: {
-      title: success ? 'Success' : 'Error',
-      text: message,
-      icon: success ? 'success' : 'error'
-    },
-    data
-  };
-};
-const getAllCategories=async(req,res)=>{
-    try {
-      const page=parseInt(req.query.page)||1;
-      const limit=10;
-      const skip=(page-1)*limit;
-      
-      const totalCategories=await Category.countDocuments();
-      const categories=await Category.find()
-      .skip(skip)
-      .limit(limit)
-      .sort({createdAt:-1});
 
-      res.render('admin/categories',{
-        categories,
-        currentPage:page,
-        totalPages:Math.ceil(totalCategories/limit),
-totalCategories,
-startItem:skip+1,
-endItem:Math.min(skip+limit,totalCategories)
-      })
-
-    } catch (err) {
-    console.error(err);
-    res.redirect('/admin/categories?alert=' + 
-      encodeURIComponent(JSON.stringify({
-        title: 'Error',
-        text: 'Failed to load categories',
-        icon: 'error'
-      }))
-  )}
-}
-//get single category for editing
-const getCategory=async (req,res)=>{
-    try {
-     const category=await Category.findById(req.params.id);   
-     if(!category){
-        return res.status(404).json({success:false,message:'Categrory not found'});
-     }
-    //  res.json('admin/category',{category});
-     res.status(200).json({success:true,data:category});
-} catch (error) {
-        console.error(error);
-        res.status(500).json({success:false,message:'Server Error'});
-    }
-
-}
-const getCategoryDetails=async(req,res)=>{
-    try {
-        const category=await Category.findById(req.params.id);
-        if(!category){
-return res.status(404).json(formatResponse(false, 'Category not found'));
-                    }
-
-const productCount=await Product.countDocuments({category:req.params.id});
-const viewCount=0;
-const salesCount=0;
-
-res.json({
-    success:true,
-    category,
-    stats:{
-        productCount,
-        viewCount,
-        salesCount
-    }
-
+const formatResponse = (success, message, data = {}) => ({
+  success,
+  alert: { title: success ? 'Success' : 'Error', text: message, icon: success ? 'success' : 'error' },
+  ...data,
 });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({success:false,message:'server error'});
-    }
-}
-const addCategory=async(req,res)=>{
-    try {
-     const{name,code,description,status}=req.body;
-     const existingCategory = await Category.findOne({ name: name.trim().toLowerCase() }); 
-     if (existingCategory) {
-      return res.status(400).json({
-        success: false,
-alert: {
-      title: 'Error',
-      text: 'Category with this name already exists',
-      icon: 'error'
-    }      });
-    }
-     
-     let imagePath=''  ;
-     if(req.file){
-        imagePath='/img/admin/category/'+req.file.filename;
+// Get all categories
+const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const startItem = (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, categories.length);
+    const totalCategories = categories.length;
+    const totalPages = Math.ceil(totalCategories / limit);
 
-     } 
-     const newCategory=new Category({
-        name :name.trim().toLowerCase(),
-        code,
-        description,
-                status,
-        image:imagePath
-     });
-     await newCategory.save();
-return res.status(201).json({
-      success: true,
-      alert: {
-        title: 'Success',
-        text: 'Category added successfully!',
-        icon: 'success'
-      }
+    res.render('admin/categories', {
+      categories,
+      startItem,
+      endItem,
+      totalCategories,
+      currentPage: page,
+      totalPages,
     });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({success:false,message:'error adding category'});
-    }
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json(formatResponse(false, 'Error fetching categories'));
+  }
 };
 
-const updateCategoryStatus=async(req,res)=>{
-   try {
-   const {status}=req.body;
-   const category=await Category.findByIdAndUpdate(
-    req.params.id,
-    {status},
-    {new:true}
-   ) ;
+// Get a single category by ID
+const getCategory = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
     if (!category) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
+      return res.status(404).json(formatResponse(false, 'Category not found'));
     }
+    res.json(category);
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    res.status(500).json(formatResponse(false, 'Error fetching category'));
+  }
+};
+
+// Add a new category
+const addCategory = async (req, res) => {
+  try {
+    if (req.fileValidationError) {
+      return res.status(400).json(formatResponse(false, req.fileValidationError.message));
+    }
+
+    const { name, code, description, status, croppedImage } = req.body;
+    if (!name || name.trim() === '') {
+      return res.status(400).json(formatResponse(false, 'Category name is required'));
+    }
+
+    const existingCategory = await Category.findOne({ name: name.trim().toLowerCase() });
+    if (existingCategory) {
+      return res.status(400).json(formatResponse(false, 'Category with this name already exists'));
+    }
+
+    let imagePath = '';
+    if (req.file) {
+      imagePath = `/img/admin/category/${req.file.filename}`;
+      console.log('Image saved from file upload:', imagePath);
+    } else if (croppedImage && croppedImage.startsWith('data:image/')) {
+      const base64Data = croppedImage.replace(/^data:image\/(jpeg|png|jpg);base64,/, '');
+      const filename = `cropped-${Date.now()}.jpg`;
+      const filePath = `public/img/admin/category/${filename}`;
+      const fs = require('fs');
+      if (!fs.existsSync('public/img/admin/category/')) {
+        fs.mkdirSync('public/img/admin/category/', { recursive: true });
+      }
+      fs.writeFileSync(filePath, base64Data, 'base64');
+      imagePath = `/img/admin/category/${filename}`;
+      console.log('Image saved from base64:', imagePath);
+    }
+
+    const newCategory = new Category({
+      name: name.trim().toLowerCase(),
+      code: code || '',
+      description: description || '',
+      status: status || 'active',
+      image: imagePath,
+    });
+    await newCategory.save();
+    return res.status(201).json(formatResponse(true, 'Category added successfully'));
+  } catch (error) {
+    console.error('Error adding category:', error);
+    res.status(500).json(formatResponse(false, error.message || 'Error adding category'));
+  }
+};
+// Update category status
+const updateCategoryStatus = async (req, res) => {
+  try {
     
-    res.json( formatResponse(true, 'Status updated successfully', { category }));
+    const { categoryId } = req.params; // Use categoryId from params
+    const { status } = req.body;
 
-   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error updating status' });
-  
-   }
-}
-
-const updateCategory=async(req,res)=>{
-    try {
-        const{name,code,description,status}=req.body;
-        const updateData={
-            name,
-            code,
-            description,
-             status:status||'active'
-        };
-        if(req.file){
-            updateData.image='/img/category/'+req.file.filename;
-        }
-        const category=await Category.findByIdAndUpdate(
-            req.params.id,
-            updateData,
-            {new:true}
-        );
-if(!category){
-    return res.status(404).json({success:false,message:'Error updating category'});
-
-}
-return res.json(
-  formatResponse(true, 'Category updated successfully', { category })
-);
-
-    } catch (error) {
-       console.log(error);
-       res.status(500).json({success:false,message:'error updating category'});
-
+    // Validate status
+    if (!['active', 'inactive'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        alert: { title: 'Validation Error', text: 'Invalid status value', icon: 'error' },
+      });
     }
-}
-const deleteCategory=async(req,res)=>{
-    try {
-       const productCount=await Product.countDocuments({category:req.params.id});
-       if(productCount>0){
-        return res.status(400).json(
-  formatResponse(false, 'Cannot delete category with associated products', {
-    productCount
-  })
-);
-       } 
 
-const category=await Category.findByIdAndDelete(req.params.id);
-if(!category){
-return res.status(404).json(
-        formatResponse(false, 'Category not found')
-      );
-}
-return res.json(
-  formatResponse(true, 'Category deleted successfully')
-);
+    // Update category status
+    const category = await Category.findByIdAndUpdate(
+      categoryId, // Use categoryId instead of req.params.id
+      { status },
+    );
 
-    } catch (error) {
-        console.error(error);
-res.status(500).json(
-      formatResponse(false, error.message || 'Error deleting category')
-    );    }
-}
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        alert: { title: 'Not Found', text: 'Category not found', icon: 'error' },
+      });
+    }
 
-module.exports={
+    res.json({
+      success: true,
+      alert: { title: 'Success', text: 'Status updated successfully', icon: 'success' },
+    });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({
+      success: false,
+      alert: { title: 'Server Error', text: error.message || 'Error updating status', icon: 'error' },
+    });
+  }
+};
+
+// Update a category
+const updateCategory = async (req, res) => {
+  try {
+    if (req.fileValidationError) {
+      return res.status(400).json(formatResponse(false, req.fileValidationError.message));
+    }
+    const { name, code, description, status } = req.body;
+    if (!name || name.trim() === '') {
+      return res.status(400).json(formatResponse(false, 'Category name is required'));
+    }
+
+    const updateData = {
+      name: name.trim().toLowerCase(),
+      code: code || '',
+      description: description || '',
+      status: status || 'active',
+    };
+
+    if (req.file) {
+      updateData.image = `/img/admin/category/${req.file.filename}`;
+    } else {
+      const existingCategory = await Category.findById(req.params.id);
+      if (existingCategory) {
+        updateData.image = existingCategory.image; // Retain existing image
+      }
+    }
+
+    const category = await Category.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!category) {
+      return res.status(404).json(formatResponse(false, 'Category not found'));
+    }
+    return res.json(formatResponse(true, 'Category updated successfully', { category }));
+  } catch (error) {
+    console.error('Error updating category:', error);
+    res.status(500).json(formatResponse(false, error.message || 'Error updating category'));
+  }
+};
+
+// Delete a category
+const deleteCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.body;
+    if (!categoryId) {
+      return res.status(400).json(formatResponse(false, 'Category ID is required'));
+    }
+
+    const productCount = await Product.countDocuments({ category: categoryId });
+    if (productCount > 0) {
+      return res.status(400).json(formatResponse(false, `Cannot delete category with ${productCount} associated products`));
+    }
+
+    const category = await Category.findByIdAndDelete(categoryId);
+    if (!category) {
+      return res.status(404).json(formatResponse(false, 'Category not found'));
+    }
+    return res.json(formatResponse(true, 'Category deleted successfully'));
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    res.status(500).json(formatResponse(false, error.message || 'Error deleting category'));
+  }
+};
+
+module.exports = {
   getAllCategories,
-    getCategory,
-   addCategory,
-    updateCategoryStatus,
-    updateCategory,
-    deleteCategory,
-    getCategoryDetails,
-    // formatResponse 
-}
+  getCategory,
+  addCategory,
+  updateCategoryStatus,
+  updateCategory,
+  deleteCategory,
+};

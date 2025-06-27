@@ -18,14 +18,12 @@ router.get("/logout",adminController.logout);
 router.get("/users",adminAuth,customerController.customerInfo);
 router.post("/toggle_block",adminAuth,customerController.toggleBlockStatus);
 // category Managment
-router.get('/categories', adminAuth,catController.getAllCategories);
+router.get('/categories', adminAuth, catController.getAllCategories);
 router.post('/addCategory', adminAuth, singleUpload, catController.addCategory);
-//id based routes
-// router.get('/categories/:id/details', adminAuth, catController.getCategoryDetails);
-router.put('/categories/:id/status', adminAuth, catController.updateCategoryStatus);
-router.post('/categories/:id/update', adminAuth, singleUpload, catController.updateCategory);
-router.delete('/categories/:id', adminAuth, catController.deleteCategory);
 router.get('/categories/:id', adminAuth, catController.getCategory);
+router.post('/categories/status/:categoryId', adminAuth, catController.updateCategoryStatus);
+router.post('/categories/:id/update', adminAuth, singleUpload, catController.updateCategory);
+router.post('/categories/delete', adminAuth, catController.deleteCategory);
 //product routes
 router.get('/products', adminAuth, productController.renderProducts);
 router.get('/products/add', adminAuth, productController.renderForm);

@@ -1,5 +1,9 @@
 <%- include('../partials/admin/admin-header') %>
 <link rel="stylesheet" href="/css/admin/category.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <section class="category-page">
   <div class="section-header">
     <div class="header-content">
@@ -44,7 +48,7 @@
             <td><%= index + 1 %></td>
             <td>
               <div class="category-image">
-<img src="<%= category.image || '/img/category/default-category.jpg' %>" alt="<%= category.name %>" onerror="this.src='/img/category/default-category.jpg'">
+                <img src="<%= category.image || '/img/category/default-category.jpg' %>" alt="<%= category.name %>" class="category-img" onerror="this.src='/img/category/default-category.jpg'">
               </div>
             </td>
             <td>
@@ -55,11 +59,11 @@
                 <% } %>
               </div>
             </td>
-            <td class="description-cell"><%= category.description %></td>
+            <td class="description-cell"><%= category.description || 'No description' %></td>
             <td>
               <label class="status-toggle">
                 <input type="checkbox" <%= category.status === 'active' ? 'checked' : '' %> data-id="<%= category._id %>">
-                <span class="slider-slider<%= category.status === 'active' ? 'active' : 'inactive' %>">
+                <span class="status-slider round <%= category.status === 'active' ? 'active' : 'inactive' %>">
                   <%= category.status === 'active' ? 'Active' : 'Inactive' %>
                 </span>
               </label>
@@ -109,20 +113,19 @@
   </div>
 </section>
 
-<!-- Add Category Modal -->
+<!-- Add/Edit Category Modal -->
 <div class="modal-overlay" id="categoryModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Add New Category</h3>
-      <button class="close-modal">&times;</button>
+      <h3 id="modalTitle">Add New Category</h3>
+      <button class="close-modal" aria-label="Close modal">×</button>
     </div>
     <div class="modal-body">
-      <form id="categoryForm" action="/admin/categories" method="POST" enctype="multipart/form-data">
+      <form id="categoryForm" action="/admin/addCategory" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label for="categoryName">Category Name</label>
-          <input type="text" id="categoryName" name="name" placeholder="Enter category name" required>
+          <input type="text" id="categoryName" name="name" placeholder="Enter category name" required aria-required="true">
         </div>
-
         <div class="form-group">
           <label for="categoryImage">Category Image</label>
           <div class="image-upload">
@@ -130,24 +133,29 @@
               <i class="fas fa-cloud-upload-alt"></i> Choose Image
             </label>
             <input type="file" id="categoryImage" name="image" accept="image/*">
-            <div class="image-preview"></div>
+            <div class="image-preview" id="imagePreview">
+              <div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>
+              <canvas id="cropCanvas" style="display: none;"></canvas>
+            </div>
+            <div class="crop-controls" style="display: none; margin-top: 10px;">
+              <button type="button" class="crop-btn" id="cropButton">Crop Image</button>
+              <button type="button" class="cancel-crop-btn" id="cancelCropButton">Cancel Crop</button>
+            </div>
+            <input type="hidden" name="croppedImage" id="croppedImage">
           </div>
         </div>
-
         <div class="form-group">
           <label for="categoryDesc">Description</label>
           <textarea id="categoryDesc" name="description" placeholder="Enter category description"></textarea>
         </div>
-
         <div class="form-group switch-group">
-          <label>Status</label>
+          <label for="categoryStatus">Status</label>
           <label class="switch">
             <input type="checkbox" id="categoryStatus" name="status" checked>
-            <span class="slider round"></span>
+            <span class="slider-round">Active</span>
             <span class="switch-label">Active</span>
           </label>
         </div>
-
         <div class="form-actions">
           <button type="button" class="cancel-btn">Cancel</button>
           <button type="submit" class="submit-btn">Save Category</button>
@@ -156,12 +164,13 @@
     </div>
   </div>
 </div>
+
 <!-- Delete Confirmation Modal -->
-<div class="modal-overlay" id="deleteModal" style="display: none;">
+<div class="modal-overlay" id="deleteConfirmationModal">
   <div class="modal-content confirm-modal">
     <div class="modal-header">
       <h3>Confirm Deletion</h3>
-      <button class="close-modal">&times;</button>
+      <button class="close-modal" aria-label="Close modal">×</button>
     </div>
     <div class="modal-body">
       <p>Are you sure you want to delete this category? This action cannot be undone.</p>
@@ -175,5 +184,637 @@
     </div>
   </div>
 </div>
-<script src="/js/admin/categories.js"></script>
-<%- include('../partials/admin/admin-footer') %> 
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log('Script loaded at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug with IST timestamp
+
+    // === DOM Elements ===
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const categoryModal = document.getElementById('categoryModal');
+    const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+    const closeModalBtns = document.querySelectorAll('.close-modal, .cancel-btn');
+    const categoryForm = document.getElementById('categoryForm');
+    const deleteForm = document.getElementById('deleteForm');
+    const imagePreview = document.getElementById('imagePreview'); // Updated to match HTML ID
+    const cropCanvas = document.getElementById('cropCanvas');
+    const cropControls = document.querySelector('.crop-controls');
+    const cropButton = document.getElementById('cropButton');
+    const cancelCropButton = document.getElementById('cancelCropButton');
+    const croppedImageInput = document.getElementById('croppedImage');
+    const categoryImageInput = document.getElementById('categoryImage');
+    const searchInput = document.querySelector('.search-input');
+    const filterSelect = document.querySelector('.filter-select');
+    const statusToggles = document.querySelectorAll('.status-toggle input');
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteCategoryId = document.getElementById('deleteCategoryId');
+    const sortableHeaders = document.querySelectorAll('th.sortable');
+
+    let cropper;
+
+    // === Validate DOM Elements ===
+    if (!addCategoryBtn || !categoryModal || !imagePreview || !cropButton || !cancelCropButton) {
+      console.error('Missing required DOM elements:', {
+        addCategoryBtn, categoryModal, imagePreview, cropButton, cancelCropButton
+      });
+      Swal.fire({
+        title: 'Error',
+        text: 'Page elements missing. Please contact support.',
+        icon: 'error',
+      });
+      return;
+    }
+
+    // === Initialize ===
+    initImageErrorHandling();
+    initSortableHeaders();
+    initKeyboardNavigation();
+
+    // === Add Category Modal ===
+    addCategoryBtn.addEventListener('click', () => {
+      try {
+        console.log('Add Category button clicked'); // Debug
+        console.log('Initial modal display:', categoryModal.style.display); // Debug
+
+        // Reset form
+        categoryForm.reset();
+        console.log('Form reset'); // Debug
+        imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
+        console.log('Image preview reset'); // Debug
+
+        // Reset status
+        const statusCheckbox = document.getElementById('categoryStatus');
+        if (statusCheckbox) {
+          statusCheckbox.checked = true;
+          console.log('Status checkbox set to checked'); // Debug
+        } else {
+          console.warn('Status checkbox not found');
+        }
+
+        const switchLabel = document.querySelector('.switch-label');
+        if (switchLabel) {
+          switchLabel.textContent = 'Active';
+          console.log('Switch label set to Active'); // Debug
+        } else {
+          console.warn('Switch label not found');
+        }
+
+        const slider = document.querySelector('.slider-round');
+        if (slider) {
+          slider.className = 'slider-round';
+          slider.textContent = 'Active';
+          console.log('Slider class set to slider-round'); // Debug
+        } else {
+          console.warn('Slider not found');
+        }
+
+        categoryForm.action = '/admin/addCategory';
+        console.log('Form action set to /admin/addCategory'); // Debug
+
+        const modalHeader = document.querySelector('.modal-header h3');
+        if (modalHeader) {
+          modalHeader.textContent = 'Add New Category';
+          console.log('Modal header set to Add New Category'); // Debug
+        } else {
+          console.warn('Modal header not found');
+        }
+
+        // Show modal
+        requestAnimationFrame(() => {
+          categoryModal.classList.add('active');
+          categoryModal.style.display = 'flex';
+          categoryModal.style.visibility = 'visible';
+          categoryModal.style.opacity = '1';
+          console.log('Modal set to display: flex, visibility: visible, opacity: 1, class: active'); // Debug
+        });
+
+        const categoryName = document.getElementById('categoryName');
+        if (categoryName) {
+          categoryName.focus();
+          console.log('Focus set to categoryName input'); // Debug
+        } else {
+          console.warn('Category name input not found');
+        }
+        if (cropper) cropper.destroy();
+        cropControls.style.display = 'none';
+      } catch (error) {
+        console.error('Error opening add category modal:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to open modal. Please try again.',
+          icon: 'error',
+        });
+      }
+    });
+
+    // === Image Preview and Cropping ===
+    categoryImageInput.addEventListener('change', function () {
+      console.log('Image input changed at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug
+      const file = this.files[0];
+      if (file) {
+        console.log('File selected:', file); // Debug
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          console.log('Reader loaded:', e.target.result); // Debug
+          imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="preview-image">`;
+          const img = imagePreview.querySelector('img');
+          if (!img) {
+            console.error('Image element not found in preview');
+            return;
+          }
+          if (cropper) cropper.destroy();
+          try {
+            cropper = new Cropper(img, {
+              aspectRatio: 1,
+              viewMode: 1,
+              dragMode: 'move',
+              guides: true,
+              cropBoxResizable: true,
+              toggleDragModeOnDblclick: false,
+            });
+            console.log('Cropper initialized successfully'); // Debug
+            cropControls.style.display = 'block';
+          } catch (error) {
+            console.error('Failed to initialize Cropper:', error);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
+        if (cropper) cropper.destroy();
+        cropControls.style.display = 'none';
+      }
+    });
+
+    if (cropButton) {
+      cropButton.addEventListener('click', () => {
+        console.log('Crop button clicked at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug
+        if (cropper) {
+          try {
+            const canvas = cropper.getCroppedCanvas({
+              width: 200,
+              height: 200,
+            });
+            if (canvas) {
+              console.log('Cropped canvas created'); // Debug
+              canvas.toBlob((blob) => {
+                console.log('Cropped blob:', blob); // Debug
+                const croppedFile = new File([blob], 'cropped-image.jpg', { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+                categoryImageInput.files = dataTransfer.files;
+                croppedImageInput.value = canvas.toDataURL('image/jpeg');
+                imagePreview.innerHTML = canvas.outerHTML;
+                cropControls.style.display = 'none';
+                if (cropper) cropper.destroy();
+                console.log('Crop completed'); // Debug
+              }, 'image/jpeg', 0.9);
+            } else {
+              console.error('Failed to get cropped canvas');
+            }
+          } catch (error) {
+            console.error('Error during cropping:', error);
+          }
+        } else {
+          console.error('Cropper instance not available');
+        }
+      });
+    } else {
+      console.error('Crop button not found');
+    }
+
+    if (cancelCropButton) {
+      cancelCropButton.addEventListener('click', () => {
+        console.log('Cancel crop clicked at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug
+        if (cropper) cropper.destroy();
+        categoryImageInput.value = '';
+        imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
+        cropControls.style.display = 'none';
+        console.log('Crop cancelled'); // Debug
+      });
+    } else {
+      console.error('Cancel crop button not found');
+    }
+
+    // === Form Submission (Add/Edit Category) ===
+    categoryForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const submitButton = this.querySelector('.submit-btn');
+      const originalText = submitButton.innerHTML;
+
+      // Client-side validation
+      const categoryName = document.getElementById('categoryName').value.trim();
+      if (!categoryName) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Category name is required',
+          icon: 'error',
+        });
+        return;
+      }
+
+      try {
+        setLoading(submitButton, true);
+        const formData = new FormData(this);
+        formData.set('status', document.getElementById('categoryStatus').checked ? 'active' : 'inactive');
+
+        const response = await fetch(this.action, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Expected JSON response from server');
+        }
+
+        const data = await response.json();
+
+        Swal.fire({
+          title: data.alert.title,
+          text: data.alert.text,
+          icon: data.alert.icon,
+        });
+
+        if (data.success) {
+          setTimeout(() => {
+            categoryModal.classList.remove('active');
+            categoryModal.style.display = 'none';
+            window.location.reload();
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to save category. Please try again.',
+          icon: 'error',
+        });
+      } finally {
+        setLoading(submitButton, false, originalText);
+      }
+    });
+
+    // === Modal Controls ===
+    closeModalBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        categoryModal.classList.remove('active');
+        categoryModal.style.display = 'none';
+        deleteConfirmationModal.classList.remove('active');
+        deleteConfirmationModal.style.display = 'none';
+        if (cropper) cropper.destroy();
+        cropControls.style.display = 'none';
+      });
+    });
+
+    window.addEventListener('click', e => {
+      if (e.target === categoryModal) {
+        categoryModal.classList.remove('active');
+        categoryModal.style.display = 'none';
+      }
+      if (e.target === deleteConfirmationModal) {
+        deleteConfirmationModal.classList.remove('active');
+        deleteConfirmationModal.style.display = 'none';
+      }
+      if (cropper) cropper.destroy();
+      cropControls.style.display = 'none';
+    });
+
+    // === Status Toggle ===
+    statusToggles.forEach(toggle => {
+      toggle.addEventListener('change', async function () {
+        const categoryId = this.getAttribute('data-id');
+        const newStatus = this.checked ? 'active' : 'inactive';
+        const statusSpan = this.nextElementSibling;
+        const originalChecked = this.checked;
+
+        try {
+          document.body.classList.add('freeze-layout');
+          statusSpan.style.transition = 'none';
+          const response = await fetch(`/admin/categories/status/${categoryId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus }),
+          });
+
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Expected JSON response from server');
+          }
+
+          const data = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.alert.text || 'Failed to update status');
+          }
+
+          requestAnimationFrame(() => {
+            statusSpan.className = `status-slider round ${newStatus}`;
+            statusSpan.textContent = newStatus === 'active' ? 'Active' : 'Inactive';
+            statusSpan.style.backgroundColor = newStatus === 'active' ? '#2ecc71' : '#e74c3c';
+
+            setTimeout(() => {
+              statusSpan.style.transition = '';
+              document.body.classList.remove('freeze-layout');
+            }, 50);
+          });
+
+          Swal.fire({
+            title: data.alert.title,
+            text: data.alert.text,
+            icon: data.alert.icon,
+          });
+        } catch (error) {
+          console.error('Error:', error);
+          this.checked = !originalChecked; // Revert toggle
+          statusSpan.className = `status-slider round ${originalChecked ? 'active' : 'inactive'}`;
+          statusSpan.textContent = originalChecked ? 'Active' : 'Inactive';
+          statusSpan.style.backgroundColor = originalChecked ? '#2ecc71' : '#e74c3c';
+          document.body.classList.remove('freeze-layout');
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'Failed to update status',
+            icon: 'error',
+          });
+        }
+      });
+    });
+
+    // === Edit Category ===
+    editButtons.forEach(button => {
+      button.addEventListener('click', async function () {
+        const categoryId = this.getAttribute('data-id');
+
+        try {
+          const response = await fetch(`/admin/categories/${categoryId}`);
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Expected JSON response from server');
+          }
+
+          const data = await response.json();
+          if (!data._id) {
+            throw new Error('Category data not found');
+          }
+
+          document.getElementById('categoryName').value = data.name || '';
+          document.getElementById('categoryDesc').value = data.description || '';
+          document.getElementById('categoryStatus').checked = data.status === 'active';
+
+          const switchLabel = document.querySelector('.switch-label');
+          if (switchLabel) {
+            switchLabel.textContent = data.status === 'active' ? 'Active' : 'Inactive';
+          }
+
+          const slider = document.querySelector('.slider-round');
+          if (slider) {
+            slider.className = 'slider-round';
+            slider.textContent = data.status === 'active' ? 'Active' : 'Inactive';
+          }
+
+          if (imagePreview) {
+            if (data.image) {
+              imagePreview.innerHTML = `<img src="${data.image}" alt="Preview" class="preview-image" onerror="this.src='/img/category/default-category.jpg'">`;
+              const img = imagePreview.querySelector('img');
+              if (!img) {
+                console.error('Image element not found for editing');
+                return;
+              }
+              if (cropper) cropper.destroy();
+              try {
+                cropper = new Cropper(img, {
+                  aspectRatio: 1,
+                  viewMode: 1,
+                  dragMode: 'move',
+                  guides: true,
+                  cropBoxResizable: true,
+                  toggleDragModeOnDblclick: false,
+                });
+                console.log('Cropper initialized for edit mode');
+                cropControls.style.display = 'block';
+              } catch (error) {
+                console.error('Failed to initialize Cropper in edit mode:', error);
+              }
+            } else {
+              imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
+              if (cropper) cropper.destroy();
+              cropControls.style.display = 'none';
+            }
+          }
+
+          categoryForm.action = `/admin/categories/${categoryId}/update`;
+          document.querySelector('.modal-header h3').textContent = 'Edit Category';
+          
+          requestAnimationFrame(() => {
+            categoryModal.classList.add('active');
+            categoryModal.style.display = 'flex';
+            categoryModal.style.visibility = 'visible';
+            categoryModal.style.opacity = '1';
+            console.log('Edit modal set to display: flex, visibility: visible, opacity: 1, class: active'); // Debug
+          });
+
+          document.getElementById('categoryName').focus();
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'Failed to load category data',
+            icon: 'error',
+          });
+        }
+      });
+    });
+
+    // === Delete Category ===
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const categoryId = this.getAttribute('data-id');
+        if (!categoryId) {
+          Swal.fire({
+            title: 'Error',
+            text: 'Invalid category ID',
+            icon: 'error',
+          });
+          return;
+        }
+        deleteCategoryId.value = categoryId;
+        requestAnimationFrame(() => {
+          deleteConfirmationModal.classList.add('active');
+          deleteConfirmationModal.style.display = 'flex';
+          deleteConfirmationModal.style.visibility = 'visible';
+          deleteConfirmationModal.style.opacity = '1';
+        });
+      });
+    });
+
+    deleteForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const submitButton = this.querySelector('.delete-confirm-btn');
+      const originalText = submitButton.innerHTML;
+
+      try {
+        setLoading(submitButton, true);
+        const categoryId = deleteCategoryId.value;
+
+        const response = await fetch('/admin/categories/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categoryId }),
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Expected JSON response from server');
+        }
+
+        const data = await response.json();
+
+        Swal.fire({
+          title: data.alert.title,
+          text: data.alert.text,
+          icon: data.alert.icon,
+        });
+
+        if (data.success) {
+          const row = document.querySelector(`.delete-btn[data-id="${categoryId}"]`).closest('tr');
+          row.remove();
+          updateRowNumbers();
+          deleteConfirmationModal.classList.remove('active');
+          deleteConfirmationModal.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to delete category',
+          icon: 'error',
+        });
+      } finally {
+        setLoading(submitButton, false, originalText);
+      }
+    });
+
+    // === Search & Filter ===
+    searchInput.addEventListener('input', debounce(function () {
+      filterCategories(this.value.trim().toLowerCase(), filterSelect.value);
+    }, 300));
+
+    filterSelect.addEventListener('change', function () {
+      filterCategories(searchInput.value.trim().toLowerCase(), this.value);
+    });
+
+    // === Helper Functions ===
+    function initImageErrorHandling() {
+      document.querySelectorAll('.category-img').forEach(img => {
+        img.addEventListener('error', function () {
+          this.src = '/img/category/default-category.jpg';
+        });
+      });
+    }
+
+    function initSortableHeaders() {
+      sortableHeaders.forEach(header => {
+        header.addEventListener('click', function () {
+          const columnIndex = Array.from(this.parentNode.children).indexOf(this);
+          const isAscending = !this.classList.contains('asc');
+
+          sortTable(columnIndex, isAscending);
+
+          sortableHeaders.forEach(h => {
+            h.classList.remove('asc', 'desc');
+            h.querySelector('i').className = 'fas fa-sort';
+          });
+
+          this.classList.toggle('asc', isAscending);
+          this.classList.toggle('desc', !isAscending);
+
+          const icon = this.querySelector('i');
+          icon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
+        });
+      });
+    }
+
+    function initKeyboardNavigation() {
+      document.querySelectorAll('.icon-btn').forEach(btn => {
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+          }
+        });
+      });
+    }
+
+    function sortTable(columnIndex, isAscending) {
+      const table = document.querySelector('table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+
+      rows.sort((a, b) => {
+        const aValue = a.children[columnIndex].textContent.trim();
+        const bValue = b.children[columnIndex].textContent.trim();
+
+        if (columnIndex === 0) {
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+
+        if (columnIndex === 4) {
+          const aStatus = a.querySelector('.status-toggle input').checked;
+          const bStatus = b.querySelector('.status-toggle input').checked;
+          return isAscending ? aStatus - bStatus : bStatus - aStatus;
+        }
+
+        return isAscending 
+          ? aValue.localeCompare(bValue) 
+          : bValue.localeCompare(aValue);
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+      updateRowNumbers();
+    }
+
+    function filterCategories(searchTerm, statusFilter) {
+      const rows = document.querySelectorAll('tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const name = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        const status = row.querySelector('.status-toggle input').checked ? 'active' : 'inactive';
+        const nameMatch = name.includes(searchTerm);
+        const statusMatch = statusFilter === '' || status === statusFilter;
+
+        row.style.display = nameMatch && statusMatch ? '' : 'none';
+        if (nameMatch && statusMatch) visibleCount++;
+      });
+
+      document.querySelector('.table-info').textContent = `Showing ${visibleCount} of ${rows.length} entries`;
+    }
+
+    function setLoading(element, isLoading, originalText = null) {
+      if (isLoading) {
+        element.dataset.originalText = originalText || element.textContent;
+        element.disabled = true;
+        element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (originalText || element.textContent);
+      } else {
+        element.disabled = false;
+        element.innerHTML = originalText || element.dataset.originalText || '';
+      }
+    }
+
+    function updateRowNumbers() {
+      document.querySelectorAll('tbody tr').forEach((row, index) => {
+        row.querySelector('td:first-child').textContent = index + 1;
+      });
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+  });
+</script>
+<%- include('../partials/admin/admin-footer') %>

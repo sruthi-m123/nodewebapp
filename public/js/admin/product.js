@@ -250,9 +250,6 @@ function handleFormSubmission(e) {
         selectedColors.push(option.dataset.color);
     });
     
-    // Get offer data
-    const offerEnabled = offerToggle.classList.contains('active');
-    const offerPercentage = offerEnabled ? (offerInput.value || 0) : 0;
     
     // Create product object
     const newProduct = {
@@ -264,9 +261,7 @@ function handleFormSubmission(e) {
         amount: parseInt(formData.get('stock')),
         price: parseFloat(formData.get('price')),
         stock: parseInt(formData.get('stock')),
-        colors: selectedColors,
-        offerEnabled: offerEnabled,
-        offerPercentage: parseInt(offerPercentage),
+        colors: formData.get('colors'),
         lastUpdated: new Date().toLocaleDateString('en-GB')
     };
     
@@ -399,24 +394,15 @@ function editProduct(id) {
     
     // Populate form with product data
     document.querySelector('input[name="productName"]').value = product.name;
-    document.querySelector('select[name="category"]').value = product.category;
+    document.querySelector('input[name="category"]').value = product.category;
     document.querySelector('textarea[name="description"]').value = product.description;
     document.querySelector('input[name="price"]').value = product.price;
     document.querySelector('input[name="stock"]').value = product.stock;
+    document.querySelector('input[name="colors"]').value = product.colors;
     
-    // Set colors
-    document.querySelectorAll('.color-option').forEach(option => {
-        if (product.colors.includes(option.dataset.color)) {
-            option.classList.add('selected');
-        }
-    });
+   
     
-    // Set offer
-    if (product.offerEnabled) {
-        offerToggle.classList.add('active');
-        offerInput.classList.add('active');
-        offerInput.value = product.offerPercentage;
-    }
+    
     
     // Change form to edit mode
     document.querySelector('.modal-title').textContent = 'Edit Product';

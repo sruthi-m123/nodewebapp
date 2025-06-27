@@ -6,19 +6,20 @@ const { v4: uuidv4 } = require('uuid');
 // Configure storage destinations
 const getUploadPath = (uploadType) => {
   const paths = {
-     avatar: 'public/img/admin/admin-avatar',
+    avatar: 'public/img/admin/admin-avatar',
     product: 'public/img/admin/products',
-    category: 'public/img/category',  
-     review: 'public/img/admin/reviews',
+    category: 'public/img/admin/category', // Updated to match controller
+    review: 'public/img/admin/reviews',
     admin: 'public/img/admin',
-    logo:'public/img/admin/logo'
+    logo: 'public/img/admin/logo',
+    misc: 'public/img/misc' // Added fallback path
   };
-  
+
   // Create directory if it doesn't exist
   if (!fs.existsSync(paths[uploadType])) {
     fs.mkdirSync(paths[uploadType], { recursive: true });
   }
-  
+
   return paths[uploadType];
 };
 
@@ -26,31 +27,29 @@ const getUploadPath = (uploadType) => {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadType;
-    
-    // Determine upload type based on fieldname or route
+
     if (file.fieldname === 'avatar') {
       uploadType = 'avatar';
     } else if (file.fieldname === 'productImages' || req.baseUrl.includes('/products')) {
       uploadType = 'product';
-    } else if (file.fieldname === 'categoryImage' || req.baseUrl.includes('/categories')) {
-      uploadType = 'category';
+    } else if (file.fieldname === 'image' || req.baseUrl.includes('/categories')) {
+      uploadType = 'category'; // Updated to match form fieldname
     } else if (file.fieldname === 'bannerImage') {
       uploadType = 'banner';
     } else {
       uploadType = 'misc';
     }
-    
+
     cb(null, getUploadPath(uploadType));
   },
   filename: (req, file, cb) => {
     const uniqueId = uuidv4();
     const fileExt = path.extname(file.originalname).toLowerCase();
-    // Determine uploadType again for filename
     let uploadType = 'file';
     if (file.fieldname === 'avatar') uploadType = 'avatar';
     else if (file.fieldname === 'productImages') uploadType = 'product';
-    else if (file.fieldname === 'categoryImage') uploadType = 'category';
-    
+    else if (file.fieldname === 'image') uploadType = 'category';
+
     cb(null, `${uploadType}-${uniqueId}${fileExt}`);
   }
 });
@@ -80,35 +79,12 @@ const limits = {
   default: { fileSize: 2 * 1024 * 1024 } // 2MB
 };
 
-// Create upload handlers for different use cases
+// Create upload handlers
 const upload = {
-  // Single image uploads
-  avatar: multer({
-    storage,
-    fileFilter,
-    limits: limits.avatar
-  }).single('avatar'),
-
-  // Multiple product images
-  products: multer({
-    storage,
-    fileFilter,
-    limits: limits.product
-  }).array('productImages', 10), // Up to 10 files
-
-  // Single category image
-  category: multer({
-    storage,
-    fileFilter,
-    limits: limits.category
-  }).single('categoryImage'),
-
-  // Mixed uploads (for complex forms)
-  mixed: multer({
-    storage,
-    fileFilter,
-    limits: limits.default
-  }).fields([
+  avatar: multer({ storage, fileFilter, limits: limits.avatar }).single('avatar'),
+  products: multer({ storage, fileFilter, limits: limits.product }).array('productImages', 10),
+  category: multer({ storage, fileFilter, limits: limits.category }).single('image'), // Updated to 'image'
+  mixed: multer({ storage, fileFilter, limits: limits.default }).fields([
     { name: 'mainImage', maxCount: 1 },
     { name: 'galleryImages', maxCount: 5 }
   ])
@@ -117,9 +93,8 @@ const upload = {
 // Image processing middleware
 const processImage = async (req, res, next) => {
   if (!req.file && !req.files) return next();
-  
   try {
-    // Image processing logic here
+    // Add image processing logic if needed
     next();
   } catch (err) {
     next(err);
@@ -128,8 +103,8 @@ const processImage = async (req, res, next) => {
 
 // Export configuration
 module.exports = {
-  upload,       // Named upload handlers
-  processImage, // Image processing middleware
+  upload,
+  processImage,
   singleUpload: multer({ storage, fileFilter, limits: limits.default }).single('image'),
   multiUpload: multer({ storage, fileFilter, limits: limits.product }).array('images', 5)
 };

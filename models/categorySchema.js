@@ -11,12 +11,12 @@ const categorySchema = new Schema({
     type: String,
     required: true,
   },
-  code: {
-    type: String,
-    unique: true,
-    trim: true,
-    default: "",
-  },
+  // code: {
+  //   type: String,
+  //   unique: true,
+  //   trim: true,
+  //   default: "",
+  // },
   status: {
     type: String,
     enum: ["active", "inactive","on","off"],
@@ -28,10 +28,10 @@ const categorySchema = new Schema({
     }
   },
 
-  categoryOffer: {
-    type: Number,
-    default: 0,
-  },
+  // categoryOffer: {
+  //   type: Number,
+  //   default: 0,
+  // },
   image: {
     type: String, // Path to image (like "/uploads/categories/filename.jpg")
     default: null,
