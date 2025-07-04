@@ -21,25 +21,43 @@
       
       <!-- Desktop Navigation -->
       <nav class="main-nav">
-        <a href="" class="nav-link">Home</a>
-        <a href="#" class="nav-link">Collections</a>
-        <a href="#" class="nav-link">About</a>
-        <a href="#" class="nav-link">Contact</a>
+        <a href="/" class="nav-link">Home</a>
+          <a href="/user/shopall" class="nav-link">Shop all</a>
+        <a href="/user/catergoryproduct" class="nav-link">Collections</a>
+        <a href="#" class="nav-link">About Us</a>
+        <a href="#" class="nav-link">Contact Us</a>
       </nav>
       
-      <%if (currentPath==="/"){%>
+      <%if (!user && currentPath === "/"){%>
         <div class="auth-links">
           <a href="/signup" class="nav-link">Sign Up</a>
           <a href="/login" class="nav-link">Log In</a>
         </div>
       <%}%>
 
-      <div class="desktop-icons">
-        <a href="#" class="icon-link"><i class="fas fa-search"></i></a>
-        <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
-        <a href="#" class="icon-link"><i class="fas fa-user"></i></a>
-        <a href="#" class="icon-link"><i class="fas fa-shopping-bag"></i></a>
-      </div>
+     <div class="desktop-icons">
+  <a href="#" class="icon-link" aria-label="Search"><i class="fas fa-search"></i></a>
+  <a href="#" class="icon-link" aria-label="Wishlist"><i class="far fa-heart"></i></a>
+
+  <% if (user) { %>
+  <div class="profile-card-container">
+    <a href="#" class="icon-link" id="profileIcon"><i class="fas fa-user"></i></a>
+    <div class="profile-card" id="profileCard">
+      <div class="card-greeting">Hi, <%= user.name || user.username %> 👋</div>
+      <a href="/profile" class="card-link">Profile</a>
+      <a href="/orders" class="card-link">My Orders</a>
+      <a href="/logout" class="card-link">Logout</a>
+    </div>
+  </div>
+<% } %>
+
+
+
+  <a href="#" class="icon-link cart-icon" aria-label="Shopping cart">
+    <i class="fas fa-shopping-bag"></i>
+    <span class="cart-count">0</span>
+  </a>
+</div>
       
       <!-- Mobile Menu Toggle -->
       <button class="menu-toggle" aria-label="Toggle menu">
@@ -50,24 +68,43 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu">
       <nav class="mobile-nav">
-        <a href="" class="nav-link mobile-nav-link">Home</a>
+        <a href="/" class="nav-link mobile-nav-link">Home</a>
+        <a href="/user/shopall" class="nav-link mobile-nav-link">Shop All</a>
         <a href="#" class="nav-link mobile-nav-link">Collections</a>
-        <a href="#" class="nav-link mobile-nav-link">About</a>
-        <a href="#" class="nav-link mobile-nav-link">Contact</a>
-        
-        <%if (currentPath==="/"){%>
-          <a href="/signup" class="nav-link mobile-nav-link">Sign Up</a>
-          <a href="/login" class="nav-link mobile-nav-link">Log In</a>
-        <%}%>
-      </nav>
+        <a href="#" class="nav-link mobile-nav-link">About Us</a>
+        <a href="#" class="nav-link mobile-nav-link">Contact Us</a>
+                   </nav>
+                      <%if (!user && currentPath === "/"){%>
+        <div class="auth-links">
+          <a href="/signup" class="nav-link">Sign Up</a>
+          <a href="/login" class="nav-link">Log In</a>
+        </div>
+      <%}%>
       
       <div class="mobile-icons">
-        <a href="#" class="mobile-icon-link"><i class="fas fa-search"></i> Search</a>
-        <a href="#" class="mobile-icon-link"><i class="far fa-heart"></i> Wishlist</a>
-        <a href="#" class="mobile-icon-link"><i class="fas fa-user"></i> Profile</a>
-        <a href="#" class="mobile-icon-link"><i class="fas fa-shopping-bag"></i> Cart</a>
-      </div>
+  <a href="#" class="icon-link" aria-label="Search"><i class="fas fa-search"></i></a>
+  <a href="#" class="icon-link" aria-label="Wishlist"><i class="far fa-heart"></i></a>
+
+  <% if (user) { %>
+    <div class="profile-dropdown-container">
+      <a href="#" class="icon-link" id="profileToggle" aria-label="User profile" aria-expanded="false">
+        <i class="fas fa-user"></i>
+      </a>
+      <div class="profile-card" id="profileCard">
+    <a href="/profile" class="card-link">Profile</a>
+    <a href="/orders" class="card-link">My Orders</a>
+    <a href="/logout" class="card-link">Logout</a>
+  </div>
     </div>
+  <% } else { %>
+    <a href="/login" class="icon-link" aria-label="Login"><i class="fas fa-user-circle"></i></a>
+  <% } %>
+
+  <a href="#" class="icon-link cart-icon" aria-label="Shopping cart">
+    <i class="fas fa-shopping-bag"></i>
+    <span class="cart-count">0</span>
+  </a>
+</div>
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -90,4 +127,18 @@
           });
         });
       });
+const profileIcon=document.getElementById("profileIcon");
+const profileCard=document.getElementById("profileCard");
+
+profileIcon.addEventListener("click",(e)=>{
+  e.preventDefault();
+  profileCard.classList.toggle("show");
+});
+window.addEventListener("click",(e)=>{
+  if(!profileIcon.contains(e.target)&&!profileCard.contains(e.target)){
+    profileCard.classList.remove("show");
+  }
+})
+
+
     </script>

@@ -15,19 +15,16 @@ const productSchema= new Schema({
         ref:"Category",
         required:true
     },
-    regularPrice:{
-        type:Number,
-        required:true
-    },
-    salePrice:{
+    
+    price:{
         type:Number,
         default:0
     },
-    productOffer:{
-type:Number,
-default:0
-    },
-    quantity:{
+//     productOffer:{
+// type:Number,
+// default:0
+//     },
+    stock:{
         type:Number,
         default:0
     },
@@ -35,20 +32,30 @@ default:0
         type:String,
         required:true
     },
-    productImage:{
+    images:{
         type:[String],
         required:true
     },
+    isNewArrival: {
+    type: Boolean,
+    default: false,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
     isBlocked:{
         type:Boolean,
         default:false
     },
+     isDeleted: { type: Boolean, default: false },
     status:{
 type:String,
 enum:["In Stock","out of stock","Discontinued"],
 required:true,
 default:"In Stock"
-    }
+    },
+    createdAt: { type: Date, default: Date.now }
 },{timestamps:true});
 const Product=mongoose.model("Product",productSchema)
 module.exports=Product;

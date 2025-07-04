@@ -8,14 +8,13 @@ const getUploadPath = (uploadType) => {
   const paths = {
     avatar: 'public/img/admin/admin-avatar',
     product: 'public/img/admin/products',
-    category: 'public/img/admin/category', // Updated to match controller
+    category: 'public/img/admin/category',
     review: 'public/img/admin/reviews',
     admin: 'public/img/admin',
     logo: 'public/img/admin/logo',
-    misc: 'public/img/misc' // Added fallback path
+    misc: 'public/img/misc'
   };
 
-  // Create directory if it doesn't exist
   if (!fs.existsSync(paths[uploadType])) {
     fs.mkdirSync(paths[uploadType], { recursive: true });
   }
@@ -30,10 +29,10 @@ const storage = multer.diskStorage({
 
     if (file.fieldname === 'avatar') {
       uploadType = 'avatar';
-    } else if (file.fieldname === 'productImages' || req.baseUrl.includes('/products')) {
+    } else if (file.fieldname === 'images' || req.baseUrl.includes('/products')) {
       uploadType = 'product';
-    } else if (file.fieldname === 'image' || req.baseUrl.includes('/categories')) {
-      uploadType = 'category'; // Updated to match form fieldname
+    } else if (file.fieldname === 'categoryImage' || req.baseUrl.includes('/categories')) {
+      uploadType = 'category';
     } else if (file.fieldname === 'bannerImage') {
       uploadType = 'banner';
     } else {
@@ -47,15 +46,15 @@ const storage = multer.diskStorage({
     const fileExt = path.extname(file.originalname).toLowerCase();
     let uploadType = 'file';
     if (file.fieldname === 'avatar') uploadType = 'avatar';
-    else if (file.fieldname === 'productImages') uploadType = 'product';
-    else if (file.fieldname === 'image') uploadType = 'category';
-
+    else if (file.fieldname === 'images') uploadType = 'product';
+    else if (file.fieldname === 'categoryImage') uploadType = 'category';
     cb(null, `${uploadType}-${uniqueId}${fileExt}`);
   }
 });
 
 // Advanced file filter
 const fileFilter = (req, file, cb) => {
+  console.log("MIME TYPE:", file.mimetype); // Debug
   const allowedTypes = {
     'image/jpeg': 'jpg',
     'image/jpg': 'jpg',
@@ -75,26 +74,51 @@ const fileFilter = (req, file, cb) => {
 const limits = {
   avatar: { fileSize: 2 * 1024 * 1024 }, // 2MB
   product: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  category: { fileSize: 3 * 1024 * 1024 }, // 3MB
+  category: { fileSize: 5 * 1024 * 1024 }, // Updated to 5MB
   default: { fileSize: 2 * 1024 * 1024 } // 2MB
 };
 
 // Create upload handlers
 const upload = {
   avatar: multer({ storage, fileFilter, limits: limits.avatar }).single('avatar'),
-  products: multer({ storage, fileFilter, limits: limits.product }).array('productImages', 10),
-  category: multer({ storage, fileFilter, limits: limits.category }).single('image'), // Updated to 'image'
+  products: multer({ storage, fileFilter, limits: limits.product }).array('images', 10),
+  category: multer({ storage, fileFilter, limits: limits.category }).single('categoryImage'),
   mixed: multer({ storage, fileFilter, limits: limits.default }).fields([
     { name: 'mainImage', maxCount: 1 },
     { name: 'galleryImages', maxCount: 5 }
   ])
 };
 
-// Image processing middleware
+// Multer error handling middleware
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+
+    return res.status(400).json({
+      success: false,
+      alert: {
+        title: 'Error',
+        text: err.message === 'File too large' ? 'File size exceeds the 5MB limit.' : 'File upload error.',
+        icon: 'error',
+      },
+    });
+  } else if (err) {
+    return res.status(400).json({
+      success: false,
+      alert: {
+        title: 'Error',
+        text: err.message || 'Failed to upload file.',
+        icon: 'error',
+      },
+    });
+  }
+  next();
+};
+
+// Image processing middleware (placeholder for future processing)
 const processImage = async (req, res, next) => {
   if (!req.file && !req.files) return next();
   try {
-    // Add image processing logic if needed
+    // Add image processing logic if needed (e.g., resizing)
     next();
   } catch (err) {
     next(err);
@@ -105,6 +129,7 @@ const processImage = async (req, res, next) => {
 module.exports = {
   upload,
   processImage,
-  singleUpload: multer({ storage, fileFilter, limits: limits.default }).single('image'),
+  handleMulterError,
+  singleUpload: multer({ storage, fileFilter, limits: limits.category }).single('categoryImage'),
   multiUpload: multer({ storage, fileFilter, limits: limits.product }).array('images', 5)
 };

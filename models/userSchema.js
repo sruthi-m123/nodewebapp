@@ -7,15 +7,7 @@ const userSchema=new Schema({
         type:String,
         required:true
     },
-    firstname:{
-        type:String,
-        required:true,
-        trim:true
-    },
-    lastname:{
-        type:String,
-        trim:true
-    },
+
 
     email :{
         type:String,
@@ -33,7 +25,6 @@ const userSchema=new Schema({
     gender:{
         type:String,
        enum:['Male','Female','Other','Prefer not to say'],
-       default:'Prefer not to say '
     },
     avatar:{
         type:String,
@@ -46,8 +37,7 @@ googleId:{
     required:false
     },
     lastUpdated:{
-        type:Date,
-        default:'/img/profile.jpg'
+        type:Date
         },
     password:{
         type:String,

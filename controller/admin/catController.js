@@ -1,6 +1,6 @@
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-
+const fs = require('fs');
 const formatResponse = (success, message, data = {}) => ({
   success,
   alert: { title: success ? 'Success' : 'Error', text: message, icon: success ? 'success' : 'error' },
@@ -53,7 +53,7 @@ const addCategory = async (req, res) => {
       return res.status(400).json(formatResponse(false, req.fileValidationError.message));
     }
 
-    const { name, code, description, status, croppedImage } = req.body;
+    const { name,  description, status} = req.body;
     if (!name || name.trim() === '') {
       return res.status(400).json(formatResponse(false, 'Category name is required'));
     }
@@ -67,27 +67,29 @@ const addCategory = async (req, res) => {
     if (req.file) {
       imagePath = `/img/admin/category/${req.file.filename}`;
       console.log('Image saved from file upload:', imagePath);
-    } else if (croppedImage && croppedImage.startsWith('data:image/')) {
-      const base64Data = croppedImage.replace(/^data:image\/(jpeg|png|jpg);base64,/, '');
-      const filename = `cropped-${Date.now()}.jpg`;
-      const filePath = `public/img/admin/category/${filename}`;
-      const fs = require('fs');
-      if (!fs.existsSync('public/img/admin/category/')) {
-        fs.mkdirSync('public/img/admin/category/', { recursive: true });
-      }
-      fs.writeFileSync(filePath, base64Data, 'base64');
-      imagePath = `/img/admin/category/${filename}`;
-      console.log('Image saved from base64:', imagePath);
     }
+    // } else if (croppedImage && croppedImage.startsWith('data:image/')) {
+    //   const base64Data = croppedImage.replace(/^data:image\/(jpeg|png|jpg);base64,/, '');
+    //   const filename = `cropped-${Date.now()}.jpg`;
+    //   const filePath = `public/img/admin/category/${filename}`;
+    //   const fs = require('fs');
+    //   if (!fs.existsSync('public/img/admin/category/')) {
+    //     fs.mkdirSync('public/img/admin/category/', { recursive: true });
+    //   }
+    //   fs.writeFileSync(filePath, base64Data, 'base64');
+    //   imagePath = `/img/admin/category/${filename}`;
+    //   console.log('Image saved from base64:', imagePath);
+    // }
 
     const newCategory = new Category({
       name: name.trim().toLowerCase(),
-      code: code || '',
+     
       description: description || '',
       status: status || 'active',
       image: imagePath,
     });
     await newCategory.save();
+    console.log('saved category:',newCategory)
     return res.status(201).json(formatResponse(true, 'Category added successfully'));
   } catch (error) {
     console.error('Error adding category:', error);
@@ -141,14 +143,14 @@ const updateCategory = async (req, res) => {
     if (req.fileValidationError) {
       return res.status(400).json(formatResponse(false, req.fileValidationError.message));
     }
-    const { name, code, description, status } = req.body;
+    const { name,  description, status } = req.body;
     if (!name || name.trim() === '') {
       return res.status(400).json(formatResponse(false, 'Category name is required'));
     }
 
     const updateData = {
       name: name.trim().toLowerCase(),
-      code: code || '',
+      
       description: description || '',
       status: status || 'active',
     };

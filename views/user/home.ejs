@@ -17,14 +17,18 @@
       <p>Explore our exquisite collections</p>
     </div>
     <div class="category-grid">
-      <div class="category-card">
-        <img src="cat1.jpg" alt="Pure Silk Saree">
-        <div class="overlay">
-          <p>Pure Silk</p>
-          <button class="secondary-btn">View Collection</button>
-        </div>
+  <% categories.forEach(category => { %>
+    <div class="category-card">
+      <img src="<%= category.img %>" alt="<%= category.name %> Saree">
+      <div class="overlay">
+        <p><%= category.name %></p>
+        <button class="secondary-btn">View Collection</button>
       </div>
-      <div class="category-card">
+    </div>
+  <% }); %>
+</div>
+
+      <!-- <div class="category-card">
         <img src="cat2.jpg" alt="Cotton Silk Saree">
         <div class="overlay">
           <p>Cotton Silk</p>
@@ -36,15 +40,15 @@
         <div class="overlay">
           <p>Raw Silk</p>
           <button class="secondary-btn">View Collection</button>
-        </div>
-      </div>
+        </div> -->
+      <!-- </div>
       <div class="category-card">
         <img src="cat4.jpg" alt="Soft Silk Saree">
         <div class="overlay">
           <p>Soft Silk</p>
           <button class="secondary-btn">View Collection</button>
         </div>
-      </div>
+      </div> -->
     </div>
   </section>
 
@@ -54,7 +58,20 @@
       <p>Our Best Picks This Season</p>
     </div>
     <div class="arrival-grid">
-      <div class="product-card">
+      <% products.forEach(product => { %>
+    <div class="product-card">
+      <img src="<%= product.img %>" alt="<%= product.name %>">
+      <div class="product-info">
+        <p><%= product.name %></p>
+        <p class="price"><%= product.price %></p>
+        <div class="product-actions">
+          <button class="icon-btn"><i class="far fa-heart"></i></button>
+          <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+      <!-- <div class="product-card">
         <img src="product1.jpg" alt="Pure Zari Kota Silk Dupatta">
         <div class="product-info">
           <p>Pure Zari Kota Silk Dupatta</p>
@@ -64,8 +81,8 @@
             <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
           </div>
         </div>
-      </div>
-      <div class="product-card">
+      </div> -->
+      <!-- <div class="product-card">
         <img src="product2.jpg" alt="Pure Chettinadu Cotton">
         <div class="product-info">
           <p>Pure Chettinadu Cotton</p>
@@ -75,8 +92,8 @@
             <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
           </div>
         </div>
-      </div>
-      <div class="product-card">
+      </div> -->
+      <!-- <div class="product-card">
         <img src="product3.jpg" alt="Pure Kanchipuram Silk">
         <div class="product-info">
           <p>Pure Kanchipuram Silk</p>
@@ -87,7 +104,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <button class="primary-btn outline">View All Collections</button>
   </section>
 

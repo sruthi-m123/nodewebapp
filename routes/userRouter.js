@@ -27,14 +27,18 @@ router.post("/reset-password",userController.resetPassword);
 router.get('/error', (req, res) => {
   res.status(500).render('user/error', {message: "Something went wrong!"});
 });
-router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}));
-router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
-  res.redirect('/')
-});
+router.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/signup' }),
+  userController.googleAuthSuccess  
+);
 //profile page
 router.get('/profile', isLoggedIn, userController.getProfile);
 
-// //product page
-// router.post('/add-product',singleUpload,userControllerController.addProduct);
-// router.post('/add-products', upload.products, userControllerController.addProducts);
+router.get("/shopAll",userController.loadShopping);
 module.exports = router;

@@ -1,4 +1,18 @@
-/* Header Styles */
+/* Header Styles with Updated Theme */
+:root {
+  --primary-color: #9e6d4e;
+  --secondary-color: #e8d5c0;
+  --accent-color: #c7a17a;
+  --dark-color: #333;
+  --text-color: #444;
+  --border-color: #ddd;
+  --light-bg: #f9f4f1;
+  --white: #ffffff;
+  --black: #000;
+  --font-primary: 'Playfair Display', serif;
+  --font-secondary: 'Poppins', sans-serif;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -17,9 +31,9 @@
   color: var(--primary-color);
   letter-spacing: 1px;
   z-index: 101;
+  font-family: var(--font-primary);
 }
 
-/* Desktop Navigation - Visible by default */
 .main-nav {
   display: flex;
 }
@@ -29,6 +43,7 @@
   font-family: var(--font-secondary);
   font-weight: 500;
   position: relative;
+  color: var(--text-color);
 }
 
 .main-nav a:after {
@@ -50,26 +65,29 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  font-family: var(--font-secondary);
 }
 
 .desktop-icons {
   display: flex;
+  align-items: center;
   gap: 20px;
 }
 
-.desktop-icons .icon-link {
-  color: var(--dark-color);
-  font-size: 18px;
-  transition: color 0.3s ease;
+.icon-link {
+  color: var(--text-color);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.desktop-icons .icon-link:hover {
+.icon-link:hover {
   color: var(--primary-color);
+  transform: translateY(-2px);
 }
 
-/* Mobile Menu Toggle - Hidden by default */
 .menu-toggle {
-  display: none; /* Hidden on desktop */
+  display: none;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -119,7 +137,6 @@
   bottom: 0;
 }
 
-/* Mobile Menu - Hidden by default */
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -183,7 +200,6 @@
   text-align: center;
 }
 
-/* Overlay when mobile menu is open */
 body.mobile-menu-open::before {
   content: '';
   position: fixed;
@@ -195,36 +211,101 @@ body.mobile-menu-open::before {
   z-index: 98;
 }
 
-/* Prevent scrolling when menu is open */
 body.no-scroll {
   overflow: hidden;
 }
 
-/* ========================================= */
-/* CRITICAL FIXES FOR MOBILE MENU VISIBILITY */
-/* ========================================= */
+.profile-card-container {
+  position: relative;
+}
+
+.profile-card {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 100;
+  min-width: 160px;
+  padding: 12px 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  font-family: var(--font-secondary);
+}
+
+.profile-card.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-card .card-link {
+  display: block;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+.profile-card .card-link:hover {
+  background-color: var(--light-bg);
+  color: var(--primary-color);
+}
+
+.cart-icon {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 @media (max-width: 768px) {
-  /* Hide desktop navigation elements */
   .main-nav,
-  .auth-links,
-  .desktop-icons {
-    display: none !important;
+  .auth-links {
+    display: none;
   }
-  
-  /* Show mobile menu toggle */
+
   .menu-toggle {
     display: block;
   }
-  
-  /* Adjust navbar padding for mobile */
+
   .navbar {
     padding: 15px 20px;
   }
-  
-  /* Adjust mobile menu padding */
+
   .mobile-menu {
     padding-top: 80px;
+  }
+
+  .profile-card {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    left: 20px;
+    width: auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+
+  .profile-card .card-link {
+    padding: 12px 18px;
+    font-size: 1rem;
   }
 }
 
@@ -232,8 +313,18 @@ body.no-scroll {
   .logo {
     font-size: 20px;
   }
-  
+
   .mobile-menu {
     width: 85%;
   }
+}
+.card-greeting {
+  padding: 12px 15px;
+  font-family: var(--font-secondary);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--light-bg);
+  text-align: left;
 }

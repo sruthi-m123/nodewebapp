@@ -1,8 +1,10 @@
 const User = require("../../models/userSchema");
+const Product=require("../../models/productSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
+const Category = require("../../models/categorySchema");
 const pageNotFound = async (req, res) => {
   try {
     res.render("page-404", { pageCSS: "pageNotFound.css" });
@@ -14,14 +16,25 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
+const categories=await Category.find().limit(4);
+const products=await Product.find().sort({createdAt:-1}).limit(3);
 
-    return res.render("user/home", {
+   const testimonial = {
+      quote: "Each saree from Chettinad tells a story of craftsmanship and heritage. Wearing them makes me feel connected to my roots while looking effortlessly elegant.",
+      customerName: "Priya Nair",
+      title: "Loyal Customer",
+      img: "/img/customer.jpg",
+    };
+   return res.render("user/home", {
       pageCSS: "home.css",
       currentPath: req.path,
+      categories,
+      products,
+      testimonial
     });
   } catch (error) {
     console.log("home page not found");
-    res.status(500).send("Server error");
+    res.status(500).send("Server error:",error);
   }
 };
 const loadSignup = async (req, res) => {
@@ -32,14 +45,7 @@ const loadSignup = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-const loadShopping = async (req, res) => {
-  try {
-    return res.render("shop", { pageCSS: "allproducts.css" });
-  } catch (error) {
-    console.log("Shopping page not loading:", error);
-    res.status(500).send("Server Error");
-  }
-};
+
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -137,17 +143,17 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp, email } = req.body;
-    if (
-      !req.session.userOtp ||
-      !req.session.userData ||
-      req.session.userData.email !== email ||
-      req.session.userOtp !== otp ||
-      Date.now() > req.session.otpExpires
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or expired OTP" });
-    }
+    // if (
+    //   !req.session.userOtp ||
+    //   !req.session.userData ||
+    //   req.session.userData.email !== email ||
+    //   req.session.userOtp !== otp ||
+    //   Date.now() > req.session.otpExpires
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Invalid or expired OTP" });
+    // }
     const { name, phone, password } = req.session.userData;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -442,6 +448,73 @@ const getProfile=async(req,res)=>{
   };
 
 }
+const googleAuthSuccess = async (req, res) => {
+  if (!req.user) {
+    return res.redirect("/login");
+  }
+
+  req.session.user = {
+    _id: req.user._id,
+    email: req.user.email,
+    isAdmin: req.user.isAdmin || 0,
+    name: req.user.name,
+    // add any other details you need in session
+  };
+
+  req.session.save((err) => {
+    if (err) {
+      console.error("Session save error:", err);
+      return res.redirect("/login");
+    }
+    res.redirect("/");
+  });
+};
+const loadShopping=async(req,res)=>{
+  try{
+    const filters={isDeleted:false};//base filter
+   //availability
+   if(req.query.availability==="In Stock"){
+    filters.stock={$gt:0};
+       }else if(req.query.availability==="out of stock"){
+        filters.stock=0;
+      }
+      
+      
+    //price range 
+    if(req.query.price==="0-1000"){
+      filters.price={$lte:100};
+    }else if(req.query.price==="1000-3000"){
+      filters.price={$gt:1000,$lye:3000};
+    }else if(req.query.price==="3000+"){
+      filters.price={$gt:3000};
+    }
+// color 
+if(req.query.color&&req.query.color!=="all"){
+  filters.color=req.query.color;
+}
+//search
+let searchQuery={};
+if(req.query.search){
+  searchQuery={
+  name:{$regex: req.query.search,$options:'i'}
+  }
+}
+
+
+//combining all the filters and search 
+const categories=await Category.find({isDeleted:false})
+const products=await Product.find({...filters,...searchQuery}).populate("category");
+return res.render("user/shopall",{
+  pageCSS:"shopall.css",
+  products,
+  categories
+});
+  }catch(error){
+console.log("shopping page not loading:",error);
+res.status(500).send("server error");
+  }
+}
+
 
 module.exports = {
   loadHomepage,
@@ -463,5 +536,7 @@ module.exports = {
   verifyOTP,
   resendForgotOtp,
   resetforgotPassword,
-  getProfile
+  getProfile,
+   googleAuthSuccess
 };
+ googleAuthSuccess
