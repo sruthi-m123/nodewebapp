@@ -50,6 +50,7 @@ const customerInfo = async (req, res) => {
 
     // Render the users page
     res.render("admin/users", {
+      layout:false,
       users: userData,
       pageCSS: "/css/admin/users.css",
       pageScript: "/js/admin/users.js",

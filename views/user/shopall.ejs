@@ -1,5 +1,5 @@
-<%- include('../partials/user/header') %>
-<link rel="stylesheet" href="/css/user/shopall.css">
+
+<!-- <link rel="stylesheet" href="/css/user/shopall.css"> -->
 
 <section class="shop-container">
   <div class="filters-sidebar">
@@ -46,16 +46,18 @@
     </div>
 
     <div class="filter-group">
-      <h4 class="filter-title">Categories</h4>
-      <div class="filter-options">
-          <label class="filter-option">
-    <input type="checkbox" name="category" value="<%= category._id %>">
-    <span class="checkmark"></span>
-    <%= category.name %>
-  </label>
-        <% }) %>
-      </div>
-    </div>
+  <h4 class="filter-title">Categories</h4>
+  <div class="filter-options">
+    <% categories.forEach(category => { %>
+      <label class="filter-option">
+        <input type="checkbox" name="category" value="<%= category._id %>">
+        <span class="checkmark"></span>
+        <%= category.name %>
+      </label>
+    <% }) %>
+  </div>
+</div>
+
   </div>
 
   <div class="shop-main">
@@ -87,11 +89,11 @@
       <% products.forEach(product => { %>
   <div class="product-card <%= !product.isActive ? 'inactive' : '' %>">          <div class="product-badge"><%= product.badge || 'New' %></div>
           <div class="product-image">
-            <img src="<%= product.image[0] %>" alt="<%= product.name %>">
+            <img src="/<%= product.images[0] %>" alt="<%= product.productName%>">
             <div class="quick-view">Quick View</div>
           </div>
           <div class="product-info">
-            <h4 class="product-name"><%= product.name %></h4>
+            <h4 class="product-name"><%= product.productName%></h4>
             <div class="product-meta">
               <div class="product-rating">
                 <% for(let i=0; i<5; i++) { %>
@@ -122,4 +124,3 @@
   </div>
 </section>
 
-<%- include('../partials/user/footer') %>

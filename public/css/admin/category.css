@@ -355,13 +355,15 @@ table tbody tr:hover {
   margin-top: 16px;
   text-align: center;
 }
-
 .preview-image {
-  max-width: 200px;
-  max-height: 200px;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  display: block;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 
 .crop-btn {
   margin-top: 12px;
@@ -706,4 +708,39 @@ table tbody tr:hover {
     width: 100%;
     height: 40px;
   }
+}
+/* Add these styles */
+.image-upload-preview {
+  position: relative;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-upload-preview .placeholder {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.image-upload-preview .image-container {
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.image-upload-preview .crop-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: none;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(0,0,0,0.5);
 }

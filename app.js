@@ -8,6 +8,8 @@ const adminRouter = require("./routes/adminRouter");
 const session = require("express-session");
 const methodOverride = require('method-override');
 const flash =require('connect-flash')
+const expressLayouts = require('express-ejs-layouts');
+
 
 db();
 
@@ -43,8 +45,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
 app.use(flash())
+app.use(expressLayouts);
+
 
 app.set("view engine", "ejs");
+app.set('layout', 'layout'); 
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -59,6 +64,12 @@ app.get("/error", (req, res) => {
 
 app.use((req, res) => {
   res.status(404).render("user/pageNotFound");
+});
+app.use((req, res, next) => {
+  if (!res.locals.pageTitle) {
+    res.locals.pageTitle = 'Chettinad'; 
+  }
+  next();
 });
 
 

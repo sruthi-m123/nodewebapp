@@ -19,6 +19,7 @@ const renderProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments({ isDeleted: false });
     const totalPages = Math.ceil(totalProducts / limit);
     res.render("admin/products", {
+      layout:false,
       category: categories,
       products,
       currentPage: page,
@@ -77,10 +78,16 @@ const updateProduct = async (req, res) => {
       stock,
       color,
       isNewArrival,
+      removedImages
     } = req.body;
 
 if (isNaN(parseFloat(price)) || isNaN(parseInt(stock))) {
       return res.status(400).json({ success: false, message: 'Invalid price or stock value' });
+    }
+
+ const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
     const updateData = {
@@ -93,14 +100,8 @@ if (isNaN(parseFloat(price)) || isNaN(parseInt(stock))) {
       isNewArrival: isNewArrival === "true" || isNewArrival === true,
     };
 
-
-     
-
-      const existingProduct = await Product.findById(id);
-if (!existingProduct) {
-  return res.status(404).json({ success: false, message: 'Product not found' });
-}
-
+  
+ 
 let updatedImages=[...existingProduct.images];
 if (removedImages) {
       const imagesToRemove = JSON.parse(removedImages);
@@ -118,7 +119,7 @@ if (req.files && req.files.length > 0) {
   updateData.images = req.files.map(file =>
     file.path.replace(/\\/g, '/').replace('public/', '')
   );
-} else {
+
   updateData.images = existingProduct.images; //  Safe to access now
 }
     

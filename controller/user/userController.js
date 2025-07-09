@@ -1,5 +1,6 @@
 const User = require("../../models/userSchema");
-const Product=require("../../models/productSchema");
+const Product = require("../../models/productSchema");
+const Testimonial = require("../../models/testimonialSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -7,7 +8,9 @@ const mongoose = require("mongoose");
 const Category = require("../../models/categorySchema");
 const pageNotFound = async (req, res) => {
   try {
-    res.render("page-404", { pageCSS: "pageNotFound.css" });
+    res.render("page-404", { pageCSS: "pageNotFound.css" ,
+      pageTitle:"chettinad-Premium sarees"
+    });
   } catch (error) {
     console.error("Error rendering 404 page:", error);
     res.status(500).send("Internal Server Error");
@@ -16,36 +19,41 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
-const categories=await Category.find().limit(4);
-const products=await Product.find().sort({createdAt:-1}).limit(3);
+    console.log("reached home page ");
+    const categories = await Category.find({ status: "active" }).limit(4);
+    const products = await Product.find({ isNewArrival: true })
+      .sort({ createdAt: -1 })
+      .limit(3);
 
-   const testimonial = {
-      quote: "Each saree from Chettinad tells a story of craftsmanship and heritage. Wearing them makes me feel connected to my roots while looking effortlessly elegant.",
-      customerName: "Priya Nair",
-      title: "Loyal Customer",
-      img: "/img/customer.jpg",
-    };
-   return res.render("user/home", {
-      pageCSS: "home.css",
-      currentPath: req.path,
+    console.log("Categories:", categories);
+    console.log("Products:", products);
+
+    const testimonials = await Testimonial.findOne({ isVisible: true });
+        console.log("Testimonials:", testimonials);
+
+    return res.render("user/home", {
+    
+      pageCSS:"home.css",
+       pageTitle: 'Chettinad - Premium Saree Boutique',
+        user: req.user,
+         currentPath: req.path,
       categories,
       products,
-      testimonial
+      testimonials
     });
   } catch (error) {
-    console.log("home page not found");
-    res.status(500).send("Server error:",error);
+    console.log("home page not found", error);
+    res.status(500).send("Server error:", error);
   }
 };
 const loadSignup = async (req, res) => {
   try {
-    return res.render("user/signup", { pageCSS: "signup.css" });
+    return res.render("user/signup", {layout:false, pageCSS: "signup.css" });
   } catch (error) {
     console.log("home page not loading:", error);
     res.status(500).send("Server Error");
   }
 };
-
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -91,6 +99,7 @@ const signup = async (req, res) => {
 
     if (findUser) {
       return res.render("user/signup", {
+        layout:false,
         message: "User with this email already exists",
       });
     }
@@ -99,16 +108,20 @@ const signup = async (req, res) => {
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
       return res.render("user/signup", {
+        layout:false,
         message: "Failed to send OTP.plaease try again.",
         pageCSS: "singup.css",
+        pageTitle:"Chettinad-Premium sarees"
       });
     }
     req.session.userOtp = otp;
     req.session.userData = { name, phone, email, password };
     req.session.otpExpires = Date.now() + 5 * 60 * 1000;
     res.render("user/generateotp", {
+      layout:false,
       email,
       pageCSS: "generateotp.css",
+        pageTitle:"Chettinad-Premium sarees"
     });
     console.log("OTP Sent", otp);
   } catch (error) {
@@ -208,9 +221,9 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
-    res.render("user/login");
+    res.render("user/login",{ layout:false, pageTitle:"Chettinad-Premium sarees"});
   } catch (error) {
-     console.error("Error rendering login page:", error);
+    console.error("Error rendering login page:", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -220,41 +233,44 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const findUser = await User.findOne({ isAdmin: 0, email: email });
     if (!findUser) {
-      return res.render("user/login", { message: "User not found" });
+      return res.render("user/login", {layout:false, message: "User not found" });
     }
     if (findUser.isBlocked) {
-      return res.render("login", { message: "User is blocked by admin" });
+      return res.render("login", { layout:false,message: "User is blocked by admin" });
     }
     const passwordMatch = await bcrypt.compare(password, findUser.password);
     if (!passwordMatch) {
-      return res.render("login", { message: "Incorrect password" });
+      return res.render("login", { layout:false,message: "Incorrect password" });
     }
-// Properly set session with user details
+    // Properly set session with user details
     req.session.user = {
       _id: findUser._id,
       email: findUser.email,
-      isAdmin: findUser.isAdmin
+      isAdmin: findUser.isAdmin,
       // Add other user details you need in the session
     };
-     // Explicitly save the session
-    req.session.save(err => {
+    // Explicitly save the session
+    req.session.save((err) => {
       if (err) {
         console.error("Session save error:", err);
-        return res.render("user/login", { message: "Login failed. Please try again." });
+        return res.render("user/login", {
+          layout:false,
+          message: "Login failed. Please try again.",
+        });
       }
       res.redirect("/");
     });
-    
   } catch (error) {
     console.error("login error", error);
     res.render("user/login", {
+      layout:false,
       message: "login failed.please try again later ",
     });
   }
 };
 
 const loadGenerateotp = (req, res) => {
-  res.render("user/generateotp");
+  res.render("user/generateotp",{layout:false});
 };
 
 const loadResetPassword = async (req, res) => {
@@ -270,8 +286,10 @@ const loadResetPassword = async (req, res) => {
 
     const userId = req.query.id;
     return res.render("user/resetPassword", {
+      layout:false,
       userId,
       pageCSS: "resetPassword.css",
+        pageTitle:"Chettinad-Premium sarees"
     });
   } catch (error) {
     console.log(error.message);
@@ -291,8 +309,10 @@ const resetPassword = async (req, res) => {
 
     if (newPassword !== confirmPassword) {
       return res.render("user/resetPassword", {
+        layout:false,
         error: "Paswords do match",
-        email
+        email,
+          pageTitle:"Chettinad-Premium sarees"
       });
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -317,7 +337,7 @@ const resetPassword = async (req, res) => {
 };
 
 const loadForgotPassword = (req, res) => {
-  res.render("user/forgotPassword");
+  res.render("user/forgotPassword",{layout:false,pageTitle:"Chettinad"});
 };
 
 const sendOTP = async (req, res) => {
@@ -327,7 +347,7 @@ const sendOTP = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.render("user/forgotPassword", { error: "email not found" });
+      return res.render("user/forgotPassword", {layout:false, error: "email not found" });
     }
     const otp = Math.floor(100000 + Math.random() * 900000);
     console.log("otp is:", otp);
@@ -360,7 +380,7 @@ const sendOTP = async (req, res) => {
 };
 
 const loadOTPPage = (req, res) => {
-  res.render("user/validationotp");
+  res.render("user/validationotp",{layout:false,pageTitle:"Chettinad"});
 };
 
 const verifyOTP = async (req, res) => {
@@ -368,9 +388,12 @@ const verifyOTP = async (req, res) => {
   const sessionOTP = req.session.otp;
   const email = req.session.resetEmail;
 
+  
   if (!userOTP || userOTP.length !== 6 || isNaN(userOTP)) {
     return res.render("user/validationotp", {
+      layout:false,
       error: "Please enter a valid 6-digit OTP",
+      pageTitle:"Chettinad"
     });
   }
 
@@ -378,8 +401,10 @@ const verifyOTP = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.render("user/validationotp", {
+        layout:false,
         error: "User not found",
         pageCSS: "validationotp.css",
+        pageTitle:"Chettinad"
       });
     }
 
@@ -387,7 +412,7 @@ const verifyOTP = async (req, res) => {
     req.session.otpExpiry = null;
     return res.redirect(`/resetpassword?id=${user._id}`);
   } else {
-    res.render("user/validationotp", { error: "invalid OTP" });
+    res.render("user/validationotp", {layout:false, error: "invalid OTP" ,pageTitle:"Error"});
   }
 };
 
@@ -428,26 +453,26 @@ const resetforgotPassword = async (req, res) => {
   }
 };
 
-const getProfile=async(req,res)=>{
+const getProfile = async (req, res) => {
   try {
-    const user=await User.findById(req.user._id)
-    .select('-password -googleId -isBlocked -isAdmin');
-    res.render('profile',{
-      user:{
-        firstName:user.firstName||'',
-        lastName:user.lastname||'',
-        email:user.email,
-        phone:user.email,
-        gender:user.gender||'Prefer not say',
-        avatar:user.avatar||'/img/profile.jpg'
-      }
-    })
+    const user = await User.findById(req.user._id).select(
+      "-password -googleId -isBlocked -isAdmin"
+    );
+    res.render("profile", {
+      user: {
+        firstName: user.firstName || "",
+        lastName: user.lastname || "",
+        email: user.email,
+        phone: user.email,
+        gender: user.gender || "Prefer not say",
+        avatar: user.avatar || "/img/profile.jpg",
+      },
+    });
   } catch (error) {
-    console.error('Profile load error:',error);
-    res.redirect('/error')
-  };
-
-}
+    console.error("Profile load error:", error);
+    res.redirect("/error");
+  }
+};
 const googleAuthSuccess = async (req, res) => {
   if (!req.user) {
     return res.redirect("/login");
@@ -469,52 +494,137 @@ const googleAuthSuccess = async (req, res) => {
     res.redirect("/");
   });
 };
-const loadShopping=async(req,res)=>{
-  try{
-    const filters={isDeleted:false};//base filter
-   //availability
-   if(req.query.availability==="In Stock"){
-    filters.stock={$gt:0};
-       }else if(req.query.availability==="out of stock"){
-        filters.stock=0;
-      }
-      
-      
-    //price range 
-    if(req.query.price==="0-1000"){
-      filters.price={$lte:100};
-    }else if(req.query.price==="1000-3000"){
-      filters.price={$gt:1000,$lye:3000};
-    }else if(req.query.price==="3000+"){
-      filters.price={$gt:3000};
+const loadShopping = async (req, res) => {
+  try {
+    const filters = { isDeleted: false }; //base filter
+    //availability
+    if (req.query.availability === "In Stock") {
+      filters.stock = { $gt: 0 };
+    } else if (req.query.availability === "out of stock") {
+      filters.stock = 0;
     }
-// color 
-if(req.query.color&&req.query.color!=="all"){
-  filters.color=req.query.color;
-}
-//search
-let searchQuery={};
-if(req.query.search){
-  searchQuery={
-  name:{$regex: req.query.search,$options:'i'}
+
+    //price range
+    if (req.query.price === "0-1000") {
+      filters.price = { $lte: 100 };
+    } else if (req.query.price === "1000-3000") {
+      filters.price = { $gt: 1000, $lte: 3000 };
+    } else if (req.query.price === "3000+") {
+      filters.price = { $gt: 3000 };
+    }
+    // color
+    if (req.query.color && req.query.color !== "all") {
+      filters.color = req.query.color;
+    }
+    //search
+    let searchQuery = {};
+    if (req.query.search) {
+      searchQuery = {
+        name: { $regex: req.query.search, $options: "i" },
+      };
+    }
+
+    //combining all the filters and search
+    const categories = await Category.find({ isDeleted: false });
+    const products = await Product.find({
+      ...filters,
+      ...searchQuery,
+    }).populate("category");
+    return res.render("user/shopall", {
+
+      pageCSS: "user/shopall.css",
+      pageJS:"user/shopall.js",
+       pageTitle: 'Chettinad - Premium Saree Boutique',
+        user: req.user,
+         currentPath: req.path,
+      products,
+      categories
+    });
+  } catch (error) {
+    console.log("shopping page not loading:", error);
+    res.status(500).send("server error");
   }
-}
+};
+const applyFilters = async (req, res) => {
+  try {
+    const { search, sort, categories, availability, colors, minPrice, maxPrice } = req.body;
+    let query = {};
 
+    // 🔍 Search by product name
+    if (search) {
+      query.productName = { $regex: search, $options: 'i' };
+    }
 
-//combining all the filters and search 
-const categories=await Category.find({isDeleted:false})
-const products=await Product.find({...filters,...searchQuery}).populate("category");
-return res.render("user/shopall",{
-  pageCSS:"shopall.css",
-  products,
-  categories
-});
-  }catch(error){
-console.log("shopping page not loading:",error);
-res.status(500).send("server error");
+    // ✅ Categories
+    if (categories && categories.length > 0) {
+      query.category = { $in: categories }; // ✅ Typo fixed: catgeories → categories
+    }
+
+    // 📦 Availability
+    if (availability && availability.length > 0) {
+      if (
+        availability.includes('in-stock') &&
+        !availability.includes('out-stock')
+      ) {
+        query.stock = { $gt: 0 }; // In-stock
+      } else if (
+        !availability.includes('in-stock') &&
+        availability.includes('out-stock')
+      ) {
+        query.stock = { $lte: 0 }; // Out-of-stock
+      }
+      // If both are selected, don't filter by stock
+    }
+
+    // 🎨 Color Filter
+    if (colors && colors.length > 0) {
+      query.color = { $in: colors };
+    }
+
+    // 💰 Price Range
+    if (minPrice && maxPrice) {
+      query.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
+    }
+
+    // 🛒 Only fetch active products
+    query.isActive = true;
+
+    // 📦 Build the query
+    let productsQuery = Product.find(query);
+
+    // 🔃 Sorting
+    switch (sort) {
+      case 'price-asc':
+        productsQuery = productsQuery.sort({ price: 1 });
+        break;
+      case 'price-desc':
+        productsQuery = productsQuery.sort({ price: -1 });
+        break;
+      case 'new':
+        productsQuery = productsQuery.sort({ createdAt: -1 });
+        break;
+      default:
+        break;
+    }
+
+    const filteredProducts = await productsQuery.exec();
+
+    res.status(200).json({ products: filteredProducts });
+
+  } catch (error) {
+    console.error("Error filtering products:", error);
+    res.status(500).json({ message: 'Filtering failed' });
   }
-}
-
+};
+const getProductsByCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const products = await Product.find({ category: categoryId });
+    res.status(200).json({ products });
+  } catch (err) {
+    res.status(500).json({ message: 'Category filter failed' });
+  }
+};
 
 module.exports = {
   loadHomepage,
@@ -537,6 +647,9 @@ module.exports = {
   resendForgotOtp,
   resetforgotPassword,
   getProfile,
-   googleAuthSuccess
+  googleAuthSuccess,
+  applyFilters,
+  getProductsByCategory
+  
 };
- googleAuthSuccess
+

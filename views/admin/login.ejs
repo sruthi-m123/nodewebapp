@@ -80,20 +80,34 @@
         <img src="/img/admin-weaver.jpg" alt="Admin Portal" />
       </div>
     </div>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-      function togglePassword(fieldId) {
-        const passwordInput = document.getElementById(fieldId);
-        const eyeIcon = passwordInput.nextElementSibling.querySelector("i");
+<script>
+  function togglePassword(fieldId) {
+    const passwordInput = document.getElementById(fieldId);
+    const eyeIcon = passwordInput.nextElementSibling.querySelector("i");
 
-        if (passwordInput.type === "password") {
-          passwordInput.type = "text";
-          eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
-        } else {
-          passwordInput.type = "password";
-          eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
-        }
-      }
-    </script>
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+    } else {
+      passwordInput.type = "password";
+      eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+    }
+  }
+
+</script>
+<% if (error) { %>
+  <script>
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: '<%= error %>'
+    });
+  </script>
+<% } %>
+
+
+
   </body>
 </html>

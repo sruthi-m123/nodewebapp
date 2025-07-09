@@ -7,8 +7,15 @@ const productController = require('../controller/admin/productController');
 const { upload, singleUpload, multiUpload } = require('../config/multer');
 const { adminAuth } = require("../middlewares/auth");
 
+// Disable layout for all admin views
+router.use((req, res, next) => {
+  res.locals.layout = false;
+  next();
+});
+
+
 router.get('/page_error', adminController.page_error);
-router.get('/login',adminAuth, adminController.loadAdminLogin);
+router.get('/login', adminController.loadAdminLogin);
 router.post('/login', adminController.login);
 router.get('/', adminAuth, adminController.loadDashboard);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
@@ -31,7 +38,7 @@ router.get('/products', adminAuth, productController.renderProducts);
 // router.get('/products/add', adminAuth, productController.renderForm);
 router.post('/products',adminAuth,upload.products,productController.addProduct)
 // router.get('/products/:id', adminAuth, productController.renderEditForm);
-router.post('/products/:id', adminAuth, upload.products, productController.updateProduct);
+router.put('/products/:id', adminAuth, upload.products, productController.updateProduct);
 router.put('/products/status/:productId',adminAuth,productController.updateProductStatus)
 router.delete('/products/:id', adminAuth, productController.deleteProduct);
 router.get('/products/:id/details', adminAuth,productController.getProductDetails);

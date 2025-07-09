@@ -1,123 +1,80 @@
-  <%- include('../partials/user/header') %>
-  <link rel="stylesheet" href="/css/home.css">
-  <section class="hero">
-    <div class="hero-text">
-      <h1>Let your spirit soar, draped in the ethereal beauty of a saree.</h1>
-      <p>Discover handcrafted sarees that celebrate tradition with contemporary elegance</p>
-      <button class="primary-btn">Shop Now</button>
-    </div>
-    <div class="hero-img">
-      <img src="hero-img.jpg" alt="Elegant woman wearing traditional saree" />
-    </div>
-  </section>
 
-  <section class="categories">
-    <div class="section-header">
-      <h2>Shop By Categories</h2>
-      <p>Explore our exquisite collections</p>
-    </div>
-    <div class="category-grid">
-  <% categories.forEach(category => { %>
-    <div class="category-card">
-      <img src="<%= category.img %>" alt="<%= category.name %> Saree">
-      <div class="overlay">
-        <p><%= category.name %></p>
-        <button class="secondary-btn">View Collection</button>
-      </div>
-    </div>
-  <% }); %>
-</div>
+<section class="hero">
+  <div class="hero-text">
+    <h1>Let your spirit soar, draped in the ethereal beauty of a saree.</h1>
+    <p>
+      Discover handcrafted sarees that celebrate tradition with contemporary
+      elegance
+    </p>
+    <button class="primary-btn">Shop Now</button>
+  </div>
+  <div class="hero-img">
+    <img
+      src="/img/banner/banner3.jpg"
+      alt="Elegant woman wearing traditional saree"
+    />
+  </div>
+</section>
 
-      <!-- <div class="category-card">
-        <img src="cat2.jpg" alt="Cotton Silk Saree">
+
+<section class="categories">
+  <div class="section-header">
+    <h2>Shop By Categories</h2>
+    <p>Explore our exquisite collections</p>
+  </div>
+  <div class="category-grid">
+    <% categories.forEach(category => { 
+         if (category.status === "active") { %>
+      <div class="category-card">
+        <img src="<%= category.image %>" alt="<%= category.name %> Saree" />
         <div class="overlay">
-          <p>Cotton Silk</p>
+          <p><%= category.name %></p>
           <button class="secondary-btn">View Collection</button>
         </div>
       </div>
-      <div class="category-card">
-        <img src="cat3.jpg" alt="Raw Silk Saree">
-        <div class="overlay">
-          <p>Raw Silk</p>
-          <button class="secondary-btn">View Collection</button>
-        </div> -->
-      <!-- </div>
-      <div class="category-card">
-        <img src="cat4.jpg" alt="Soft Silk Saree">
-        <div class="overlay">
-          <p>Soft Silk</p>
-          <button class="secondary-btn">View Collection</button>
-        </div>
-      </div> -->
-    </div>
-  </section>
+    <% } }); %>
+  </div>
+</section>
 
-  <section class="new-arrivals">
-    <div class="section-header">
-      <h2>New Arrivals</h2>
-      <p>Our Best Picks This Season</p>
-    </div>
-    <div class="arrival-grid">
-      <% products.forEach(product => { %>
+
+<section class="new-arrivals">
+  <div class="section-header">
+    <h2>New Arrivals</h2>
+    <p>Our Best Picks This Season</p>
+  </div>
+  <div class="arrival-grid">
+    <% products.forEach(product => { %>
     <div class="product-card">
-      <img src="<%= product.img %>" alt="<%= product.name %>">
+      <img src="/<%= product.images[0] %>" alt="<%= product.productName %>" />
       <div class="product-info">
-        <p><%= product.name %></p>
-        <p class="price"><%= product.price %></p>
+        <p><%= product.productName %></p>
+        <p class="price">₹<%= product.price %></p>
         <div class="product-actions">
           <button class="icon-btn"><i class="far fa-heart"></i></button>
           <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
         </div>
       </div>
     </div>
-  <% }); %>
-      <!-- <div class="product-card">
-        <img src="product1.jpg" alt="Pure Zari Kota Silk Dupatta">
-        <div class="product-info">
-          <p>Pure Zari Kota Silk Dupatta</p>
-          <p class="price">₹3,650</p>
-          <div class="product-actions">
-            <button class="icon-btn"><i class="far fa-heart"></i></button>
-            <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
-          </div>
-        </div>
-      </div> -->
-      <!-- <div class="product-card">
-        <img src="product2.jpg" alt="Pure Chettinadu Cotton">
-        <div class="product-info">
-          <p>Pure Chettinadu Cotton</p>
-          <p class="price">₹1,650</p>
-          <div class="product-actions">
-            <button class="icon-btn"><i class="far fa-heart"></i></button>
-            <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
-          </div>
-        </div>
-      </div> -->
-      <!-- <div class="product-card">
-        <img src="product3.jpg" alt="Pure Kanchipuram Silk">
-        <div class="product-info">
-          <p>Pure Kanchipuram Silk</p>
-          <p class="price">₹6,850</p>
-          <div class="product-actions">
-            <button class="icon-btn"><i class="far fa-heart"></i></button>
-            <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
-          </div>
-        </div>
-      </div>
-    </div> -->
-    <button class="primary-btn outline">View All Collections</button>
-  </section>
+    <% }); %>
+  </div>
 
-  <section class="testimonial">
-    <div class="testimonial-content">
-      <i class="fas fa-quote-left"></i>
-      <p>Each saree from Chettinad tells a story of craftsmanship and heritage. Wearing them makes me feel connected to my roots while looking effortlessly elegant.</p>
-      <div class="author">
-        <img src="customer.jpg" alt="Happy Customer">
-        <p>Priya Nair</p>
-        <p>Loyal Customer</p>
-      </div>
+  <button class="primary-btn outline">View All Collections</button>
+</section>
+
+<section class="testimonial">
+  <div class="testimonial-content">
+    <i class="fas fa-quote-left"></i>
+    <p>
+      Each saree from Chettinad tells a story of craftsmanship and heritage.
+      Wearing them makes me feel connected to my roots while looking
+      effortlessly elegant.
+    </p>
+    <div class="author">
+      <img src="/img/customer.jpg" alt="Happy Customer" />
+      <p>Priya Nair</p>
+      <p>Loyal Customer</p>
     </div>
-  </section>
-<%- include('../partials/user/footer') %>
+  </div>
+</section>
+
 

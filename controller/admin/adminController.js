@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const Product = require("../../models/productSchema");
 const saltRounds = 10;
 const newPassword = "admin@123";
 
@@ -10,14 +11,20 @@ bcrypt.hash(newPassword, saltRounds, (err, hash) => {
 });
 
 const page_error = async (req, res) => {
-  res.render("admin/admin-error");
+  res.render("admin/admin-error",{layout:false});
 };
 
 const loadAdminLogin = (req, res) => {
   if (req.session.admin) {
     return res.redirect("/admin/dashboard");
   } else {
-    res.render("admin/login", { pageCSS: "login.css" });
+    const error=req.flash("error");
+
+    res.render("admin/login", { 
+      layout:false,
+      error:error.length>0?error[0]:null,
+      pageCSS: "login.css"
+        });
   }
 };
 const login = async (req, res) => {
@@ -37,12 +44,15 @@ const login = async (req, res) => {
         // console.log('Session after login:', req.session); // ✅ Debug
         return res.redirect("/admin/dashboard");
       } else {
+         req.flash("error", "Invalid password");
         return res.redirect("/admin/login");
       }
     } else {
+      req.flash("error", "Invalid email or not an admin");
       return res.redirect("/admin/login");
     }
   } catch (error) {
+     req.flash("error", "Something went wrong");
     console.log("login error", error);
     return res.redirect("/page_error");
   }
@@ -51,7 +61,7 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
-      res.render("admin/dashboard", { pageCSS: "/css/admin/dashboard.css" });
+      res.render("admin/dashboard", {layout:false, pageCSS: "/css/admin/dashboard.css" });
     } catch (error) {
       res.redirect("/pageNotFound");
     }
@@ -74,6 +84,7 @@ const logout = async (req, res) => {
     res.redirect("/page_error");
   }
 };
+
 
 module.exports = {
   loadAdminLogin,

@@ -36,7 +36,10 @@ const categorySchema = new Schema({
     type: String, // Path to image (like "/uploads/categories/filename.jpg")
     default: null,
   },
-  
+  isDeleted:{
+     type: Boolean,
+    default: false,
+  }
 });
 const Category = mongoose.model("Category", categorySchema);
 module.exports = Category;

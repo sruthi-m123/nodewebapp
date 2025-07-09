@@ -130,16 +130,24 @@
             <label for="categoryImage" class="upload-btn">
               <i class="fas fa-cloud-upload-alt"></i> Choose Image
             </label>
-            <input type="file" id="categoryImage" name="categoryImage"accept="image/*">
-            <div class="image-preview" id="imagePreview">
-              <div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>
-              <canvas id="cropCanvas" style="display: none;"></canvas>
-            </div>
+            <input type="file" id="categoryImageInput" name="categoryImage"accept="image/*">
+            <div class="image-upload-preview" id="imagePreview">
+  <div class="placeholder" id="imageUploadPlaceholder">
+    <i class="fas fa-image"></i>
+    <span>Upload Category Image</span>
+  </div>
+  <div class="image-container" id="cropperContainer"></div>
+  <div class="crop-controls" id="cropControls">
+    <button type="button" class="btn crop-btn" id="confirmCrop">Crop Image</button>
+    <button type="button" class="btn cancel-btn" id="cancelCrop">Cancel</button>
+  </div>
+</div>
+
             <div class="crop-controls" style="display: none; margin-top: 10px;">
               <button type="button" class="crop-btn" id="cropButton">Crop Image</button>
               <button type="button" class="cancel-crop-btn" id="cancelCropButton">Cancel Crop</button>
             </div>
-            <input type="hidden" name="croppedImage" id="croppedImage">
+            <!-- <input type="hidden" name="croppedImage" id="croppedImage"> -->
           </div>
         </div>
         <div class="form-group">
@@ -205,7 +213,7 @@
   const cropControls = document.querySelector('.crop-controls');
   const cropButton = document.getElementById('cropButton');
   const cancelCropButton = document.getElementById('cancelCropButton');
-  const categoryImageInput = document.getElementById('categoryImage');
+  const categoryImageInput = document.getElementById('categoryImageInput');
   const searchInput = document.querySelector('.search-input');
   const filterSelect = document.querySelector('.filter-select');
   const statusToggles = document.querySelectorAll('.status-toggle input');
@@ -282,138 +290,165 @@
     }
     return true;
   }
+// categoryImageInput.addEventListener('change', function () {
+//   const file = this.files[0];
+//   if (!file) return;
 
-  categoryImageInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-      try {
-        validateImageFile(file);
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = new Image();
-          img.onload = function () {
-            console.log('Image loaded for preview'); // Debug
-            imagePreview.innerHTML = '';
-            imagePreview.appendChild(img);
-            img.className = 'preview-image';
-            img.src = e.target.result;
+//   try {
+//     validateImageFile(file);
 
-            if (cropper) {
-              cropper.destroy();
-              cropper = null;
-              console.log('Previous Cropper instance destroyed'); // Debug
-            }
+//     const reader = new FileReader();
+//     reader.onload = function (e) {
+//       const img = new Image();
+//       img.id = 'croppingImage';
+//       img.src = event.target.result;
+//       img.style.maxWidth = '100%';
+//       img.style.maxHeight = '100%';
+     
 
-            try {
-              cropper = new Cropper(img, {
-                aspectRatio: 1,
-                viewMode: 1,
-                dragMode: 'move',
-                guides: true,
-                cropBoxResizable: true,
-                toggleDragModeOnDblclick: false,
-                ready: function () {
-                  console.log('Cropper initialized successfully'); // Debug
-                  cropControls.style.display = 'block';
-                },
-              });
-            } catch (error) {
-              console.error('Cropper initialization failed:', error);
-              Swal.fire({
-                title: 'Error',
-                text: 'Failed to initialize image cropper.',
-                icon: 'error',
-              });
-            }
-          };
-          img.onerror = function () {
-            console.error('Failed to load image for preview');
-            Swal.fire({
-              title: 'Error',
-              text: 'Failed to load image.',
-              icon: 'error',
-            });
-            imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
-            cropControls.style.display = 'none';
-          };
-          img.src = e.target.result;
-        };
-        reader.onerror = function () {
-          console.error('FileReader error');
-          Swal.fire({
-            title: 'Error',
-            text: 'Failed to read image file.',
-            icon: 'error',
-          });
-          imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
-          cropControls.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-      } catch (error) {
-        console.error('Image validation error:', error.message);
-        Swal.fire({
-          title: 'Invalid File',
-          text: error.message,
-          icon: 'error',
-        });
-        this.value = '';
-        imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
-        cropControls.style.display = 'none';
+//       img.onload = function () {
+//         console.log('Image loaded for preview');
+
+//         const imageContainer = document.getElementById('imageContainer');
+//         const placeholder = document.getElementById('imagePlaceholder');
+//         // Destroy previous cropper if exists
+//         if (cropper) {
+//           cropper.destroy();
+//           cropper = null;
+//           console.log('Previous Cropper instance destroyed');
+//         }
+
+//         if (imageContainer) {
+//           imageContainer.innerHTML = '';
+//           img.className = 'preview-image'; // Set class before appending
+//           imageContainer.appendChild(img);
+
+//           // Delay cropper init to ensure DOM is ready
+//           requestAnimationFrame(() => {
+//             try {
+//               cropper = new Cropper(img, {
+//                 aspectRatio: 1,
+//                 viewMode: 1,
+//                 dragMode: 'move',
+//                 guides: true,
+//                 cropBoxResizable: true,
+//                 toggleDragModeOnDblclick: false,
+//                 ready: function () {
+//                   console.log('Cropper initialized successfully');
+//                   cropControls.style.display = 'block';
+//                 },
+//               });
+//               // reader.readAsDataURL(file);
+//             } catch (error) {
+//               console.error('Cropper initialization failed:', error);
+//               Swal.fire({
+//                 title: 'Error',
+//                 text: 'Failed to initialize image cropper.',
+//                 icon: 'error',
+//               });
+//             }
+//           });
+//         }
+
+//         if (placeholder) {
+//           placeholder.style.display = 'none';
+//         }
+//       };
+
+//       img.onerror = function () {
+//         showImageError('Failed to load image.');
+//       };
+
+//       // img.src = e.target.result;
+//     };
+
+//     reader.onerror = function () {
+//       showImageError('Failed to read image file.');
+//     };
+
+//     reader.readAsDataURL(file);
+//   } catch (error) {
+//     showImageError(error.message);
+//   }
+// });
+// Simplified and corrected image upload handler
+categoryImageInput.addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file || !file.type.startsWith('image/')) {
+    return Swal.fire('Error', 'Please upload a valid image file.', 'error');
+  }
+
+  const reader = new FileReader();
+  const img = document.createElement('img');
+  img.id = 'croppingImage';
+  img.className = 'preview-image';
+  img.style.maxWidth = '100%';
+  img.style.height = 'auto';
+
+  reader.onload = function (event) {
+    img.onload = function () {
+// Verify the element is actually in the DOM
+  if (!document.body.contains(img)) {
+    console.error('Image element not in DOM!');
+    return;
+  }
+  
+
+      const imageContainer = document.getElementById('imageContainer');
+      const placeholder = document.getElementById('imagePlaceholder');
+      
+      // Clear previous content
+      if (imageContainer) {
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(img);
       }
-    } else {
-      imagePreview.innerHTML = '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image Preview</span></div>';
-      cropControls.style.display = 'none';
+
+      // Destroy previous cropper if exists
       if (cropper) {
         cropper.destroy();
         cropper = null;
       }
-    }
-  });
 
-  cropButton.addEventListener('click', () => {
-    console.log('Crop button clicked at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug
-    if (cropper) {
+      // Initialize new cropper
       try {
-        const canvas = cropper.getCroppedCanvas({
-          width: 200,
-          height: 200,
+        cropper = new Cropper(img, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 0.8,
+          responsive: true,
+          guides: true
         });
-        if (canvas) {
-          canvas.toBlob((blob) => {
-            console.log('Cropped blob created:', blob); // Debug
-            const croppedFile = new File([blob], 'cropped-image.jpg', { type: 'image/jpeg', lastModified: Date.now() });
-            window.croppedImageFile = croppedFile;
-
-            const croppedURL = URL.createObjectURL(blob);
-            imagePreview.innerHTML = `<img src="${croppedURL}" alt="Cropped Preview" class="preview-image">`;
-            cropControls.style.display = 'none';
-            cropCanvas.style.display = 'none';
-
-            cropper.destroy();
-            cropper = null;
-            console.log('Crop completed, Cropper destroyed'); // Debug
-          }, 'image/jpeg', 0.9);
-        } else {
-          throw new Error('Failed to get cropped canvas');
-        }
+        cropControls.style.display = 'block';
       } catch (error) {
-        console.error('Error during cropping:', error);
-        Swal.fire({
-          title: 'Error',
-          text: 'Failed to crop image.',
-          icon: 'error',
-        });
+        console.error('Cropper init failed:', error);
+        Swal.fire('Error', 'Failed to initialize image editor.', 'error');
       }
-    } else {
-      console.error('Cropper instance not available');
-      Swal.fire({
-        title: 'Error',
-        text: 'No image to crop.',
-        icon: 'error',
-      });
-    }
-  });
 
+      if (placeholder) placeholder.style.display = 'none';
+    };
+
+    img.src = e.target.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+function showImageError(message) {
+  const placeholder = document.getElementById('imagePlaceholder');
+  const imageContainer = document.getElementById('imageContainer');
+
+  if (placeholder) placeholder.style.display = 'block';
+  if (imageContainer) imageContainer.innerHTML = '';
+  cropControls.style.display = 'none';
+  if (cropper) cropper.destroy();
+  cropper = null;
+
+  Swal.fire({
+    title: 'Error',
+    text: message,
+    icon: 'error',
+  });
+}
   cancelCropButton.addEventListener('click', () => {
     console.log('Cancel crop clicked at', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })); // Debug
     if (cropper) {
@@ -428,82 +463,196 @@
   });
 
   // === Form Submission ===
-  categoryForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
+  // categoryForm.addEventListener('submit', async function (e) {
+  //   e.preventDefault();
 
-    const categoryName = document.getElementById('categoryName').value.trim();
-    if (!categoryName) {
-      Swal.fire({
-        title: 'Error',
-        text: 'Category name is required',
-        icon: 'error',
-      });
-      return;
-    }
+  //   const categoryName = document.getElementById('categoryName').value.trim();
+  //   if (!categoryName) {
+  //     Swal.fire({
+  //       title: 'Error',
+  //       text: 'Category name is required',
+  //       icon: 'error',
+  //     });
+  //     return;
+  //   }
 
-    const submitButton = this.querySelector('.submit-btn');
-    const originalText = submitButton.innerHTML;
+  //   const submitButton = this.querySelector('.submit-btn');
+  //   const originalText = submitButton.innerHTML;
 
-    try {
-      setLoading(submitButton, true);
-      const formData = new FormData();
+  //   try {
+  //     setLoading(submitButton, true);
+  //     const formData = new FormData();
 
-      formData.append('name', categoryName);
-      formData.append('description', document.getElementById('categoryDesc').value);
-      const statusCheckbox = document.getElementById('categoryStatus');
-      formData.append('status', statusCheckbox.checked ? 'active' : 'inactive');
+  //     formData.append('name', categoryName);
+  //     formData.append('description', document.getElementById('categoryDesc').value);
+  //     const statusCheckbox = document.getElementById('categoryStatus');
+  //     formData.append('status', statusCheckbox.checked ? 'active' : 'inactive');
 
-      if (window.croppedImageFile) {
-        console.log('Appending cropped image to FormData'); // Debug
-        formData.append('categoryImage', window.croppedImageFile);
-      } else if (categoryImageInput.files[0]) {
-        console.log('Appending original image to FormData'); // Debug
-        formData.append('categoryImage', categoryImageInput.files[0]);
-      } else {
-        console.log('No image provided'); // Debug
-      }
+  //     if (window.croppedImageFile) {
+  //       console.log('Appending cropped image to FormData'); // Debug
+  //       formData.append('categoryImage', window.croppedImageFile);
+  //     } else if (categoryImageInput.files[0]) {
+  //       console.log('Appending original image to FormData'); // Debug
+  //       formData.append('categoryImage', categoryImageInput.files[0]);
+  //     } else {
+  //       console.log('No image provided'); // Debug
+  //     }
 
-      const response = await fetch(this.action, {
-        method: 'POST',
-        body: formData,
-      });
+  //     const response = await fetch(this.action, {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
 
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Expected JSON response from server');
-      }
+  //     const contentType = response.headers.get('content-type');
+  //     if (!contentType || !contentType.includes('application/json')) {
+  //       throw new Error('Expected JSON response from server');
+  //     }
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      Swal.fire({
-        title: data.alert.title,
-        text: data.alert.text,
-        icon: data.alert.icon,
-      });
+  //     Swal.fire({
+  //       title: data.alert.title,
+  //       text: data.alert.text,
+  //       icon: data.alert.icon,
+  //     });
 
-      if (data.success) {
-        setTimeout(() => {
-          categoryModal.classList.remove('active');
-          categoryModal.style.display = 'none';
-          window.location.reload();
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      Swal.fire({
-        title: 'Error',
-        text: error.message || 'Failed to save category. Please try again.',
-        icon: 'error',
-      });
-    } finally {
-      setLoading(submitButton, false, originalText);
-    }
+  //     if (data.success) {
+  //       setTimeout(() => {
+  //         categoryModal.classList.remove('active');
+  //         categoryModal.style.display = 'none';
+  //         window.location.reload();
+  //       }, 1500);
+  //     }
+  //   } catch (error) {
+  //     console.error('Form submission error:', error);
+  //     Swal.fire({
+  //       title: 'Error',
+  //       text: error.message || 'Failed to save category. Please try again.',
+  //       icon: 'error',
+  //     });
+  //   } finally {
+  //     setLoading(submitButton, false, originalText);
+  //   }
+  // });
+// Add this before form submission
+cropButton.addEventListener('click', function() {
+  if (!cropper) {
+    return Swal.fire('Error', 'No image to crop', 'error');
+  }
+
+  // Get cropped canvas
+  const canvas = cropper.getCroppedCanvas({
+    width: 400,
+    height: 400,
+    minWidth: 256,
+    minHeight: 256,
+    maxWidth: 800,
+    maxHeight: 800,
+    fillColor: '#fff',
+    imageSmoothingEnabled: true,
+    imageSmoothingQuality: 'high',
   });
 
+  if (!canvas) {
+    return Swal.fire('Error', 'Could not crop image', 'error');
+  }
+
+  // Convert canvas to blob
+  canvas.toBlob((blob) => {
+    if (!blob) {
+      return Swal.fire('Error', 'Failed to process image', 'error');
+    }
+    
+    // Create file from blob
+    window.croppedImageFile = new File([blob], 'cropped-image.jpg', {
+      type: 'image/jpeg',
+      lastModified: Date.now()
+    });
+    
+    // Update preview
+    const imageContainer = document.getElementById('imageContainer');
+    if (imageContainer) {
+      imageContainer.innerHTML = '';
+      const croppedImg = document.createElement('img');
+      croppedImg.src = URL.createObjectURL(blob);
+      croppedImg.className = 'preview-image';
+      imageContainer.appendChild(croppedImg);
+    }
+    
+    Swal.fire('Success', 'Image cropped successfully', 'success');
+  }, 'image/jpeg', 0.9);
+});
+
+//form submission
+categoryForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const categoryName = document.getElementById('categoryName').value.trim();
+  if (!categoryName) {
+    Swal.fire({
+      title: 'Error',
+      text: 'Category name is required',
+      icon: 'error',
+    });
+    return;
+  }
+
+  const submitButton = this.querySelector('.submit-btn');
+  const originalText = submitButton.innerHTML;
+
+  try {
+    setLoading(submitButton, true);
+    const formData = new FormData();
+
+    formData.append('name', categoryName);
+    formData.append('description', document.getElementById('categoryDesc').value);
+    const statusCheckbox = document.getElementById('categoryStatus');
+    formData.append('status', statusCheckbox.checked ? 'active' : 'inactive');
+
+    // Handle both cropped and original images
+    if (window.croppedImageFile) {
+      formData.append('categoryImage', window.croppedImageFile);
+    } else if (categoryImageInput.files[0]) {
+      formData.append('categoryImage', categoryImageInput.files[0]);
+    }
+
+    const response = await fetch(this.action, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    if (!data) throw new Error('No response data');
+
+    Swal.fire({
+      title: data.success ? 'Success' : 'Error',
+      text: data.message || (data.success ? 'Category saved successfully' : 'Failed to save category'),
+      icon: data.success ? 'success' : 'error',
+    });
+
+    if (data.success) {
+      setTimeout(() => {
+        categoryModal.classList.remove('active');
+        window.location.reload();
+      }, 1500);
+    }
+  } catch (error) {
+    console.error('Form submission error:', error);
+    Swal.fire({
+      title: 'Error',
+      text: error.message || 'Failed to save category. Please try again.',
+      icon: 'error',
+    });
+  } finally {
+    setLoading(submitButton, false, originalText);
+  }
+});
   // === Modal Controls ===
   closeModalBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -538,69 +687,113 @@
   });
 
   // === Status Toggle ===
-  statusToggles.forEach(toggle => {
-    toggle.addEventListener('change', async function () {
-      const categoryId = this.getAttribute('data-id');
-      const newStatus = this.checked ? 'active' : 'inactive';
-      const statusSpan = this.nextElementSibling;
-      const originalChecked = this.checked;
+  // statusToggles.forEach(toggle => {
+  //   toggle.addEventListener('change', async function () {
+  //     const categoryId = this.getAttribute('data-id');
+  //     const newStatus = this.checked ? 'active' : 'inactive';
+  //     const statusSpan = this.nextElementSibling;
+  //     const originalChecked = this.checked;
 
-      try {
-        document.body.classList.add('freeze-layout');
-        statusSpan.style.transition = 'none';
-        const response = await fetch(`/admin/categories/status/${categoryId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus }),
-        });
+  //     try {
+  //       document.body.classList.add('freeze-layout');
+  //       statusSpan.style.transition = 'none';
+  //       const response = await fetch(`/admin/categories/status/${categoryId}`, {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({ status: newStatus }),
+  //       });
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Expected JSON response from server');
-        }
+  //       const contentType = response.headers.get('content-type');
+  //       if (!contentType || !contentType.includes('application/json')) {
+  //         throw new Error('Expected JSON response from server');
+  //       }
 
-        const data = await response.json();
+  //       const data = await response.json();
 
-        if (!data.success) {
-          throw new Error(data.alert.text || 'Failed to update status');
-        }
+  //       if (!data.success) {
+  //         throw new Error(data.alert.text || 'Failed to update status');
+  //       }
 
-        requestAnimationFrame(() => {
-          statusSpan.className = `status-slider round ${newStatus}`;
-          statusSpan.textContent = newStatus === 'active' ? 'Active' : 'Inactive';
-          statusSpan.style.backgroundColor = newStatus === 'active' ? '#2ecc71' : '#e74c3c';
+  //       requestAnimationFrame(() => {
+  //         statusSpan.className = `status-slider round ${newStatus}`;
+  //         statusSpan.textContent = newStatus === 'active' ? 'Active' : 'Inactive';
+  //         statusSpan.style.backgroundColor = newStatus === 'active' ? '#2ecc71' : '#e74c3c';
 
-          setTimeout(() => {
-            statusSpan.style.transition = '';
-            document.body.classList.remove('freeze-layout');
-          }, 50);
-        });
+  //         setTimeout(() => {
+  //           statusSpan.style.transition = '';
+  //           document.body.classList.remove('freeze-layout');
+  //         }, 50);
+  //       });
 
-        Swal.fire({
-          title: data.alert.title,
-          text: data.alert.text,
-          icon: data.alert.icon,
-        });
-      } catch (error) {
-        console.error('Error:', error);
-        this.checked = !originalChecked;
-        statusSpan.className = `status-slider round ${originalChecked ? 'active' : 'inactive'}`;
-        statusSpan.textContent = originalChecked ? 'Active' : 'Inactive';
-        statusSpan.style.backgroundColor = originalChecked ? '#2ecc71' : '#e74c3c';
-        document.body.classList.remove('freeze-layout');
-        Swal.fire({
-          title: 'Error',
-          text: error.message || 'Failed to update status',
-          icon: 'error',
-        });
+  //       Swal.fire({
+  //         title: data.alert.title,
+  //         text: data.alert.text,
+  //         icon: data.alert.icon,
+  //       });
+  //     } catch (error) {
+  //       console.error('Error:', error);
+  //       this.checked = !originalChecked;
+  //       statusSpan.className = `status-slider round ${originalChecked ? 'active' : 'inactive'}`;
+  //       statusSpan.textContent = originalChecked ? 'Active' : 'Inactive';
+  //       statusSpan.style.backgroundColor = originalChecked ? '#2ecc71' : '#e74c3c';
+  //       document.body.classList.remove('freeze-layout');
+  //       Swal.fire({
+  //         title: 'Error',
+  //         text: error.message || 'Failed to update status',
+  //         icon: 'error',
+  //       });
+  //     }
+  //   });
+  // });
+statusToggles.forEach(toggle => {
+  toggle.addEventListener('change', async function() {
+    const categoryId = this.dataset.id;
+    const newStatus = this.checked ? 'active' : 'inactive';
+    const statusSpan = this.nextElementSibling;
+    const originalStatus = !this.checked;
+
+    try {
+      // Immediate UI feedback
+      statusSpan.textContent = newStatus === 'active' ? 'Active' : 'Inactive';
+      statusSpan.style.backgroundColor = newStatus === 'active' ? '#2ecc71' : '#e74c3c';
+
+      const response = await fetch(`/admin/categories/status/${categoryId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Status update failed');
       }
-    });
-  });
 
+    } catch (error) {
+      // Revert on error
+      console.error('Status update error:', error);
+      this.checked = originalStatus;
+      statusSpan.textContent = originalStatus ? 'Active' : 'Inactive';
+      statusSpan.style.backgroundColor = originalStatus ? '#2ecc71' : '#e74c3c';
+      
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to update status',
+        icon: 'error'
+      });
+    }
+  });
+});
   // === Edit Category ===
   editButtons.forEach(button => {
     button.addEventListener('click', async function () {
       const categoryId = this.getAttribute('data-id');
+if (!categoryId) {
+      Swal.fire('Error', 'Invalid category ID', 'error');
+      return;
+    }
 
       try {
         const response = await fetch(`/admin/categories/${categoryId}`);
@@ -608,7 +801,7 @@
         if (!contentType || !contentType.includes('application/json')) {
           throw new Error('Expected JSON response from server');
         }
-
+if (!response.ok) throw new Error('Failed to fetch category');
         const data = await response.json();
         if (!data._id) {
           throw new Error('Category data not found');

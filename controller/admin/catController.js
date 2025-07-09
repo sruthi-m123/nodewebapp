@@ -19,6 +19,7 @@ const getAllCategories = async (req, res) => {
     const totalPages = Math.ceil(totalCategories / limit);
 
     res.render('admin/categories', {
+      layout:false,
       categories,
       startItem,
       endItem,
@@ -68,18 +69,7 @@ const addCategory = async (req, res) => {
       imagePath = `/img/admin/category/${req.file.filename}`;
       console.log('Image saved from file upload:', imagePath);
     }
-    // } else if (croppedImage && croppedImage.startsWith('data:image/')) {
-    //   const base64Data = croppedImage.replace(/^data:image\/(jpeg|png|jpg);base64,/, '');
-    //   const filename = `cropped-${Date.now()}.jpg`;
-    //   const filePath = `public/img/admin/category/${filename}`;
-    //   const fs = require('fs');
-    //   if (!fs.existsSync('public/img/admin/category/')) {
-    //     fs.mkdirSync('public/img/admin/category/', { recursive: true });
-    //   }
-    //   fs.writeFileSync(filePath, base64Data, 'base64');
-    //   imagePath = `/img/admin/category/${filename}`;
-    //   console.log('Image saved from base64:', imagePath);
-    // }
+    
 
     const newCategory = new Category({
       name: name.trim().toLowerCase(),

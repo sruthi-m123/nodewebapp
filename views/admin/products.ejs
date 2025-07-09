@@ -241,6 +241,9 @@ function openModal() {
 function closeModal() {
     document.getElementById('productModal').style.display = 'none';
     document.getElementById('productForm').reset();
+    document.getElementById('croppedImageList').innerHTML = '';
+  previewArea.innerHTML = '';
+  removedImages = []; 
     currentProductId = null;
 }
 
@@ -283,12 +286,7 @@ function editProduct(productId) {
         document.getElementById('isNewArrival').checked = product.isNewArrival || false;
         document.getElementById('isActive').checked = product.isActive !== false;
 
-        // // Clear old previews
-        // const croppedImageList = document.getElementById("croppedImageList");
-        // croppedImageList.innerHTML = "";
-
-        // const previewArea = document.getElementById("previewArea");
-        // previewArea.innerHTML = "";
+      
 
         // Show existing images
         if (product.images && product.images.length > 0) {
@@ -421,12 +419,12 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const formData = new FormData(this);
-    const url = '/admin/products';
+    // const url = '/admin/products';
     // const method =  'POST';
     
  if (currentProductId) {
         formData.append('id', currentProductId); // Add product ID for backend to detect update
-      
+      formData.append('removedImages',JSON.stringify(removedImages));
         
     }
     
@@ -435,17 +433,19 @@ croppedImages.forEach((blob,index)=>{
     formData.append('images',blob,`image${Date.now()}_${index}.jpg`);
 });
 
-// Append removed images (from edit modal)
-    formData.append('removedImages', JSON.stringify(removedImages));
+// // Append removed images (from edit modal)
+//     formData.append('removedImages', JSON.stringify(removedImages));
 
 
 for (let [key, value] of formData.entries()) {
   console.log(key, value);
 }
+const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/products';
+const method = currentProductId ? 'PUT' : 'POST';
 
 
     fetch(url, {
-        method: 'POST',
+        method,
         body: formData
     })
 .then(res => {
