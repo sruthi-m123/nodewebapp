@@ -44,6 +44,7 @@ function applyFilters(){
     .then(res=>res.json())
 .then(data=>{
     console.log('filtered products by price:',data);
+     updateProductGrid(data.products); 
 });
 
 }
@@ -69,13 +70,13 @@ searchInput.addEventListener('input',  debounce(()=>{
     .then(res => res.json())
     .then(data => {
       console.log('Search results:', data);
-      // updateProductUI(data); // update product display based on result
+       updateProductGrid(data.products); 
     });
 },300));
 
   sortSelect.addEventListener('change', function(){
     const selectedSort=sortSelect.value;
-    fetch('user/shopall/filter',{
+    fetch('/user/shopall/filter',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -85,13 +86,26 @@ searchInput.addEventListener('input',  debounce(()=>{
     .then(res=>res.json())
     .then(data=>{
       console.log('sorted products:',data);
+       updateProductGrid(data.products); 
     })
   });
 
 checkboxes.forEach(cb => {
   cb.addEventListener('change', function () {
     const selectedAvailability = [...document.querySelectorAll('input[name="availability"]:checked')].map(cb => cb.value);
+if (selectedAvailability.length === 0 ) {
+    fetch('/user/shopall/all')
+      .then(res => res.json())
+      .then(data => {
+        updateProductGrid(data.products);
+      })
+      .catch(err => {
+        console.error('Error loading all products:', err);
+      });
+    return;
+  }
 
+    if(this.checked){
     fetch('/user/shopall/filter', {
       method: 'POST',
       headers: {
@@ -102,9 +116,18 @@ checkboxes.forEach(cb => {
       .then(res => res.json())
       .then(data => {
         console.log('Filtered by availability:', data);
-        // updateProductUI(data); 
+       updateProductGrid(data.products); 
       });
+    }else{
+ fetch('/user/shopall/all')
+        .then(res => res.json())
+        .then(data => {
+          updateProductGrid(data.products);
+        })
+        .catch(err => console.error('Error loading all products:', err));
+    }
   });
+
 });
 
 
@@ -112,7 +135,20 @@ checkboxes.forEach(cb => {
     colorBox.addEventListener('click', function () {
       colorBox.classList.toggle('selected');
       const selectedColors=[...document.querySelectorAll('.color-option.selected')].map(el=>el.dataset.color);
-    fetch('/user/shopall/filter',{
+   if (selectedColors.length === 0 ) {
+    fetch('/user/shopall/all')
+      .then(res => res.json())
+      .then(data => {
+        updateProductGrid(data.products);
+      })
+      .catch(err => {
+        console.error('Error loading all products:', err);
+      });
+    return;
+  }
+   
+   
+      fetch('/user/shopall/filter',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -122,8 +158,7 @@ checkboxes.forEach(cb => {
     .then(res=>res.json())
     .then(data=>{
       console.log('filtered by colors:',data);
-      //updtaeProductUI(data);
-    })
+ updateProductGrid(data.products);     })
     });
   });
 
@@ -146,10 +181,75 @@ checkboxes.forEach(cb => {
       timeout = setTimeout(() => func.apply(this, args), delay);
     };
   }
+
+function updateProductGrid(products) {
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = ''; // Clear old cards
+
+  if (products.length === 0) {
+    grid.innerHTML = '<p>No products found.</p>';
+    return;
+  }
+
+  products.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    if (!product.isActive) {
+      card.classList.add('inactive');
+    }
+
+    card.innerHTML = `
+      <div class="product-badge">${product.badge || 'New'}</div>
+      <div class="product-image">
+        <img src="/${product.images[0]}" alt="${product.productName}">
+        <div class="quick-view">Quick View</div>
+      </div>
+      <div class="product-info">
+        <h4 class="product-name">${product.productName}</h4>
+        <div class="product-meta">
+          <div class="product-rating">
+            ${generateStarRating(product.rating)}
+            <span>(${product.reviews || 0})</span>
+          </div>
+          <p class="product-price">₹${Number(product.price).toLocaleString()}</p>
+        </div>
+        <div class="product-actions">
+          <button class="wishlist-btn" title="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          <button class="add-to-cart primary-btn">Add to Cart</button>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+// Helper function for rendering star rating
+function generateStarRating(rating) {
+  let stars = '';
+  for (let i = 0; i < 5; i++) {
+    stars += `<i class="${i < rating ? 'fas' : 'far'} fa-star"></i>`;
+  }
+  return stars;
+}
+
+
   categoryCheckboxes.forEach(checkbox => {
   checkbox.addEventListener('change', function () {
     const categoryId = this.value;
-
+if (checkbox.length === 0 && selectedAvailability.length === 0) {
+    fetch('/user/shopall/all')
+      .then(res => res.json())
+      .then(data => {
+        updateProductGrid(data.products);
+      })
+      .catch(err => {
+        console.error('Error loading all products:', err);
+      });
+    return;
+  }
     // Only fetch if checked
     if (this.checked) {
       fetch(`/user/shopall/category/${categoryId}`)

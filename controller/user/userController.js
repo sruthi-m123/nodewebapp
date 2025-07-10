@@ -550,14 +550,14 @@ const applyFilters = async (req, res) => {
     const { search, sort, categories, availability, colors, minPrice, maxPrice } = req.body;
     let query = {};
 
-    // 🔍 Search by product name
+    //  Search by product name
     if (search) {
       query.productName = { $regex: search, $options: 'i' };
     }
 
-    // ✅ Categories
+    //  Categories
     if (categories && categories.length > 0) {
-      query.category = { $in: categories }; // ✅ Typo fixed: catgeories → categories
+      query.category = { $in: categories }; 
     }
 
     // 📦 Availability
@@ -576,23 +576,32 @@ const applyFilters = async (req, res) => {
       // If both are selected, don't filter by stock
     }
 
-    // 🎨 Color Filter
+    //  Color Filter
     if (colors && colors.length > 0) {
       query.color = { $in: colors };
     }
 
-    // 💰 Price Range
-    if (minPrice && maxPrice) {
-      query.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
-    }
+    //  Price Range
+    if (minPrice !== undefined || maxPrice !== undefined) {
+  query.price = {};
+  if (minPrice !== undefined && minPrice !== "") {
+    query.price.$gte = Number(minPrice);
+  }
+  if (maxPrice !== undefined && maxPrice !== "") {
+    query.price.$lte = Number(maxPrice);
+  }
+}
 
-    // 🛒 Only fetch active products
+
+    //  Only fetch active products
     query.isActive = true;
-
-    // 📦 Build the query
+    query.isDeleted=false;
+console.log("all the queries:",query)
+    //  Build the query
     let productsQuery = Product.find(query);
+    
 
-    // 🔃 Sorting
+    //  Sorting
     switch (sort) {
       case 'price-asc':
         productsQuery = productsQuery.sort({ price: 1 });
@@ -603,12 +612,16 @@ const applyFilters = async (req, res) => {
       case 'new':
         productsQuery = productsQuery.sort({ createdAt: -1 });
         break;
+        case 'rating-desc':
+    productsQuery = productsQuery.sort({ rating: -1 }); // if rating exists
+    break;
       default:
         break;
     }
+console.log(' Received minPrice:', minPrice, 'maxPrice:', maxPrice);
 
     const filteredProducts = await productsQuery.exec();
-
+   console.log("filtered products",filteredProducts)
     res.status(200).json({ products: filteredProducts });
 
   } catch (error) {
@@ -619,12 +632,26 @@ const applyFilters = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
-    const products = await Product.find({ category: categoryId });
+    const products = await Product.find({ category: categoryId,isDeleted:false,isActive:true });
     res.status(200).json({ products });
   } catch (err) {
     res.status(500).json({ message: 'Category filter failed' });
   }
 };
+
+const logout=async (req,res)=>{
+  req.session.destroy((err)=>{
+    if(err){
+      console.log('session destroyed error:',err);
+      return res.status(500).send('logout failed');
+    }
+    res.clearCookie('connect.sid');
+    res.sendStatus(200);
+  })
+}
+
+
+
 
 module.exports = {
   loadHomepage,
@@ -649,7 +676,8 @@ module.exports = {
   getProfile,
   googleAuthSuccess,
   applyFilters,
-  getProductsByCategory
+  getProductsByCategory,
+  logout
   
 };
 

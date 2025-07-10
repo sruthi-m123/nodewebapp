@@ -31,6 +31,8 @@ router.get(
   '/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
+//logout
+router.post('/logout',userController.logout);
 
 router.get(
   '/auth/google/callback',

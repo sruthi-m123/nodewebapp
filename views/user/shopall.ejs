@@ -85,34 +85,41 @@
       </div>
     </div>
 
-    <div class="product-grid">
-      <% products.forEach(product => { %>
-  <div class="product-card <%= !product.isActive ? 'inactive' : '' %>">          <div class="product-badge"><%= product.badge || 'New' %></div>
-          <div class="product-image">
-            <img src="/<%= product.images[0] %>" alt="<%= product.productName%>">
-            <div class="quick-view">Quick View</div>
+   <div class="product-grid" id="product-grid">
+  <% if (products.length === 0) { %>
+    <div class="no-products-message">
+      <p>No products available.</p>
+    </div>
+  <% } else { %>
+    <% products.forEach(product => { %>
+      <div class="product-card <%= !product.isActive ? 'inactive' : '' %>">
+        <div class="product-badge"><%= product.badge || 'New' %></div>
+        <div class="product-image">
+          <img src="/<%= product.images[0] %>" alt="<%= product.productName %>">
+          <div class="quick-view">Quick View</div>
+        </div>
+        <div class="product-info">
+          <h4 class="product-name"><%= product.productName %></h4>
+          <div class="product-meta">
+            <div class="product-rating">
+              <% for(let i = 0; i < 5; i++) { %>
+                <i class="<%= i < product.rating ? 'fas' : 'far' %> fa-star"></i>
+              <% } %>
+              <span>(<%= product.reviews || 0 %>)</span>
+            </div>
+            <p class="product-price">₹<%= product.price.toLocaleString() %></p>
           </div>
-          <div class="product-info">
-            <h4 class="product-name"><%= product.productName%></h4>
-            <div class="product-meta">
-              <div class="product-rating">
-                <% for(let i=0; i<5; i++) { %>
-                  <i class="<%= i < product.rating ? 'fas' : 'far' %> fa-star"></i>
-                <% } %>
-                <span>(<%= product.reviews || 0 %>)</span>
-              </div>
-              <p class="product-price">₹<%= product.price.toLocaleString() %></p>
-            </div>
-            <div class="product-actions">
-              <button class="wishlist-btn" title="Add to wishlist">
-                <i class="far fa-heart"></i>
-              </button>
-              <button class="add-to-cart primary-btn">Add to Cart</button>
-            </div>
+          <div class="product-actions">
+            <button class="wishlist-btn" title="Add to wishlist">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="add-to-cart primary-btn">Add to Cart</button>
           </div>
         </div>
-      <% }) %>
-    </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
 
     <div class="pagination">
       <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
