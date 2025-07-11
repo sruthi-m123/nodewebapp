@@ -11,8 +11,9 @@ const formatResponse = (success, message, data = {}) => ({
 
 const getAllCategories = async (req, res) => {
   try {
+    const search=req.query.search||'';
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = 5;
     const skip = (page - 1) * limit;
     
     const [categories, totalCategories] = await Promise.all([
@@ -34,6 +35,7 @@ const getAllCategories = async (req, res) => {
       totalCategories,
       currentPage: page,
       totalPages,
+      search
     });
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -104,7 +106,8 @@ const addCategory = async (req, res) => {
 
       imagePath = path.join('/img/admin/category', req.file.filename);
     }
-
+console.log(req.body); // Log text fields
+console.log(req.file); //debuging
     // Create new category
     const newCategory = new Category({
       name: name.trim(),
@@ -114,7 +117,7 @@ const addCategory = async (req, res) => {
     });
 
     await newCategory.save();
-
+console.log("category saved");
     res.status(201).json(formatResponse(true, 'Category added successfully', { 
       category: newCategory 
     }));

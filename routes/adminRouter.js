@@ -4,7 +4,7 @@ const adminController = require("../controller/admin/adminController");
 const catController = require("../controller/admin/catController")
 const customerController = require("../controller/admin/customerController")
 const productController = require('../controller/admin/productController');
-const { upload, singleUpload, multiUpload } = require('../config/multer');
+const { upload, singleUpload, multiUpload,handleMulterError } = require('../config/multer');
 const { adminAuth } = require("../middlewares/auth");
 
 // Disable layout for all admin views
@@ -26,10 +26,10 @@ router.get("/users", adminAuth, customerController.customerInfo);
 router.post("/toggle_block", adminAuth, customerController.toggleBlockStatus);
 //category managment
 router.get('/categories', adminAuth, catController.getAllCategories);
-router.post('/addCategory', singleUpload, catController.addCategory);
+router.post('/addCategory', upload.category, handleMulterError,catController.addCategory);
 router.post('/categories/delete', adminAuth, catController.deleteCategory);
 router.post('/categories/status/:categoryId', adminAuth, catController.updateCategoryStatus);
-router.post('/categories/:id/update', adminAuth, singleUpload, catController.updateCategory);
+router.put('/categories/:id/update', adminAuth, singleUpload, catController.updateCategory);
 router.get('/categories/:id', adminAuth, catController.getCategory); // keep this last
 
 //product routes

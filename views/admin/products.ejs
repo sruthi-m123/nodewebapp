@@ -82,11 +82,11 @@
 
   <div class="pagination">
     <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined' && totalPages > 0) { %>
-      <button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? 'disabled' : '' %>>&laquo;</button>
+<button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? disabled="disabled" : '' %>>&laquo;</button>
       <% for (let i = 1; i <= totalPages; i++) { %>
-        <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%- i %>)"><%= i %></button>
+        <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage('<%- i %>')"><%= i %></button>
       <% } %>
-      <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? 'disabled' : '' %>>&raquo;</button>
+      <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? disabled="disabled" : '' %>>&raquo;</button>
     <% } else { %>
       <button disabled>&laquo;</button>
       <button class="active">1</button>
@@ -398,9 +398,9 @@
         formData.append('removedImages', JSON.stringify(removedImages));
       }
       
-      croppedImages.forEach((blob, index) => {
+      
         formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
-      });
+      
 
       const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/products';
       const method = currentProductId ? 'PUT' : 'POST';

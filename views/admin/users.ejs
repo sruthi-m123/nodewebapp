@@ -18,6 +18,9 @@
     <form action="/admin/users" method="GET">
       <input type="text" name="search" placeholder="Search users..." value="<%= search || '' %>">
       <button type="submit"><i class="fas fa-search"></i></button>
+   <% if (search) { %>
+        <a href="/admin/users" class="reset-btn">Reset</a>
+      <% } %>
     </form>
   </div>
 

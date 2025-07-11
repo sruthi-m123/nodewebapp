@@ -1,606 +1,460 @@
 <%- include('../partials/admin/admin-header') %>
+<link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet"/>
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
 <link rel="stylesheet" href="/css/admin/category.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-<section class="category-page">
-  <div class="section-header">
-    <div class="header-content">
-      <h2>Category Management</h2>
-      <p>Organize and manage your product categories</p>
-    </div>
-    <button class="primary-btn add-btn" id="addCategoryBtn">
-      <i class="fas fa-plus-circle"></i> Add New Category
-    </button>
-  </div>
+<div class="category-page">
+  <div class="category-header">
+    <h2>Categories</h2>
+   <div class="search-bar">
+  <form action="/admin/categories" method="GET" id="searchForm">
+    <input type="text" name="search" id="searchBox" placeholder="Search for categories" value="<%= search || '' %>">
+ </form>
+    <button type="submit" id="searchBtn">Search</button>
+    <% if (search) { %>
+      <a href="/admin/categories" class="reset-btn" id="resetBtn">Reset</a>
+    <% } %>
+   
+    <button type="button" class="demo-button" onclick="openModal()">Add Category +</button>
   
-  <div class="category-controls">
-    <div class="search-filter">
-      <div class="search-box">
-        <input type="text" placeholder="Search categories..." class="search-input" id="searchInput">
-        <button class="search-btn"><i class="fas fa-search"></i></button>
-      </div>
-      <select class="filter-select" id="statusFilter">
-        <option value="">All Status</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
-    </div>
-  </div>
+</div>
 
-  <div class="category-table-container">
-    <div class="table-responsive">
-      <table class="category-table">
-        <thead>
-          <tr>
-            <th class="sortable">No <i class="fas fa-sort"></i></th>
-            <th>Image</th>
-            <th class="sortable">Category Name <i class="fas fa-sort"></i></th>
-            <th>Description</th>
-            <th class="sortable">Status <i class="fas fa-sort"></i></th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Category Image</th>
+          <th>Category Name</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="categoryTable">
+        <% if (categories && categories.length > 0) { %>
           <% categories.forEach((category, index) => { %>
+            <tr>
+              <td><%= category._id.toString().slice(-6) %></td>
+              <td>
+                <% if (category.image) { %>
+                  <img src="<%= category.image %>" alt="<%= category.name %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                <% } else { %>
+                  <div style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                    📷
+                  </div>
+                <% } %>
+              </td>
+              <td><%= category.name %></td>
+              <td><%= category.description || '-' %></td>
+              <td>
+                <button class="action-btn <%= category.isActive ? 'unblock-btn' : 'block-btn' %>" 
+                        onclick="toggleCategoryStatus('<%= category._id %>', <%= !category.isActive %>)">
+                  <%= category.isActive ? 'Active' : 'Inactive' %>
+                </button>
+              </td>
+              <td>
+                <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
           <tr>
-            <td><%= index + 1 %></td>
-            <td>
-              <div class="category-image">
-                <img src="<%= category.image || '/img/admin/category/default-category.jpg' %>" 
-                     alt="<%= category.name %>" 
-                     class="category-img" 
-                     onerror="this.src='/img/admin/category/default-category.jpg'">
-              </div>
-            </td>
-            <td>
-              <div class="category-name">
-                <strong><%= category.name %></strong>
-              </div>
-            </td>
-            <td class="description-cell"><%= category.description || 'No description' %></td>
-            <td>
-              <label class="status-toggle">
-                <input type="checkbox" <%= category.status === 'active' ? 'checked' : '' %> 
-                       data-id="<%= category._id %>"
-                       class="status-checkbox">
-                <span class="status-slider round <%= category.status === 'active' ? 'active' : 'inactive' %>">
-                  <%= category.status === 'active' ? 'Active' : 'Inactive' %>
-                </span>
-              </label>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="icon-btn edit-btn" title="Edit" data-id="<%= category._id %>">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="icon-btn delete-btn" title="Delete" data-id="<%= category._id %>">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </div>
-            </td>
+            <td colspan="6" style="text-align: center; padding: 40px;">No categories found</td>
           </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </div>
-    
-    <div class="table-footer">
-      <div class="table-info">
-        Showing <%= startItem %> to <%= endItem %> of <%= totalCategories %> entries
-      </div>
-      <div class="pagination">
-        <% if (currentPage > 1) { %>
-          <a href="?page=<%= currentPage - 1 %>" class="page-btn"><i class="fas fa-chevron-left"></i></a>
-        <% } else { %>
-          <span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>
         <% } %>
-        
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <% if (i === currentPage) { %>
-            <span class="page-btn active"><%= i %></span>
-          <% } else { %>
-            <a href="?page=<%= i %>" class="page-btn"><%= i %></a>
-          <% } %>
-        <% } %>
-        
-        <% if (currentPage < totalPages) { %>
-          <a href="?page=<%= currentPage + 1 %>" class="page-btn"><i class="fas fa-chevron-right"></i></a>
-        <% } else { %>
-          <span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>
-        <% } %>
-      </div>
-    </div>
+      </tbody>
+    </table>
   </div>
-</section>
 
-<!-- Add/Edit Category Modal -->
-<div class="modal-overlay" id="categoryModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalTitle">Add New Category</h3>
-      <button class="close-modal" aria-label="Close modal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form id="categoryForm"action="/admin/addCategory" enctype="multipart/form-data">
-        <input type="hidden" id="categoryId" name="categoryId">
-        <div class="form-group">
-          <label for="categoryName">Category Name *</label>
-          <input type="text" id="categoryName" name="name" placeholder="Enter category name" required>
-        </div>
-        <div class="form-group">
-          <label for="categoryImage">Category Image</label>
-          <div class="image-upload-container">
-            <input type="file" id="categoryImageInput" accept="image/*" style="display: none;">
-            <label for="categoryImageInput" class="upload-btn">
-              <i class="fas fa-cloud-upload-alt"></i> Choose Image
-            </label>
-            <div id="imagePreview" class="image-preview">
-              <div class="image-placeholder">
-                <i class="fas fa-image"></i>
-                <span>Image Preview</span>
-              </div>
-            </div>
-            <div id="cropperContainer" class="cropper-container" style="display: none;"></div>
-            <div id="cropControls" class="crop-controls" style="display: none;">
-              <button type="button" id="cropButton" class="btn crop-btn">Crop</button>
-              <button type="button" id="cancelCropButton" class="btn cancel-btn">Cancel</button>
+  <div class="pagination">
+    <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined' && totalPages > 0) { %>
+      <button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? 'disabled' : '' %>>&laquo;</button>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%- i %>)"><%= i %></button>
+      <% } %>
+      <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? 'disabled' : '' %>>&raquo;</button>
+    <% } else { %>
+      <button disabled>&laquo;</button>
+      <button class="active">1</button>
+      <button disabled>&raquo;</button>
+    <% } %>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Category</h3>
+        <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="categoryForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="categoryName">Category Name *</label>
+              <input type="text" id="categoryName" name="name" required>
             </div>
           </div>
-          <input type="hidden" id="croppedImageData" name="croppedImage">
-        </div>
-        <div class="form-group">
-          <label for="categoryDesc">Description</label>
-          <textarea id="categoryDesc" name="description" placeholder="Enter category description"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="categoryStatus">Status</label>
-          <div class="status-switch">
-            <input type="checkbox" id="categoryStatus" name="status" checked>
-            <label for="categoryStatus" class="switch-label">
-              <span class="slider-round"></span>
-              <!-- <span class="status-text">Active</span> -->
+          
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="cropImageInput">Category Image (Crop & Upload)</label>
+            <input type="file" id="cropImageInput" accept="image/*">
+            <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
+            <div style="margin-top: 10px;">
+              <img id="cropPreview" style="display: none; max-width: 100%; max-height: 300px;" />
+            </div>
+            <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop & Add</button>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <h4>Cropped Image:</h4>
+            <div id="croppedImageList" style="display: flex; flex-wrap: wrap;"></div>
+          </div>
+          
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="isActive" name="isActive" value="true" checked>
+              <span class="checkmark"></span>
+              Active Category
             </label>
           </div>
         </div>
-        <div class="form-actions">
-          <button type="button" class="btn cancel-btn" id="cancelModalBtn">Cancel</button>
-          <button type="submit" class="btn submit-btn" id="submitCategoryBtn">Save Category</button>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
         </div>
       </form>
     </div>
   </div>
-</div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal-overlay" id="deleteConfirmationModal">
-  <div class="modal-content confirm-modal">
-    <div class="modal-header">
-      <h3>Confirm Deletion</h3>
-      <button class="close-modal" aria-label="Close modal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete this category? This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-      <input type="hidden" id="deleteCategoryId">
-      <button type="button" class="btn cancel-btn" id="cancelDeleteBtn">Cancel</button>
-      <button type="button" class="btn delete-confirm-btn" id="confirmDeleteBtn">Delete</button>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-content small-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Delete</h3>
+        <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this category? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
-  const addCategoryBtn = document.getElementById('addCategoryBtn');
-  const categoryModal = document.getElementById('categoryModal');
-  const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-  const categoryForm = document.getElementById('categoryForm');
-  const categoryImageInput = document.getElementById('categoryImageInput');
-  const imagePreview = document.getElementById('imagePreview');
-  const cropperContainer = document.getElementById('cropperContainer');
-  const cropControls = document.getElementById('cropControls');
-  const cropButton = document.getElementById('cropButton');
-  const cancelCropButton = document.getElementById('cancelCropButton');
-  const croppedImageData = document.getElementById('croppedImageData');
-  const searchInput = document.getElementById('searchInput');
-  const statusFilter = document.getElementById('statusFilter');
-  const cancelModalBtn = document.getElementById('cancelModalBtn');
-  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  
-  let cropper;
-  let currentCategoryId = null;
-  let deleteCategoryId = null;
+  <script>
+    let currentCategoryId = null;
+    let deleteCategoryId = null;
+    let cropper;
+    let croppedImage = null;
 
-  // Initialize modals
-  function openModal() {
-    categoryModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal() {
-    categoryModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    resetForm();
-  }
-
-  function openDeleteModal() {
-    deleteConfirmationModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeDeleteModal() {
-    deleteConfirmationModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    deleteCategoryId = null;
-  }
-
-  // Reset form
-  function resetForm() {
-    categoryForm.reset();
-    currentCategoryId = null;
-    document.getElementById('modalTitle').textContent = 'Add New Category';
-    categoryForm.action = '/admin/categories/add';
-    imagePreview.innerHTML = `
-      <div class="image-placeholder">
-        <i class="fas fa-image"></i>
-        <span>Image Preview</span>
-      </div>`;
-    cropperContainer.style.display = 'none';
-    cropControls.style.display = 'none';
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
+    // Modal Functions
+    function openModal() {
+      document.getElementById('categoryModal').style.display = 'flex';
+      document.querySelector('.modal-title').textContent = 'Add Category';
+      document.getElementById('categoryForm').reset();
+      document.getElementById('croppedImageList').innerHTML = '';
+      document.getElementById('previewArea').innerHTML = '';
+      currentCategoryId = null;
+      croppedImage = null;
     }
-  }
 
-  // Add Category Button
-  addCategoryBtn.addEventListener('click', openModal);
+    function closeModal() {
+      document.getElementById('categoryModal').style.display = 'none';
+    }
 
-  // Edit Category Buttons
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const categoryId = this.dataset.id;
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+      deleteCategoryId = null;
+    }
+
+    // Category CRUD Operations
+    function editCategory(categoryId) {
       currentCategoryId = categoryId;
-      
-      // Fetch category data
-      fetch(`/admin/categories/${categoryId}`)
+      document.getElementById('categoryForm').reset();
+      document.getElementById('croppedImageList').innerHTML = '';
+      document.getElementById('previewArea').innerHTML = '';
+      croppedImage = null;
+
+      fetch(`/admin/categories/${categoryId}/details`)
         .then(response => response.json())
-        .then(data => {
-          if (data.error) throw new Error(data.error);
-          
-          // Populate form
-          document.getElementById('categoryId').value = data._id;
-          document.getElementById('categoryName').value = data.name;
-          document.getElementById('categoryDesc').value = data.description || '';
-          document.getElementById('categoryStatus').checked = data.status === 'active';
-          
-          // Update status text
-          updateStatusText(data.status === 'active');
-          
-          // Set image preview
-          if (data.image) {
-            imagePreview.innerHTML = `
-              <img src="${data.image}" alt="Category Image" class="preview-image">
-            `;
+        .then(category => {
+          // Fill form fields
+          document.getElementById('categoryName').value = category.name || '';
+          document.getElementById('description').value = category.description || '';
+          document.getElementById('isActive').checked = category.isActive !== false;
+
+          // Show existing image
+          if (category.image) {
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("existing-image");
+            wrapper.style.position = "relative";
+
+            const img = document.createElement("img");
+            img.src = `/${category.image}`;
+            img.style.width = "60px";
+            img.style.height = "60px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "4px";
+            img.style.marginRight = "10px";
+
+            const removeBtn = document.createElement("button");
+            removeBtn.innerHTML = "&times;";
+            removeBtn.classList.add("remove-existing-btn");
+            removeBtn.style.position = "absolute";
+            removeBtn.style.top = "-6px";
+            removeBtn.style.right = "-6px";
+
+            removeBtn.addEventListener("click", () => {
+              wrapper.remove();
+              croppedImage = null;
+            });
+            
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            document.getElementById('previewArea').appendChild(wrapper);
           }
-          
-          // Update modal title and form action
-          document.getElementById('modalTitle').textContent = 'Edit Category';
-          categoryForm.action = `/admin/categories/${categoryId}/update`;
-          
-          // Open modal
-          openModal();
+
+          document.querySelector('.modal-title').textContent = 'Edit Category';
+          document.getElementById('categoryModal').style.display = 'flex';
         })
         .catch(error => {
           console.error('Error fetching category:', error);
-          Swal.fire('Error', 'Failed to load category data', 'error');
+          alert('Error loading category data');
         });
-    });
-  });
+    }
 
-  // Delete Category Buttons
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      deleteCategoryId = this.dataset.id;
-      openDeleteModal();
-    });
-  });
+    function deleteCategory(categoryId) {
+      deleteCategoryId = categoryId;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
 
-  // Confirm Delete
-  confirmDeleteBtn.addEventListener('click', function() {
-    if (!deleteCategoryId) return;
-    
-    fetch(`/admin/categories/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ categoryId: deleteCategoryId })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        Swal.fire('Success', data.message, 'success');
-        // Remove the deleted row
-        document.querySelector(`.delete-btn[data-id="${deleteCategoryId}"]`).closest('tr').remove();
-        closeDeleteModal();
-        updateRowNumbers();
-      } else {
-        Swal.fire('Error', data.message || 'Failed to delete category', 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error deleting category:', error);
-      Swal.fire('Error', 'Failed to delete category', 'error');
-    });
-  });
-
-  // Status Toggle
-  document.querySelectorAll('.status-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const categoryId = this.dataset.id;
-      const newStatus = this.checked ? 'active' : 'inactive';
-      const statusSpan = this.nextElementSibling;
+    function confirmDelete() {
+      if (!deleteCategoryId) return;
       
-      // Optimistic UI update
-      statusSpan.textContent = newStatus === 'active' ? 'Active' : 'Inactive';
-      statusSpan.className = `status-slider round ${newStatus}`;
-      
-      // Send request to server
-      fetch(`/admin/categories/status/${categoryId}`, {
-        method: 'POST',
+      fetch(`/admin/categories/${deleteCategoryId}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus })
+          'Accept': 'application/json'
+        }
       })
       .then(response => response.json())
       .then(data => {
-        if (!data.success) {
-          // Revert if failed
-          this.checked = !this.checked;
-          statusSpan.textContent = this.checked ? 'Active' : 'Inactive';
-          statusSpan.className = `status-slider round ${this.checked ? 'active' : 'inactive'}`;
-          Swal.fire('Error', data.message || 'Failed to update status', 'error');
+        if (data.success) {
+          location.reload();
+        } else {
+          alert(data.message || 'Error deleting category');
         }
       })
       .catch(error => {
-        console.error('Error updating status:', error);
-        // Revert on error
-        this.checked = !this.checked;
-        statusSpan.textContent = this.checked ? 'Active' : 'Inactive';
-        statusSpan.className = `status-slider round ${this.checked ? 'active' : 'inactive'}`;
-        Swal.fire('Error', 'Failed to update status', 'error');
+        console.error('Error deleting category:', error);
+        alert('Error deleting category');
+      })
+      .finally(() => {
+        closeDeleteModal();
       });
-    });
-  });
-
-  // Image Upload and Cropping
-  categoryImageInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    // Validate image
-    if (!file.type.match('image.*')) {
-      Swal.fire('Error', 'Please select an image file', 'error');
-      return;
     }
-    
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      // Clear previous cropper if exists
-      if (cropper) {
-        cropper.destroy();
-        cropper = null;
+
+    // Form Submission
+    document.getElementById('categoryForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      
+      // Explicitly handle checkbox
+      formData.set('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
+
+      if (currentCategoryId) {
+        formData.append('id', currentCategoryId);
       }
       
-      // Create image for cropper
-      const img = document.createElement('img');
-      img.id = 'croppingImage';
-      img.src = event.target.result;
-      
-      // Clear and setup containers
-      cropperContainer.innerHTML = '';
-      cropperContainer.appendChild(img);
-      cropperContainer.style.display = 'block';
-      imagePreview.style.display = 'none';
-      cropControls.style.display = 'flex';
-      
-      // Initialize cropper
-      cropper = new Cropper(img, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 0.8,
-        responsive: true
-      });
-    };
-    reader.readAsDataURL(file);
-  });
+      if (croppedImage) {
+formData.append('categoryImage', croppedImage, `category-${Date.now()}.jpg`);
+      }
 
-  // Crop Button
-  cropButton.addEventListener('click', function() {
-    if (!cropper) return;
-    
-    // Get cropped canvas
-    const canvas = cropper.getCroppedCanvas({
-      width: 400,
-      height: 400,
-      minWidth: 256,
-      minHeight: 256,
-      maxWidth: 800,
-      maxHeight: 800,
-      fillColor: '#fff'
+      const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
+      const method = currentCategoryId ? 'PUT' : 'POST';
+
+      fetch(url, {
+        method,
+        body: formData
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert(data.message || 'Error saving category');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving category:', error);
+        alert('Error saving category');
+      });
     });
-    
-    if (!canvas) {
-      Swal.fire('Error', 'Could not crop image', 'error');
-      return;
-    }
-    
-    // Convert to blob and create preview
-    canvas.toBlob(function(blob) {
-      const url = URL.createObjectURL(blob);
-      
-      // Update preview
-      imagePreview.innerHTML = `
-        <img src="${url}" alt="Cropped Image" class="preview-image">
-      `;
-      imagePreview.style.display = 'block';
-      cropperContainer.style.display = 'none';
-      cropControls.style.display = 'none';
-      
-      // Store cropped image data
-      canvas.toDataURL('image/jpeg', 0.9, function(dataUrl) {
-        croppedImageData.value = dataUrl;
-      });
-      
-      // Clean up
-      cropper.destroy();
-      cropper = null;
-    }, 'image/jpeg', 0.9);
-  });
 
-  // Cancel Crop
-  cancelCropButton.addEventListener('click', function() {
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
-    }
-    categoryImageInput.value = '';
-    cropperContainer.style.display = 'none';
-    cropControls.style.display = 'none';
-    imagePreview.style.display = 'block';
-    imagePreview.innerHTML = `
-      <div class="image-placeholder">
-        <i class="fas fa-image"></i>
-        <span>Image Preview</span>
-      </div>`;
-  });
-
-  // Form Submission
-  categoryForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const submitBtn = document.getElementById('submitCategoryBtn');
-    const originalBtnText = submitBtn.innerHTML;
-    
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    
-    // Send request
-    fetch(this.action, {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      return response.json();
-    } else {
-      return response.text().then(text => {
-        console.error('Server returned non-JSON response:', text);
-        throw new Error('Unexpected response format from server');
-      });
-    }
-  })
-    .then(data => {
-      if (data.success) {
-        Swal.fire('Success', data.message, 'success').then(() => {
-          window.location.reload();
+    // Image Cropping Functionality
+    document.getElementById('cropImageInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      document.getElementById('previewArea').innerHTML = '';
+      
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        document.getElementById('cropPreview').src = event.target.result;
+        document.getElementById('cropPreview').style.display = "block";
+        document.getElementById('cropButton').style.display = "inline-block";
+        
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(document.getElementById('cropPreview'), {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true,
+          scalable: true,
+          zoomable: true
         });
-      } else {
-        Swal.fire('Error', data.message || 'Failed to save category', 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error saving category:', error);
-      Swal.fire('Error', 'Failed to save category', 'error');
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalBtnText;
+      };
+      reader.readAsDataURL(file);
     });
-  });
 
-  // Search and Filter
-  searchInput.addEventListener('input', debounce(function() {
-    filterCategories();
-  }, 300));
+    document.getElementById('cropButton').addEventListener('click', function() {
+      const canvas = cropper.getCroppedCanvas();
+      canvas.toBlob(function(blob) {
+        const imageUrl = URL.createObjectURL(blob);
+        
+        const container = document.createElement("div");
+        container.style.border = "1px solid #ccc";
+        container.style.borderRadius = "8px";
+        container.style.padding = "8px";
+        container.style.background = "#f9f9f9";
+        container.style.width = "120px";
+        container.style.textAlign = "center";
 
-  statusFilter.addEventListener('change', function() {
-    filterCategories();
-  });
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.style.width = "100%";
+        img.style.height = "100px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "4px";
 
-  function filterCategories() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const statusValue = statusFilter.value;
-    
-    document.querySelectorAll('tbody tr').forEach(row => {
-      const name = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-      const status = row.querySelector('.status-checkbox').checked ? 'active' : 'inactive';
-      
-      const nameMatch = name.includes(searchTerm);
-      const statusMatch = statusValue === '' || status === statusValue;
-      
-      row.style.display = nameMatch && statusMatch ? '' : 'none';
+        const indexLabel = document.createElement("div");
+        indexLabel.textContent = `Image`;
+        indexLabel.style.marginTop = "5px";
+        indexLabel.style.fontSize = "12px";
+        indexLabel.style.color = "#333";
+
+        container.appendChild(img);
+        container.appendChild(indexLabel);
+        document.getElementById('croppedImageList').innerHTML = '';
+        document.getElementById('croppedImageList').appendChild(container);
+
+        croppedImage = blob;
+        
+        cropper.destroy();
+        document.getElementById('cropPreview').style.display = "none";
+        document.getElementById('cropButton').style.display = "none";
+      });
     });
-    
-    updateVisibleCount();
-  }
 
-  // Helper Functions
-  function updateStatusText(isActive) {
-    const statusText = document.querySelector('.status-text');
-    if (statusText) {
-      statusText.textContent = isActive ? 'Active' : 'Inactive';
+    // Toggle Category Status
+    function toggleCategoryStatus(categoryId, newStatus) {
+      fetch(`/admin/categories/status/${categoryId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isActive: newStatus })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to update status');
+        }
+      })
+      .catch(err => {
+        console.error('Error updating category status:', err);
+        alert('Error occurred while updating the status');
+      });
     }
-  }
 
-  function updateRowNumbers() {
-    document.querySelectorAll('tbody tr').forEach((row, index) => {
-      if (row.style.display !== 'none') {
-        row.querySelector('td:first-child').textContent = index + 1;
+    // Search Functionality
+    document.getElementById('searchBtn').addEventListener('click', function() {
+      const searchTerm = document.getElementById('searchBox').value;
+      if (searchTerm.trim()) {
+        window.location.href = `/admin/categories?search=${encodeURIComponent(searchTerm)}`;
       }
     });
-  }
 
-  function updateVisibleCount() {
-    const visibleRows = document.querySelectorAll('tbody tr:not([style*="display: none"])');
-    const totalRows = document.querySelectorAll('tbody tr').length;
-    document.querySelector('.table-info').textContent = 
-      `Showing ${visibleRows.length} of ${totalRows} entries`;
-  }
+    document.addEventListener('DOMContentLoaded', function() {
+      const resetBtn=document.getElementById('resetBtn');
+      if(resetBtn){
+        resetBtn.addEventListener('click',function(){
+document.getElementById('searchBox').value = '';
+      window.location.href = '/admin/categories';
+        });
+            }
+    });
 
-  function debounce(func, wait) {
-    let timeout;
-    return function() {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, arguments), wait);
-    };
-  }
+    document.getElementById('searchBox').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+      }
+    });
 
-  // Close modals when clicking outside
-  window.addEventListener('click', function(e) {
-    if (e.target === categoryModal) closeModal();
-    if (e.target === deleteConfirmationModal) closeDeleteModal();
-  });
+    // Pagination
+    function goToPage(page) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('page', page);
+      window.location.href = `/admin/categories?${urlParams.toString()}`;
+    }
 
-  // Close buttons
-  cancelModalBtn.addEventListener('click', closeModal);
-  cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+    function goToPrevPage() {
+      if (currentPage > 1) {
+        goToPage(currentPage - 1);
+      }
+    }
+
+    function goToNextPage() {
+      if (currentPage < totalPages) {
+        goToPage(currentPage + 1);
+      }
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'categoryModal') closeModal();
+        if (e.target.id === 'deleteModal') closeDeleteModal();
+      }
+    });
+
+    // Initialize pagination variables
+    var currentPage = parseInt('<%= currentPage || 1 %>');
+    var totalPages = parseInt('<%= totalPages || 1 %>');
+
   
-  // Initialize status text
-  document.getElementById('categoryStatus').addEventListener('change', function() {
-    updateStatusText(this.checked);
-  });
-});
-</script>
 
-<%- include('../partials/admin/admin-footer') %>
+
+  
+  </script>
+
+  <%- include('../partials/admin/admin-footer') %>

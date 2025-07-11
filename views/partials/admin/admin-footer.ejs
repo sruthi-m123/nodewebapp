@@ -2,22 +2,26 @@
   </div> <!-- Close main-content -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Sidebar toggle
+document.addEventListener('DOMContentLoaded', function () {
   const toggleSidebar = document.querySelector('.toggle-sidebar');
   const sidebar = document.querySelector('.sidebar');
-  
-  toggleSidebar.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-    this.classList.toggle('fa-chevron-left');
-    this.classList.toggle('fa-chevron-right');
-  });
-  
-  // Hamburger menu for mobile
-  document.querySelector('.hamburger').addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-show');
-  });
+  const hamburger = document.querySelector('.hamburger');
+
+  if (toggleSidebar && sidebar) {
+    toggleSidebar.addEventListener('click', function () {
+      sidebar.classList.toggle('collapsed');
+      this.classList.toggle('fa-chevron-left');
+      this.classList.toggle('fa-chevron-right');
+    });
+  }
+
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', function () {
+      sidebar.classList.toggle('mobile-show');
+    });
+  }
 });
+
 </script>
 
 <script>

@@ -16,7 +16,7 @@ const customerInfo = async (req, res) => {
         page = 1; // Ensure page is at least 1
       }
     }
-    const limit = 3;
+    const limit = 6;
 
     // Fetch users with search and pagination
     const userData = await User.find({
