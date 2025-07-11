@@ -24,14 +24,13 @@ router.get("/logout", adminController.logout);
 //User or customer management
 router.get("/users", adminAuth, customerController.customerInfo);
 router.post("/toggle_block", adminAuth, customerController.toggleBlockStatus);
-
-// category Management
+//category managment
 router.get('/categories', adminAuth, catController.getAllCategories);
-router.post('/addCategory', adminAuth,singleUpload, catController.addCategory);
-router.get('/categories/:id', adminAuth, catController.getCategory);
+router.post('/addCategory', singleUpload, catController.addCategory);
+router.post('/categories/delete', adminAuth, catController.deleteCategory);
 router.post('/categories/status/:categoryId', adminAuth, catController.updateCategoryStatus);
 router.post('/categories/:id/update', adminAuth, singleUpload, catController.updateCategory);
-router.post('/categories/delete', adminAuth, catController.deleteCategory);
+router.get('/categories/:id', adminAuth, catController.getCategory); // keep this last
 
 //product routes
 router.get('/products', adminAuth, productController.renderProducts);

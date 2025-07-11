@@ -20,11 +20,16 @@ const pageNotFound = async (req, res) => {
 const loadHomepage = async (req, res) => {
   try {
     console.log("reached home page ");
+    let userData = null;
+    if (req.session.user) {
+      userData = await User.findById(req.session.user._id);
+    }
+
     const categories = await Category.find({ status: "active" }).limit(4);
     const products = await Product.find({ isNewArrival: true })
       .sort({ createdAt: -1 })
       .limit(3);
-
+console.log("userData:",userData);
     console.log("Categories:", categories);
     console.log("Products:", products);
 
@@ -32,10 +37,10 @@ const loadHomepage = async (req, res) => {
         console.log("Testimonials:", testimonials);
 
     return res.render("user/home", {
-    
+      user:userData,
       pageCSS:"home.css",
        pageTitle: 'Chettinad - Premium Saree Boutique',
-        user: req.user,
+        
          currentPath: req.path,
       categories,
       products,
@@ -245,10 +250,15 @@ const login = async (req, res) => {
     // Properly set session with user details
     req.session.user = {
       _id: findUser._id,
+      name: findUser.name, 
       email: findUser.email,
       isAdmin: findUser.isAdmin,
       // Add other user details you need in the session
     };
+
+    
+
+    
     // Explicitly save the session
     req.session.save((err) => {
       if (err) {
@@ -265,6 +275,7 @@ const login = async (req, res) => {
     res.render("user/login", {
       layout:false,
       message: "login failed.please try again later ",
+    
     });
   }
 };
@@ -520,11 +531,15 @@ const loadShopping = async (req, res) => {
     let searchQuery = {};
     if (req.query.search) {
       searchQuery = {
-        name: { $regex: req.query.search, $options: "i" },
+        productNameame: { $regex: req.query.search, $options: "i" },
       };
     }
 
     //combining all the filters and search
+    let userData = null;
+    if (req.session.user) {
+      userData = await User.findById(req.session.user._id);
+    }
     const categories = await Category.find({ isDeleted: false });
     const products = await Product.find({
       ...filters,
@@ -535,7 +550,7 @@ const loadShopping = async (req, res) => {
       pageCSS: "user/shopall.css",
       pageJS:"user/shopall.js",
        pageTitle: 'Chettinad - Premium Saree Boutique',
-        user: req.user,
+        user: userData,
          currentPath: req.path,
       products,
       categories
@@ -649,6 +664,35 @@ const logout=async (req,res)=>{
     res.sendStatus(200);
   })
 }
+const productDetail=async(req,res)=>{
+  try {
+    const productId=req.params.id;
+    const product=await Product.findById(productId).lean();
+    if(!product||product.isDeleted||!product.isActive){
+      return res.status(404).render('404');
+    }
+const relatedProducts = await Product.find({
+      category: product.category._id,
+      _id: { $ne: productId },
+      isActive: true,
+      isDeleted: false
+    }).limit(4);
+
+
+    res.render('user/productDetails',{product,
+      relatedProducts,
+      pageCSS:"productdetails.css",
+      isOutofStock:product.stock<=0,
+pageJS:"user/productdetails.js",
+pageTitle:"Product Detail"
+    })
+  } catch (error) {
+    console.error('Product details error:', error);
+    res.status(500).render('500'); 
+  }
+}
+
+
 
 
 
@@ -657,7 +701,7 @@ module.exports = {
   loadHomepage,
   pageNotFound,
   loadSignup,
-  loadShopping,
+  loadShopping,//shop all page
   signup,
   loadLogin,
   loadGenerateotp,
@@ -677,7 +721,8 @@ module.exports = {
   googleAuthSuccess,
   applyFilters,
   getProductsByCategory,
-  logout
+  logout,
+  productDetail
   
 };
 

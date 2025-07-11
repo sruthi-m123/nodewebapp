@@ -22,7 +22,7 @@
         <img src="/img/admin/logo.jpg" alt="Chettinad Logo">
         <!-- <span>Chettinad</span> -->
       </div>
-      <i class="fas fa-chevron-left toggle-sidebar"></i>
+      <!-- <i class="fas fa-chevron-left toggle-sidebar"></i> -->
     </div>
     
     <div class="sidebar-menu">
@@ -43,9 +43,9 @@
           <a href="/admin/categories" class="menu-item">
             <span class="menu-text">All Categories</span>
           </a>
-          <a href="/admin/addCategories" class="menu-item">
+          <!-- <a href="/admin/addCategories" class="menu-item">
             <span class="menu-text">Add New</span>
-          </a>
+          </a> -->
         </div>
       </div>
       
@@ -59,19 +59,14 @@
           <a href="/admin/products" class="menu-item">
             <span class="menu-text">All Products</span>
           </a>
-          <!-- <a href="/admin/products/add" class="menu-item">
-            <span class="menu-text">Add New</span>
-          </a> -->
-          <a href="/admin/products/inventory" class="menu-item">
-            <span class="menu-text">Inventory</span>
-          </a>
+         
         </div>
       </div>
       
       <a href="/admin/orders" class="menu-item">
         <i class="fas fa-shopping-cart"></i>
         <span class="menu-text">Orders</span>
-        <span class="menu-badge">5</span>
+        <!-- <span class="menu-badge">5</span> -->
       </a>
       
       <a href="/admin/users" class="menu-item">
@@ -133,18 +128,76 @@
       </div>
     </header>
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-      <div class="page-header">
-        <div class="page-title">
-          <h1>Categories</h1>
-          <p>Manage your product categories</p>
-        </div>
-        </div>
+   
       </html>
       <style>
         @media (max-width: 768px) {
   .hamburger { display: block !important; }
   .sidebar:not(.mobile-show) { transform: translateX(-100%); }
 }
-      </style>
+  .sidebar {
+  width: 240px;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.toggle-sidebar {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.toggle-sidebar.rotated {
+  transform: rotate(180deg);
+}
+@media (max-width: 768px) {
+  .hamburger-toggle {
+    display: block !important;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100%;
+    z-index: 1000;
+    background-color: #fff;
+  }
+
+  .sidebar.mobile-visible {
+    transform: translateX(0);
+  }
+}
+  :root {
+  --primary-color: unset;
+   
+}
+
+  </style>
+      <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.querySelector('.sidebar');
+    const chevronToggle = document.querySelector('.toggle-sidebar');
+    const hamburgerToggle = document.querySelector('.hamburger-toggle');
+    
+    // Desktop Chevron Click
+    if (chevronToggle) {
+      chevronToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        chevronToggle.classList.toggle('rotated');
+      });
+    }
+
+    // Mobile Hamburger Click
+    if (hamburgerToggle) {
+      hamburgerToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('mobile-visible');
+      });
+    }
+  });
+</script>

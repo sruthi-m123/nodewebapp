@@ -9,17 +9,24 @@
     <a href="#" class="nav-link">Contact Us</a>
   </nav>
   
-  <% if (!user && currentPath === "/") { %>
+  <!-- <% if (!user && currentPath === "/") { %>
     <div class="auth-links">
       <a href="/signup" class="nav-link">Sign Up</a>
       <a href="/login" class="nav-link">Log In</a>
     </div>
-  <% } %>
+  <% } %> -->
+  <% if (!user) { %>
+  <div class="auth-links">
+    <a href="/signup" class="nav-link">Sign Up</a>
+    <a href="/login" class="nav-link">Log In</a>
+  </div>
+<% } %>
+
 
   <div class="desktop-icons">
-    <a href="#" class="icon-link"><i class="fas fa-search"></i></a>
+    <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
     <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
-    <% if (user) { %>
+    <% if (user && user.name) { %>
       <div class="profile-card-container">
         <a href="#" class="icon-link" id="profileIcon"><i class="fas fa-user"></i></a>
         <div class="profile-card" id="profileCard">
@@ -47,7 +54,7 @@
     <a href="#" class="nav-link mobile-nav-link">Contact Us</a>
   </nav>
 
-  <% if (!user && currentPath === "/") { %>
+  <% if (!user ) { %>
     <div class="auth-links">
       <a href="/signup" class="nav-link">Sign Up</a>
       <a href="/login" class="nav-link">Log In</a>
@@ -55,7 +62,7 @@
   <% } %>
 
   <div class="mobile-icons">
-    <a href="#" class="icon-link"><i class="fas fa-search"></i></a>
+    <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
     <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
     <% if (user) { %>
       <a href="/profile" class="icon-link"><i class="fas fa-user"></i></a>

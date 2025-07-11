@@ -41,10 +41,12 @@ router.get(
 );
 //profile page
 router.get('/profile', isLoggedIn, userController.getProfile);
-
+// //category page
+// router.get('/categoryProducts/:id',userController.shopAllByCategory)
 //shopall
 router.get("/shopAll",userController.loadShopping);
 router.post('/shopall/filter',userController.applyFilters);
 router.get('/shopall/category/:id', userController.getProductsByCategory);
-
+//product detail page 
+router.get('/product/:id',userController.productDetail)
 module.exports = router;

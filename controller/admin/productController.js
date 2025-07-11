@@ -9,14 +9,24 @@ const renderProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
-    const products = await Product.find({ isDeleted: false })
+       
+    const searchQuery = req.query.search?.trim() || '';
+        const searchFilter = searchQuery
+  ? { productName: { $regex: searchQuery, $options: 'i' } }
+  : {};
+                     
+        
+    
+    const filter = { isDeleted: false, ...searchFilter };
+    const products = await Product.find(filter)
       .populate("category")
       .sort({createdAt:-1})
       .skip(skip)
       .limit(limit);
     const categories = await Category.find();
 
-    const totalProducts = await Product.countDocuments({ isDeleted: false });
+      
+    const totalProducts = await Product.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / limit);
     res.render("admin/products", {
       layout:false,
@@ -24,6 +34,7 @@ const renderProducts = async (req, res) => {
       products,
       currentPage: page,
       totalPages: totalPages,
+      search:searchQuery
     });
   } catch (error) {
     console.error(error);
@@ -44,17 +55,29 @@ const addProduct = async (req, res) => {
     if (imagePaths.length === 0) {
       return res.status(400).json({ success: false, message: 'At least one image is required' });
     }
+const isNewArrival = req.body.isNewArrival === 'true' || req.body.isNewArrival === true || req.body.isNewArrival === 'on';
+const isActive = req.body.isActive === 'true' || req.body.isActive === true;
+  const productName = req.body.productName ? req.body.productName.trim() : '';
+const existingProduct = await Product.findOne({
+      productName: { $regex: `^${productName}$`, $options: 'i' } 
+    });
 
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product with this name already exists'
+      });
+    }
     const productData = {
       productName: req.body.productName,
-      category: req.body.category, // Changed from categoryName
+      category: req.body.category, 
       description: req.body.description,
       price: parseFloat(req.body.price),
       stock: parseInt(req.body.stock),
       color: req.body.color,
-      isNewArrival: req.body.isNewArrival === 'on' || req.body.isNewArrival === true,
       images: imagePaths,
-      isActive: req.body.isActive === 'on' || req.body.isActive === true,
+      isNewArrival,
+      isActive
     };
 
     console.log('Product data before saving to db:', productData);
@@ -77,7 +100,6 @@ const updateProduct = async (req, res) => {
       price,
       stock,
       color,
-      isNewArrival,
       removedImages
     } = req.body;
 
@@ -89,6 +111,8 @@ if (isNaN(parseFloat(price)) || isNaN(parseInt(stock))) {
     if (!existingProduct) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
+const isNewArrival = req.body.isNewArrival === 'true' || req.body.isNewArrival === true || req.body.isNewArrival === 'on';
+const isActive = req.body.isActive === 'true' || req.body.isActive === true;
 
     const updateData = {
       productName,
@@ -97,7 +121,8 @@ if (isNaN(parseFloat(price)) || isNaN(parseInt(stock))) {
       price: parseFloat(price),
       stock: parseInt(stock),
       color,
-      isNewArrival: isNewArrival === "true" || isNewArrival === true,
+      isNewArrival,
+      isActive
     };
 
   
@@ -116,13 +141,13 @@ if (removedImages) {
     }
 //adding newly uploaded images 
 if (req.files && req.files.length > 0) {
-  updateData.images = req.files.map(file =>
+  const newImages = req.files.map(file =>
     file.path.replace(/\\/g, '/').replace('public/', '')
   );
-
-  updateData.images = existingProduct.images; //  Safe to access now
+  updatedImages = [...updatedImages, ...newImages];
 }
-    
+updateData.images = updatedImages;
+  
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,

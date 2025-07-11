@@ -6,7 +6,9 @@
       Discover handcrafted sarees that celebrate tradition with contemporary
       elegance
     </p>
-    <button class="primary-btn">Shop Now</button>
+    <!-- <button class="primary-btn">Shop Now</button> -->
+  <a href="/user/shopall" class="primary-btn">Shop Now</a>
+
   </div>
   <div class="hero-img">
     <img
@@ -22,18 +24,21 @@
     <h2>Shop By Categories</h2>
     <p>Explore our exquisite collections</p>
   </div>
-  <div class="category-grid">
-    <% categories.forEach(category => { 
-         if (category.status === "active") { %>
+ <div class="category-grid">
+  <% categories.forEach(category => { 
+       if (category.status === "active") { %>
+    <a href="/shopall/category/<%= category._id %>" class="category-card-link">
       <div class="category-card">
         <img src="<%= category.image %>" alt="<%= category.name %> Saree" />
         <div class="overlay">
           <p><%= category.name %></p>
-          <button class="secondary-btn">View Collection</button>
+<button class="secondary-btn" onclick="window.location.href='/user/shopall'">View Collection</button>
         </div>
       </div>
-    <% } }); %>
-  </div>
+    </a>
+  <% } }); %>
+</div>
+
 </section>
 
 
@@ -44,21 +49,26 @@
   </div>
   <div class="arrival-grid">
     <% products.forEach(product => { %>
-    <div class="product-card">
-      <img src="/<%= product.images[0] %>" alt="<%= product.productName %>" />
-      <div class="product-info">
-        <p><%= product.productName %></p>
-        <p class="price">₹<%= product.price %></p>
-        <div class="product-actions">
-          <button class="icon-btn"><i class="far fa-heart"></i></button>
-          <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
-        </div>
+      <div class="product-card">
+        <a href="/user/product/<%= product._id %>" class="product-link">
+          <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" />
+          <div class="product-info">
+            <p><%= product.productName %></p>
+            <p class="price">₹<%= product.price %></p>
+            </a>
+            <div class="product-actions">
+              <button class="icon-btn"><i class="far fa-heart"></i></button>
+              <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
+            </div>
+          </div>
+        
       </div>
-    </div>
     <% }); %>
   </div>
 
-  <button class="primary-btn outline">View All Collections</button>
+  <div class="button-container" style="text-align: center; margin-top: 30px;">
+    <a href="/user/shopall" class="primary-btn outline">View All Collections</a>
+  </div>
 </section>
 
 <section class="testimonial">

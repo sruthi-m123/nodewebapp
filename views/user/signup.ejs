@@ -207,15 +207,21 @@
   }
 
   function phoneValidateChecking() {
-    const phoneval = phoneid.value;
-    if (phoneval.trim() === "" || phoneval.length !== 10 || isNaN(phoneval)) {
-      error3.innerHTML = "Enter a valid 10-digit phone number";
-      return false;
-    } else {
-      error3.innerHTML = "";
-      return true;
-    }
+  const phoneval = phoneid.value.trim();
+  const repeatedPattern = /^(\d)\1{9}$/; 
+
+  if (phoneval === "" || phoneval.length !== 10 || isNaN(phoneval)) {
+    error3.innerHTML = "Enter a valid 10-digit phone number";
+    return false;
+  } else if (repeatedPattern.test(phoneval)) {
+    error3.innerHTML = "Phone number cannot be all same digits";
+    return false;
+  } else {
+    error3.innerHTML = "";
+    return true;
   }
+}
+
 
   function passwordValidateChecking() {
     const passwordval = passwordid.value;

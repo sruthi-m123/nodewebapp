@@ -39,7 +39,7 @@
     <div class="filter-group">
       <h4 class="filter-title">Colors</h4>
       <div class="color-options">
-        <% ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow'].forEach(color => { %>
+        <% ['Red', 'Blue', 'Green', 'Black', 'Yellow'].forEach(color => { %>
           <div class="color-option" data-color="<%= color.toLowerCase() %>" style="background-color: <%= color.toLowerCase() %>"></div>
         <% }) %>
       </div>
@@ -75,11 +75,11 @@
         <div class="sort-dropdown">
           <label for="sort">Sort by:</label>
           <select id="sort">
-            <option value="best">Best Selling</option>
-            <option value="new">Newest Arrivals</option>
+            <!-- <option value="best">Best Selling</option> -->
+            <!-- <option value="new">Newest Arrivals</option> -->
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
-            <option value="rating">Customer Rating</option>
+            <!-- <option value="rating">Customer Rating</option> -->
           </select>
         </div>
       </div>
@@ -92,14 +92,25 @@
     </div>
   <% } else { %>
     <% products.forEach(product => { %>
+      <!-- <a href="/user/product/<%= product._id %>" class="product-link"></a> -->
       <div class="product-card <%= !product.isActive ? 'inactive' : '' %>">
-        <div class="product-badge"><%= product.badge || 'New' %></div>
+        <!-- <div class="product-badge"><%= product.badge || 'New' %></div> -->
+       <% if (product.isNewArrival) { %>
+  <div class="product-badge">New</div>
+<% } %>
+
         <div class="product-image">
+           <a href="/user/product/<%= product._id %>">
           <img src="/<%= product.images[0] %>" alt="<%= product.productName %>">
+          </a>
           <div class="quick-view">Quick View</div>
         </div>
         <div class="product-info">
-          <h4 class="product-name"><%= product.productName %></h4>
+          <h4 class="product-name">
+                       <a href="/user/product/<%= product._id %>" class="product-link-name">
+
+            <%= product.productName %></h4>
+            </a>
           <div class="product-meta">
             <div class="product-rating">
               <% for(let i = 0; i < 5; i++) { %>

@@ -35,7 +35,7 @@
       <p class="sub-text">We've sent a 6-digit code to your registered email</p>
       
       <div class="otp-timer">
-        <span id="timer">05:00</span>
+        <span id="timer">00:60</span>
         <span>remaining</span>
       </div>
       
@@ -59,32 +59,30 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // 5-minute countdown timer
-  let minutes = 4;
-  let seconds = 59;
-  const timer = document.getElementById('timer');
-  const resendLink = document.getElementById('resend-link');
-  let timerActive = true;
+  //  countdown timer
+  let seconds = 60;
+const timer = document.getElementById('timer');
+const resendLink = document.getElementById('resend-link');
+let timerActive = true;
 
-  const interval = setInterval(() => {
-    if (seconds === 0) {
-      if (minutes === 0) {
-        clearInterval(interval);
-        timerActive = false;
-        resendLink.style.color = "var(--primary-color)";
-        resendLink.style.cursor = "pointer";
-        resendLink.style.textDecoration = "underline";
-        return;
-      }
-      minutes--;
-      seconds = 59;
-    } else {
-      seconds--;
-    }
+const interval = setInterval(() => {
+  if (seconds === 0) {
+    clearInterval(interval);
+    timerActive = false;
+    resendLink.style.color = "var(--primary-color)";
+    resendLink.style.cursor = "pointer";
+    resendLink.style.textDecoration = "underline";
+    return;
+  }
 
-    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-    timer.textContent = `0${minutes}:${formattedSeconds}`;
-  }, 1000);
+  seconds--;
+
+  const displayMinutes = Math.floor(seconds / 60);
+  const displaySeconds = seconds % 60;
+  const formattedSeconds = displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds;
+  timer.textContent = `0${displayMinutes}:${formattedSeconds}`;
+}, 1000);
+
 
   const inputs = document.querySelectorAll('.otp-inputs input');
   const verifyBtn = document.querySelector('.verify-btn');
@@ -183,65 +181,65 @@
 
   // Resend OTP
   resendLink.addEventListener('click', async (e) => {
-    if (!timerActive) {
-      e.preventDefault();
-      try {
-        const response = await fetch('/user/resend-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userEmail }),
-        });
-        const data = await response.json();
-        if (data.success) {
-          Swal.fire({
-            icon: 'success',
-            title: 'OTP Resent',
-            text: 'A new OTP has been sent to your email',
-            confirmButtonColor: '#8B4513',
-          });
-          minutes = 4;
-          seconds = 59;
-          timerActive = true;
-          resendLink.style.color = "var(--text-color)";
-          resendLink.style.cursor = "default";
-          resendLink.style.textDecoration = "none";
+  if (!timerActive) {
+    e.preventDefault();
+    try {
+      const response = await fetch('/user/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      });
 
-          const newInterval = setInterval(() => {
-            if (seconds === 0) {
-              if (minutes === 0) {
-                clearInterval(newInterval);
-                timerActive = false;
-                resendLink.style.color = "var(--primary-color)";
-                resendLink.style.cursor = "pointer";
-                resendLink.style.textDecoration = "underline";
-                return;
-              }
-              minutes--;
-              seconds = 59;
-            } else {
-              seconds--;
-            }
-            const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-            timer.textContent = `0${minutes}:${formattedSeconds}`;
-          }, 1000);
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Resend Failed',
-            text: data.message || 'Failed to resend OTP',
-            confirmButtonColor: '#8B4513',
-          });
-        }
-      } catch (error) {
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'OTP Resent',
+          text: 'A new OTP has been sent to your email',
+          confirmButtonColor: '#8B4513',
+        });
+
+        let seconds = 60; 
+        timerActive = true;
+        resendLink.style.color = "var(--text-color)";
+        resendLink.style.cursor = "default";
+        resendLink.style.textDecoration = "none";
+
+        const newInterval = setInterval(() => {
+          if (seconds === 0) {
+            clearInterval(newInterval);
+            timerActive = false;
+            resendLink.style.color = "var(--primary-color)";
+            resendLink.style.cursor = "pointer";
+            resendLink.style.textDecoration = "underline";
+            return;
+          }
+
+          seconds--;
+          const displayMinutes = Math.floor(seconds / 60);
+          const displaySeconds = seconds % 60;
+          const formattedSeconds = displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds;
+          timer.textContent = `0${displayMinutes}:${formattedSeconds}`;
+        }, 1000);
+
+      } else {
         Swal.fire({
           icon: 'error',
           title: 'Resend Failed',
-          text: 'Internal server error',
+          text: data.message || 'Failed to resend OTP',
           confirmButtonColor: '#8B4513',
         });
       }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Resend Failed',
+        text: 'Internal server error',
+        confirmButtonColor: '#8B4513',
+      });
     }
-  });
+  }
+});
 
   // Set email on page load
   window.addEventListener('DOMContentLoaded', () => {
