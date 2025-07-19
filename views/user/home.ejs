@@ -48,22 +48,23 @@
     <p>Our Best Picks This Season</p>
   </div>
   <div class="arrival-grid">
-    <% products.forEach(product => { %>
-      <div class="product-card">
-        <a href="/user/product/<%= product._id %>" class="product-link">
-          <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" />
-          <div class="product-info">
-            <p><%= product.productName %></p>
-            <p class="price">₹<%= product.price %></p>
-            </a>
-            <div class="product-actions">
-              <button class="icon-btn"><i class="far fa-heart"></i></button>
-              <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
-            </div>
-          </div>
-        
+    <% products.forEach(product => {
+     if (product.isNewArrival && product.isActive) { %>
+  <div class="product-card">
+    <a href="/user/product/<%= product._id %>" class="product-link">
+      <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" />
+      <div class="product-info">
+        <p><%= product.productName %></p>
+        <p class="price">₹<%= product.price %></p>
       </div>
-    <% }); %>
+    </a>
+    <div class="product-actions">
+      <button class="icon-btn"><i class="far fa-heart"></i></button>
+      <button class="icon-btn"><i class="fas fa-shopping-bag"></i></button>
+    </div>
+  </div>
+<% } }); %>
+
   </div>
 
   <div class="button-container" style="text-align: center; margin-top: 30px;">

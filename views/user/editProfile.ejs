@@ -1,0 +1,192 @@
+<link rel="stylesheet" href="/css/profile.css">
+
+<section class="profile-container">
+  <div class="settings-sidebar">
+    <div class="sidebar-header">
+      <h3><%= user.name %></h3>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="<%= activeTab === 'profile' ? '' : '' %>">
+        <a href="/profile">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <li class="<%= activeTab === 'addresses' ? 'active' : '' %>">
+        <a href="/addresses">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Addresses</span>
+        </a>
+      </li>
+      <li class="<%= activeTab === 'orders' ? 'active' : '' %>">
+        <a href="/orders">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Orders</span>
+        </a>
+      </li>
+      <li class="<%= activeTab === 'wishlist' ? 'active' : '' %>">
+        <a href="/wishlist">
+          <i class="fas fa-heart"></i>
+          <span>Wishlist</span>
+        </a>
+      </li>
+    </ul>
+    <form action="/logout" method="POST" class="logout-form">
+      <button type="submit" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-header">
+      <h2>Edit Profile</h2>
+      <a href="/profile" class="edit-btn cancel-btn">
+        <i class="fas fa-times"></i>
+        <span>Cancel</span>
+      </a>
+    </div>
+    <div id="profile-success-msg" class="success-msg" style="display: none;">
+    <i class="fas fa-check-circle"></i> Profile updated successfully!
+  </div>
+    
+    <form action="/profile/update" method="POST" enctype="multipart/form-data" class="profile-box">
+      <div class="form-group profile-image">
+        <label>Profile Image</label>
+        <div class="image-upload">
+          <img 
+            src="<%= user.avatar %>"
+            alt="Profile Image" 
+            class="profile-img"
+            id="profile-img-preview"
+          >
+          <label for="avatar-upload" class="upload-overlay">
+            <i class="fas fa-camera"></i>
+            <span>Change</span>
+          </label>
+          <input type="file" id="avatar-upload" name="avatar" accept="image/*" style="display: none;">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="name">Name</label>
+        <div class="input-field">
+          <input type="text" id="name" name="name" value="<%= user.name %>" required>
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <div class="input-field">
+          <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>">
+          <i class="fas fa-phone"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="gender" value="Male" <%= user.gender === 'Male' ? 'checked' : '' %>>
+            <span class="radio-checkmark"></span>
+            <span class="radio-label">Male</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="gender" value="Female" <%= user.gender === 'Female' ? 'checked' : '' %>>
+            <span class="radio-checkmark"></span>
+            <span class="radio-label">Female</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="gender" value="Other" <%= !['Male', 'Female'].includes(user.gender) ? 'checked' : '' %>>
+            <span class="radio-checkmark"></span>
+            <span class="radio-label">Prefer Not to Say</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group email-box">
+        <label for="email">Email Address</label>
+        <div class="input-field">
+          <input type="email" id="email" name="email" value="<%= user.email %>" readonly>
+          <i class="fas fa-envelope"></i>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="save-btn">
+          <i class="fas fa-save"></i>
+          <span>Save Changes</span>
+        </button>
+      </div>
+    </form>
+  </div>
+  
+</section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Image preview functionality
+    document.getElementById('avatar-upload').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('profile-img-preview').src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    // Form submission with SweetAlert
+    document.querySelector(".profile-box").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch("/profile/update", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const json = await response.json();
+          
+          // Show success SweetAlert
+          Swal.fire({
+            title: 'Success!',
+            text: 'Your profile has been updated successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true
+          });
+
+          // Update avatar if changed
+          if (json.updatedAvatarUrl) {
+            document.getElementById("profile-img-preview").src = json.updatedAvatarUrl;
+          }
+        } else {
+          // Show error SweetAlert
+          const errorData = await response.json();
+          Swal.fire({
+            title: 'Error!',
+            text: errorData.message || 'Update failed. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Something went wrong. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  });
+</script>

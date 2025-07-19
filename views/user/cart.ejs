@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="cart.css">
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="cart-container">
+  <h2 class="cart-title">CART</h2>
+  <div class="cart-table">
+    <% if (cartItems && cartItems.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>PRODUCT</th>
+            <th>PRICE</th>
+            <th>QUANTITY</th>
+            <th>TOTAL</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items">
+          <% cartItems.forEach(item => { %>
+            <tr data-id="<%= item.id %>">
+              <td>
+                <button class="delete-btn" onclick="removeItem('<%= item.id %>')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+              <td class="product-info">
+                <img src="<%= item.image %>" alt="<%= item.name %>" class="product-img">
+                <span><%= item.name %></span>
+              </td>
+              <td>Rs. <span class="item-price"><%= item.price %></span></td>
+              <td>
+                <div class="quantity-selector">
+                  <button onclick="updateQuantity('<%= item.id %>', -1)">-</button>
+                  <input type="number" value="<%= item.quantity %>" min="1" 
+                         onchange="updateQuantityInput('<%= item.id %>', this.value)">
+                  <button onclick="updateQuantity('<%= item.id %>', 1)">+</button>
+                </div>
+              </td>
+              <td>Rs. <span class="item-total"><%= item.price * item.quantity %></span></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <div class="cart-buttons">
+        <button class="continue-btn" onclick="window.location.href='/products'">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </button>
+        <button class="update-btn" onclick="updateCart()">
+          <i class="fas fa-sync-alt"></i> Update Cart
+        </button>
+      </div>
+
+      <div class="cart-total">
+        <span>Total:</span>
+        <strong>Rs. <span id="grand-total"><%= total %></span></strong>
+      </div>
+
+      <div class="checkout-btn-container">
+        <button class="checkout-btn" onclick="checkout()">
+          <i class="fas fa-lock"></i> Proceed to Checkout
+        </button>
+      </div>
+    <% } else { %>
+      <div class="empty-cart">
+        <i class="fas fa-shopping-cart fa-3x"></i>
+        <h3>Your cart is empty</h3>
+        <button class="continue-btn" onclick="window.location.href='/products'">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </button>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script src="/js/cart.js"></script>

@@ -3,12 +3,13 @@ const router = express.Router();
 const userController = require("../controller/user/userController");
 const passport =require("passport");
 const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require("../middlewares/auth");
-const {singleUpload, multiUpload}=require('../config/multer')
-
-
+const {singleUpload, multiUpload,upload}=require('../config/multer');
+const profileController = require("../controller/user/profileController");
+const shopController=require("../controller/user/shopController");
+const addressController=require("../controller/user/addressController");
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
-router.get("/shop", userController.loadShopping);
+router.get("/shop", shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);
 router.post("/signup", userController.signup);
 router.post("/send-otp", userController.sendOtp);
@@ -27,9 +28,26 @@ router.post("/reset-password",userController.resetPassword);
 router.get('/error', (req, res) => {
   res.status(500).render('user/error', {message: "Something went wrong!"});
 });
-router.get(
-  '/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+
+router.get('/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
+
+router.get('/auth/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/login?error=google_failed'
+  }),
+  (req, res) => {
+req.session.user = {
+      _id: req.user._id.toString(),
+      name: req.user.name,
+      email: req.user.email,
+      phone: req.user.phone || null
+    };
+        res.redirect('/');
+  }
 );
 //logout
 router.post('/logout',userController.logout);
@@ -40,13 +58,20 @@ router.get(
   userController.googleAuthSuccess  
 );
 //profile page
-router.get('/profile', isLoggedIn, userController.getProfile);
-// //category page
-// router.get('/categoryProducts/:id',userController.shopAllByCategory)
+router.get('/profile', isLoggedIn,upload.avatar, profileController.getProfile);
+router.get('/profile/edit',upload.avatar,profileController.getEditProfile);
+router.post('/profile/update', upload.avatar, profileController.postEditProfile);
 //shopall
-router.get("/shopAll",userController.loadShopping);
-router.post('/shopall/filter',userController.applyFilters);
-router.get('/shopall/category/:id', userController.getProductsByCategory);
+router.get("/shopAll",shopController.loadShopping);
+router.post('/shopall/filter',shopController.applyFilters);
+router.get('/shopall/category/:id', shopController.getProductsByCategory);
 //product detail page 
 router.get('/product/:id',userController.productDetail)
+//address page
+router.get('/address',isLoggedIn,addressController.getAddressPage);
+router.post('/addresses/add',addressController.addAddress);
+router.put('/addresses/edit/:id',addressController.updateAddress);
+router.delete('/addresses/delete/:id',addressController.deleteAddress);
+router.post('/set-default-address/:id',addressController.setDefaultAddress)
+
 module.exports = router;

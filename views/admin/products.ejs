@@ -386,6 +386,8 @@
     // Form Submission
     document.getElementById('productForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
+      
       
       const formData = new FormData(this);
       
@@ -399,7 +401,9 @@
       }
       
       
-        formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
+blobs.forEach((blob, index) => {
+  formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
+});
       
 
       const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/products';

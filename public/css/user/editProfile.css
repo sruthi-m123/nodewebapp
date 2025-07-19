@@ -1,0 +1,146 @@
+/* Edit Profile Specific Styles - Brown Color Scheme */
+.cancel-btn {
+  background: #8B4513 !important; /* SaddleBrown */
+}
+
+.cancel-btn:hover {
+  background: #A0522D !important; /* Sienna */
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.5rem;
+  background: #D2691E; /* Chocolate */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.save-btn i {
+  margin-right: 8px;
+}
+
+.save-btn:hover {
+  background: #CD853F; /* Peru */
+  transform: translateY(-2px);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+/* Radio Button Styles */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-option input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #F5DEB3; /* Wheat */
+  border: 1px solid #D2B48C; /* Tan */
+  border-radius: 50%;
+}
+
+.radio-option:hover input ~ .radio-checkmark {
+  background-color: #DEB887; /* BurlyWood */
+}
+
+.radio-option input:checked ~ .radio-checkmark {
+  background-color: #A0522D; /* Sienna */
+  border-color: #8B4513; /* SaddleBrown */
+}
+
+.radio-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.radio-option input:checked ~ .radio-checkmark:after {
+  display: block;
+}
+
+.radio-option .radio-checkmark:after {
+  top: 5px;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFF8DC; /* Cornsilk */
+}
+
+.radio-label {
+  margin-left: 5px;
+  font-size: 0.9rem;
+  color: #5D4037; /* Brown */
+}
+
+/* Input fields in edit mode */
+.profile-box input:not([readonly]) {
+  background: #FFF8DC !important; /* Cornsilk */
+  border-color: #BC8F8F !important; /* RosyBrown */
+}
+
+.profile-box input:not([readonly]):focus {
+  border-color: #A0522D !important; /* Sienna */
+  box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25); /* SaddleBrown with opacity */
+  outline: none;
+}
+
+/* Responsive adjustments for edit page */
+@media (max-width: 576px) {
+  .radio-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-actions {
+    justify-content: center;
+  }
+  
+  .save-btn {
+    padding: 0.8rem;
+  }
+}
+.success-msg {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px 15px;
+  margin: 15px 0;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}

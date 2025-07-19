@@ -49,10 +49,14 @@
               <td><%= category.name %></td>
               <td><%= category.description || '-' %></td>
               <td>
-                <button class="action-btn <%= category.isActive ? 'unblock-btn' : 'block-btn' %>" 
-                        onclick="toggleCategoryStatus('<%= category._id %>', <%= !category.isActive %>)">
-                  <%= category.isActive ? 'Active' : 'Inactive' %>
-                </button>
+                <% const nextStatus = category.status === 'active' ? 'inactive' : 'active'; %>
+              <button 
+  id="status-btn-<%= category._id %>" 
+  onclick="toggleCategoryStatus('<%= category._id %>', '<%= nextStatus %>')">
+  <%= category.status === 'active' ? 'Active' : 'Inactive' %>
+</button>
+
+
               </td>
               <td>
                 <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">Edit</button>
@@ -70,18 +74,27 @@
   </div>
 
   <div class="pagination">
-    <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined' && totalPages > 0) { %>
-      <button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? 'disabled' : '' %>>&laquo;</button>
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%- i %>)"><%= i %></button>
-      <% } %>
-      <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? 'disabled' : '' %>>&raquo;</button>
-    <% } else { %>
-      <button disabled>&laquo;</button>
-      <button class="active">1</button>
-      <button disabled>&raquo;</button>
-    <% } %>
-  </div>
+  <% if (totalPages > 0) { %>
+    <button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? 'disabled' : '' %>>&laquo;</button>
+  <% for (let i = 1; i <= totalPages; i++) { %>
+  <button 
+    class="<%= i === currentPage ? 'active' : '' %>" 
+    data-page="<%= i %>" 
+    class="pagination-btn">
+    <%= i %>
+  </button>
+<% } %>
+
+
+
+    <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? 'disabled' : '' %>>&raquo;</button>
+  <% } else { %>
+    <button disabled>&laquo;</button>
+    <button class="active">1</button>
+    <button disabled>&raquo;</button>
+  <% } %>
+</div>
+
 
   <!-- Category Modal -->
   <div class="modal-overlay" id="categoryModal">
@@ -189,7 +202,10 @@
 
       fetch(`/admin/categories/${categoryId}/details`)
         .then(response => response.json())
-        .then(category => {
+        .then(data => {
+           if (data.success && data.category) {
+    const category = data.category;
+           
           // Fill form fields
           document.getElementById('categoryName').value = category.name || '';
           document.getElementById('description').value = category.description || '';
@@ -202,7 +218,7 @@
             wrapper.style.position = "relative";
 
             const img = document.createElement("img");
-            img.src = `/${category.image}`;
+            img.src = `${category.image}`;
             img.style.width = "60px";
             img.style.height = "60px";
             img.style.objectFit = "cover";
@@ -228,6 +244,7 @@
 
           document.querySelector('.modal-title').textContent = 'Edit Category';
           document.getElementById('categoryModal').style.display = 'flex';
+           }
         })
         .catch(error => {
           console.error('Error fetching category:', error);
@@ -243,14 +260,20 @@
     function confirmDelete() {
       if (!deleteCategoryId) return;
       
-      fetch(`/admin/categories/${deleteCategoryId}`, {
+      fetch(`/admin/categories/${deleteCategoryId}/delete`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
       })
-      .then(response => response.json())
+.then(async (response) => {
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Server Error: ${response.status}\n${text}`);
+  }
+  return response.json();
+})
       .then(data => {
         if (data.success) {
           location.reload();
@@ -269,45 +292,46 @@
 
     // Form Submission
     document.getElementById('categoryForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      
-      // Explicitly handle checkbox
-      formData.set('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  
+  // Simplified checkbox handling
+  formData.append('isActive', document.getElementById('isActive').checked);
 
-      if (currentCategoryId) {
-        formData.append('id', currentCategoryId);
-      }
-      
-      if (croppedImage) {
-formData.append('categoryImage', croppedImage, `category-${Date.now()}.jpg`);
-      }
+  if (currentCategoryId) {
+    formData.append('id', currentCategoryId);
+  }
+  
+  if (croppedImage) {
+    formData.append('categoryImage', croppedImage, `category-${Date.now()}.jpg`);
+  }
 
-      const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
-      const method = currentCategoryId ? 'PUT' : 'POST';
+  const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
+  const method = currentCategoryId ? 'PUT' : 'POST';
 
-      fetch(url, {
-        method,
-        body: formData
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert(data.message || 'Error saving category');
-        }
-      })
-      .catch(error => {
-        console.error('Error saving category:', error);
-        alert('Error saving category');
-      });
-    });
-
+  fetch(url, {
+    method,
+    body: formData // No headers needed for FormData
+  })
+  .then(res => {
+    if (!res.ok) {
+      return res.json().then(err => { throw err; });
+    }
+    return res.json();
+  })
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || 'Error saving category');
+    }
+  })
+  .catch(error => {
+    console.error('Error saving category:', error);
+    alert(error.message || 'Error saving category');
+  });
+});
     // Image Cropping Functionality
     document.getElementById('cropImageInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -375,20 +399,30 @@ formData.append('categoryImage', croppedImage, `category-${Date.now()}.jpg`);
 
     // Toggle Category Status
     function toggleCategoryStatus(categoryId, newStatus) {
+      const status = isActive ? 'active' : 'inactive';  
       fetch(`/admin/categories/status/${categoryId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ isActive: newStatus })
+        body: JSON.stringify({ status })
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          location.reload();
-        } else {
+const button = document.getElementById(`status-btn-${categoryId}`);
+      const updatedStatus = data.category.status;
+
+      // Update button text and onclick
+      if (button) {
+        button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
+        button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
+      
+      }
+    }else{
           alert('Failed to update status');
         }
+      
       })
       .catch(err => {
         console.error('Error updating category status:', err);
@@ -421,23 +455,47 @@ document.getElementById('searchBox').value = '';
     });
 
     // Pagination
-    function goToPage(page) {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('page', page);
-      window.location.href = `/admin/categories?${urlParams.toString()}`;
-    }
+   
+ 
+  
+ 
+  //Initialize pagination variables
+ 
+  var currentPage = <%= currentPage %>;
+  var totalPages = <%= totalPages %>;
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.pagination-btn');
 
-    function goToPrevPage() {
-      if (currentPage > 1) {
-        goToPage(currentPage - 1);
-      }
-    }
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const page = button.getAttribute('data-page');
+        if (page) {
+          goToPage(page);
+        }
+      });
+    });
+  });
+  function goToPage(page) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page);
+    window.location.href = url.toString();
+  }
 
-    function goToNextPage() {
-      if (currentPage < totalPages) {
-        goToPage(currentPage + 1);
-      }
+  function goToPrevPage() {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
     }
+  }
+
+  function goToNextPage() {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  }
+
+
+
+
 
     // Close modals when clicking outside
     window.addEventListener('click', function(e) {
@@ -447,11 +505,7 @@ document.getElementById('searchBox').value = '';
       }
     });
 
-    // Initialize pagination variables
-    var currentPage = parseInt('<%= currentPage || 1 %>');
-    var totalPages = parseInt('<%= totalPages || 1 %>');
-
-  
+    
 
 
   

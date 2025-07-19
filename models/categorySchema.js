@@ -39,7 +39,9 @@ const categorySchema = new Schema({
   isDeleted:{
      type: Boolean,
     default: false,
-  }
-});
+  },
+ 
+},
+ {timestamps:true});
 const Category = mongoose.model("Category", categorySchema);
 module.exports = Category;

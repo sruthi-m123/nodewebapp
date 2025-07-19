@@ -80,12 +80,12 @@
           </div>
           <div class="tab-content" id="details">
             <ul>
-              <li><strong>Category:</strong> <%= product.category.name %></li>
+              <li><strong>Category:</strong> <%= product.productName%></li>
               <li><strong>Color:</strong> <%= product.color %></li>
               <li><strong>Stock:</strong> <%= product.stock %></li>
               <li><strong>New Arrival:</strong> <%= product.isNewArrival ? "Yes" : "No" %></li>
               <li><strong>Status:</strong> <%= product.status %></li>
-              <li><strong>Created At:</strong> <%= product.createdAt.toDateString() %></li>
+              <!-- <li><strong>Created At:</strong> <%= product.createdAt.toDateString() %></li> -->
             </ul>
           </div>
           <div class="tab-content" id="shipping">
@@ -102,13 +102,15 @@
   </section>
 
   <!-- Related Products -->
+ <% if (relatedProducts && relatedProducts.some(prod => prod.isNewArrival)) { %>
   <section class="related-products">
     <div class="section-header">
       <h2>You May Also Like</h2>
       <p>Complement your collection with these exquisite pieces</p>
     </div>
     <div class="products-grid">
-      <% relatedProducts.forEach(prod => { %>
+      <% relatedProducts.forEach(prod => { 
+           if (prod.isNewArrival) { %>
         <div class="product-card">
           <div class="product-image">
             <img src="/<%= prod.images[0] %>" alt="<%= prod.productName %>">
@@ -121,8 +123,7 @@
             <p class="price">₹<%= prod.price.toLocaleString('en-IN') %></p>
           </div>
         </div>
-      <% }) %>
+      <% } }) %>
     </div>
   </section>
-
-  
+<% } %>

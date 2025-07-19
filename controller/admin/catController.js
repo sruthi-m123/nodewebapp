@@ -11,16 +11,22 @@ const formatResponse = (success, message, data = {}) => ({
 
 const getAllCategories = async (req, res) => {
   try {
-    const search=req.query.search||'';
+    const search = req.query.search || '';
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const skip = (page - 1) * limit;
-    
+
+    const searchFilter = {
+      isDeleted: false,
+      name: { $regex: search, $options: 'i' }  // case-insensitive search
+    };
+
     const [categories, totalCategories] = await Promise.all([
-      Category.find({ isDeleted: false })
-        .sort({ createdAt: -1 })  
+      Category.find(searchFilter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
         .limit(limit),
-      Category.countDocuments({ isDeleted: false })
+      Category.countDocuments(searchFilter)
     ]);
 
     const startItem = skip + 1;
@@ -33,8 +39,8 @@ const getAllCategories = async (req, res) => {
       startItem,
       endItem,
       totalCategories,
-      currentPage: page,
-      totalPages,
+      currentPage: page||1,
+      totalPages:totalPages||1,
       search
     });
   } catch (error) {
@@ -134,18 +140,23 @@ console.log("category saved");
 // Update category status
 const updateCategoryStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { categoryId } = req.params;
     const { status } = req.body;
 
-    if (!['active', 'inactive'].includes(status)) {
-      return res.status(400).json(formatResponse(false, 'Invalid status value'));
-    }
+const validStatus = (status === true || status === 'active') ? 'active'
+                      : (status === false || status === 'inactive') ? 'inactive'
+                      : null;
 
-    const category = await Category.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+
+    if (!validStatus) {
+  return res.status(400).json(formatResponse(false, 'Invalid status value'));
+}
+
+const category = await Category.findByIdAndUpdate(
+  req.params.categoryId,
+  { status: validStatus },
+  { new: true }
+);
 
     if (!category) {
       return res.status(404).json(formatResponse(false, 'Category not found'));
@@ -245,25 +256,30 @@ const updateCategory = async (req, res) => {
 // Delete category (soft delete)
 const deleteCategory = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
+console.log("category id to delete :",id);
+    // const productCount = await Product.countDocuments({ 
+    //   category: id,
+    //   isDeleted: false 
+    // });
 
-    const productCount = await Product.countDocuments({ 
-      category: id,
-      isDeleted: false 
-    });
-
-    if (productCount > 0) {
-      return res.status(400).json(
-        formatResponse(false, `Cannot delete: ${productCount} products exist in this category`)
-      );
-    }
+    // if (productCount > 0) {
+    //   return res.status(400).json(
+    //     formatResponse(false, `Cannot delete: ${productCount} products exist in this category`)
+    //   );
+    // }
+//firstly ,decative the products 
+ await Product.updateMany(
+      { category: id, isDeleted: false },
+      { isActive: false }
+    );
 
     // Soft delete
-    const category = await Category.findByIdAndUpdate(
-      id,
-      { isDeleted: true },
-      { new: true }
-    );
+    const category = await Category.findOneAndUpdate(
+  { _id: id, isDeleted: false },
+  { isDeleted: true },
+  { new: true }
+);
 
     if (!category) {
       return res.status(404).json(formatResponse(false, 'Category not found'));

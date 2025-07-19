@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 // Configure storage destinations
 const getUploadPath = (uploadType) => {
   const paths = {
-    avatar: 'public/img/admin/admin-avatar',
+    avatar: 'public/img/uploads/avatar',
     product: 'public/img/admin/products',
     category: 'public/img/admin/category',
     review: 'public/img/admin/reviews',

@@ -42,7 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 app.use(methodOverride('_method'));
 app.use(flash())
 app.use(expressLayouts);

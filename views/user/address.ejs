@@ -1,0 +1,164 @@
+
+
+<section class="profile-container">
+  <div class="settings-sidebar">
+    <div class="sidebar-header">
+      <h3><%= user.name %></h3>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="<%= activeTab === 'profile' ? 'active' : '' %>">
+        <a href="/profile"><i class="fas fa-user"></i><span>Profile</span></a>
+      </li>
+      <li class="<%= activeTab === 'addresses' ? 'active' : '' %>">
+        <a href="/address"><i class="fas fa-map-marker-alt"></i><span>Addresses</span></a>
+      </li>
+      <li class="<%= activeTab === 'orders' ? 'active' : '' %>">
+        <a href="/profile/orders"><i class="fas fa-shopping-bag"></i><span>Orders</span></a>
+      </li>
+      <li class="<%= activeTab === 'wishlist' ? 'active' : '' %>">
+        <a href="/profile/wishlist"><i class="fas fa-heart"></i><span>Wishlist</span></a>
+      </li>
+      <form action="/logout" method="POST" class="logout-form">
+        <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+      </form>
+    </ul>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-header">
+      <h2>Addresses</h2>
+     <div class="add-address-wrapper">
+  <a href="#" class="add-address-btn" id="openAddAddressModal">+ Add Address</a>
+</div>
+
+    </div>
+
+    <div class="address-box">
+      <h3 class="section-title">ADDRESSES</h3>
+
+      <% if (user.addresses && user.addresses.length > 0) { %>
+        <% user.addresses.forEach(function(addr) { %>
+          <div class="address-card <%= addr.isDefault ? 'default-address' : '' %>">
+            <% if (addr.isDefault) { %>
+              <div class="default-label">Default Address</div>
+            <% } %>
+
+            <div class="address-details">
+             <strong data-name><%= addr.name %></strong><br>
+        <span data-phone><%= addr.phone %></span><br>
+                <span data-building><%= addr.building %></span><br>
+        <span data-city><%= addr.city %></span>, 
+        <span data-state><%= addr.state %></span>, 
+        <span data-pincode><%= addr.pincode %></span><br>
+        <span data-landmark><%= addr.landmark || '' %></span>
+            </div>
+
+            <div class="address-actions">
+              <a href="/addresses/edit/<%= addr._id %>" class="btn edit-btn">Edit</a>
+
+              <form action="/addresses/delete/<%= addr._id %>" method="POST" style="display:inline;">
+                <button class="btn delete-btn" type="submit" onclick="return confirm('Are you sure to delete this address?')">Delete</button>
+              </form>
+
+              <% if (!addr.isDefault) { %>
+                <form action="/set-default-address/<%= addr._id %>" method="POST" style="display:inline;">
+                  <button class="btn set-default-btn" type="submit">Set as Default</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>No address added yet.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<div id="addAddressModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <div class="address-form-container">
+      <h3 class="form-title">Add New Address</h3>
+      <form  id=addAddressForm class="address-form" action="/user/addresses/add" method="POST" enctype="multipart/form-data">
+        
+        <!-- Full Name and Phone -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" class="form-input" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" class="form-input" placeholder="1234567890" required pattern="\d{10}" title="Phone must be 10 digits">
+          </div>
+        </div>
+          <!-- Building  -->
+<div class="form-row">
+          <div class="form-group">
+            <label for="name">Building</label>
+            <input type="text" id="building" name="building" class="form-input" placeholder=" Building name or Number" required>
+          </div>
+          
+        </div>
+
+
+        <!-- Alternate Phone and Address Type -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="altPhone">Alternate Phone (Optional)</label>
+            <input type="text" id="altPhone" name="altPhone" class="form-input" placeholder="0987654321" pattern="\d{10}" title="Phone must be 10 digits">
+          </div>
+          <div class="form-group">
+            <label for="addressType">Address Type</label>
+            <select id="addressType" name="addressType" class="form-input" required>
+              <option value="">Select Type</option>
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- City and State -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" class="form-input" placeholder="City" required>
+          </div>
+          <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" class="form-input" placeholder="State" required>
+          </div>
+        </div>
+
+        <!-- Pincode and Landmark -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pincode">Pincode</label>
+            <input type="text" id="pincode" name="pincode" class="form-input" placeholder="123456" required pattern="\d{6}" title="Pincode must be 6 digits">
+          </div>
+          <div class="form-group">
+            <label for="landmark">Landmark (Optional)</label>
+            <input type="text" id="landmark" name="landmark" class="form-input" placeholder="Near landmark">
+          </div>
+        </div>
+
+        <!-- Set as Default -->
+        <div class="form-row">
+          <div class="form-group" style="flex-direction: row; align-items: center;">
+            <input type="checkbox" id="setAsDefault" name="setAsDefault" value="true">
+            <label for="setAsDefault" style="margin-left: 5px;">Set as Default Address</label>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">Save Address</button>
+          <a href="/addresses" class="btn-cancel">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">

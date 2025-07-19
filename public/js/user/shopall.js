@@ -56,23 +56,29 @@ function debounce(func,delay){
     timeout=setTimeout(()=>func.apply(this,args),delay);
   }
 }
-searchInput.addEventListener('input',  debounce(()=>{
-  const searchQuery=searchInput.value.trim();
-  // const filters = getFilterData(); // includes search, sort, categories, etc.
+searchInput.addEventListener('input', debounce(() => {
+  const searchQuery = searchInput.value.trim();
 
   fetch('/user/shopall/filter', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(searchQuery) // includes search value inside
+    body: JSON.stringify({
+      search: searchQuery,
+      // you can also include categories, colors, etc. here
+    }),
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       console.log('Search results:', data);
-       updateProductGrid(data.products); 
+      updateProductGrid(data.products);
+    })
+    .catch((err) => {
+      console.error('Search fetch error:', err);
     });
-},300));
+}, 300));
+
 
   sortSelect.addEventListener('change', function(){
     const selectedSort=sortSelect.value;
@@ -170,8 +176,11 @@ if (selectedAvailability.length === 0 ) {
     searchInput.value = '';
     minPriceInput.value = '';
     maxPriceInput.value = '';
-    sortSelect.value = 'best';
-    applyFilters();
+    sortSelect.value = 'priceLowHigh';
+    fetch('/user/shopall/all')
+  .then(res => res.json())
+  .then(data => updateProductGrid(data.products));
+
   });
 
   function debounce(func, delay) {

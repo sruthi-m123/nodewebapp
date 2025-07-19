@@ -23,7 +23,7 @@ const userSchema = new Schema({
   },
   avatar: {
     type: String,
-    default: '/img/profile.jpg'
+   default:'/img/admin-products.png'
   },
   googleId: {
     type: String,
@@ -66,6 +66,7 @@ const userSchema = new Schema({
   redeemed: {
     type: Boolean
   },
+  
   redeemedUsers: [{
     type: Schema.Types.ObjectId,
     ref: "User"
