@@ -1,9 +1,24 @@
 // Update quantity with buttons
 function updateQuantity(itemId, change) {
-  const input = document.querySelector(`tr[data-id="${itemId}"] input`);
+  const container = document.querySelector(`.quantity-selector[data-id="${itemId}"]`);
+  const input = container.querySelector('input');
+  const maxStock = parseInt(container.dataset.stock);
   let newValue = parseInt(input.value) + change;
+
+  if (newValue > maxStock) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Out of Stock',
+      text: `Only ${maxStock} items available in stock.`,
+      timer: 2000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
   if (newValue < 1) newValue = 1;
   input.value = newValue;
+
   updateItemTotal(itemId);
   calculateGrandTotal();
 }
@@ -37,7 +52,8 @@ function calculateGrandTotal() {
 async function removeItem(itemId) {
   try {
     const response = await fetch(`/cart/remove/${itemId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+       credentials: 'include' 
     });
     
     if (response.ok) {

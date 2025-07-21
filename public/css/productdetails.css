@@ -462,4 +462,10 @@
   color: green;
   font-weight: bold;
 }
+.out-of-stock {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 

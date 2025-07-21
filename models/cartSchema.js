@@ -36,4 +36,4 @@ required:true
     }]
 })
 const Cart=mongoose.model("Cart",cartSchema);
-modules.exports=Cart;
+module.exports=Cart;

@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="cart.css">
 <!-- Add Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -25,17 +24,18 @@
                 </button>
               </td>
               <td class="product-info">
-                <img src="<%= item.image %>" alt="<%= item.name %>" class="product-img">
+                <img src="<%= item.productId.images[0] %>" alt="<%= item.name %>" class="product-img">
                 <span><%= item.name %></span>
               </td>
               <td>Rs. <span class="item-price"><%= item.price %></span></td>
               <td>
-                <div class="quantity-selector">
-                  <button onclick="updateQuantity('<%= item.id %>', -1)">-</button>
-                  <input type="number" value="<%= item.quantity %>" min="1" 
-                         onchange="updateQuantityInput('<%= item.id %>', this.value)">
-                  <button onclick="updateQuantity('<%= item.id %>', 1)">+</button>
-                </div>
+<div class="quantity-selector" data-id="<%= item.id %>" data-stock="<%= item.productId.stock %>">
+  <button onclick="updateQuantity('<%= item.id %>', -1)">-</button>
+  <input type="number" value="<%= item.quantity %>" min="1" max="<%= item.productId.stock %>" 
+         onchange="updateQuantityInput('<%= item.id %>', this.value)">
+  <button onclick="updateQuantity('<%= item.id %>', 1)">+</button>
+</div>
+
               </td>
               <td>Rs. <span class="item-total"><%= item.price * item.quantity %></span></td>
             </tr>
@@ -74,4 +74,3 @@
   </div>
 </div>
 
-<script src="/js/cart.js"></script>

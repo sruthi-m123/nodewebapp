@@ -36,8 +36,11 @@
           <a href="/logout" class="card-link" id="logoutBtn">Logout</a>
         </div>
       </div>
+      <a href="/cart" id="viewCartBtn" class="icon-link cart-icon">
+  <i class="fas fa-shopping-bag"></i><span class="cart-count">0</span>
+</a>
     <% } %>
-    <a href="#" class="icon-link cart-icon"><i class="fas fa-shopping-bag"></i><span class="cart-count">0</span></a>
+
   </div>
 
   <!-- Mobile Toggle -->
@@ -66,11 +69,13 @@
     <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
     <% if (user) { %>
       <a href="/profile" class="icon-link"><i class="fas fa-user"></i></a>
-    <% } else { %>
+   <a href="/cart" id="viewCartBtn" class="icon-link cart-icon">
+  <i class="fas fa-shopping-bag"></i><span class="cart-count"><%= cartCount %></span>
+</a> 
+      <% } else { %>
       <a href="/login" class="icon-link"><i class="fas fa-user-circle"></i></a>
     <% } %>
-    <a href="#" class="icon-link cart-icon"><i class="fas fa-shopping-bag"></i><span class="cart-count">0</span></a>
-  </div>
+ </div>
 </div>
 
    

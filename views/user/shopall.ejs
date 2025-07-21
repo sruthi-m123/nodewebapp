@@ -92,14 +92,13 @@
     </div>
   <% } else { %>
     <% products.forEach(product => { %>
-      <!-- <a href="/user/product/<%= product._id %>" class="product-link"></a> -->
-      <div class="product-card <%= !product.isActive ? 'inactive' : '' %>">
-        <!-- <div class="product-badge"><%= product.badge || 'New' %></div> -->
+      <% if (product.isActive) { %>
+<div class="product-card ">
        <% if (product.isNewArrival) { %>
   <div class="product-badge">New</div>
 <% } %>
 
-        <div class="product-image">
+        <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
            <a href="/user/product/<%= product._id %>">
           <img src="/<%= product.images[0] %>" alt="<%= product.productName %>">
           </a>
@@ -124,10 +123,17 @@
             <button class="wishlist-btn" title="Add to wishlist">
               <i class="far fa-heart"></i>
             </button>
-            <button class="add-to-cart primary-btn">Add to Cart</button>
-          </div>
+<% if (product.stock === 0) { %>
+                <p class="out-of-stock-message">Out of Stock</p>
+              <% } else { %>
+<button class="add-to-cart primary-btn" data-id="<%= product._id %>">
+  Add to Cart
+</button>
+              <% } %>
+                      </div>
         </div>
       </div>
+      <% } %>
     <% }) %>
   <% } %>
 </div>

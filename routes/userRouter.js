@@ -6,7 +6,9 @@ const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require(
 const {singleUpload, multiUpload,upload}=require('../config/multer');
 const profileController = require("../controller/user/profileController");
 const shopController=require("../controller/user/shopController");
+const productController=require("../controller/user/productController")
 const addressController=require("../controller/user/addressController");
+const cartController=require("../controller/user/cartController")
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
@@ -66,12 +68,15 @@ router.get("/shopAll",shopController.loadShopping);
 router.post('/shopall/filter',shopController.applyFilters);
 router.get('/shopall/category/:id', shopController.getProductsByCategory);
 //product detail page 
-router.get('/product/:id',userController.productDetail)
+router.get('/product/:id',productController.productDetail);
 //address page
 router.get('/address',isLoggedIn,addressController.getAddressPage);
 router.post('/addresses/add',addressController.addAddress);
 router.put('/addresses/edit/:id',addressController.updateAddress);
 router.delete('/addresses/delete/:id',addressController.deleteAddress);
 router.post('/set-default-address/:id',addressController.setDefaultAddress)
-
+//cart page
+router.get('/cart',cartController.getCart);
+router.post('/cart/add/:productId',cartController.addToCart);
+router.delete('/cart/remove/:itemId',cartController.removeCartItem);
 module.exports = router;

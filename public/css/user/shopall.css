@@ -481,3 +481,13 @@
   font-size: 1.2rem;
   padding: 40px 20px;
 }
+.out-of-stock-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 8px;
+}
+.grayscale img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  pointer-events: none;
+}

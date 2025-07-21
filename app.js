@@ -9,6 +9,7 @@ const session = require("express-session");
 const methodOverride = require('method-override');
 const flash =require('connect-flash')
 const expressLayouts = require('express-ejs-layouts');
+const Cart = require('./models/cartSchema');
 
 
 db();
@@ -36,11 +37,27 @@ app.use(
     },
   })
 );
-app.use((req, res, next) => {
+
+app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path; // this already exists in your code
+  res.locals.currentPath = req.path;
+
+  if (req.session.user) {
+    try {
+      const cart = await Cart.findOne({ userId: req.session.user.id });
+     console.log("cart found:",cart)
+      res.locals.cartCount = cart ? cart.items.length : 0;
+    } catch (error) {
+      console.error("Cart count middleware error:", error);
+      res.locals.cartCount = 0;
+    }
+  } else {
+    res.locals.cartCount = 0;
+  }
+
   next();
 });
+
 app.use(passport.initialize());
 // app.use(passport.session());
 app.use(methodOverride('_method'));

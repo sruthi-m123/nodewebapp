@@ -53,7 +53,8 @@ const loadShopping = async (req, res) => {
         user: userData,
          currentPath: req.path,
       products,
-      categories
+      categories,
+      isProductDetail: false
     });
   } catch (error) {
     console.log("shopping page not loading:", error);

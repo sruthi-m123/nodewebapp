@@ -401,7 +401,7 @@
       }
       
       
-blobs.forEach((blob, index) => {
+croppedImages.forEach((blob, index) => {
   formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
 });
       

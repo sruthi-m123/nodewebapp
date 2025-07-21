@@ -52,22 +52,37 @@
         
   
 
+<% if (isProductDetail) { %>
+  <!-- Product Detail Page -->
+  <button id="minus-btn">-</button>
+  <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>">
+  <button id="plus-btn">+</button>
+<% } else { %>
+  <!-- All Products Page (inside loop) -->
+  <% products.forEach((product) => { %>
+    <div class="qty-control">
+      <button class="qty-btn minus">-</button>
+      <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>">
+      <button class="qty-btn plus">+</button>
+    </div>
+  <% }) %>
+<% } %>
 
-        <div class="quantity-selector">
-  <label for="quantity">Quantity:</label>
-  <div class="qty-control">
-    <button class="qty-btn minus" type="button">-</button>
-    <input type="text" id="quantity" value="1" readonly data-stock="<%= product.stock %>">
-    <button class="qty-btn plus" type="button">+</button>
+<div class="product" data-product-id="<%= product._id %>">
+  <div class="actions">
+    <% if (product.stock > 0) { %>
+      <button class="add-to-cart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+      <button class="buy-now"><i class="fas fa-bolt"></i> Buy Now</button>
+    <% } else { %>
+      <button class="add-to-cart out-of-stock" disabled><i class="fas fa-shopping-cart"></i> Out of Stock</button>
+      <button class="buy-now out-of-stock" disabled><i class="fas fa-bolt"></i> Unavailable</button>
+    <% } %>
   </div>
 </div>
 
+  <ul class="message-area"></ul>
+</div>
 
-
-        <div class="actions">
-          <button class="add-to-cart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-          <button class="buy-now"><i class="fas fa-bolt"></i> Buy Now</button>
-        </div>
 
         <div class="product-tabs">
           <div class="tab-header">
