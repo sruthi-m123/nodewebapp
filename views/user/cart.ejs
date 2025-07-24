@@ -15,36 +15,45 @@
             <th>TOTAL</th>
           </tr>
         </thead>
-        <tbody id="cart-items">
-          <% cartItems.forEach(item => { %>
-            <tr data-id="<%= item.id %>">
-              <td>
-                <button class="delete-btn" onclick="removeItem('<%= item.id %>')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-              <td class="product-info">
-                <img src="<%= item.productId.images[0] %>" alt="<%= item.name %>" class="product-img">
-                <span><%= item.name %></span>
-              </td>
-              <td>Rs. <span class="item-price"><%= item.price %></span></td>
-              <td>
-<div class="quantity-selector" data-id="<%= item.id %>" data-stock="<%= item.productId.stock %>">
-  <button onclick="updateQuantity('<%= item.id %>', -1)">-</button>
-  <input type="number" value="<%= item.quantity %>" min="1" max="<%= item.productId.stock %>" 
-         onchange="updateQuantityInput('<%= item.id %>', this.value)">
-  <button onclick="updateQuantity('<%= item.id %>', 1)">+</button>
-</div>
+      <tbody id="cart-items">
+  <% cartItems.forEach(item => { %>
+    <tr data-id="<%= item.id %>">
+      <td>
+        <button class="delete-btn" onclick="removeItem('<%= item.id %>')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
 
-              </td>
-              <td>Rs. <span class="item-total"><%= item.price * item.quantity %></span></td>
-            </tr>
-          <% }); %>
-        </tbody>
+      <td class="product-info">
+        <img src="<%= item.productId.images[0] %>" alt="<%= item.name %>" class="product-img">
+        <span><%= item.name %></span>
+        <% if (!item.productId.isActive) { %>
+          <p class="text-red">This product is not currently available</p>
+        <% } %>
+      </td>
+
+      <% if (item.productId.isActive) { %>
+        <td>Rs. <span class="item-price"><%= item.price %></span></td>
+        <td>
+          <div class="quantity-selector" data-id="<%= item.id %>" data-stock="<%= item.productId.stock %>">
+            <button onclick="updateQuantity('<%= item.id %>', -1)">-</button>
+            <input type="number" value="<%= item.quantity %>" min="1" max="<%= item.productId.stock %>"
+              onchange="updateQuantityInput('<%= item.id %>', this.value)">
+            <button onclick="updateQuantity('<%= item.id %>', 1)">+</button>
+          </div>
+        </td>
+        <td>Rs. <span class="item-total"><%= item.price * item.quantity %></span></td>
+      <% } else { %>
+        <td colspan="3" style="color: gray;">Unavailable</td>
+      <% } %>
+    </tr>
+  <% }); %>
+</tbody>
+
       </table>
 
       <div class="cart-buttons">
-        <button class="continue-btn" onclick="window.location.href='/products'">
+        <button class="continue-btn" onclick="window.location.href='/user/shopall'">
           <i class="fas fa-arrow-left"></i> Continue Shopping
         </button>
         <button class="update-btn" onclick="updateCart()">
@@ -66,7 +75,7 @@
       <div class="empty-cart">
         <i class="fas fa-shopping-cart fa-3x"></i>
         <h3>Your cart is empty</h3>
-        <button class="continue-btn" onclick="window.location.href='/products'">
+        <button class="continue-btn" onclick="window.location.href='/user/shopall'">
           <i class="fas fa-arrow-left"></i> Continue Shopping
         </button>
       </div>

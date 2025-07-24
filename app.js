@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -39,12 +41,13 @@ app.use(
 );
 
 app.use(async (req, res, next) => {
+  console.log(req.session)
   res.locals.user = req.session.user || null;
   res.locals.currentPath = req.path;
 
   if (req.session.user) {
     try {
-      const cart = await Cart.findOne({ userId: req.session.user.id });
+      const cart = await Cart.findOne({ userId: req.session.user._id });
      console.log("cart found:",cart)
       res.locals.cartCount = cart ? cart.items.length : 0;
     } catch (error) {
@@ -93,4 +96,3 @@ app.use((req, res, next) => {
 app.listen(process.env.PORT, () => {
   console.log("server Running");
 });
-module.exports = app;

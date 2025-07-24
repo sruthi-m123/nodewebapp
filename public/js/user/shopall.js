@@ -8,26 +8,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const applyPriceBtn = document.querySelector('.price-apply');
 const categoryCheckboxes=document.querySelectorAll('input[name="category"]');
 
-  //  function getFilterData() {
-//     const selectedCategories = [...document.querySelectorAll('input[name="category"]:checked')].map(cb => cb.value);
-//     const selectedAvailability = [...document.querySelectorAll('input[name="availability"]:checked')].map(cb => cb.value);
-//     const selectedColors = [...document.querySelectorAll('.color-option.selected')].map(el => el.dataset.color);
-//     const minPrice = minPriceInput.value;
-//     const maxPrice = maxPriceInput.value;
-//     const searchQuery = searchInput.value;
-//     const sortBy = sortSelect.value;
-
-//     return {
-//       search: searchQuery,
-//       sort: sortBy,
-//       categories: selectedCategories,
-//       availability: selectedAvailability,
-//       colors: selectedColors,
-//       minPrice,
-//       maxPrice,
-//     };
-// }
-//this is for apply button 
+  
 function applyFilters(){
     // const filters=getFilterData();
     // console.log('applied filters:',filters);
@@ -193,7 +174,7 @@ if (selectedAvailability.length === 0 ) {
 
 function updateProductGrid(products) {
   const grid = document.getElementById('product-grid');
-  grid.innerHTML = ''; // Clear old cards
+  grid.innerHTML = ''; 
 
   if (products.length === 0) {
     grid.innerHTML = '<p>No products found.</p>';
@@ -209,9 +190,11 @@ function updateProductGrid(products) {
 
     card.innerHTML = `
       <div class="product-badge">${product.badge || 'New'}</div>
-      <div class="product-image">
-        <img src="/${product.images[0]}" alt="${product.productName}">
-        <div class="quick-view">Quick View</div>
+<div class="product-image ${product.stock === 0 ? 'grayscale' : ''}">
+        <a href="/user/product/${product._id}">
+      <img src="/${product.images[0]}" alt="${product.productName}">
+       </a>
+      <div class="quick-view">Quick View</div>
       </div>
       <div class="product-info">
         <h4 class="product-name">${product.productName}</h4>
@@ -226,7 +209,11 @@ function updateProductGrid(products) {
           <button class="wishlist-btn" title="Add to wishlist">
             <i class="far fa-heart"></i>
           </button>
-          <button class="add-to-cart primary-btn">Add to Cart</button>
+${
+  product.stock === 0
+    ? `<p class="out-of-stock-message">Out of Stock</p>`
+    : `<button class="add-to-cart primary-btn" data-id="${product._id}">Add to Cart</button>`
+}
         </div>
       </div>
     `;
@@ -265,11 +252,11 @@ if (checkbox.length === 0 && selectedAvailability.length === 0) {
         .then(res => res.json())
         .then(data => {
           console.log('Category Products:', data);
-          updateProductGrid(data.products); // Replace with real DOM update logic
+          updateProductGrid(data.products); 
         })
         .catch(err => console.error('Error fetching category products:', err));
     } else {
-      // Optional: reload all products or clear filtered view
+      
       fetch('/user/shopall/all')
         .then(res => res.json())
         .then(data => {
@@ -337,3 +324,52 @@ document.querySelectorAll('.add-to-cart').forEach(button=>{
   
 });
 })
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartButtons = document.querySelectorAll('.add-to-cart');
+
+    cartButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const productId = button.dataset.id;
+
+        fetch(`/cart/add/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ quantity: 1 }) 
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 'error') {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: data.message || 'Added to cart',
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          })
+          .catch(err => {
+            console.error('Add to cart failed:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops!',
+              text: 'Something went wrong.'
+            });
+          });
+      });
+    });
+  });
+

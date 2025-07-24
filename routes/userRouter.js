@@ -79,4 +79,5 @@ router.post('/set-default-address/:id',addressController.setDefaultAddress)
 router.get('/cart',cartController.getCart);
 router.post('/cart/add/:productId',cartController.addToCart);
 router.delete('/cart/remove/:itemId',cartController.removeCartItem);
+router.post('/cart/update',cartController.updateCart);
 module.exports = router;

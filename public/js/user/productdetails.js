@@ -126,6 +126,16 @@ addToCartBtn.addEventListener('click',async()=>{
     confirmButtonText: 'OK'
   });
   return;
+}
+  if (data.status === 'error') {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: data.message,
+            showConfirmButton: false,
+            timer: 2000
+          });
     
       }else if(response.ok){
       Swal.fire({

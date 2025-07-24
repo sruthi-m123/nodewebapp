@@ -126,14 +126,16 @@ console.log("all the queries:",query)
       case 'price-desc':
         productsQuery = productsQuery.sort({ price: -1 });
         break;
-      case 'new':
-        productsQuery = productsQuery.sort({ createdAt: -1 });
-        break;
-        case 'rating-desc':
-    productsQuery = productsQuery.sort({ rating: -1 }); // if rating exists
+      
+     case 'name-asc':
+    productsQuery = productsQuery.sort({ productName: 1 });
     break;
-      default:
-        break;
+  case 'name-desc':
+    productsQuery = productsQuery.sort({ productName: -1 });
+    break;
+  default:
+    productsQuery = productsQuery.sort({ createdAt: -1 });
+    break;
     }
 console.log(' Received minPrice:', minPrice, 'maxPrice:', maxPrice);
 

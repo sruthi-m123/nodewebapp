@@ -21,6 +21,7 @@ function updateQuantity(itemId, change) {
 
   updateItemTotal(itemId);
   calculateGrandTotal();
+  updateCart();
 }
 
 // Update quantity with direct input
@@ -28,6 +29,7 @@ function updateQuantityInput(itemId, value) {
   if (value < 1) value = 1;
   updateItemTotal(itemId);
   calculateGrandTotal();
+  updateCart();
 }
 
 // Calculate item total (price * quantity)
@@ -80,7 +82,7 @@ async function updateCart() {
       quantity: parseInt(row.querySelector('input').value)
     });
   });
-
+console.log(updates);
   try {
     const response = await fetch('/cart/update', {
       method: 'POST',
