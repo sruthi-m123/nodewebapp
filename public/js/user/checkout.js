@@ -1,23 +1,28 @@
 // public/js/checkout.js
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize data from the hidden div
+document.addEventListener('DOMContentLoaded', function () {
     const checkoutData = document.getElementById('checkout-data');
     const offers = JSON.parse(checkoutData.dataset.offers || '[]');
     const addresses = JSON.parse(checkoutData.dataset.addresses || '[]');
     const cartItems = JSON.parse(checkoutData.dataset.cart || '[]');
     const selectedPayment = checkoutData.dataset.payment || '';
-    
-    // Set up event listeners
-    setupAddressSelection();
+
+    const addressCards = document.querySelectorAll('.address-card');
+    addressCards.forEach((card, index) => {
+        const addressDocId = card.dataset.addressId;
+        card.addEventListener('click', () => {
+            setupAddressSelection(card, addressDocId, index);
+        });
+    });
+
     setupPaymentSelection();
     setupFormValidation();
-    
-    // If we're showing the success page, hide the main content
+
     if (window.location.hash === '#success') {
         showSuccessPage();
     }
 });
+;
 
 // Address Modal Functions
 function openAddressModal(addressId = null) {
@@ -25,6 +30,7 @@ function openAddressModal(addressId = null) {
     const form = document.getElementById('addressForm');
     const title = document.getElementById('modalTitle');
     
+    form.reset();
     if (addressId) {
         // Editing an existing address
         title.textContent = 'Edit Address';
@@ -34,18 +40,21 @@ function openAddressModal(addressId = null) {
                 if (data.success) {
                     const address = data.address;
                     form.reset();
-                    document.getElementById('fullName').value = address.name;
-                    document.getElementById('addressLine1').value = address.addressLine1;
-                    document.getElementById('addressLine2').value = address.addressLine2 || '';
+                    document.getElementById('name').value = address.name;
+                  document.getElementById('building').value=address.building;
+                   document.getElementById('landmark').value=address.landmark;
                     document.getElementById('city').value = address.city;
                     document.getElementById('state').value = address.state;
-                    document.getElementById('zipCode').value = address.zipCode;
+                    document.getElementById('pincode').value = address.pincode;
                     document.getElementById('phone').value = address.phone;
+                    document.getElementById('altPhone').value=address.altphone;
                     document.getElementById('addressType').value = address.type || 'home';
                     document.getElementById('setDefault').checked = address.isDefault || false;
                     
                     // Store the address ID in the form for update
                     form.dataset.addressId = addressId;
+                }else{
+                    alert("failed to load address.")
                 }
             })
             .catch(error => {
@@ -55,7 +64,7 @@ function openAddressModal(addressId = null) {
     } else {
         // Adding a new address
         title.textContent = 'Add New Address';
-        form.reset();
+        
         delete form.dataset.addressId;
     }
     
@@ -73,26 +82,27 @@ function setupFormValidation() {
         e.preventDefault();
         
         const formData = {
-            name: document.getElementById('fullName').value,
-            addressLine1: document.getElementById('addressLine1').value,
-            addressLine2: document.getElementById('addressLine2').value,
-            city: document.getElementById('city').value,
-            state: document.getElementById('state').value,
-            zipCode: document.getElementById('zipCode').value,
-            phone: document.getElementById('phone').value,
-            type: document.getElementById('addressType').value,
+            name: document.getElementById('name').value.trim(),
+            building: document.getElementById('building').value.trim(),
+                        landmark: document.getElementById('landmark').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            state: document.getElementById('state').value.trim(),
+            pincode: document.getElementById('pincode').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+                      altPhone: document.getElementById('altPhone').value.trim(),
+ addressType: document.getElementById('addressType').value,
             isDefault: document.getElementById('setDefault').checked
         };
         
         // Basic validation
-        if (!formData.name || !formData.addressLine1 || !formData.city || 
-            !formData.state || !formData.zipCode || !formData.phone) {
+        if (!formData.name ||! formData.building  ||!formData.city || 
+            !formData.state || !formData.pincode|| !formData.phone||!formData.addressType) {
             alert('Please fill in all required fields');
             return;
         }
         
         const addressId = form.dataset.addressId;
-        
+       
         if (addressId) {
             // Update existing address
             updateAddress(addressId, formData);
@@ -152,23 +162,22 @@ function updateAddress(addressId, addressData) {
 function editAddress(addressId) {
     openAddressModal(addressId);
 }
-
-function setupAddressSelection() {
+function setupAddressSelection(cardElement, addressDocId, addressIndex) {
     const addressCards = document.querySelectorAll('.address-card');
     
-    addressCards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Remove selected class from all cards
-            addressCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selected class to clicked card
-            this.classList.add('selected');
-            
-            // You might want to store the selected address ID for the order
-            const addressId = this.dataset.addressId;
-            document.getElementById('checkout-data').dataset.selectedAddress = addressId;
-        });
-    });
+    
+    addressCards.forEach(card => card.classList.remove('selected'));
+    
+    
+    cardElement.classList.add('selected');
+    
+   
+    const checkoutData = document.getElementById('checkout-data');
+    checkoutData.dataset.selectedAddressDoc = addressDocId;
+    checkoutData.dataset.selectedAddressIndex = addressIndex;
+    
+    
+    checkoutData.dataset.selectedAddress = `${addressDocId}_${addressIndex}`;
 }
 
 // Payment Selection

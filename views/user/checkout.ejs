@@ -13,18 +13,13 @@
                         <button class="btn" onclick="openAddressModal()">Add Address</button>
                     </div>
                     
-                    <!-- views/checkout/checkout.ejs -->
-                  <div class="address-list" id="addressList">
+                 <div class="address-list" id="addressList">
   <% addresses.forEach(addressDoc => { 
        addressDoc.address.forEach((addr, index) => { %>
     <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
          data-address-id="<%= addressDoc._id %>" 
          onclick="setupAddressSelection(this, '<%= addressDoc._id %>', <%= index %>)">
          
-      <input type="radio" name="selectedAddress" 
-             value="<%= addressDoc._id %>_<%= index %>" 
-             <%= addr.isDefault ? 'checked' : '' %> />
-
       <div class="address-name"><%= addr.name || 'Unknown' %></div>
       <div class="address-details">
         <%= addr.addressLine1 || '' %><br>
@@ -149,9 +144,9 @@
                     <span>₹<%= total || 0 %></span>
                 </div>
 
-                <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border: 1px solid #eee;">
+                <!-- <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border: 1px solid #eee;">
                     <strong>Payment Method:</strong> <span id="selectedPaymentMethod"><%= selectedPaymentMethod || 'Not Selected' %></span>
-                </div>
+                </div> -->
                 
                 <button class="continue-btn" onclick="placeOrder()">Place Order</button>
             </div>
@@ -189,59 +184,63 @@
             </div>
             
             <form id="addressForm">
-                <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" class="form-input" id="fullName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address Line 1 *</label>
-                    <input type="text" class="form-input" id="addressLine1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address Line 2</label>
-                    <input type="text" class="form-input" id="addressLine2">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">City *</label>
-                        <input type="text" class="form-input" id="city" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">State *</label>
-                        <input type="text" class="form-input" id="state" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">ZIP Code *</label>
-                        <input type="text" class="form-input" id="zipCode" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Phone *</label>
-                        <input type="tel" class="form-input" id="phone" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Address Type</label>
-                    <select class="form-input" id="addressType">
-                        <option value="home">Home</option>
-                        <option value="office">Office</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="setDefault">
-                    <label for="setDefault">Set as default address</label>
-                </div>
-                
-                <button type="submit" class="save-btn">Save Address</button>
-            </form>
+    <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" class="form-input" id="name" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Building / House No. *</label>
+        <input type="text" class="form-input" id="building" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Landmark (optional)</label>
+        <input type="text" class="form-input" id="landmark">
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">City *</label>
+        <input type="text" class="form-input" id="city" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">State *</label>
+        <input type="text" class="form-input" id="state" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Pincode *</label>
+        <input type="number" class="form-input" id="pincode" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Phone *</label>
+        <input type="tel" class="form-input" id="phone" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Alternate Phone (optional)</label>
+        <input type="tel" class="form-input" id="altPhone">
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Address Type *</label>
+        <select class="form-input" id="addressType" required>
+            <option value="Home">Home</option>
+            <option value="Work">Work</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="setDefault">
+        <label for="setDefault">Set as default address</label>
+    </div>
+
+    <button type="submit" class="save-btn">Save Address</button>
+</form>
+
         </div>
     </div>
     <div id="checkout-data"

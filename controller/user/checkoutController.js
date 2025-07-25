@@ -19,7 +19,9 @@ exports.getCheckoutPage = async (req, res) => {
         // Get cart items
         const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
         console.log("cart items:",cart);
-        const cartItems = cart.items.map(item => ({
+        const cartItems = cart.items
+        .filter(item=>item.productId&&item.productId.isActive)
+        .map(item => ({
             id: item.productId._id,
             name: item.productId.name,
             image: item.productId.images[0],
@@ -85,109 +87,137 @@ exports.getCheckoutPage = async (req, res) => {
 
 exports.addAddress = async (req, res) => {
     try {
-        const userId = req.session.user._id;
-        const { 
+const user = req.session?.user;
+
+if (!user || !user._id) {
+    console.log(" No active user session.");
+    return res.status(401).json({ success: false, message: 'User not logged in' });
+}
+
+const userId = user._id;  
+console.log("rwq body:",req.body)   
+   const { 
             name, 
-            addressLine1, 
-            addressLine2, 
+            building,
+            landmark, 
             city, 
             state, 
-            zipCode, 
-            phone, 
-            type, 
+            pincode, 
+            phone,
+            altPhone, 
+            addressType, 
             isDefault 
         } = req.body;
-        
+           let userAddressDoc = await Address.findOne({ userId });
         // If setting as default, unset any existing default
-        if (isDefault) {
-            await Address.updateMany(
-                { user: userId, isDefault: true },
-                { $set: { isDefault: false } }
-            );
-        }
+        if (isDefault && userAddressDoc) {
+      userAddressDoc.address.forEach(addr => addr.isDefault = false);
+    }
         
-        const newAddress = new Address({
+        const newAddress = {
             userId: userId,
             name,
-            addressLine1,
-            addressLine2,
+           building,
+           landmark,
             city,
             state,
-            zipCode,
+            pincode,
             phone,
-            type,
+            altPhone,
+            addressType,
             isDefault
-        });
+        };
         
-        await newAddress.save();
-        
-        res.json({ success: true, address: newAddress });
-    } catch (error) {
-        console.error('Add address error:', error);
-        res.status(500).json({ success: false, message: 'Error adding address' });
+       if (userAddressDoc) {
+      userAddressDoc.address.push(newAddress);
+      await userAddressDoc.save();
+    } else {
+      userAddressDoc = new Address({
+        userId,
+        address: [newAddress]
+      });
+      await userAddressDoc.save();
     }
-};
 
+    res.json({ success: true, address: newAddress});
+}catch (error) {
+    console.error('Add address error:', error);
+    res.status(500).json({ success: false, message: 'Error adding address' });
+  };
+}
 exports.updateAddress = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const user = req.session?.user;
+
+        if (!user || !user._id) {
+            console.log("❌ No active user session.");
+            return res.status(401).json({ success: false, message: 'User not logged in' });
+        }
+
         const addressId = req.params.id;
+
         const { 
             name, 
-            addressLine1, 
-            addressLine2, 
+            building,
+            landmark,
             city, 
             state, 
-            zipCode, 
+            pincode, 
             phone, 
-            type, 
+            altPhone,
+            addressType,
             isDefault 
         } = req.body;
-        
-        // If setting as default, unset any existing default
+
+        // Unset existing default if this one is marked as default
         if (isDefault) {
             await Address.updateMany(
-                { user: userId, isDefault: true },
+                { userId: user._id, isDefault: true },
                 { $set: { isDefault: false } }
             );
         }
-        
+
         const updatedAddress = await Address.findOneAndUpdate(
-            { _id: addressId, user: userId },
+            { _id: addressId, userId: user._id },
             {
-                name,
-                addressLine1,
-                addressLine2,
-                city,
-                state,
-                zipCode,
-                phone,
-                type,
-                isDefault
+                name, 
+                building,
+                landmark,
+                city, 
+                state, 
+                pincode, 
+                phone, 
+                altPhone,
+                addressType,
+                isDefault 
             },
             { new: true }
         );
-        
+
         if (!updatedAddress) {
+            console.log(`⚠️ No address found for ID: ${addressId} and User: ${user._id}`);
             return res.status(404).json({ success: false, message: 'Address not found' });
         }
-        
+
+        console.log("✅ Address updated:", updatedAddress);
         res.json({ success: true, address: updatedAddress });
+
     } catch (error) {
-        console.error('Update address error:', error);
+        console.error('🔥 Update address error:', error);
         res.status(500).json({ success: false, message: 'Error updating address' });
     }
 };
 
 exports.getAddress = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = req.session.user._id;
         const addressId = req.params.id;
         
         const address = await Address.findOne({ _id: addressId, user: userId });
         
         if (!address) {
-            return res.status(404).json({ success: false, message: 'Address not found' });
+            return res.
+            status(404).json({ success: false, message: 'Address not found' });
         }
         
         res.json({ success: true, address });

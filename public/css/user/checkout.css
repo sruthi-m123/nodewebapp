@@ -297,19 +297,18 @@ h1 {
     color: #9e6d4e;
     font-weight: 500;
 }
-
-/* Payment Options */
+/* Payment Options - Modified Compact Version */
 .payment-methods {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px; /* Reduced from 15px */
 }
 
 .payment-option {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px;
+    gap: 12px; /* Reduced from 15px */
+    padding: 12px; /* Reduced from 15px */
     border: 1px solid #d9c4b3;
     border-radius: 8px;
     cursor: pointer;
@@ -317,31 +316,23 @@ h1 {
     background: #faf5f2;
 }
 
-.payment-option:hover {
-    border-color: #9e6d4e;
-    box-shadow: 0 3px 10px rgba(158, 109, 78, 0.1);
-}
-
-.payment-option.selected {
-    border-color: #9e6d4e;
-    background: #f5ede6;
-}
-
 .payment-icon {
-    font-size: 24px;
+    font-size: 20px; /* Reduced from 24px */
     color: #9e6d4e;
 }
 
 .payment-title {
     font-weight: 600;
     color: #7d573e;
-    margin-bottom: 3px;
+    margin-bottom: 2px; /* Reduced from 3px */
+    font-size: 13px; /* Added smaller font size */
 }
 
 .payment-description {
-    font-size: 14px;
+    font-size: 12px; /* Reduced from 14px */
     color: #9e6d4e;
 }
+
 
 /* Order Summary */
 .summary-title {
@@ -417,6 +408,7 @@ h1 {
 }
 
 /* Updated Modal Styles */
+/* Updated Modal Styles */
 #addressModal {
     display: none;
     position: fixed;
@@ -428,29 +420,49 @@ h1 {
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    overflow-y: auto; /* Enable scrolling for the modal backdrop */
 }
 
 .modal-content {
     background: #faf5f2;
     border: 1px solid #d9c4b3;
-    padding: 30px;
+    padding: 0;
     border-radius: 8px;
     max-width: 600px;
     width: 90%;
     position: relative;
     animation: fadeIn 0.3s ease-in-out;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-height: 90vh; /* Limit height to viewport */
+    overflow-y: auto; /* Enable scrolling for content */
 }
 
+/* Optional: Style the scrollbar to match your theme */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f5ede6;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #d9c4b3;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #9e6d4e;
+}
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #d9c4b3;
+    position: sticky;
+    top: 0;
+    background: #faf5f2;
+    z-index: 10;
+    padding-top: 15px;
+    margin-top: -15px; /* Compensate for modal padding */
 }
-
 .modal-title {
     color: #7d573e;
     font-family: 'Playfair Display', serif;
