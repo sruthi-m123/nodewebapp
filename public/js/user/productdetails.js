@@ -179,7 +179,7 @@ buyNowBtn.addEventListener('click',async()=>{
     });
     const data=await response.json();
     if(response.ok){
-      window.location.href='/user/checkout';
+      window.location.href='user/checkout';
     }else{
     Swal.fire({
           icon: 'error',

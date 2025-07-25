@@ -36,13 +36,14 @@ const adminAuth=(req,res,next)=>{
 
 const ifAuthenticated=(req,res,next)=>{
     if(req.session.user){
-        return res.redirect('/user/home');
+        return res.redirect('/');      
+          
+
     }
     next();
 }
 const redirectIfLoggedIn = (req, res, next) => {
     if (req.session && req.session.user) {
-        return res.redirect("/user/home");
     }
     next();
 };

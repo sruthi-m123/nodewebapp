@@ -102,5 +102,5 @@ console.log(updates);
 
 // Proceed to checkout
 function checkout() {
-  window.location.href = '/checkout';
+  window.location.href = 'user/checkout';
 }

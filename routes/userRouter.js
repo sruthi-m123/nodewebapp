@@ -9,6 +9,7 @@ const shopController=require("../controller/user/shopController");
 const productController=require("../controller/user/productController")
 const addressController=require("../controller/user/addressController");
 const cartController=require("../controller/user/cartController")
+const checkoutController=require("../controller/user/checkoutController");
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
@@ -17,7 +18,7 @@ router.post("/signup", userController.signup);
 router.post("/send-otp", userController.sendOtp);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
-router.get("/login",ifAuthenticated, userController.loadLogin);
+router.get("/login", userController.loadLogin);
 router.post("/login",userController.login);
 router.get("/generateotp", userController.loadGenerateotp);
 router.get("/forgotpassword",userController.loadForgotPassword);
@@ -80,4 +81,19 @@ router.get('/cart',cartController.getCart);
 router.post('/cart/add/:productId',cartController.addToCart);
 router.delete('/cart/remove/:itemId',cartController.removeCartItem);
 router.post('/cart/update',cartController.updateCart);
+
+//checkout page
+router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
+//address checkout page 
+router.post('/api/addresses',checkoutController.addAddress);
+router.put('/api/addresses/:id',checkoutController.updateAddress);
+router.get('/api/addresses/:id',checkoutController.getAddress);
+
+//offer checkout routes
+router.post('/api/offers/apply',checkoutController.applyOffer);
+//order chekout routes
+router.post('/api/orders',checkoutController.placeOrder);
+
+
+
 module.exports = router;

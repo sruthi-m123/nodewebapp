@@ -1,88 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Complete Your Order</title>
-    <link rel="stylesheet" href="/css/checkout.css">
-</head>
-<body>
-    <!-- Main Checkout Content -->
-    <div class="main-content">
-        <div class="container">
-            <h1>Checkout</h1>
-            <p class="subtitle">Review your order and complete your purchase</p>
+<!-- Main Checkout Content -->
+<div class="main-content">
+    <div class="container">
+        <h1>Checkout</h1>
+        <p class="subtitle">Review your order and complete your purchase</p>
 
-            <div class="checkout-grid">
-                <div class="left-column">
-                    <!-- Address Selection -->
-                    <div class="address-section">
-                        <div class="section-title">
-                            SELECT ADDRESS
-                            <button class="btn" onclick="openAddressModal()">Add Address</button>
-                        </div>
-                        
-                       <!-- views/checkout/checkout.ejs -->
-<div class="address-list" id="addressList">
-    <% addresses.forEach(address => { %>
-        <div class="address-card <%= address.isDefault ? 'selected' : '' %>" 
-             data-address-id="<%= address.id %>">
-            <div class="address-name"><%= address.name %></div>
-            <div class="address-details">
-                <%= address.addressLine1 %><br>
-                <% if (address.addressLine2) { %>
-                    <%= address.addressLine2 %><br>
-                <% } %>
-                <%= address.city %>, <%= address.state %> <%= address.zipCode %><br>
-                Phone: <%= address.phone %>
-            </div>
-            <div class="address-tags">
-                <span class="tag <%= address.type %>">
-                    <%= address.type.charAt(0).toUpperCase() + address.type.slice(1) %>
-                </span>
-                <% if (address.isDefault) { %>
-                    <span class="tag default">Default</span>
-                <% } %>
-            </div>
-            <a href="#" class="edit-address" onclick="editAddress(<%= address.id %>)">Edit</a>
-        </div>
-    <% }); %>
-</div>
-                        <div class="delivery-info">
-                            <div class="delivery-title">Estimated Delivery Date</div>
-                            <div class="delivery-date">Monday, 13 | 12:00 - 16:00</div>
-                        </div>
+        <div class="checkout-grid">
+            <div class="left-column">
+                <!-- Address Selection -->
+                <div class="address-section">
+                    <div class="section-title">
+                        SELECT ADDRESS
+                        <button class="btn" onclick="openAddressModal()">Add Address</button>
                     </div>
+                    
+                    <!-- views/checkout/checkout.ejs -->
+                  <div class="address-list" id="addressList">
+  <% addresses.forEach(addressDoc => { 
+       addressDoc.address.forEach((addr, index) => { %>
+    <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
+         data-address-id="<%= addressDoc._id %>" 
+         onclick="setupAddressSelection(this, '<%= addressDoc._id %>', <%= index %>)">
+         
+      <input type="radio" name="selectedAddress" 
+             value="<%= addressDoc._id %>_<%= index %>" 
+             <%= addr.isDefault ? 'checked' : '' %> />
 
-                    <!-- Products in Cart -->
-                    <div class="product-section">
-                        <div class="section-title">ORDER ITEMS</div>
-                        
-                        <% cartItems.forEach(item => { %>
+      <div class="address-name"><%= addr.name || 'Unknown' %></div>
+      <div class="address-details">
+        <%= addr.addressLine1 || '' %><br>
+        <% if (addr.addressLine2) { %>
+          <%= addr.addressLine2 %><br>
+        <% } %>
+        <%= addr.city || '' %>, <%= addr.state || '' %> <%= addr.zipCode || '' %><br>
+        Phone: <%= addr.phone || 'N/A' %>
+      </div>
+      <div class="address-tags">
+        <span class="tag <%= addr.type || 'other' %>">
+          <%= (addr.type || 'other').charAt(0).toUpperCase() + (addr.type || 'other').slice(1) %>
+        </span>
+        <% if (addr.isDefault) { %>
+          <span class="tag default">Default</span>
+        <% } %>
+      </div>
+      <a href="#" class="edit-address" onclick="editAddress('<%= addressDoc._id %>', <%= index %>)">Edit</a>
+    </div>
+  <% }) }) %>
+</div>
+
+                    <div class="delivery-info">
+                        <div class="delivery-title">Estimated Delivery Date</div>
+                        <div class="delivery-date">Monday, 13 | 12:00 - 16:00</div>
+                    </div>
+                </div>
+
+                <!-- Products in Cart -->
+                <div class="product-section">
+                    <div class="section-title">ORDER ITEMS</div>
+                    
+                    <% cartItems.forEach(item => { %>
                         <div class="product-item">
-                            <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image">
+                            <img src="/<%= item.image || 'images/placeholder.jpg' %>" alt="<%= item.name || 'Product' %>" class="product-image">
                             <div class="product-details">
-                                <div class="product-name"><%= item.name %></div>
-                                <div class="product-variant"><%= item.variant %></div>
+                                <div class="product-name"><%= item.name || 'Unknown Product' %></div>
+                                <div class="product-variant"><%= item.variant || 'Default' %></div>
                                 <div class="product-price-info">
-                                    <div class="quantity-price">Qty: <%= item.quantity %> × ₹<%= item.price %></div>
-                                    <div class="item-total">₹<%= item.quantity * item.price %></div>
+                                    <div class="quantity-price">Qty: <%= item.quantity || 1 %> × ₹<%= item.price || 0 %></div>
+                                    <div class="item-total">₹<%= (item.quantity || 1) * (item.price || 0) %></div>
                                 </div>
                             </div>
                         </div>
-                        <% }); %>
-                    </div>
+                    <% }); %>
+                </div>
 
-                    <!-- Offers Section -->
-                    <div class="offers-section">
-                        <div class="section-title">AVAILABLE OFFERS</div>
-                        
-                        <% offers.forEach(offer => { %>
+                <!-- Offers Section -->
+                 <% if (offers && offers.length > 0) { %>
+                <div class="offers-section">
+                    <div class="section-title">AVAILABLE OFFERS</div>
+                    
+                    <% offers.forEach(offer => { %>
                         <div class="offer-item">
-                            <div class="offer-icon"><%= offer.icon %></div>
+                            <div class="offer-icon"><%= offer.icon || '🎁' %></div>
                             <div class="offer-details">
-                                <div class="offer-title"><%= offer.title %></div>
-                                <div class="offer-description"><%= offer.description %></div>
+                                <div class="offer-title"><%= offer.title || 'Offer' %></div>
+                                <div class="offer-description"><%= offer.description || 'No description available' %></div>
                                 <div class="offer-code"><%= offer.code ? 'Code: ' + offer.code : 'T&C Apply' %></div>
                             </div>
                             <button class="apply-offer-btn <%= offer.applied ? 'applied' : '' %>" 
@@ -90,96 +90,102 @@
                                 <%= offer.applied ? 'Applied' : 'Apply' %>
                             </button>
                         </div>
-                        <% }); %>
-                    </div>
+                    <% }); %>
+                </div>
+                <% } %>
 
-                    <!-- Payment Options -->
-                    <div class="payment-section">
-                        <div class="section-title">PAYMENT OPTIONS</div>
-                        
-                        <div class="payment-methods">
-                            <% paymentMethods.forEach(method => { %>
+                <!-- Payment Options -->
+                <div class="payment-section">
+                    <div class="section-title">PAYMENT OPTIONS</div>
+                    
+                    <div class="payment-methods">
+                        <% paymentMethods.forEach(method => { %>
                             <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %>" data-payment="<%= method.id %>">
                                 <div class="payment-radio">
                                     <input type="radio" name="payment" id="<%= method.id %>" value="<%= method.id %>" <%= method.id === selectedPayment ? 'checked' : '' %>>
                                     <label for="<%= method.id %>"></label>
                                 </div>
                                 <div class="payment-info">
-                                    <div class="payment-icon"><%= method.icon %></div>
+                                    <div class="payment-icon"><%= method.icon || '💳' %></div>
                                     <div class="payment-details">
-                                        <div class="payment-title"><%= method.title %></div>
-                                        <div class="payment-description"><%= method.description %></div>
+                                        <div class="payment-title"><%= method.title || 'Payment Method' %></div>
+                                        <div class="payment-description"><%= method.description || 'No description' %></div>
                                     </div>
                                 </div>
                             </div>
-                            <% }); %>
-                        </div>
+                        <% }); %>
                     </div>
                 </div>
+            </div>
 
-                <!-- Order Summary -->
-                <div class="order-summary">
-                    <div class="summary-title">ORDER SUMMARY</div>
-                    
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #2c3e50;">CART TOTAL</div>
-                    
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span>₹<%= subtotal %></span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span>Delivery</span>
-                        <span>₹<%= delivery %></span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span>Tax (GST <%= taxRate %>%)</span>
-                        <span>₹<%= tax %></span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span>Discount</span>
-                        <span style="color: #28a745;">-₹<%= discount %></span>
-                    </div>
-                    
-                    <div class="summary-row total">
-                        <span>TOTAL</span>
-                        <span>₹<%= total %></span>
-                    </div>
-
-                    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border: 1px solid #eee;">
-                        <strong>Payment Method:</strong> <span id="selectedPaymentMethod"><%= selectedPaymentMethod %></span>
-                    </div>
-                    
-                    <button class="continue-btn" onclick="placeOrder()">Place Order</button>
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="summary-title">ORDER SUMMARY</div>
+                
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #2c3e50;">CART TOTAL</div>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹<%= subtotal || 0 %></span>
                 </div>
+                
+                <div class="summary-row">
+                    <span>Delivery</span>
+                    <span>₹<%= delivery || 0 %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Tax (GST <%= taxRate || 0 %>%)</span>
+                    <span>₹<%= tax || 0 %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <span style="color: #28a745;">-₹<%= discount || 0 %></span>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>TOTAL</span>
+                    <span>₹<%= total || 0 %></span>
+                </div>
+
+                <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border: 1px solid #eee;">
+                    <strong>Payment Method:</strong> <span id="selectedPaymentMethod"><%= selectedPaymentMethod || 'Not Selected' %></span>
+                </div>
+                
+                <button class="continue-btn" onclick="placeOrder()">Place Order</button>
             </div>
         </div>
     </div>
 
     <!-- Order Success Page -->
-    <div class="success-page" id="successPage">
-        <div class="container">
-            <div class="success-icon">✓</div>
-            <h1 class="success-title">Order Placed Successfully!</h1>
-            <p class="success-message">
-                Thank you for your purchase! Your order has been confirmed and will be delivered to your selected address. 
-                You will receive a confirmation email with your order details shortly.
-            </p>
-            <div class="success-buttons">
-                <a href="/orders/<%= orderId %>" class="success-btn primary">View Order Details</a>
-                <a href="/shop" class="success-btn secondary">Continue Shopping</a>
-            </div>
-        </div>
+    <!-- Success Modal -->
+     
+<% if (orderPlaced) { %>
+<div class="modal-overlay" id="successModal">
+  <div class="modal-content">
+<span class="close-btn" id="closeOrderSuccessModal">&times;</span>
+    <div class="success-icon">✓</div>
+    <h1 class="success-title">Order Placed Successfully!</h1>
+    <p class="success-message">
+      Thank you for your purchase! Your order has been confirmed and will be delivered to your selected address.
+      You will receive a confirmation email with your order details shortly.
+    </p>
+    <div class="success-buttons">
+      <a href="/orders/<%= orderId || '' %>" class="success-btn primary">View Order Details</a>
+      <a href="/shop" class="success-btn secondary">Continue Shopping</a>
     </div>
+  </div>
+</div>
+<% } %>
+
 
     <!-- Add/Edit Address Modal -->
     <div class="modal" id="addressModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">Add New Address</h3>
-                <button class="close-btn" onclick="closeAddressModal()">&times;</button>
+                <button class="close-btn"  id="closeSuccessModal" onclick="closeAddressModal()">×</button>
             </div>
             
             <form id="addressForm">
@@ -238,7 +244,10 @@
             </form>
         </div>
     </div>
-
-    <script src="/js/checkout.js"></script>
-</body>
-</html>
+    <div id="checkout-data"
+         data-offers='<%- JSON.stringify(appliedOffers || []) %>'
+         data-addresses='<%- JSON.stringify(addresses || []) %>'
+         data-cart='<%- JSON.stringify(cartItems || []) %>'
+         data-payment="<%= selectedPayment || '' %>">
+    </div>
+</div>

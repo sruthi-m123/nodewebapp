@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
   if (req.session.user) {
     try {
       const cart = await Cart.findOne({ userId: req.session.user._id });
-     console.log("cart found:",cart)
+     
       res.locals.cartCount = cart ? cart.items.length : 0;
     } catch (error) {
       console.error("Cart count middleware error:", error);

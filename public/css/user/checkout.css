@@ -7,8 +7,8 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #faf5f2; /* Very light warm beige */
-    color: #5a4a42; /* Dark brown text */
+    background-color: #faf5f2;
+    color: #5a4a42;
     line-height: 1.6;
 }
 
@@ -30,7 +30,7 @@ h1 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 600;
-    color: #9e6d4e; /* Main brown color */
+    color: #9e6d4e;
     margin-bottom: 10px;
     text-align: center;
 }
@@ -47,12 +47,12 @@ h1 {
 .offers-section, 
 .payment-section,
 .order-summary {
-    background: #f5ede6; /* Light warm beige */
+    background: #f5ede6;
     padding: 25px;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(158, 109, 78, 0.1);
     margin-bottom: 20px;
-    border: 1px solid #d9c4b3; /* Soft brown border */
+    border: 1px solid #d9c4b3;
 }
 
 .section-title {
@@ -70,7 +70,7 @@ h1 {
 
 /* Buttons */
 .btn {
-    background: #9e6d4e; /* Main brown */
+    background: #9e6d4e;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -82,7 +82,7 @@ h1 {
 }
 
 .btn:hover {
-    background: #7d573e; /* Darker brown */
+    background: #7d573e;
     transform: translateY(-2px);
 }
 
@@ -122,6 +122,7 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     background: #faf5f2;
+    position: relative;
 }
 
 .address-card:hover {
@@ -326,18 +327,6 @@ h1 {
     background: #f5ede6;
 }
 
-.payment-radio label {
-    border: 2px solid #d9c4b3;
-}
-
-.payment-option.selected .payment-radio label {
-    border-color: #9e6d4e;
-}
-
-.payment-option.selected .payment-radio label::after {
-    background: #9e6d4e;
-}
-
 .payment-icon {
     font-size: 24px;
     color: #9e6d4e;
@@ -427,68 +416,124 @@ h1 {
     transform: none;
 }
 
-/* Modal Styles */
-.modal {
-    background: rgba(158, 109, 78, 0.5);
+/* Updated Modal Styles */
+#addressModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(158, 109, 78, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
     background: #faf5f2;
     border: 1px solid #d9c4b3;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d9c4b3;
 }
 
 .modal-title {
     color: #7d573e;
     font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin: 0;
 }
 
 .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
     color: #9e6d4e;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+    padding: 0 5px;
 }
 
 .close-btn:hover {
     color: #7d573e;
 }
 
-.form-input {
-    border: 1px solid #d9c4b3;
-    background: #faf5f2;
-    color: #5a4a42;
-}
-
-.form-input:focus {
-    border-color: #9e6d4e;
-    box-shadow: 0 0 0 3px rgba(158, 109, 78, 0.1);
-}
-
-.save-btn {
-    background: #9e6d4e;
-}
-
-.save-btn:hover {
-    background: #7d573e;
-}
-
-/* Success Page */
-.success-page {
-    background: #faf5f2;
+/* Success Modal */
+#successModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(158, 109, 78, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
 .success-icon {
     background: #9e6d4e;
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
 }
 
 .success-title {
     color: #9e6d4e;
     font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 .success-message {
     color: #9e6d4e;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.success-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.success-btn {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .success-btn.primary {
     background: #9e6d4e;
+    color: white;
 }
 
 .success-btn.primary:hover {
@@ -498,17 +543,71 @@ h1 {
 .success-btn.secondary {
     background: #d9c4b3;
     color: #7d573e;
+    border: 1px solid #d9c4b3;
 }
 
 .success-btn.secondary:hover {
     background: #c9b4a3;
 }
 
-/* Toast Notification */
-.toast {
-    background: #9e6d4e;
+/* Form Elements */
+.form-group {
+    margin-bottom: 15px;
 }
 
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #7d573e;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9c4b3;
+    border-radius: 6px;
+    background: #faf5f2;
+    color: #5a4a42;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #9e6d4e;
+    box-shadow: 0 0 0 3px rgba(158, 109, 78, 0.1);
+}
+
+.save-btn {
+    background: #9e6d4e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.save-btn:hover {
+    background: #7d573e;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
     .checkout-grid {
         grid-template-columns: 1fr;
@@ -519,10 +618,6 @@ h1 {
         padding: 1rem;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
     .success-buttons {
         flex-direction: column;
         align-items: center;
@@ -531,5 +626,42 @@ h1 {
     .success-btn {
         width: 100%;
         max-width: 300px;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-item {
+        flex-direction: column;
+    }
+
+    .product-image {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+    }
+
+    .address-card {
+        padding: 12px;
+    }
+
+    .success-container {
+        padding: 25px 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .success-title {
+        font-size: 1.5rem;
+    }
+
+    .success-message {
+        font-size: 1rem;
     }
 }

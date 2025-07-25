@@ -1,19 +1,6 @@
 
 
-// // Set default address
-// function setDefaultAddress(addressId) {
-//   fetch(`/addresses/set-default/${addressId}`, {
-//     method: 'PUT'
-//   })
-//   .then(res => res.json())
-//   .then(data => {
-//     if (data.success) {
-//       location.reload();
-//     } else {
-//       alert('Failed to set default address.');
-//     }
-//   });
-// }
+
 
 // Get elements
 const modal = document.getElementById('addAddressModal');
