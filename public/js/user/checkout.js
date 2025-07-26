@@ -303,30 +303,20 @@ function placeOrder() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success page
-            showSuccessPage(data.orderId);
-            
-            // Update URL without reloading
-            window.history.pushState(null, '', '#success');
+            window.location.href = `/order-success/${data.orderId}`;
         } else {
             alert(data.message || 'Error placing order');
+       alert(data.message || 'Error placing order');
+            btn.disabled = false;
+            btn.textContent = 'Place Order';
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('Error placing order');
+         btn.disabled = false;
+        btn.textContent = 'Place Order';
     });
-}
-
-function showSuccessPage(orderId = null) {
-    document.querySelector('.main-content > .container').style.display = 'none';
-    document.getElementById('successPage').style.display = 'block';
-    
-    if (orderId) {
-        // Update the order details link
-        const orderLink = document.querySelector('.success-btn.primary');
-        orderLink.href = `/orders/${orderId}`;
-    }
 }
 
 // Close modal when clicking outside

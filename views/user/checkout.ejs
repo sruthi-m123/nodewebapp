@@ -7,40 +7,47 @@
         <div class="checkout-grid">
             <div class="left-column">
                 <!-- Address Selection -->
-                <div class="address-section">
-                    <div class="section-title">
-                        SELECT ADDRESS
-                        <button class="btn" onclick="openAddressModal()">Add Address</button>
-                    </div>
-                    
-                 <div class="address-list" id="addressList">
+               <div class="address-list" id="addressList">
   <% addresses.forEach(addressDoc => { 
-       addressDoc.address.forEach((addr, index) => { %>
+    addressDoc.address.forEach((addr, index) => { %>
+
     <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
-         data-address-id="<%= addressDoc._id %>" 
-         onclick="setupAddressSelection(this, '<%= addressDoc._id %>', <%= index %>)">
-         
+         data-address-id="<%= addr._id %>" 
+         onclick="setupAddressSelection(this, '<%= addr._id %>')">
+
+      <!-- Name -->
       <div class="address-name"><%= addr.name || 'Unknown' %></div>
+
+      <!-- Full Address -->
       <div class="address-details">
-        <%= addr.addressLine1 || '' %><br>
-        <% if (addr.addressLine2) { %>
-          <%= addr.addressLine2 %><br>
+        <%= addr.building || '' %><br>
+        <%= addr.landmark ? addr.landmark + '<br>' : '' %>
+        <%= addr.city || '' %>, <%= addr.state || '' %> - <%= addr.pincode || '' %><br>
+        Phone: <%= addr.phone || 'N/A' %><br>
+        <% if (addr.altPhone) { %>
+          Alt: <%= addr.altPhone %><br>
         <% } %>
-        <%= addr.city || '' %>, <%= addr.state || '' %> <%= addr.zipCode || '' %><br>
-        Phone: <%= addr.phone || 'N/A' %>
       </div>
+
+      <!-- Tags -->
       <div class="address-tags">
-        <span class="tag <%= addr.type || 'other' %>">
-          <%= (addr.type || 'other').charAt(0).toUpperCase() + (addr.type || 'other').slice(1) %>
+        <span class="tag <%= addr.addressType || 'other' %>">
+          <%= (addr.addressType || 'Other').charAt(0).toUpperCase() + (addr.addressType || 'Other').slice(1) %>
         </span>
         <% if (addr.isDefault) { %>
           <span class="tag default">Default</span>
         <% } %>
       </div>
-      <a href="#" class="edit-address" onclick="editAddress('<%= addressDoc._id %>', <%= index %>)">Edit</a>
+
+      <!-- Edit Button -->
+      <a href="#" class="edit-address" onclick="openAddressModal('<%= addr._id %>')">Edit</a>
+
     </div>
+
   <% }) }) %>
 </div>
+
+
 
                     <div class="delivery-info">
                         <div class="delivery-title">Estimated Delivery Date</div>
@@ -155,7 +162,7 @@
 
     <!-- Order Success Page -->
     <!-- Success Modal -->
-     
+<!--      
 <% if (orderPlaced) { %>
 <div class="modal-overlay" id="successModal">
   <div class="modal-content">
@@ -172,7 +179,7 @@
     </div>
   </div>
 </div>
-<% } %>
+<% } %> -->
 
 
     <!-- Add/Edit Address Modal -->

@@ -677,3 +677,9 @@ h1 {
         font-size: 1rem;
     }
 }
+.error-message {
+  font-size: 14px;
+  color: red;
+  margin-bottom: 10px;
+  display: none; /* hide initially */
+}

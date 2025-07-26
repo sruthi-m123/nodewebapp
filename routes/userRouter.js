@@ -10,6 +10,8 @@ const productController=require("../controller/user/productController")
 const addressController=require("../controller/user/addressController");
 const cartController=require("../controller/user/cartController")
 const checkoutController=require("../controller/user/checkoutController");
+const orderController=require("../controller/user/orderController")
+
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
@@ -29,8 +31,10 @@ router.post("/resend-forgot-otp",userController.resendForgotOtp);
 router.get("/resetpassword",userController.loadResetPassword);
 router.post("/reset-password",userController.resetPassword);
 router.get('/error', (req, res) => {
-  res.status(500).render('user/error', {message: "Something went wrong!"});
+  const message = req.query.msg || "Something went wrong!";
+  res.status(500).render('/error', { message });
 });
+
 
 router.get('/auth/google',
   passport.authenticate('google', {
@@ -93,7 +97,9 @@ router.get('/api/addresses/:id',checkoutController.getAddress);
 router.post('/api/offers/apply',checkoutController.applyOffer);
 //order chekout routes
 router.post('/api/orders',checkoutController.placeOrder);
-
-
+//success page
+router.get('/order-success/:orderId',checkoutController.successPage);
+//order history page
+router.get('/orders',orderController.getOrderHistory);
 
 module.exports = router;

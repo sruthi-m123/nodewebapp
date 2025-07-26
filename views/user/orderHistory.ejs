@@ -1,0 +1,37 @@
+
+  <div class="orders-container">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Product ID</th>
+          <th>Price</th>
+          <th>Delivery Date</th>
+          <th>Product Image</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td data-label="Product ID">#<%= order.id %></td>
+            <td data-label="Price">₹<%= order.price.toLocaleString('en-IN') %></td>
+            <td data-label="Delivery Date"><%= new Date(order.deliveryDate).toLocaleDateString('en-GB') %></td>
+            <td data-label="Product Image">
+              <img src="<%= order.imageUrl %>" alt="<%= order.productName %>" class="product-img">
+            </td>
+            <td data-label="Status">
+              <button class="status-btn status-<%= order.status.toLowerCase() %>">
+                <%= order.status %>
+              </button>
+            </td>
+            <td data-label="Action">
+              <button class="action-btn">
+                View <span>→</span>
+              </button>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>

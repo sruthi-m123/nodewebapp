@@ -1,296 +1,97 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const mongoose = require('mongoose');
 
-const orderItemSchema = new Schema({
-  productId: {
-    type: Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  image: {
-    type: String,
-    default: "/img/placeholder.jpg"
-  },
-  variant: {
-    type: String,
-    default: "Default"
-  },
-  totalPrice: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  status: {
-    type: String,
-    enum: ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned"],
-    default: "pending"
-  },
-  cancellationReason: {
-    type: String,
-    default: null
-  },
-  returnReason: {
-    type: String,
-    default: null
-  },
-  returnStatus: {
-    type: String,
-    enum: ["requested", "approved", "rejected", "completed"],
-    default: null
-  }
-}, { _id: false });
-
-const addressSchema = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  addressType: {
-    type: String,
-    enum: ["Home", "Work", "Other"],
-    required: true
-  },
-  building: {
-    type: String,
-    required: true
-  },
-  city: {
-    type: String,
-    required: true
-  },
-  state: {
-    type: String,
-    required: true
-  },
-  pincode: {
-    type: Number,
-    required: true
-  },
-  landmark: {
-    type: String
-  },
-  phone: {
-    type: String,
-    required: true
-  },
-  altPhone: {
-    type: String
-  }
-}, { _id: false });
-
-const paymentSchema = new Schema({
-  method: {
-    type: String,
-    enum: ["cod", "razorpay", "wallet"],
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ["pending", "completed", "failed", "refunded"],
-    default: "pending"
-  },
-  transactionId: {
-    type: String
-  },
-  amount: {
-    type: Number,
-    required: true
-  },
-  razorpayPaymentId: {
-    type: String
-  },
-  razorpayOrderId: {
-    type: String
-  },
-  razorpaySignature: {
-    type: String
-  },
-  refundAmount: {
-    type: Number,
-    default: 0
-  }
-}, { _id: false });
-
-const orderSchema = new Schema({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
+const orderSchema = new mongoose.Schema({
   orderId: {
-    type: String,
-    unique: true,
+  type: String,
+  required: true,
+  unique: true
+},
+
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  items: [orderItemSchema],
-  address: addressSchema,
-  payment: paymentSchema,
+  items: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      variant: {
+        type: String,
+        default: "Default"
+      },
+      quantity: {
+        type: Number,
+        required: true
+      },
+      price: {
+        type: Number,
+        required: true
+      },
+      totalPrice: {
+        type: Number,
+        required: true
+      }
+    }
+  ],
+  shippingAddress: {
+    name: { type: String, required: true },
+    building: { type: String, required: true },
+    landmark: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
+    phone: { type: String, required: true },
+    altPhone: { type: String, default: "" }
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['COD', 'Online', 'UPI', 'Card'],
+    required: true
+  },
   subtotal: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
   delivery: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
   tax: {
     type: Number,
-    required: true,
-    min: 0
-  },
-  taxRate: {
-    type: Number,
-    default: 18
+    required: true
   },
   discount: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
   total: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
   status: {
     type: String,
-    enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
-    default: "pending"
+    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    default: 'pending'
   },
-  appliedOffers: [{
-    type: Schema.Types.ObjectId,
-    ref: "Offer"
-  }],
-  trackingNumber: {
-    type: String
-  },
-  shippingProvider: {
-    type: String
-  },
-  expectedDelivery: {
-    type: Date
-  },
-  deliveredAt: {
-    type: Date
-  },
-  cancellationRequest: {
-    requestedAt: {
-      type: Date
-    },
-    reason: {
-      type: String
-    },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"]
-    },
-    processedAt: {
-      type: Date
+  appliedOffers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Offer'
     }
-  },
-  returnRequest: {
-    requestedAt: {
-      type: Date
-    },
-    reason: {
-      type: String
-    },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected", "completed"]
-    },
-    processedAt: {
-      type: Date
-    },
-    refundAmount: {
-      type: Number
-    }
-  },
-  notes: {
-    type: String
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
 });
 
-// Generate order ID before saving
-orderSchema.pre("save", async function(next) {
-  if (!this.orderId) {
-    const count = await this.constructor.countDocuments();
-    this.orderId = `ORD${Date.now()}${(count + 1).toString().padStart(6, "0")}`;
-  }
-  next();
-});
-
-// Update product stock when order is cancelled
-orderSchema.methods.cancelOrder = async function(reason) {
-  if (this.status === "cancelled") {
-    throw new Error("Order is already cancelled");
-  }
-
-  // Update product stocks
-  for (const item of this.items) {
-    await mongoose.model("Product").findByIdAndUpdate(
-      item.productId,
-      { $inc: { stock: item.quantity } }
-    );
-  }
-
-  this.status = "cancelled";
-  this.cancellationRequest = {
-    reason,
-    status: "approved",
-    processedAt: new Date()
-  };
-
-  // Initiate refund if payment was completed
-  if (this.payment.status === "completed") {
-    this.payment.status = "refunded";
-    this.payment.refundAmount = this.total;
-  }
-
-  return this.save();
-};
-
-// Virtual for formatted order date
-orderSchema.virtual("formattedDate").get(function() {
-  return this.createdAt.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-});
-
-// Virtual for order status display
-orderSchema.virtual("statusDisplay").get(function() {
-  const statusMap = {
-    pending: "Pending",
-    confirmed: "Confirmed",
-    shipped: "Shipped",
-    delivered: "Delivered",
-    cancelled: "Cancelled"
-  };
-  return statusMap[this.status] || this.status;
-});
-
-const Order = mongoose.model("Order", orderSchema);
-
-module.exports = Order;
+const Order = mongoose.model('Order', orderSchema);
+module.exports=Order;
