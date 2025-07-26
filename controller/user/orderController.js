@@ -2,14 +2,22 @@ const Order=require('../../models/orderSchema');
 
 const getOrderHistory=async(req,res)=>{
     try{
-    console.log("reached order history controllr");
-    console.log("session in orderhis:",req.session);
     const userId=req.session.user._id;
-console.log("userId:",userId);
+const page=parseInt(req.query.page)||1;
+const limit=6;
+const skip=(page-1)*limit;
 
-    //fetching orders
+const totalOrders=await Order.countDocuments({userId});
+const totalPages=Math.ceil(totalOrders/limit)
+   
+
+
+
+//fetching orders
     const orders = await Order.find({ userId })
   .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit)
   .populate("items.productId") 
   .lean();               
 
@@ -30,7 +38,9 @@ deliveryDate: new Date(order.createdAt.getTime() + 5 * 24 * 60 * 60 * 1000).toDa
         pagetitle:'Order History',
         storeName:'Chettinad sarees',
         orders:formatOrders,
-        user:req.session.user
+        user:req.session.user,
+        totalPages:totalPages,
+        currentPage:page,
     })
 
     }catch(error){
