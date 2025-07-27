@@ -56,8 +56,8 @@ exports.getCheckoutPage = async (req, res) => {
             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
         ];
         
-        // Default selected payment
-        const selectedPayment = 'cod';
+
+        const selectedPayment = '';
         const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedPayment)?.title || 'Cash on Delivery';
         
         res.render('user/checkout', {
@@ -297,27 +297,49 @@ exports.applyOffer = async (req, res) => {
 
 exports.placeOrder = async (req, res) => {
     try {
+        console.log("inside place order controller")
         console.log("user in place order:",req.session.user);
         const userId = req.session.user._id;
-
+console.log("req body",req.body);
         const { 
             addressId, 
             paymentMethod, 
             appliedOffers = [] 
         } = req.body;
+        // validation of required fields
+ if (!addressId || !paymentMethod) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Address and payment method are required' 
+            });
+        }
+
         
         // Get cart items
 const cart = await Cart.findOne({ userId: userId }).populate({
   path: 'items.productId',
    match: { isActive: true },
-  select: 'productName price'
+  select: 'productName price stock'
 });
+
+if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Cart is empty' 
+            });
+        }
+
+
         console.log("cart items:",cart);
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
         }
         const activeCartItems = cart.items.filter(item => item.productId !== null);
-
+for (const item of activeCartItems) {
+    if (item.productId.stock < item.quantity) {
+        throw new Error(`Not enough stock for ${item.productId.productName}`);
+    }
+}
         // Get address
         console.log("addressId:",addressId);
         console.log("user:",userId);
@@ -329,6 +351,14 @@ const addresses = await Address.findOne(
         if (!addresses) {
             return res.status(400).json({ success: false, message: 'Address not found' });
         }
+ if (!addresses || addresses.address.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Address not found' 
+            });
+        }
+
+
         const selectedAddress=addresses.address[0];
         // Calculate order totals
         const subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -340,6 +370,17 @@ const addresses = await Address.findOne(
         let discount = 0;
         
         const total = subtotal + delivery + tax - discount;
+       
+        let status;
+        if(paymentMethod==='cod'){
+            status='ordered';
+        }else{
+            status='processing';
+        }
+       
+       
+       
+       
         const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         // Create order
@@ -366,17 +407,26 @@ shippingAddress: {
     phone: selectedAddress.phone,
     altPhone: selectedAddress.altPhone
 },
-            paymentMethod:paymentMethod.toUpperCase(),
+            paymentMethod,
             subtotal,
             delivery,
             tax,
             discount,
             total,
-            status: 'pending',
+            status,
             appliedOffers: appliedOffers.map(offer => offer.id)
         });
         console.log("order Items:",order);
         await order.save();
+
+//updating stock
+for(const item of activeCartItems){
+    await Product.findByIdAndUpdate(
+        item.productId._id,
+        {$inc:{stock:-item.quantity}}
+    )
+}
+
         
         // Clear the cart
         await Cart.findOneAndUpdate(

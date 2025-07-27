@@ -79,3 +79,43 @@
                 closeModal();
             }
         }
+
+        function downloadInvoice(orderId){
+            const button=document.querySelector('.download-invoice');
+            const originalText=button.innerHTML;
+            button.innerHTML='<span>Generating Invoice...</span>';
+            button.disabled=true;
+
+            fetch('/orders/${orderId}/invoice',{
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                }
+            })
+            .then(response=>{
+                if(!response.ok){
+throw new Error('failed to generate invoice');
+                }
+                return response.blob();
+            })
+.then(blob=>{
+    const url=window.URL.createObjectURL(blob);
+    const a =document.createElement('a');
+    a.href=url;
+    a.download=`Invoice_${orderId}.pdf`;
+     document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+})
+ .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to download invoice. Please try again.');
+        })
+        .finally(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+
+
+        }

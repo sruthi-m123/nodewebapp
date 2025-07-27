@@ -92,9 +92,9 @@ console.log(updates);
       body: JSON.stringify({ updates })
     });
     
-    if (response.ok) {
-      alert('Cart updated successfully!');
-    }
+    // if (response.ok) {
+    //   alert('Cart updated successfully!');
+    // }
   } catch (error) {
     console.error('Error updating cart:', error);
   }

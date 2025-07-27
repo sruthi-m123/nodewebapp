@@ -53,7 +53,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['COD', 'Online', 'UPI', 'Card'],
+    enum: ['cod', 'netbanking', 'upi', 'credit_card','debit_card'],
     required: true
   },
   subtotal: {
@@ -78,7 +78,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'ordered', 'shipped', 'delivered', 'cancelled','processing'],
     default: 'pending'
   },
   appliedOffers: [

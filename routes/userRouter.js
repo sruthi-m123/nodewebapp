@@ -11,6 +11,7 @@ const addressController=require("../controller/user/addressController");
 const cartController=require("../controller/user/cartController")
 const checkoutController=require("../controller/user/checkoutController");
 const orderController=require("../controller/user/orderController")
+const orderdetailController=require('../controller/user/orderDetailController');
 
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -101,5 +102,8 @@ router.post('/api/orders',checkoutController.placeOrder);
 router.get('/order-success/:orderId',checkoutController.successPage);
 //order history page
 router.get('/orders',orderController.getOrderHistory);
-
+//order detail page
+router.get('/orders-details/:orderId',orderdetailController.getOrderDetails);
+//invoice
+router.get('/orders/:orderId/invoice',orderdetailController.invoice);
 module.exports = router;

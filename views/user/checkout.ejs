@@ -3,11 +3,14 @@
     <div class="container">
         <h1>Checkout</h1>
         <p class="subtitle">Review your order and complete your purchase</p>
+<form action="/place-order" method="POST" id="checkoutForm">
 
         <div class="checkout-grid">
             <div class="left-column">
                 <!-- Address Selection -->
                <div class="address-list" id="addressList">
+                <input type="hidden" name="addressId" id="selectedAddressId">
+
   <% addresses.forEach(addressDoc => { 
     addressDoc.address.forEach((addr, index) => { %>
 
@@ -117,6 +120,7 @@
                             </div>
                         <% }); %>
                     </div>
+                     <input type="hidden" id="selectedPaymentId" name="paymentMethod">
                 </div>
             </div>
 
@@ -155,9 +159,13 @@
                     <strong>Payment Method:</strong> <span id="selectedPaymentMethod"><%= selectedPaymentMethod || 'Not Selected' %></span>
                 </div> -->
                 
-                <button class="continue-btn" onclick="placeOrder()">Place Order</button>
+                <button  type="button" class="continue-btn" onclick="placeOrder()">Place Order</button>
             </div>
+            </form>
+
         </div>
+    
+
     </div>
 
     <!-- Order Success Page -->

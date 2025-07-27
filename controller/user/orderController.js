@@ -2,6 +2,7 @@ const Order=require('../../models/orderSchema');
 
 const getOrderHistory=async(req,res)=>{
     try{
+        console.log("this is orderhistory controller ");
     const userId=req.session.user._id;
 const page=parseInt(req.query.page)||1;
 const limit=6;

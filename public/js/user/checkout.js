@@ -178,6 +178,8 @@ function setupAddressSelection(cardElement, addressDocId, addressIndex) {
     
     
     checkoutData.dataset.selectedAddress = `${addressDocId}_${addressIndex}`;
+document.getElementById("selectedAddressId").value = addressDocId;
+
 }
 
 // Payment Selection
@@ -199,10 +201,13 @@ function setupPaymentSelection() {
             // Update the selected payment method display
             const paymentId = this.dataset.payment;
             const paymentTitle = this.querySelector('.payment-title').textContent;
-            document.getElementById('selectedPaymentMethod').textContent = paymentTitle;
+            // document.getElementById('selectedPaymentMethod').textContent = paymentTitle;
             
             // Store the selected payment method
             document.getElementById('checkout-data').dataset.payment = paymentId;
+       
+       document.getElementById('selectedPaymentId').value = paymentId;
+
         });
     });
 }
@@ -274,21 +279,29 @@ function updateOrderSummary(offer = null, removedOfferId = null) {
 
 // Place Order Function
 function placeOrder() {
+const btn=document.querySelector('.continue-btn');
+btn.disabled=true;
+btn.textContent='Processing...';
+
+
     const checkoutData = document.getElementById('checkout-data');
     const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
     const paymentMethod = checkoutData.dataset.payment;
-    const appliedOffers = []; // This would be populated with applied offers in a real app
+    const appliedOffers = []; 
     
-    if (!selectedAddress) {
+   if (!selectedAddress) {
         alert('Please select a delivery address');
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
         return;
     }
     
     if (!paymentMethod) {
         alert('Please select a payment method');
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
         return;
     }
-    
     fetch('/api/orders', {
         method: 'POST',
         headers: {
