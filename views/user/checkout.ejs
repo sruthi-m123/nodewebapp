@@ -5,51 +5,65 @@
         <p class="subtitle">Review your order and complete your purchase</p>
 <form action="/place-order" method="POST" id="checkoutForm">
 
-        <div class="checkout-grid">
-            <div class="left-column">
-                <!-- Address Selection -->
-               <div class="address-list" id="addressList">
-                <input type="hidden" name="addressId" id="selectedAddressId">
+       <div class="checkout-grid">
+  <div class="left-column">
+    <!-- Address Selection -->
+    <div class="address-list" id="addressList">
+      <input type="hidden" name="addressId" id="selectedAddressId">
 
-  <% addresses.forEach(addressDoc => { 
-    addressDoc.address.forEach((addr, index) => { %>
+      <% if (addresses.length === 0) { %>
+        <!-- Show when no addresses exist -->
+        <div class="no-addresses">
+          <div class="no-address-message">
+            No address is added
+          </div>
+          <button type="button" class="add-address-btn" onclick="openAddressModal('new')">
+             Add Address
+          </button>
+        </div>
+      <% } else { %>
+        <!-- Show address cards when addresses exist -->
+        <% addresses.forEach(addressDoc => { 
+          addressDoc.address.forEach((addr, index) => { %>
 
-    <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
-         data-address-id="<%= addr._id %>" 
-         onclick="setupAddressSelection(this, '<%= addr._id %>')">
+          <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
+               data-address-id="<%= addr._id %>" 
+               onclick="setupAddressSelection(this, '<%= addr._id %>')">
 
-      <!-- Name -->
-      <div class="address-name"><%= addr.name || 'Unknown' %></div>
+            <!-- Name -->
+            <div class="address-name"><%= addr.name || 'Unknown' %></div>
 
-      <!-- Full Address -->
-      <div class="address-details">
-        <%= addr.building || '' %><br>
-        <%= addr.landmark ? addr.landmark + '<br>' : '' %>
-        <%= addr.city || '' %>, <%= addr.state || '' %> - <%= addr.pincode || '' %><br>
-        Phone: <%= addr.phone || 'N/A' %><br>
-        <% if (addr.altPhone) { %>
-          Alt: <%= addr.altPhone %><br>
-        <% } %>
-      </div>
+            <!-- Full Address -->
+            <div class="address-details">
+              <%= addr.building || '' %><br>
+              <%= addr.landmark ? addr.landmark  : '' %><br>
+              <%= addr.city || '' %>, <%= addr.state || '' %> - <%= addr.pincode || '' %><br>
+              Phone: <%= addr.phone || 'N/A' %><br>
+              <% if (addr.altPhone) { %>
+                Alt: <%= addr.altPhone %><br>
+              <% } %>
+            </div>
 
-      <!-- Tags -->
-      <div class="address-tags">
-        <span class="tag <%= addr.addressType || 'other' %>">
-          <%= (addr.addressType || 'Other').charAt(0).toUpperCase() + (addr.addressType || 'Other').slice(1) %>
-        </span>
-        <% if (addr.isDefault) { %>
-          <span class="tag default">Default</span>
-        <% } %>
-      </div>
+            <!-- Tags -->
+            <div class="address-tags">
+              <span class="tag <%= addr.addressType || 'other' %>">
+                <%= (addr.addressType || 'Other').charAt(0).toUpperCase() + (addr.addressType || 'Other').slice(1) %>
+              </span>
+              <% if (addr.isDefault) { %>
+                <span class="tag default">Default</span>
+              <% } %>
+            </div>
 
-      <!-- Edit Button -->
-      <a href="#" class="edit-address" onclick="openAddressModal('<%= addr._id %>')">Edit</a>
+            <!-- Edit Button -->
+            <a href="#" class="edit-address" onclick="openAddressModal('<%= addr._id %>')">Edit</a>
 
+          </div>
+
+        <% }) }) %>
+      <% } %>
     </div>
-
-  <% }) }) %>
+  </div>
 </div>
-
 
 
                     <div class="delivery-info">

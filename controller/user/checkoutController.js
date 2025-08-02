@@ -7,35 +7,138 @@ const Cart = require('../../models/cartSchema');
 const Product = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 
+// exports.getCheckoutPage = async (req, res) => {
+//     try {
+//         console.log("inside checkout controller")
+       
+//         const userId = req.session.user._id;
+//         console.log("userid:",userId);
+//         const addresses = await Address.find({  userId }).lean();
+//         console.log("addresses:",addresses)
+
+
+
+        
+//         // Get cart items
+//         const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+//         const cartItems = cart.items
+//         .filter(item=>item.productId&&item.productId.isActive)
+//         .map(item => ({
+//             id: item.productId._id,
+//             name: item.productId.name,
+//             image: item.productId.images[0],
+//             variant: item.variant,
+//             price: item.price,
+//             quantity: item.quantity
+//         }));
+        
+//         // Calculate order totals
+//         const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+//         const delivery = subtotal > 500 ? 0 : 50; // Free delivery for orders over 500
+//         const taxRate = 18; // GST 18%
+//         const tax = subtotal * (taxRate / 100);
+//         const discount = 0; // Will be calculated when offers are applied
+//         const total = subtotal + delivery + tax - discount;
+        
+//         // Get available offers
+//         const offers = await Offer.find({
+//             $or: [
+//                 { userSpecific: userId },
+//                 { userSpecific: null }
+//             ],
+//             validUntil: { $gte: new Date() }
+//         }).lean();
+        
+//         // Payment methods
+//         const paymentMethods = [
+//             { id: 'credit_card', title: 'Credit Card', icon: '💳', description: 'Pay with your credit card' },
+//             { id: 'debit_card', title: 'Debit Card', icon: '💳', description: 'Pay with your debit card' },
+//             { id: 'upi', title: 'UPI', icon: '📱', description: 'Pay using any UPI app' },
+//             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
+//             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
+//         ];
+        
+
+//         const selectedPayment = '';
+//         const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedPayment)?.title || 'Cash on Delivery';
+        
+//         res.render('user/checkout', {
+//           orderPlaced: false,
+//             pageCSS:'user/checkout.css',
+//             pageJS:'user/checkout.js',
+//             addresses,
+//             cartItems,
+//             subtotal,
+//             delivery,
+//             taxRate,
+//             tax,
+//             discount,
+//             total,
+//             offers,
+//             paymentMethods,
+//             selectedPayment,
+//             selectedPaymentMethod,
+//             appliedOffers: []
+//         });
+        
+//     } catch (error) {
+//         console.error('Checkout error:', error);
+//         res.status(500).send('Error loading checkout page');
+//     }
+// };
 exports.getCheckoutPage = async (req, res) => {
     try {
-        console.log("inside checkout controller")
-        // Get user ID from session or auth middleware
-       
+        console.log("inside checkout controller");
         const userId = req.session.user._id;
-        console.log("userid:",userId);
+        
         // Get user addresses
-        const addresses = await Address.find({  userId }).lean();
-        console.log("addresses:",addresses)
-        // Get cart items
-        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
-        const cartItems = cart.items
-        .filter(item=>item.productId&&item.productId.isActive)
-        .map(item => ({
-            id: item.productId._id,
-            name: item.productId.name,
-            image: item.productId.images[0],
-            variant: item.variant,
-            price: item.price,
-            quantity: item.quantity
-        }));
+        const addresses = await Address.find({ userId }).lean();
+        
+        // Initialize variables
+        let cartItems = [];
+        let fromCart = true;
+        
+        // Check if we have a "buy now" item in session
+        if (req.session.buyNowItem) {
+            fromCart = false;
+            const product = await Product.findById(req.session.buyNowItem.productId);
+            
+            if (product) {
+                cartItems = [{
+                    id: product._id,
+                    name: product.name,
+                    image: product.images[0],
+                    variant: req.session.buyNowItem.variant || 'Default',
+                    price: req.session.buyNowItem.price || product.price,
+                    quantity: req.session.buyNowItem.quantity || 1,
+                    isBuyNow: true // Flag to identify buy now items
+                }];
+            }
+        } 
+        // Otherwise get items from cart
+        else {
+            const cart = await Cart.findOne({ userId }).populate('items.productId');
+            if (cart) {
+                cartItems = cart.items
+                    .filter(item => item.productId && item.productId.isActive)
+                    .map(item => ({
+                        id: item.productId._id,
+                        name: item.productId.name,
+                        image: item.productId.images[0],
+                        variant: item.variant,
+                        price: item.price,
+                        quantity: item.quantity,
+                        isBuyNow: false
+                    }));
+            }
+        }
         
         // Calculate order totals
         const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const delivery = subtotal > 500 ? 0 : 50; // Free delivery for orders over 500
-        const taxRate = 18; // GST 18%
+        const delivery = subtotal > 500 ? 0 : 50;
+        const taxRate = 18;
         const tax = subtotal * (taxRate / 100);
-        const discount = 0; // Will be calculated when offers are applied
+        const discount = 0;
         const total = subtotal + delivery + tax - discount;
         
         // Get available offers
@@ -56,16 +159,13 @@ exports.getCheckoutPage = async (req, res) => {
             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
         ];
         
-
-        const selectedPayment = '';
-        const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedPayment)?.title || 'Cash on Delivery';
-        
         res.render('user/checkout', {
-          orderPlaced: false,
-            pageCSS:'user/checkout.css',
-            pageJS:'user/checkout.js',
+            orderPlaced: false,
+            pageCSS: 'user/checkout.css',
+            pageJS: 'user/checkout.js',
             addresses,
             cartItems,
+            fromCart, // Pass whether items are from cart or buy now
             subtotal,
             delivery,
             taxRate,
@@ -74,8 +174,8 @@ exports.getCheckoutPage = async (req, res) => {
             total,
             offers,
             paymentMethods,
-            selectedPayment,
-            selectedPaymentMethod,
+            selectedPayment: '',
+            selectedPaymentMethod: 'Cash on Delivery',
             appliedOffers: []
         });
         
@@ -84,7 +184,6 @@ exports.getCheckoutPage = async (req, res) => {
         res.status(500).send('Error loading checkout page');
     }
 };
-
 exports.addAddress = async (req, res) => {
     try {
 const user = req.session?.user;
@@ -298,13 +397,14 @@ exports.applyOffer = async (req, res) => {
 exports.placeOrder = async (req, res) => {
     try {
         console.log("inside place order controller")
-        console.log("user in place order:",req.session.user);
+        console.log("session details:",req.session);
         const userId = req.session.user._id;
 console.log("req body",req.body);
         const { 
             addressId, 
             paymentMethod, 
-            appliedOffers = [] 
+            appliedOffers = [] ,
+        
         } = req.body;
         // validation of required fields
  if (!addressId || !paymentMethod) {
@@ -313,6 +413,34 @@ console.log("req body",req.body);
                 message: 'Address and payment method are required' 
             });
         }
+if(req.session.buyNowItem){
+    const{productId,quantity=1,variant='Default',price}=req.session.buyNowItem;
+    console.log("productId:",productId);
+    const product=await Product.findByIdAndUpdate(productId);
+
+    if(!product||!product.isActive){
+        return res.status(400).json({success:false,message:'Product is not available'})
+    }
+
+    if(product.stock<quantity){
+        return res.status(400).json({success:false,message:'not enough products available '})
+    }
+
+    var productIdForStockUpdate = productId;
+    var quantityForStockUpdate = quantity;
+
+
+    items=[{
+        productId:product._id,
+        name:product.productName,
+        variant,
+        quantity,
+        price:price||product.price,
+        totalPrice:(price||product.price)*quantity
+    }]
+    isBuyNow=true;
+}else{
+
 
         
         // Get cart items
@@ -335,10 +463,26 @@ if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
         }
         const activeCartItems = cart.items.filter(item => item.productId !== null);
-for (const item of activeCartItems) {
-    if (item.productId.stock < item.quantity) {
-        throw new Error(`Not enough stock for ${item.productId.productName}`);
-    }
+
+  for (const item of activeCartItems) {
+    await Product.findByIdAndUpdate(item.productId._id, {
+      $inc: { stock: -item.quantity },
+    });
+  
+
+  await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
+} 
+ 
+
+
+ items = activeCartItems.map(item => ({
+        productId: item.productId._id,
+        name: item.productId.productName,
+        variant: item.variant || 'Default',
+        quantity: item.quantity,
+        price: item.price,
+        totalPrice: item.price * item.quantity
+    }));
 }
         // Get address
         console.log("addressId:",addressId);
@@ -361,7 +505,7 @@ const addresses = await Address.findOne(
 
         const selectedAddress=addresses.address[0];
         // Calculate order totals
-        const subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const delivery = subtotal > 500 ? 0 : 50;
         const taxRate = 18;
         const tax = subtotal * (taxRate / 100);
@@ -387,17 +531,8 @@ const addresses = await Address.findOne(
         const order = new Order({
             orderId:orderId,
             userId: userId,
-           items: activeCartItems.map(item => ({
-  productId: item.productId._id,
-  name: item.productId.productName,
-  variant: item.variant || "Default",
-  quantity: item.quantity,
-  price: item.price,
-  totalPrice: item.price * item.quantity
-})),
-
-           
-shippingAddress: {
+          items:items,
+          shippingAddress: {
     name: selectedAddress.name,
     building: selectedAddress.building,
     landmark: selectedAddress.landmark,
@@ -420,12 +555,23 @@ shippingAddress: {
         await order.save();
 
 //updating stock
-for(const item of activeCartItems){
-    await Product.findByIdAndUpdate(
-        item.productId._id,
-        {$inc:{stock:-item.quantity}}
-    )
+if (req.session.buyNowItem) {
+    await Product.findByIdAndUpdate(productIdForStockUpdate, { 
+        $inc: { stock: -quantityForStockUpdate } 
+    });
+    delete req.session.buyNowItem;
+} else {
+    for (const item of items) {
+        await Product.findByIdAndUpdate(item.productId, {
+            $inc: { stock: -item.quantity },
+        });
+    }
+    await Cart.findOneAndUpdate(
+        { userId: userId },
+        { $set: { items: [] } }
+    );
 }
+
 
         
         // Clear the cart
@@ -493,6 +639,20 @@ pageJS:'user/successPage.js'
            
 
         }
+}
+exports.buyNow=async(req,res)=>{
+    try {
+        const{productId,variant,quantity,price}=req.body;
 
-
+        req.session.buyNowItem={
+            productId,
+            variant,
+            quantity,
+            price
+        }
+        res.status(200).json({ success: true });
+    } catch (error) {
+         console.error('Buy Now error:', err);
+        res.redirect('user/shopAll' + req.body.productId);
+    }
 }

@@ -1,0 +1,370 @@
+<%- include('../partials/admin/admin-header') %>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/admin/order.css">
+
+<div class="container">
+  <h1>Orders Management</h1>
+
+  <div class="filter-section">
+    <form id="filterForm" method="GET" action="/admin/orders">
+      <div class="filter-row">
+        <div class="search-box">
+          <input type="text" name="search" placeholder="Search by Order ID/User" class="search-input" 
+                 value="<%= searchQuery %>" />
+          <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="status">Status:</label>
+            <select name="status" id="status" class="filter-select">
+              <option value="">All Statuses</option>
+              <option value="Pending" <%= statusFilter === 'Pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="Processing" <%= statusFilter === 'Processing' ? 'selected' : '' %>>processing</option>
+
+                            <option value="Ordered" <%= statusFilter === 'Ordered' ? 'selected' : '' %>>Ordered</option>
+
+              <option value="Shipped" <%= statusFilter === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+              <option value="Out for Delivery" <%= statusFilter === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+              <option value="Delivered" <%= statusFilter === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+              <option value="Cancelled" <%= statusFilter === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+              <option value="Returned" <%= statusFilter === 'Returned' ? 'selected' : '' %>>Returned</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sort">Sort By:</label>
+            <select name="sort" id="sort" class="filter-select">
+              <option value="newest" <%= sortOption === 'newest' ? 'selected' : '' %>>Newest First</option>
+              <option value="oldest" <%= sortOption === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+              <option value="highest" <%= sortOption === 'highest' ? 'selected' : '' %>>Highest Amount</option>
+              <option value="lowest" <%= sortOption === 'lowest' ? 'selected' : '' %>>Lowest Amount</option>
+            </select>
+          </div>
+
+          <div class="filter-group date-range-group">
+            <label>Date Range:</label>
+            <div class="date-inputs">
+              <input type="date" name="startDate" id="startDate" class="date-input" 
+                     value="<%= startDate %>" placeholder="From" />
+              <span>to</span>
+              <input type="date" name="endDate" id="endDate" class="date-input" 
+                     value="<%= endDate %>" placeholder="To" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="apply-btn">
+              <i class="fas fa-filter"></i> Apply
+            </button>
+            <a href="/admin/orders" class="reset-btn">
+              <i class="fas fa-redo"></i> Reset
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-container">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Return Request</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (orders.length > 0) { %>
+            <% orders.forEach(order => { %>
+              <tr>
+                <td data-label="ID">#<%= order.id %></td>
+                <td data-label="User"><%= order.user %></td>
+                <td data-label="Date"><%= order.date %></td>
+                <td data-label="Total">₹<%= order.total %></td>
+                <td data-label="Status">
+                  <span class="status <%= order.statusClass %>">
+                    <%= order.status %>
+                  </span>
+                </td>
+                <td data-label="Return Request">
+                  <% if (order.status === 'delivered' && order.returnRequest===true) { %>
+                    <button class="verify-btn">
+                      <i class="fas fa-check-circle"></i> Verify
+                    </button>
+                  <% } else { %>
+                    <span class="no-request">-</span>
+                  <% } %>
+                </td>
+               <td data-label="Actions" class="actions-cell">
+                
+  <button class="view-btn" data-order-id="<%= order.id %>">
+    <i class="fas fa-eye"></i> View
+  </button>
+  
+<!-- <pre><%= JSON.stringify(order) %></pre> -->
+
+  <button 
+  class="change-btn" 
+  data-order-id="<%= order.id %>" 
+  <% if (order.status === 'cancelled' || order.status === 'returned') { %> 
+    disabled 
+  <% } %>
+>
+  <i class="fas fa-edit"></i> Change
+</button>
+
+
+
+</td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="no-orders">No orders found matching your criteria</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="<%= buildPaginationUrl(1) %>" class="page-link first-page">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a href="<%= buildPaginationUrl(currentPage - 1) %>" class="page-link prev-page">
+          <i class="fas fa-angle-left"></i> Previous
+        </a>
+      <% } %>
+      
+      <% const maxVisiblePages = 5;
+         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+         
+         if (endPage - startPage + 1 < maxVisiblePages) {
+           startPage = Math.max(1, endPage - maxVisiblePages + 1);
+         }
+      %>
+      
+      <% if (startPage > 1) { %>
+        <span class="page-dots">...</span>
+      <% } %>
+      
+      <% for (let i = startPage; i <= endPage; i++) { %>
+        <a href="<%= buildPaginationUrl(i) %>" class="page-link <%= i === currentPage ? 'active' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
+      
+      <% if (endPage < totalPages) { %>
+        <span class="page-dots">...</span>
+      <% } %>
+      
+      <% if (currentPage < totalPages) { %>
+        <a href="<%= buildPaginationUrl(currentPage + 1) %>" class="page-link next-page">
+          Next <i class="fas fa-angle-right"></i>
+        </a>
+        <a href="<%= buildPaginationUrl(totalPages) %>" class="page-link last-page">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("script added");
+  // DOM Elements
+  const filterForm = document.getElementById('filterForm');
+  const searchInput = document.querySelector('.search-input');
+  const statusSelect = document.getElementById('status');
+  const sortSelect = document.getElementById('sort');
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
+  const verifyButtons = document.querySelectorAll('.verify-btn');
+  const viewButtons = document.querySelectorAll('.view-btn');
+  const changeButtons = document.querySelectorAll('.change-btn');
+  console.log("buttons found",changeButtons.length);
+
+  // Date range validation
+  if (startDateInput && endDateInput) {
+    startDateInput.addEventListener('change', function() {
+      endDateInput.min = this.value;
+      if (endDateInput.value && endDateInput.value < this.value) {
+        endDateInput.value = this.value;
+      }
+    });
+
+    endDateInput.addEventListener('change', function() {
+      if (startDateInput.value && this.value < startDateInput.value) {
+        this.value = startDateInput.value;
+      }
+    });
+  }
+
+  // Form submission handling
+  if (filterForm) {
+    filterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get all form data
+      const formData = new FormData(this);
+      const params = new URLSearchParams();
+      
+      // Add all non-empty parameters
+      formData.forEach((value, key) => {
+        if (value) params.append(key, value);
+      });
+      
+      // Always reset to page 1 when applying new filters
+      params.set('page', '1');
+      
+      // Redirect with query parameters
+      window.location.href = `${this.action}?${params.toString()}`;
+    });
+  }
+
+  // View Order Details
+  viewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+ const orderId = this.dataset.orderId;
+ console.log('clicked the view button',orderId);
+       window.location.href = `/admin/orders/${orderId}/view`;
+    });
+  });
+
+  // Change Order Status
+  
+  document.querySelectorAll('.change-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      console.log("button reached ");
+   
+      const row = this.closest('tr');
+      const orderId = this.dataset.orderId;
+console.log("orderId:",orderId);
+      const existingDropdown = row.querySelector('.status-dropdown');
+      if (existingDropdown) {
+        existingDropdown.remove();
+        return;
+      }
+
+      const currentStatus = row.querySelector('.status').textContent.trim();
+      const statusOptions = ['pending', 'processing', 'shipped', 'out for Delivery', 'delivered', 'cancelled', 'returned'];
+
+      const select = document.createElement('select');
+      select.className = 'status-dropdown';
+      statusOptions.forEach(status => {
+        const option = document.createElement('option');
+        option.value = status;
+        option.textContent = status;
+        if (status === currentStatus) option.selected = true;
+        select.appendChild(option);
+      });
+
+      this.parentElement.appendChild(select);
+
+      select.addEventListener('change', function () {
+        const newStatus = this.value;
+        console.log("newststua",newStatus)
+        if (newStatus === currentStatus) return;
+
+        fetch(`/admin/orders/${orderId}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              alert(`Error: ${data.error}`);
+            } else {
+              const statusEl = row.querySelector('.status');
+              statusEl.textContent = data.status;
+              statusEl.className = 'status ' + data.statusClass;
+              alert('Status updated');
+            }
+            select.remove();
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Failed to update');
+            select.remove();
+          });
+      });
+    });
+  });
+
+
+
+  // Verify Return Request
+  verifyButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const row = this.closest('tr');
+      const orderId = row.querySelector('td:first-child').textContent.substring(1);
+      
+      if (confirm('Approve this return request?')) {
+        fetch(`/admin/orders/${orderId}/verify-return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: 'approve' })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            alert(`Error: ${data.error}`);
+          } else {
+            // Update the return request cell
+            const returnCell = row.querySelector('td:nth-child(6)');
+            returnCell.innerHTML = '<span class="return-approved">Approved</span>';
+            alert('Return request approved');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to approve return request');
+        });
+      }
+    });
+  });
+
+  // Initialize date inputs
+  if (startDateInput && endDateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    startDateInput.max = today;
+    endDateInput.max = today;
+    
+    if (startDateInput.value) {
+      endDateInput.min = startDateInput.value;
+    }
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // Focus search input on Ctrl/Cmd + F
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      e.preventDefault();
+      searchInput.focus();
+    }
+  });
+});
+
+
+</script>
+<%- include('../partials/admin/admin-footer') %>

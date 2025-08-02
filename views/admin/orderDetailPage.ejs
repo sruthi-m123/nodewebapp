@@ -1,0 +1,140 @@
+<%- include('../partials/admin/admin-header') %>
+<link rel="stylesheet" href="/css/admin/viewDetailAdmin.css">
+<div class="order-page-container">
+  <div class="top-info">
+    <div class="order-id">Order Id: <%= order.orderId %></div>
+    <div class="order-date">
+      <% const displayDate = order.orderDate || order.createdAt %>
+      Order Date: <%= displayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="left-section">
+      <div class="order-summary card">
+        <h3>Order Summary</h3>
+        <div class="summary-item">
+          <span class="label">Total Amount:</span>
+          <span class="value">Rs.<%= order.total%></span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Payment Method:</span>
+          <span class="value"><%= order.paymentMethod %></span>
+        </div>
+
+        <div class="status-actions">
+          <div class="status-select">
+            <button class="status-btn"><%= order.status %></button>
+            <select name="status" class="dropdown">
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <button class="update-btn" data-order-id="<%= order._id %>">
+            Update Status
+          </button>
+        </div>
+      </div>
+
+      <div class="product-card card">
+        <img src="/<%= order.items[0].productId.images[0] %>" alt="Product Image">
+        <div class="product-details">
+          <div class="detail-row">
+            <span class="label">Product Name:</span>
+            <span class="value"><%= order.items[0].productId.productName %></span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Quantity:</span>
+            <span class="value"><%= order.items[0].quantity %></span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Price:</span>
+            <span class="value">Rs.<%= order.items[0].price %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shipping-address card">
+      <h3>Shipping Address</h3>
+      <div class="address-item">
+        <span class="label">Name:</span>
+        <span class="value"><%= order.shippingAddress.name %></span>
+      </div>
+      <div class="address-item">
+        <span class="label">Address:</span>
+        <span class="value">
+          <%= order.shippingAddress.building %>,
+          <%= order.shippingAddress.landmark %>,
+          <%= order.shippingAddress.city %>,
+          <%= order.shippingAddress.state %> -
+          <%= order.shippingAddress.pincode %>
+        </span>
+      </div>
+      <div class="address-item">
+        <span class="label">Phone:</span>
+        <span class="value"><%= order.shippingAddress.phone %></span>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/admin/admin-footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const updateBtn=document.querySelector('.update-btn');
+  const statusSelect=document.querySelector('.dropdown');
+  const statusBtn=document.querySelector('.status-btn');
+ const dropdown = document.querySelector('.dropdown');
+  if (statusBtn && dropdown) {
+    statusBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('visible');
+    });
+  }
+  
+  document.addEventListener('click', () => {
+    if (dropdown) dropdown.classList.remove('visible');
+  });
+  
+  if (dropdown) {
+    dropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+
+if(updateBtn){
+  updateBtn.addEventListener('click',async()=>{
+ const orderId = updateBtn.dataset.orderId; 
+ const newStatus=statusSelect.value;
+try {
+  const response=await fetch(`/admin/orders/${orderId}/status`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+    },
+    body:JSON.stringify({orderId,status:newStatus})
+  });
+const data=await response.json();
+
+if(data.success){
+  statusBtn.textContent=data.status;
+  alert('status updated successfully!');
+
+}else{
+  alert('failed to update status.')
+}
+
+
+} catch (error) {
+  console.error('error:',error);
+  alert('an error occurred while updating status.')
+}
+  })
+}
+
+})
+
+</script>

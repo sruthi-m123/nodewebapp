@@ -31,7 +31,7 @@ function openAddressModal(addressId = null) {
     const title = document.getElementById('modalTitle');
     
     form.reset();
-    if (addressId) {
+    if (addressId && addressId!=='new') {
         // Editing an existing address
         title.textContent = 'Edit Address';
         fetch(`/api/addresses/${addressId}`)
@@ -104,10 +104,8 @@ function setupFormValidation() {
         const addressId = form.dataset.addressId;
        
         if (addressId) {
-            // Update existing address
             updateAddress(addressId, formData);
         } else {
-            // Add new address
             addAddress(formData);
         }
     });
@@ -124,7 +122,6 @@ function addAddress(addressData) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Refresh the address list
             window.location.reload();
         } else {
             alert(data.message || 'Error adding address');
@@ -147,7 +144,6 @@ function updateAddress(addressId, addressData) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Refresh the address list
             window.location.reload();
         } else {
             alert(data.message || 'Error updating address');
@@ -188,20 +184,15 @@ function setupPaymentSelection() {
     
     paymentOptions.forEach(option => {
         option.addEventListener('click', function() {
-            // Remove selected class from all options
             paymentOptions.forEach(o => o.classList.remove('selected'));
             
-            // Add selected class to clicked option
             this.classList.add('selected');
             
-            // Update the radio button
             const radio = this.querySelector('input[type="radio"]');
             radio.checked = true;
             
-            // Update the selected payment method display
             const paymentId = this.dataset.payment;
             const paymentTitle = this.querySelector('.payment-title').textContent;
-            // document.getElementById('selectedPaymentMethod').textContent = paymentTitle;
             
             // Store the selected payment method
             document.getElementById('checkout-data').dataset.payment = paymentId;
@@ -243,30 +234,23 @@ function applyOffer(offerId) {
 }
 
 function removeOffer(offerId) {
-    // In a real app, you would send this to the server to recalculate totals
     const offerBtn = document.querySelector(`.apply-offer-btn[onclick*="${offerId}"]`);
     offerBtn.textContent = 'Apply';
     offerBtn.classList.remove('applied');
     offerBtn.setAttribute('onclick', `applyOffer('${offerId}')`);
     
-    // Update the order summary by removing the offer
     updateOrderSummary(null, offerId);
 }
 
 function updateOrderSummary(offer = null, removedOfferId = null) {
-    // In a real app, you would get updated totals from the server
-    // This is a simplified client-side implementation
     
     const subtotal = parseFloat(document.querySelector('.summary-row span:last-child').textContent.replace('₹', ''));
     let discount = 0;
     
-    // Calculate new discount based on applied offers
-    // This would normally come from the server
     if (offer) {
         discount += offer.discountAmount || 0;
     }
     
-    // Update the discount display
     document.querySelector('.summary-row:nth-child(4) span:last-child').textContent = `-₹${discount.toFixed(2)}`;
     
     // Recalculate total
@@ -279,58 +263,85 @@ function updateOrderSummary(offer = null, removedOfferId = null) {
 
 // Place Order Function
 function placeOrder() {
-const btn=document.querySelector('.continue-btn');
-btn.disabled=true;
-btn.textContent='Processing...';
+  const btn = document.querySelector('.continue-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
 
+  const checkoutData = document.getElementById('checkout-data');
+  const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
+  const paymentMethod = checkoutData.dataset.payment;
+  const appliedOffers = [];
 
-    const checkoutData = document.getElementById('checkout-data');
-    const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
-    const paymentMethod = checkoutData.dataset.payment;
-    const appliedOffers = []; 
-    
-   if (!selectedAddress) {
-        alert('Please select a delivery address');
-        btn.disabled = false;
-        btn.textContent = 'Place Order';
-        return;
-    }
-    
-    if (!paymentMethod) {
-        alert('Please select a payment method');
-        btn.disabled = false;
-        btn.textContent = 'Place Order';
-        return;
-    }
-    fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            addressId: selectedAddress,
-            paymentMethod,
-            appliedOffers
-        })
+  if (!selectedAddress) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Select Delivery Address',
+      text: 'Please select a delivery address to proceed',
+      confirmButtonText: 'Continue'
+    });
+    btn.disabled = false;
+    btn.textContent = 'Place Order';
+    return;
+  }
+
+  if (!paymentMethod) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Select Payment Method',
+      text: 'Please select a payment method to proceed',
+      confirmButtonText: 'Continue'
+    });
+    btn.disabled = false;
+    btn.textContent = 'Place Order';
+    return;
+  }
+
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      addressId: selectedAddress,
+      paymentMethod,
+      appliedOffers
     })
+  })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            window.location.href = `/order-success/${data.orderId}`;
-        } else {
-            alert(data.message || 'Error placing order');
-       alert(data.message || 'Error placing order');
-            btn.disabled = false;
-            btn.textContent = 'Place Order';
-        }
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Order Placed!',
+          text: 'Your order was placed successfully.',
+          confirmButtonText: 'View Order'
+        }).then(() => {
+          window.location.href = `/order-success/${data.orderId}`;
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Error placing order',
+          confirmButtonText: 'Try Again'
+        });
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error placing order');
-         btn.disabled = false;
-        btn.textContent = 'Place Order';
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Something went wrong',
+        text: 'Please try again later.',
+        confirmButtonText: 'Okay'
+      });
+      btn.disabled = false;
+      btn.textContent = 'Place Order';
     });
 }
+
 
 // Close modal when clicking outside
 window.addEventListener('click', function(event) {

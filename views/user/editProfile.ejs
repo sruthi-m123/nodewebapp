@@ -1,12 +1,14 @@
-<link rel="stylesheet" href="/css/profile.css">
+<link rel="stylesheet" href="/css/user/editProfile.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <section class="profile-container">
+  <!-- Sidebar Navigation -->
   <div class="settings-sidebar">
     <div class="sidebar-header">
       <h3><%= user.name %></h3>
     </div>
     <ul class="sidebar-menu">
-      <li class="<%= activeTab === 'profile' ? '' : '' %>">
+      <li class="<%= activeTab === 'profile' ? 'active' : '' %>">
         <a href="/profile">
           <i class="fas fa-user"></i>
           <span>Profile</span>
@@ -39,6 +41,7 @@
     </form>
   </div>
 
+  <!-- Main Profile Content -->
   <div class="profile-content">
     <div class="profile-header">
       <h2>Edit Profile</h2>
@@ -47,20 +50,18 @@
         <span>Cancel</span>
       </a>
     </div>
+
     <div id="profile-success-msg" class="success-msg" style="display: none;">
-    <i class="fas fa-check-circle"></i> Profile updated successfully!
-  </div>
-    
+      <i class="fas fa-check-circle"></i> Profile updated successfully!
+    </div>
+
+    <!-- Profile Form -->
     <form action="/profile/update" method="POST" enctype="multipart/form-data" class="profile-box">
+      <!-- Profile Image -->
       <div class="form-group profile-image">
         <label>Profile Image</label>
         <div class="image-upload">
-          <img 
-            src="<%= user.avatar %>"
-            alt="Profile Image" 
-            class="profile-img"
-            id="profile-img-preview"
-          >
+          <img src="<%= user.avatar || '/img/admin-products.png' %>" alt="Profile Image" class="profile-img" id="profile-img-preview">
           <label for="avatar-upload" class="upload-overlay">
             <i class="fas fa-camera"></i>
             <span>Change</span>
@@ -68,7 +69,8 @@
           <input type="file" id="avatar-upload" name="avatar" accept="image/*" style="display: none;">
         </div>
       </div>
-      
+
+      <!-- Name Field -->
       <div class="form-group">
         <label for="name">Name</label>
         <div class="input-field">
@@ -76,7 +78,8 @@
           <i class="fas fa-user"></i>
         </div>
       </div>
-      
+
+      <!-- Phone Field -->
       <div class="form-group">
         <label for="phone">Phone Number</label>
         <div class="input-field">
@@ -84,7 +87,8 @@
           <i class="fas fa-phone"></i>
         </div>
       </div>
-      
+
+      <!-- Gender Field -->
       <div class="form-group">
         <label>Gender</label>
         <div class="radio-group">
@@ -105,88 +109,425 @@
           </label>
         </div>
       </div>
-      
+
+      <!-- Email Field -->
       <div class="form-group email-box">
         <label for="email">Email Address</label>
         <div class="input-field">
           <input type="email" id="email" name="email" value="<%= user.email %>" readonly>
           <i class="fas fa-envelope"></i>
         </div>
-      </div>
-      
+       <% if (!user.googleId) { %>
+    <a href="#" id="changeEmailLink" class="change-link">
+      <i class="fas fa-pencil-alt"></i> Change Email
+    </a>
+  <% } %>
+</div>
+
+<% if (!user.googleId) { %>
+  <!-- Change Password Button  -->
+  <button type="button" id="changePasswordBtn" class="change-link">
+    <i class="fas fa-key"></i> Change Password
+  </button>
+<% } %>
+      <!-- Form Actions -->
       <div class="form-actions">
         <button type="submit" class="save-btn">
           <i class="fas fa-save"></i>
           <span>Save Changes</span>
         </button>
       </div>
+      <p id="error-msg" class="error-msg"></p>
     </form>
   </div>
-  
-</section>
+  </section>
+
+  <!-- Password Change Modal -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>Change Password</h3>
+      <form id="passwordChangeForm">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" name="currentPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+          <div class="password-strength">
+            <div class="password-strength-bar"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <i class="fas fa-key"></i> Update Password
+          </button>
+        </div>
+        <p id="password-error-msg" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Email Verification Modal -->
+  <div id="emailModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>Change Email Address</h3>
+      <form id="emailChangeForm">
+        <div class="form-group">
+          <label for="newEmail">New Email Address</label>
+          <input type="email" id="newEmail" name="newEmail" required>
+        </div>
+        <div class="form-group" id="otpField" style="display:none;">
+          <label for="otp">Verification Code</label>
+          <input type="text" id="otp" name="otp"  placeholder="Enter 6-digit code">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="save-btn" id="emailSubmitBtn">
+            <i class="fas fa-paper-plane"></i> Send Verification Code
+          </button>
+        </div>
+        <p id="email-error-msg" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Image preview functionality
-    document.getElementById('avatar-upload').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          document.getElementById('profile-img-preview').src = event.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elements
+  const fileInput = document.getElementById('avatar-upload');
+  const previewImg = document.getElementById('profile-img-preview');
+  const errorMsg = document.getElementById('error-msg');
+  const passwordModal = document.getElementById('passwordModal');
+  const emailModal = document.getElementById('emailModal');
+  const changePasswordBtn = document.getElementById('changePasswordBtn');
+  const changeEmailLink = document.getElementById('changeEmailLink');
+  const closeButtons = document.querySelectorAll('.close-modal');
+  const passwordForm = document.getElementById('passwordChangeForm');
+  const emailForm = document.getElementById('emailChangeForm');
+  const newPasswordInput = document.getElementById('newPassword');
+  const passwordStrengthBar = document.querySelector('.password-strength-bar');
+
+  // Image Upload Handling
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    
+    if (file) {
+      if (!allowedTypes.includes(file.type)) {
+        errorMsg.textContent = 'Only JPG and PNG image files are allowed.';
+        fileInput.value = '';
+        return;
       }
-    });
+      
+      errorMsg.textContent = '';
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        previewImg.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
-    // Form submission with SweetAlert
-    document.querySelector(".profile-box").addEventListener("submit", async function (e) {
-      e.preventDefault();
+  // Password Strength Indicator
+  newPasswordInput?.addEventListener('input', function() {
+    const strength = calculatePasswordStrength(this.value);
+    passwordStrengthBar.style.width = strength + '%';
+    passwordStrengthBar.style.backgroundColor = 
+      strength < 30 ? '#dc3545' : 
+      strength < 70 ? '#ffc107' : '#28a745';
+  });
 
-      const form = e.target;
-      const formData = new FormData(form);
+  // Modal Handling
+  changePasswordBtn?.addEventListener('click', function() {
+    passwordModal.style.display = 'block';
+    document.getElementById('currentPassword').focus();
+  });
 
-      try {
-        const response = await fetch("/profile/update", {
-          method: "POST",
-          body: formData,
-        });
+  changeEmailLink?.addEventListener('click', function(e) {
+    e.preventDefault();
+    emailModal.style.display = 'block';
+    document.getElementById('newEmail').focus();
+  });
 
-        if (response.ok) {
-          const json = await response.json();
-          
-          // Show success SweetAlert
-          Swal.fire({
-            title: 'Success!',
-            text: 'Your profile has been updated successfully.',
-            icon: 'success',
-            confirmButtonText: 'OK',
-            timer: 3000,
-            timerProgressBar: true
-          });
-
-          // Update avatar if changed
-          if (json.updatedAvatarUrl) {
-            document.getElementById("profile-img-preview").src = json.updatedAvatarUrl;
-          }
-        } else {
-          // Show error SweetAlert
-          const errorData = await response.json();
-          Swal.fire({
-            title: 'Error!',
-            text: errorData.message || 'Update failed. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Something went wrong. Please try again later.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
+  // Close Modals
+  closeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      this.closest('.modal').style.display = 'none';
     });
   });
+
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+      e.target.style.display = 'none';
+    }
+  });
+
+  // Password Change Form
+  passwordForm?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const errorElement = document.getElementById('password-error-msg');
+
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      errorElement.textContent = 'All fields are required';
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      errorElement.textContent = 'Passwords do not match';
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      errorElement.textContent = 'Password must be at least 8 characters';
+      return;
+    }
+
+    errorElement.textContent = '';
+
+    try {
+      const response = await fetch('/user/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Your password has been updated successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+        passwordForm.reset();
+        passwordModal.style.display = 'none';
+        passwordStrengthBar.style.width = '0%';
+      } else {
+        errorElement.textContent = result.message || 'Password change failed';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      errorElement.textContent = 'Something went wrong. Please try again.';
+    }
+  });
+
+  // Email Change Form
+  let emailChangeStep = 'request'; // 'request' or 'verify'
+  let tempEmail = '';
+
+  emailForm?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const errorElement = document.getElementById('email-error-msg');
+    errorElement.textContent = '';
+
+    const emailSubmitBtn = document.getElementById('emailSubmitBtn');
+    const otpField = document.getElementById('otpField');
+    const newEmailInput = document.getElementById('newEmail');
+    const otpInput = document.getElementById('otp');
+
+    if (emailChangeStep === 'request') {
+      const newEmail = newEmailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(newEmail)) {
+        errorElement.textContent = 'Please enter a valid email address';
+        return;
+      }
+
+      try {
+        emailSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        
+        const response = await fetch('/user/request-email-change', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ newEmail }),
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          tempEmail = newEmail;
+          emailChangeStep = 'verify';
+          otpField.style.display = 'block';
+           otpInput.setAttribute('required', true);
+          newEmailInput.readOnly = true;
+          emailSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verify Code';
+          Swal.fire('Verification code sent', 'Please check your email for the verification code.', 'info');
+        } else {
+          errorElement.textContent = result.message || 'Failed to send verification code';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorElement.textContent = 'Something went wrong. Please try again.';
+      } finally {
+        if (emailChangeStep !== 'verify') {
+          emailSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Code';
+        }
+      }
+    } else if (emailChangeStep === 'verify') {
+      const otp = otpInput.value.trim();
+
+      if (!otp || otp.length !== 6) {
+        errorElement.textContent = 'Please enter a valid 6-digit code';
+        return;
+      }
+
+      try {
+        emailSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        
+        const response = await fetch('/user/verify-email-change', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            newEmail: tempEmail,
+            enteredOtp:otp
+          }),
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          Swal.fire({
+            title: 'Success!',
+            text: 'Your email has been updated successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
+          
+          // Update the email displayed in the form
+          document.getElementById('email').value = tempEmail;
+          
+          // Reset the form
+          emailForm.reset();
+          emailModal.style.display = 'none';
+          otpField.style.display = 'none';
+          newEmailInput.readOnly = false;
+          emailSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Code';
+          emailChangeStep = 'request';
+        } else {
+          errorElement.textContent = result.message || 'Verification failed';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorElement.textContent = 'Something went wrong. Please try again.';
+      } finally {
+        emailSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verify Code';
+      }
+    }
+  });
+
+  // Profile Form Submission
+  document.querySelector('.profile-box')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const genderInput = form.querySelector('input[name="gender"]:checked');
+    const gender = genderInput ? genderInput.value : null;
+    const errorElement = document.getElementById('error-msg');
+    
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const allowedGenders = ["Male", "Female", "Other"];
+
+    // Validation
+    if (name.length === 0) {
+      errorElement.textContent = 'Name cannot be empty';
+      return;
+    }
+
+    if (phone && !phoneRegex.test(phone)) {
+      errorElement.textContent = 'Please enter a valid 10-digit Indian phone number';
+      return;
+    }
+
+    if (!gender || !allowedGenders.includes(gender)) {
+      errorElement.textContent = 'Please select a valid gender';
+      return;
+    }
+
+    errorElement.textContent = '';
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/profile/update", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Show success message
+        const successMsg = document.getElementById('profile-success-msg');
+        successMsg.style.display = 'flex';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+        }, 3000);
+
+        // Update avatar if changed
+        if (result.updatedAvatarUrl) {
+          previewImg.src = result.updatedAvatarUrl;
+        }
+      } else {
+        errorElement.textContent = result.message || 'Update failed. Please try again.';
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      errorElement.textContent = 'Something went wrong. Please try again later.';
+    }
+  });
+
+  // Helper Functions
+  function calculatePasswordStrength(password) {
+    let strength = 0;
+    
+    // Length contributes up to 50%
+    strength += Math.min(50, (password.length / 12) * 50);
+    
+    // Contains both lower and upper case
+    if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) strength += 10;
+    
+    // Contains numbers
+    if (password.match(/[0-9]/)) strength += 10;
+    
+    // Contains special chars
+    if (password.match(/[^a-zA-Z0-9]/)) strength += 10;
+    
+    // Contains both letters and numbers
+    if (password.match(/([a-zA-Z])/) && password.match(/([0-9])/)) strength += 10;
+    
+    // Contains three unique chars
+    if (password.match(/([a-zA-Z0-9])\1\1/)) strength -= 10;
+    
+    return Math.min(100, Math.max(0, strength));
+  }
+});
 </script>

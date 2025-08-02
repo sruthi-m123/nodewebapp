@@ -37,7 +37,7 @@ const addToCart = async (req, res) => {
     const userId = req.session.user._id;
     const productId = req.params.productId;
     const quantity = parseInt(req.body.quantity);
-
+const limit=10;
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -53,6 +53,14 @@ const addToCart = async (req, res) => {
           message: `Only ${product.stock} left in stock. Cannot add ${quantity} to cart.`
         });
       }
+      
+if(quantity>=limit){
+   return res.json({
+          status: 'error',
+          message: ` you can only add limited ${limit} products`
+        });
+}
+
 
       const totalPrice = price * quantity;
       cart = new Cart({
@@ -71,6 +79,14 @@ const addToCart = async (req, res) => {
           message: `You already have ${existingQty} of this item in your cart. Cannot add more than ${product.stock} total due to stock limit.`
         });
       }
+
+      
+if(quantity>=limit){
+   return res.json({
+          status: 'error',
+          message: ` you can only add limited ${limit} products`
+        });
+}
 
       if (existingItem) {
         existingItem.quantity = newQuantity;

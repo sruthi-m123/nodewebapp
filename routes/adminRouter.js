@@ -4,6 +4,7 @@ const adminController = require("../controller/admin/adminController");
 const catController = require("../controller/admin/catController")
 const customerController = require("../controller/admin/customerController")
 const productController = require('../controller/admin/productController');
+const orderController=require('../controller/admin/orderController');
 const { upload, singleUpload, multiUpload,handleMulterError } = require('../config/multer');
 const { adminAuth } = require("../middlewares/auth");
 
@@ -35,11 +36,16 @@ router.get('/categories/:id/details', adminAuth, catController.getCategory); // 
 //product routes
 router.get('/products', adminAuth, productController.renderProducts);
 // router.get('/products/add', adminAuth, productController.renderForm);
-router.post('/products',adminAuth,upload.products,productController.addProduct)
+router.post('/addProducts',adminAuth,upload.products,productController.addProduct)
 // router.get('/products/:id', adminAuth, productController.renderEditForm);
 router.put('/products/:id', adminAuth, upload.products, productController.updateProduct);
 router.put('/products/status/:productId',adminAuth,productController.updateProductStatus)
 router.delete('/products/:id', adminAuth, productController.deleteProduct);
 router.get('/products/:id/details', adminAuth,productController.getProductDetails);
-
+// order managment routes
+router.get('/orders',adminAuth,orderController.getOrderAdmin);
+router.get('order-details',orderController.getOrder);
+router.post('/orders/:orderId/status',orderController.updateOrderStatus)
+router.post('/orders/:orderId/verify-return',orderController.verifyReturnedRequest);
+router.get('/orders/:orderId/view',orderController.getOrderDetails);
 module.exports = router;

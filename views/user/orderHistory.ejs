@@ -1,8 +1,30 @@
 <div class="orders-container">
+  <!-- Search Bar -->
+  <div class="search-container">
+    <form action="/orders" method="GET" class="search-form">
+      <input 
+        type="text" 
+        name="search" 
+        placeholder="Search by Order ID or Product Name..." 
+        value="<%= searchQuery || '' %>"
+        class="search-input"
+      >
+      <button type="submit" class="search-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+      </button>
+      <% if (searchQuery) { %>
+        <a href="/orders" class="clear-search">Clear</a>
+      <% } %>
+    </form>
+  </div>
+
   <table class="orders-table">
     <thead>
       <tr>
         <th>Product ID</th>
+        <th>Product Name</th>
         <th>Price</th>
         <th>Delivery Date</th>
         <th>Product Image</th>
@@ -11,48 +33,60 @@
       </tr>
     </thead>
     <tbody>
-      <% orders.forEach(order => { %>
+      <% if (orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td data-label="Product ID">#<%= order.id %></td>
+           <td data-label="Product Name"><%= order.productName %></td>
+            <td data-label="Price">₹<%= order.price.toLocaleString('en-IN') %></td>
+            <td data-label="Delivery Date"><%= new Date(order.deliveryDate).toLocaleDateString('en-GB') %></td>
+            <td data-label="Product Image">
+              <img src="<%= order.imageUrl %>" alt="<%= order.productName %>" class="product-img">
+            </td>
+            <td data-label="Status">
+              <button class="status-btn status-<%= order.status.toLowerCase() %>">
+                <%= order.status %>
+              </button>
+            </td>
+            <td data-label="Action">
+              <button class="action-btn"  onclick="view('<%=order.id%>')">
+                View <span>→</span>
+              </button>
+            </td>
+          </tr>
+        <% }); %>
+      <% } else { %>
         <tr>
-          <td data-label="Product ID">#<%= order.id %></td>
-          <td data-label="Price">₹<%= order.price.toLocaleString('en-IN') %></td>
-          <td data-label="Delivery Date"><%= new Date(order.deliveryDate).toLocaleDateString('en-GB') %></td>
-          <td data-label="Product Image">
-            <img src="<%= order.imageUrl %>" alt="<%= order.productName %>" class="product-img">
-          </td>
-          <td data-label="Status">
-            <button class="status-btn status-<%= order.status.toLowerCase() %>">
-              <%= order.status %>
-            </button>
-          </td>
-          <td data-label="Action">
-            <button class="action-btn" onclick="window.location.href='/orders-details/<%= order.id %>'">
-              View <span>→</span>
-            </button>
+          <td colspan="6" class="no-results">
+            <% if (searchQuery) { %>
+              No orders found matching "<%= searchQuery %>"
+            <% } else { %>
+              No orders available
+            <% } %>
           </td>
         </tr>
-      <% }); %>
+      <% } %>
     </tbody>
   </table>
 
   <!-- Pagination Controls -->
-  <div class="pagination">
-    <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>" class="pagination-link">&laquo; Previous</a>
-    <% } %>
-    
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <% if (i === currentPage) { %>
-        <span class="pagination-link active"><%= i %></span>
-      <% } else { %>
-        <a href="?page=<%= i %>" class="pagination-link"><%= i %></a>
+  <% if (orders.length > 0) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>" class="pagination-link">&laquo; Previous</a>
       <% } %>
-    <% } %>
-    
-    <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>" class="pagination-link">Next &raquo;</a>
-    <% } %>
-  </div>
+      
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+          <span class="pagination-link active"><%= i %></span>
+        <% } else { %>
+          <a href="?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>" class="pagination-link"><%= i %></a>
+        <% } %>
+      <% } %>
+      
+      <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>" class="pagination-link">Next &raquo;</a>
+      <% } %>
+    </div>
+  <% } %>
 </div>
-
-
-  

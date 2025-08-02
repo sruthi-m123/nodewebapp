@@ -37,19 +37,29 @@ document.querySelectorAll('.submenu-toggle').forEach(toggle => {
 </script>
 
 <script>
-const userProfile = document.querySelector('.user-profile');
-userProfile.addEventListener('click', function() {
-  this.querySelector('.user-dropdown').classList.toggle('show');
-});
+(function () {
+  const userProfile = document.querySelector('.user-profile');
 
-// Close when clicking outside
-document.addEventListener('click', function(e) {
-  if (!userProfile.contains(e.target)) {
-    userProfile.querySelector('.user-dropdown').classList.remove('show');
-  }
-});
+  if (!userProfile) return; // Exit if element not found to avoid errors
+
+  userProfile.addEventListener('click', function () {
+    this.querySelector('.user-dropdown').classList.toggle('show');
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!userProfile.contains(e.target)) {
+      userProfile.querySelector('.user-dropdown').classList.remove('show');
+    }
+  });
+})();
+
 </script>
+<% if (typeof pageJS !== 'undefined') { %>
+   <script src="<%= pageJS %>"></script>
+<% } %>
 
-  <!-- <script src="/js/admin/categories.js"></script> -->
+
+
 </body>
 </html>

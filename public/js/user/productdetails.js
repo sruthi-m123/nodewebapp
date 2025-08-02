@@ -31,7 +31,6 @@
     plusBtn.addEventListener('click', () => updateQuantity(1));
   }
 
-  // Case 2: All Products Page
   const qtyControls = document.querySelectorAll('.qty-control');
 
   qtyControls.forEach((control) => {
@@ -96,7 +95,7 @@
 
 //add to cart and buy now 
 const addToCartBtn=document.querySelector('.add-to-cart');
-const buyNowBtn=document.querySelector('.buy-now');
+const buyNowBtn=document.getElementById('buyNowBtn');
 
 const productId=document.querySelector('[data-product-id]')?.getAttribute('data-product-id');
 const qtyInput=document.getElementById('quantity');
@@ -167,7 +166,8 @@ addToCartBtn.addEventListener('click',async()=>{
 });
 //buy now function 
 
-buyNowBtn.addEventListener('click',async()=>{
+buyNowBtn?.addEventListener('click',async(e)=>{
+   e.preventDefault();
   const quantity=parseInt(qtyInput.value)||1;
   try {
     const response=await fetch('/user/buy-now',{
@@ -179,7 +179,7 @@ buyNowBtn.addEventListener('click',async()=>{
     });
     const data=await response.json();
     if(response.ok){
-      window.location.href='user/checkout';
+      window.location.href='/user/checkout';
     }else{
     Swal.fire({
           icon: 'error',
@@ -189,7 +189,7 @@ buyNowBtn.addEventListener('click',async()=>{
     }
 
   } catch (error) {
-    wal.fire({
+    Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'Something went wrong.'

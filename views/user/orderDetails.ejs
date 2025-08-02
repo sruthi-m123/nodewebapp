@@ -1,148 +1,152 @@
-
-    <div class="container">
-        <h1>ORDER DETAILS</h1>
-         <div class="order-header">
-            <p><strong>Order #</strong> <%= order.orderId %></p>
-            <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                </svg>
-                Download Invoice
-            </button>
+<div class="container">
+    <h1>ORDER DETAILS</h1>
+    <div class="order-header">
+        <p><strong>Order #</strong> <%= order.orderId %></p>
+        <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+            </svg>
+            Download Invoice
+        </button>
+    </div>
+    <div class="order-info">
+        <div class="product-details">
+            <img src="/<%= order.items[0].imageUrl || '/images/default-product.jpg' %>" alt="<%= order.items[0].name %>">
+            <div>
+                <p><strong><%= order.items[0].name %></strong></p>
+                <p><strong>₹<%= order.items[0].price.toLocaleString('en-IN') %></strong></p>
+                <% if (order.items[0].color) { %>
+                    <p><strong>Color: </strong> <%= order.items[0].color %></p>
+                <% } %>
+                <p><strong>Quantity: </strong> <%= order.items[0].quantity %></p>
+                <p><strong>Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
+            </div>
         </div>
-        <div class="order-info">
-            <!-- <p><strong>Order #</strong> <%= order.orderId %></p> -->
-            <div class="product-details">
-                <img src="/<%= order.items[0].imageUrl || '/images/default-product.jpg' %>" alt="<%= order.items[0].name %>">
-                <div>
-                    <p><strong><%= order.items[0].name %></strong></p>
-                    <p><strong>₹<%= order.items[0].price.toLocaleString('en-IN') %></strong></p>
-                    <% if (order.items[0].color) { %>
-                        <p><strong>Color: </strong> <%= order.items[0].color %></p>
+    </div>
+
+    <div class="shipping-details">
+        <h2>SHIPPING DETAILS</h2>
+        <p><strong><%= order.shippingAddress.name %></strong></p>
+        <p>
+            <%= order.shippingAddress.building %>, 
+            <%= order.shippingAddress.city %>, 
+            <%= order.shippingAddress.state %>, 
+            <%= order.shippingAddress.pincode %>, 
+            <%= order.shippingAddress.addressType %>
+        </p>
+        <p><strong>Phone: </strong> <%= order.shippingAddress.phone %></p>
+    </div>
+
+    <div class="status-timeline">
+        <ul>
+            <li class="status-item <%= order.status.toUpperCase() === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : 'completed' %>">
+                <div class="status-icon">
+                    <% if (order.status === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
+                        •
+                    <% } else { %>
+                        ✓
                     <% } %>
-                    <p><strong>Quantity: </strong> <%= order.items[0].quantity %></p>
-<p><strong>Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
                 </div>
-            </div>
-        </div>
+                <div class="status-label">ORDER PLACED</div>
+            </li>
+            
+            <li class="status-item <%= order.status.toUpperCase() === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : (order.status === 'ORDERED' ? 'pending' : 'completed') %>">
+                <div class="status-icon">
+                    <% if (order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
+                        •
+                    <% } else if (order.status === 'ORDERED') { %>
+                        ○
+                    <% } else { %>
+                        ✓
+                    <% } %>
+                </div>
+                <div class="status-label">SHIPPED</div>
+            </li>
+           
+            <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'ORDERED' ? 'pending' : 'completed')) %>">
+                <div class="status-icon">
+                    <% if (order.status === 'DELIVERED') { %>
+                        •
+                    <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
+                        ○
+                    <% } else { %>
+                        ✓
+                    <% } %>
+                </div>
+                <div class="status-label">OUT FOR DELIVERY</div>
+            </li>
+            
+            <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'ORDERED' ? 'pending' : 'completed')) %>">
+                <div class="status-icon">
+                    <% if (order.status === 'DELIVERED') { %>
+                        •
+                    <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
+                        ○
+                    <% } else { %>
+                        ✓
+                    <% } %>
+                </div>
+                <div class="status-label">DELIVERED</div>
+            </li>
+        </ul>
+    </div>
 
-        <div class="shipping-details">
-            <h2>SHIPPING DETAILS</h2>
-            <p><strong><%= order.shippingAddress.name %></strong></p>
-            <p>
-                <%= order.shippingAddress.building %>, 
-                <%= order.shippingAddress.city %>, 
-                <%= order.shippingAddress.state %>, 
-                <%= order.shippingAddress.pincode %>, 
-                <%= order.shippingAddress.addressType %>
-            </p>
-            <p><strong>Phone: </strong> <%= order.shippingAddress.phone %></p>
+    <% if (order.status.toUpperCase() === 'ORDERED' || order.status.toUpperCase() === 'PROCESSING') { %>
+        <div class="action-buttons">
+            <button class="action-btn cancel-btn"
+            data-order-id="<%= order._id %>"
+                data-status="<%= order.status %>"
+            onclick="openModal('cancel')">Cancel Order</button>
         </div>
-<div class="status-timeline">
-  <ul>
-    <li class="status-item <%= order.status.toUpperCase() === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : 'completed' %>">
-      <div class="status-icon">
-        <% if (order.status === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
-          •
-        <% } else { %>
-          ✓
-        <% } %>
-      </div>
-      <div class="status-label">ORDER PLACED</div>
-    </li>
-    
-    <li class="status-item <%= order.status.toUpperCase() === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : (order.status === 'ORDERED' ? 'pending' : 'completed') %>">
-      <div class="status-icon">
-        <% if (order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
-          •
-        <% } else if (order.status === 'ORDERED') { %>
-          ○
-        <% } else { %>
-          ✓
-        <% } %>
-      </div>
-      <div class="status-label">SHIPPED</div>
-    </li>
-    
-    <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'ORDERED' ? 'pending' : 'completed')) %>">
-      <div class="status-icon">
-        <% if (order.status === 'DELIVERED') { %>
-          •
-        <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
-          ○
-        <% } else { %>
-          ✓
-        <% } %>
-      </div>
-      <div class="status-label">OUT FOR DELIVERY</div>
-    </li>
-    
-    <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'ORDERED' ? 'pending' : 'completed')) %>">
-      <div class="status-icon">
-        <% if (order.status === 'DELIVERED') { %>
-          •
-        <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
-          ○
-        <% } else { %>
-          ✓
-        <% } %>
-      </div>
-      <div class="status-label">DELIVERED</div>
-    </li>
-  </ul>
+    <% } else if (order.status.toUpperCase() === 'DELIVERED') { %>
+        <div class="action-buttons">
+            <button class="action-btn return-btn"
+            data-order-id="<%= order._id %>"
+                data-status="<%= order.status %>"
+            onclick="openModal('return')">Return Item</button>
+        </div>
+    <% } %>
+
+    <p class="inquiries">Any inquiries? <a href="/contact">Contact us</a></p>
+
+    <div class="order-status">
+        <p><%= getStatusmessage(order.status) %></p>
+        <ul>
+            <% order.statusHistory.forEach(history => { %>
+                <li>
+                    <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                    <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+                    <br>
+                    <%= history.message %>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
 </div>
+<!-- JSON.stringify({ "<%= order._id %>" }) -->
 
-
-        <% if (order.status.toUpperCase() === 'ORDERED' || order.status === 'PROCESSING') { %>
-            <div class="action-buttons">
-                <button class="action-btn cancel-btn" onclick="openModal('cancel')">Cancel Order</button>
-            </div>
-        <% } else if (order.status === 'DELIVERED') { %>
-            <div class="action-buttons">
-                <button class="action-btn return-btn" onclick="openModal('return')">Return Item</button>
-            </div>
-        <% } %>
-
-        <p class="inquiries">Any inquiries? <a href="/contact">Contact us</a></p>
-
-        <div class="order-status">
-            <p><%= getStatusmessage(order.status) %></p>
-            <ul>
-                <% order.statusHistory.forEach(history => { %>
-                    <li>
-                        <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
-                        <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
-                        <br>
-                        <%= history.message %>
-                    </li>
-                <% }) %>
-            </ul>
+<!-- Cancel Order Modal -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <h3>Cancel Order</h3>
+        <p>Please tell us why you're canceling this order:</p>
+        <textarea id="cancelReason" placeholder="Your reason..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn modal-cancel"  data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn modal-submit" data-order-id="<%= order._id %>" onclick="submitCancel(event)">Submit Request</button>
         </div>
     </div>
-
-    <!-- Cancel Order Modal -->
-    <div id="cancelModal" class="modal">
-        <div class="modal-content">
-            <h3>Cancel Order</h3>
-            <p>Please tell us why you're canceling this order:</p>
-            <textarea id="cancelReason" placeholder="Your reason..."></textarea>
-            <div class="modal-actions">
-                <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
-                <button class="modal-btn modal-submit" onclick="submitCancel()">Submit Request</button>
-            </div>
+</div>
+<!-- Return Order Modal -->
+<div id="returnModal" class="modal">
+    <div class="modal-content">
+        <h3>Return Item</h3>
+        <p>Please tell us why you're returning this item:</p>
+        <textarea id="returnReason" placeholder="Your reason..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button>
         </div>
     </div>
-
-    <!-- Return Order Modal -->
-    <div id="returnModal" class="modal">
-        <div class="modal-content">
-            <h3>Return Item</h3>
-            <p>Please tell us why you're returning this item:</p>
-            <textarea id="returnReason" placeholder="Your reason..."></textarea>
-            <div class="modal-actions">
-                <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
-                <button class="modal-btn modal-submit" onclick="submitReturn()">Submit Request</button>
-            </div>
-        </div>
-    </div>
+</div>

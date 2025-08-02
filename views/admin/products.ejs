@@ -23,6 +23,7 @@
           <th>ID</th>
           <th>Product Image</th>
           <th>Product Name</th>
+          <th>SKU</th>
           <th>Category</th>
           <th>Color</th>
           <th>Stock</th>
@@ -47,6 +48,7 @@
                 <% } %>
               </td>
               <td><%= product.productName %></td>
+               <td><%= product.sku || 'N/A' %></td>
               <td><%= product.category.name %></td>
               <td><%= product.color %></td>
               <td><%= product.stock %></td>
@@ -108,6 +110,12 @@
               <label for="productName">Product Name *</label>
               <input type="text" id="productName" name="productName" required>
             </div>
+             <div class="form-group">
+              <label for="sku">SKU *</label>
+              <input type="text" id="sku" name="sku" required>
+            </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label for="category">Category *</label>
               <select id="category" name="category" required>
@@ -119,7 +127,13 @@
                 <% } %>
               </select>
             </div>
-          </div>
+            <div class="form-group">
+              <label for="color">Color</label>
+              <input type="text" id="color" name="color">
+            </div>
+            </div>
+            
+          
           
           <div class="form-row">
             <div class="form-group">
@@ -132,12 +146,6 @@
             </div>
           </div>
           
-          <div class="form-row">
-            <div class="form-group">
-              <label for="color">Color</label>
-              <input type="text" id="color" name="color">
-            </div>
-          </div>
           
           <div class="form-group">
             <label for="description">Description</label>
@@ -263,6 +271,7 @@
         .then(product => {
           // Fill form fields
           document.getElementById('productName').value = product.productName || '';
+           document.getElementById('sku').value = product.sku || '';
           document.getElementById('category').value = product.category._id || '';
           document.getElementById('price').value = product.price || '';
           document.getElementById('stock').value = product.stock || '';
@@ -329,6 +338,7 @@
               </div>
               <div class="product-info">
                 <h4>${product.productName}</h4>
+                  <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
                 <p><strong>Category:</strong> ${product.category?.name || 'N/A'}</p>
                 <p><strong>Price:</strong> ₹${product.price}</p>
                 <p><strong>Stock:</strong> ${product.stock}</p>
@@ -406,7 +416,7 @@ croppedImages.forEach((blob, index) => {
 });
       
 
-      const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/products';
+      const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
       const method = currentProductId ? 'PUT' : 'POST';
 
       fetch(url, {
@@ -626,6 +636,32 @@ croppedImages.forEach((blob, index) => {
     // Initialize pagination variables
     var currentPage = parseInt('<%= currentPage || 1 %>');
     var totalPages = parseInt('<%= totalPages || 1 %>');
+
+   
+  document.addEventListener('DOMContentLoaded', function () {
+    const productNameInput = document.getElementById('productName');
+    const skuInput = document.getElementById('sku');
+
+    productNameInput.addEventListener('input', function () {
+      const name = productNameInput.value.trim().toUpperCase();
+
+      if (!name) {
+        skuInput.value = '';
+        return;
+      }
+
+      // Convert to SKU format: "Maheshwari Bottle Green" → "MAHESHWARI-BOTTLE-GREEN"
+      const formatted = name.replace(/\s+/g, '-').replace(/[^A-Z0-9\-]/g, '');
+
+      // Add a short prefix or ID — you can customize this part
+      const skuPrefix = 'SKU-'; // or derive based on category
+      const sku = `${skuPrefix}${formatted}`;
+
+      skuInput.value = sku;
+    });
+  });
+
+
   </script>
 
   <%- include('../partials/admin/admin-footer') %>

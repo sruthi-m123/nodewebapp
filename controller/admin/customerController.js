@@ -40,15 +40,15 @@ const customerInfo = async (req, res) => {
       ],
     }).countDocuments();
 
-    // Calculate total pages
+    
     const totalPages = Math.ceil(count / limit);
 
-    // Redirect to the last page if the requested page exceeds totalPages
+    
     if (page > totalPages && totalPages > 0) {
       return res.redirect(`/admin/users?page=${totalPages}&search=${search}`);
     }
 
-    // Render the users page
+    
     res.render("admin/users", {
       layout:false,
       users: userData,

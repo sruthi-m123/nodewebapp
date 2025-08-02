@@ -9,12 +9,7 @@
     <a href="#" class="nav-link">Contact Us</a>
   </nav>
   
-  <!-- <% if (!user && currentPath === "/") { %>
-    <div class="auth-links">
-      <a href="/signup" class="nav-link">Sign Up</a>
-      <a href="/login" class="nav-link">Log In</a>
-    </div>
-  <% } %> -->
+  
   <% if (!user) { %>
   <div class="auth-links">
     <a href="/signup" class="nav-link">Sign Up</a>
@@ -25,7 +20,7 @@
 
   <div class="desktop-icons">
     <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
-    <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
+    <a href="/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
     <% if (user && user.name) { %>
       <div class="profile-card-container">
         <a href="#" class="icon-link" id="profileIcon"><i class="fas fa-user"></i></a>

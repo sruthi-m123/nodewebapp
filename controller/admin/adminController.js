@@ -41,7 +41,6 @@ const login = async (req, res) => {
           name: admin.name,
         };
 
-        // console.log('Session after login:', req.session); // ✅ Debug
         return res.redirect("/admin/dashboard");
       } else {
          req.flash("error", "Invalid password");

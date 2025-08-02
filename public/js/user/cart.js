@@ -4,7 +4,7 @@ function updateQuantity(itemId, change) {
   const input = container.querySelector('input');
   const maxStock = parseInt(container.dataset.stock);
   let newValue = parseInt(input.value) + change;
-
+const limit=10;
   if (newValue > maxStock) {
     Swal.fire({
       icon: 'warning',
@@ -15,6 +15,20 @@ function updateQuantity(itemId, change) {
     });
     return;
   }
+
+     
+if(newValue>=limit){
+  Swal.fire({
+      icon: 'warning',
+      title: 'limit exceeded',
+      text: `Only ${limit} limited stocks can purchase.`,
+      timer: 2000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
+   
 
   if (newValue < 1) newValue = 1;
   input.value = newValue;

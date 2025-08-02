@@ -1,0 +1,155 @@
+.order-page-container {
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  background-color: #f9f5f0; /* Warm off-white */
+}
+
+.top-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #5d4037; /* Dark brown */
+}
+
+.main-content {
+  display: flex;
+  gap: 30px;
+}
+
+.left-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.card {
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+}
+
+.order-summary {
+  border-left: 4px solid #8d6e63; /* Medium brown */
+}
+
+.order-summary h3 {
+  color: #5d4037; /* Dark brown */
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-weight: 500;
+  color: #5d4037; /* Dark brown */
+}
+
+.value {
+  color: #3e2723; /* Very dark brown */
+}
+
+.shipping-address {
+  flex: 1;
+  border-left: 4px solid #a1887f; /* Light brown */
+}
+
+.shipping-address h3 {
+  color: #5d4037; /* Dark brown */
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.address-item {
+  margin-bottom: 12px;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 25px;
+  gap: 15px;
+}
+
+.status-btn {
+  background-color: #a1887f; /* Light brown */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.update-btn {
+  background-color: #6d4c41; /* Medium-dark brown */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.update-btn:hover {
+  background-color: #5d4037; /* Dark brown */
+}
+
+.product-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  border-left: 4px solid #bcaaa4; /* Very light brown */
+}
+
+.product-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #d7ccc8; /* Lightest brown */
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+/* Dropdown styles */
+.status-select {
+  position: relative;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 10;
+  border-radius: 6px;
+  border: 1px solid #d7ccc8;
+}
+
+.dropdown.visible {
+  display: block;
+}
+
+.dropdown option {
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.dropdown option:hover {
+  background-color: #efebe9;
+}

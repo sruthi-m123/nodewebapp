@@ -68,6 +68,11 @@ const existingProduct = await Product.findOne({
         message: 'Product with this name already exists'
       });
     }
+    const sku = req.body.sku ? req.body.sku.trim() : '';
+if (!sku) {
+  return res.status(400).json({ success: false, message: 'SKU is required' });
+}
+
     const productData = {
       productName: req.body.productName,
       category: req.body.category, 
@@ -77,7 +82,8 @@ const existingProduct = await Product.findOne({
       color: req.body.color,
       images: imagePaths,
       isNewArrival,
-      isActive
+      isActive,
+      sku
     };
 
     console.log('Product data before saving to db:', productData);

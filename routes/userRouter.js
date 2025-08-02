@@ -12,6 +12,8 @@ const cartController=require("../controller/user/cartController")
 const checkoutController=require("../controller/user/checkoutController");
 const orderController=require("../controller/user/orderController")
 const orderdetailController=require('../controller/user/orderDetailController');
+const wishlistController=require('../controller/user/wishlistController');
+
 
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -52,7 +54,8 @@ req.session.user = {
       _id: req.user._id.toString(),
       name: req.user.name,
       email: req.user.email,
-      phone: req.user.phone || null
+      phone: req.user.phone || null,
+       googleId: req.user.googleId || null,
     };
         res.redirect('/');
   }
@@ -60,15 +63,15 @@ req.session.user = {
 //logout
 router.post('/logout',userController.logout);
 
-router.get(
-  '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/signup' }),
-  userController.googleAuthSuccess  
-);
+
 //profile page
 router.get('/profile', isLoggedIn,upload.avatar, profileController.getProfile);
 router.get('/profile/edit',upload.avatar,profileController.getEditProfile);
-router.post('/profile/update', upload.avatar, profileController.postEditProfile);
+router.post('/profile/update', upload.avatar, profileController.updateProfile);
+router.post('/request-email-change',profileController.requestEmailChangeOTP);
+router.post('/change-password',profileController.changePassword);
+router.post('/verify-email-change',profileController.verifyEmailChange);
+
 //shopall
 router.get("/shopAll",shopController.loadShopping);
 router.post('/shopall/filter',shopController.applyFilters);
@@ -89,6 +92,7 @@ router.post('/cart/update',cartController.updateCart);
 
 //checkout page
 router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
+router.post('/buy-now',checkoutController.buyNow);
 //address checkout page 
 router.post('/api/addresses',checkoutController.addAddress);
 router.put('/api/addresses/:id',checkoutController.updateAddress);
@@ -104,6 +108,13 @@ router.get('/order-success/:orderId',checkoutController.successPage);
 router.get('/orders',orderController.getOrderHistory);
 //order detail page
 router.get('/orders-details/:orderId',orderdetailController.getOrderDetails);
-//invoice
+router.post('/orders/:orderId/return',orderdetailController.returnOrder);
 router.get('/orders/:orderId/invoice',orderdetailController.invoice);
+router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
+router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
+//wishlist page
+router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
+router.post('/wishlist/add-to-cart/:itemId',wishlistController.addToCartFromWishlist);
+
+
 module.exports = router;

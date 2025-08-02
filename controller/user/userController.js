@@ -142,6 +142,7 @@ const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
     const otp = generateOtp();
+    console.log("otp:",otp);
 
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
@@ -164,17 +165,17 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp, email } = req.body;
-    // if (
-    //   !req.session.userOtp ||
-    //   !req.session.userData ||
-    //   req.session.userData.email !== email ||
-    //   req.session.userOtp !== otp ||
-    //   Date.now() > req.session.otpExpires
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "Invalid or expired OTP" });
-    // }
+    if (
+      !req.session.otp ||
+      !req.session.userData ||
+      req.session.userData.email !== email ||
+      req.session.otp !== otp ||
+      Date.now() > req.session.otpExpires
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired OTP" });
+    }
     const { name, phone, password } = req.session.userData;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -256,7 +257,8 @@ const login = async (req, res) => {
       name: findUser.name, 
       email: findUser.email,
       isAdmin: findUser.isAdmin,
-      // Add other user details you need in the session
+       googleId: findUser.googleId || null  
+   
     };
 
     
