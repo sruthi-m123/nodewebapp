@@ -222,7 +222,6 @@ ${
   });
 }
 
-// Helper function for rendering star rating
 function generateStarRating(rating) {
   let stars = '';
   for (let i = 0; i < 5; i++) {
@@ -268,59 +267,57 @@ if (checkbox.length === 0 && selectedAvailability.length === 0) {
 });
 
 });
-document.querySelectorAll('.add-to-cart').forEach(button=>{
- button.addEventListener('click',async()=>{
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('.add-to-cart')) {
+    const button = e.target.closest('.add-to-cart');
     const productId = button.dataset.id;
-  const quantity=1;
+    const quantity = 1;
 
-  try {
-    const response=await fetch(`/user/cart/add/${productId}`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({productId,quantity})
-    });
+    try {
+      const response = await fetch(`/user/cart/add/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId, quantity })
+      });
 
-    const data=await response.json();
-    
-
+      const data = await response.json();
+      
       if (response.status === 401) {
-         Swal.fire({
-    icon: 'warning',
-    title: 'Login Required',
-    text: data.message || 'Please login to continue.',
-    confirmButtonText: 'OK'
-  });
-  return;
-    
-      }else if(response.ok){
-      Swal.fire({
-  toast: true,
-  position: 'top-end',
-  icon: 'success',
-  title: 'Added to cart',
-  text:data.message||'Product successfully added to cart.',
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
-
-    }else{
+        Swal.fire({
+          icon: 'warning',
+          title: 'Login Required',
+          text: data.message || 'Please login to continue.',
+          confirmButtonText: 'OK'
+        });
+        return;
+      } else if (response.ok) {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Added to cart',
+          text: data.message || 'Product successfully added to cart.',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+        updateCartCount();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Failed to add product to cart.'
+        });
+      }
+    } catch (error) {
+      console.log(error);
       Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: data.message || 'Failed to add product to cart.'
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.'
       });
     }
-  } catch (error) {
-    console.log(error)
-     Swal.fire({
-      icon: 'error',
-      title: 'Oops!',
-      text: 'Something went wrong. Please try again.'
-    });
   }
-  
 });
-})

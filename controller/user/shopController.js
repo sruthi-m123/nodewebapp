@@ -7,7 +7,7 @@ const User = require("../../models/userSchema");
 
 const loadShopping = async (req, res) => {
   try {
-    const filters = { isDeleted: false }; //base filter
+    const filters = { isDeleted: false }; 
     //availability
     if (req.query.availability === "In Stock") {
       filters.stock = { $gt: 0 };
@@ -35,16 +35,26 @@ const loadShopping = async (req, res) => {
       };
     }
 
-    //combining all the filters and search
+    
     let userData = null;
+    const limit=6;
+    const page=parseInt(req.query.page)||1;
+    
+    const totalProducts=await Product.countDocuments();
+    const totalPages=Math.ceil(totalProducts/limit);
     if (req.session.user) {
       userData = await User.findById(req.session.user._id);
     }
     const categories = await Category.find({ isDeleted: false });
+
+
     const products = await Product.find({
       ...filters,
       ...searchQuery,
-    }).populate("category");
+    })
+    .skip((page-1)*limit)
+    .limit(limit)
+    .populate("category");
     return res.render("user/shopall", {
 
       pageCSS: "user/shopall.css",
@@ -54,7 +64,9 @@ const loadShopping = async (req, res) => {
          currentPath: req.path,
       products,
       categories,
-      isProductDetail: false
+      isProductDetail: false,
+      totalPages,
+      currentPage:page
     });
   } catch (error) {
     console.log("shopping page not loading:", error);

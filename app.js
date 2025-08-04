@@ -61,6 +61,8 @@ app.use(async (req, res, next) => {
   next();
 });
 
+
+
 app.use(passport.initialize());
 // app.use(passport.session());
 app.use(methodOverride('_method'));
@@ -81,6 +83,8 @@ app.use("/admin", adminRouter);
 app.get("/error", (req, res) => {
   res.status(500).render("user/error", { message: "something went wrong!" });
 });
+
+
 
 app.use((req, res) => {
   res.status(404).render("user/pageNotFound");

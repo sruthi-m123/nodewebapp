@@ -137,13 +137,24 @@
   <% } %>
 </div>
 
-    <div class="pagination">
-      <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
-      <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
-    </div>
-  </div>
+   <div class="pagination">
+  <!-- Previous button -->
+  <button class="page-btn" <%= currentPage === 1 ? 'disabled' : '' %> onclick="window.location.href='?page=<%= currentPage - 1 %>'">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+
+  <!-- Page number buttons -->
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <button class="page-btn <%= currentPage === i ? 'active' : '' %>" onclick="window.location.href='?page=<%= i %>'">
+      <%= i %>
+    </button>
+  <% } %>
+
+  <!-- Next button -->
+  <button class="page-btn" <%= currentPage === totalPages ? 'disabled' : '' %> onclick="window.location.href='?page=<%= currentPage + 1 %>'">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+</div>
+
 </section>
 

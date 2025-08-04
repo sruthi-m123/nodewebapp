@@ -115,6 +115,7 @@ router.post('/orders/:orderId/process-return',orderdetailController.processRetur
 //wishlist page
 router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
 router.post('/wishlist/add-to-cart/:itemId',wishlistController.addToCartFromWishlist);
-
+//cart count
+router.get('/cart/count',cartController.cartCount);
 
 module.exports = router;

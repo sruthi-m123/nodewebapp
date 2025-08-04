@@ -48,52 +48,18 @@ window.addEventListener("click",(e)=>{
       .catch(err => console.error('Logout failed:', err));
   });
 
-document.querySelectorAll('.add-to-cart').forEach(button => {
-  button.addEventListener('click', async function () {
-    const productId = this.dataset.id;
 
-    try {
-      const response = await fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ productId })
-      });
+async function updateCartCount(){
+  try{
+const response=await fetch('/cart/count');
+const data=await response.json();
+const countElement=document.querySelector('.cart-count');
+if(countElement){
+  countElement.textContent=data.count;
+}
 
-      const data = await response.json();
-
-      if (response.status === 401) {
-        // 🧁 SweetAlert with clickable login link
-        Swal.fire({
-          icon: 'info',
-          title: 'Please login to continue',
-          html: 'You need to be logged in to add items to cart.<br><br><a href="/user/login" style="color: #3085d6; text-decoration: underline;">Click here to login</a>',
-          showConfirmButton: false,
-          timer: 4000
-        });
-      } else if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Added to cart!',
-          timer: 1500,
-          showConfirmButton: false
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops!',
-          text: data.message || 'Something went wrong'
-        });
-      }
-
-    } catch (err) {
-      console.error('Error:', err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops!',
-        text: 'Something went wrong'
-      });
-    }
-  });
-});
+  }catch(error){
+console.error('Faild to fetch cart count:',error);
+  }
+}
+document.addEventListener('DOMContentLoaded', updateCartCount);
