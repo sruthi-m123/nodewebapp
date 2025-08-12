@@ -5,8 +5,9 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
-
 const Category = require("../../models/categorySchema");
+const Referral=require("../../models/referralSchema");
+const Wallet=require("../../models/walletSchema");
 
 
 const pageNotFound = async (req, res) => {
@@ -25,7 +26,8 @@ const loadHomepage = async (req, res) => {
     console.log("reached home page ");
     let userData = null;
     if (req.session.user) {
-      userData = await User.findById(req.session.user._id);
+      userData = await User.findById(req.session.user.id);
+      console.log("userdata in home page",userData);
     }
 
     const categories = await Category.find({ status: "active" }).limit(4);
@@ -33,8 +35,6 @@ const loadHomepage = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(3);
 console.log("userData:",userData);
-    console.log("Categories:", categories);
-    console.log("Products:", products);
 
     const testimonials = await Testimonial.findOne({ isVisible: true });
         console.log("Testimonials:", testimonials);
@@ -96,47 +96,124 @@ async function sendVerificationEmail(email, otp) {
   }
 }
 
+
 const signup = async (req, res) => {
   try {
-    const { name, phone, email, password, confirmPassword } = req.body;
+    const { name, phone, email, password, confirmPassword, referralCode } = req.body;
+    console.log("referral code:",req.body.referralCode);
 
+    // 1. Password check
     if (password !== confirmPassword) {
-      return res.render("user/signup", { message: "Password do not match" });
+      return res.render("user/signup", { message: "Passwords do not match" });
     }
-    const findUser = await User.findOne({ email });
 
-    if (findUser) {
+    // 2. Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.render("user/signup", {
-        layout:false,
+        layout: false,
         message: "User with this email already exists",
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Prepare session data (not saving user yet)
+    req.session.userData = {
+      name,
+      phone,
+      email,
+      password: hashedPassword,
+    };
+
+    // 4. Handle referral code logic
+    let referralAmount = 100;
+    if (referralCode) {
+      const referringUser = await User.findOne({
+        referralCode: referralCode.toUpperCase(),
+      });
+console.log("refferingUser",referringUser);
+      if (referringUser) {
+        req.session.referralInfo = {
+          referrerId: referringUser._id,
+          amount: referralAmount,
+        };
+
+        // Ensure wallet exists for referrer
+        let wallet = await Wallet.findOne({ user: referringUser._id });
+        const referralRef = `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        if (!wallet) {
+          wallet = await Wallet.create({
+            user: referringUser._id,
+            balance: referralAmount,
+            transactions: [
+              {
+                amount: referralAmount,
+                type: "referral",
+                description: `Referral reward for ${email}`,
+                status: "completed",
+                reference: referralRef,
+                metadata: {
+                  referralMethod: "code",
+                  referredEmail: email,
+                },
+              },
+            ],
+          });
+        } else {
+          wallet.balance += referralAmount;
+          wallet.transactions.push({
+            amount: referralAmount,
+            type: "referral",
+            description: `Referral reward for ${email}`,
+            status: "completed",
+            reference: referralRef,
+            metadata: {
+              referralMethod: "code",
+              referredEmail: email,
+            },
+          });
+          await wallet.save();
+          console.log("wallet info while signup:",wallet);
+        }
+      }
+    }
+
+    // 5. Create OTP and send email
     const otp = generateOtp();
     const emailSent = await sendVerificationEmail(email, otp);
+
     if (!emailSent) {
       return res.render("user/signup", {
-        layout:false,
-        message: "Failed to send OTP.plaease try again.",
-        pageCSS: "singup.css",
-        pageTitle:"Chettinad-Premium sarees"
+        layout: false,
+        message: "Failed to send OTP. Please try again.",
+        pageCSS: "signup.css",
+        pageTitle: "Chettinad-Premium sarees",
       });
     }
+
+    // 6. Save OTP info in session
     req.session.userOtp = otp;
-    req.session.userData = { name, phone, email, password };
     req.session.otpExpires = Date.now() + 5 * 60 * 1000;
+
+    // 7. Render OTP entry page
     res.render("user/generateotp", {
-      layout:false,
+      layout: false,
       email,
       pageCSS: "generateotp.css",
-        pageTitle:"Chettinad-Premium sarees"
+      pageTitle: "Chettinad-Premium sarees",
     });
+
     console.log("OTP Sent", otp);
   } catch (error) {
     console.error("signup error", error);
     res.redirect("/pageNotFound");
   }
 };
+
+
+
 
 const sendOtp = async (req, res) => {
   try {
@@ -166,10 +243,10 @@ const verifyOtp = async (req, res) => {
   try {
     const { otp, email } = req.body;
     if (
-      !req.session.otp ||
+      !req.session.userOtp ||
       !req.session.userData ||
       req.session.userData.email !== email ||
-      req.session.otp !== otp ||
+      req.session.userOtp !== String(otp) ||
       Date.now() > req.session.otpExpires
     ) {
       return res
@@ -185,6 +262,19 @@ const verifyOtp = async (req, res) => {
       password: hashedPassword,
     });
     await newUser.save();
+    await Wallet.create({
+      user: newUser._id,
+      balance: 0,
+      transactions: [
+        {
+          amount: 0,
+          type: "initial",
+          description: "Wallet created",
+          status: "completed",
+          reference: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        },
+      ],
+    });
 
     req.session.userOtp = null;
     req.session.userData = null;
@@ -230,60 +320,133 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
-    res.render("user/login",{ layout:false, pageTitle:"Chettinad-Premium sarees"});
+    res.render("user/login",{ layout:false, pageTitle:"Chettinad-Premium sarees",message:null});
   } catch (error) {
     console.error("Error rendering login page:", error);
     res.redirect("/pageNotFound");
   }
 };
 
+// const login = async (req, res) => {
+//   console.log("enter the controller");
+//   try {
+//     const { email, password } = req.body;
+//     console.log("req.body", req.body);
+//      console.log("🔍 Input password:", password);
+//     console.log("🔍 Input password type:", typeof password);
+//     console.log("🔍 Input password length:", password.length);
+    
+    
+//     const findUser = await User.findOne({ isAdmin: 0, email: email });
+//     console.log("founded user:", findUser);
+    
+//     if (!findUser) {
+//       return res.render("user/login", { layout: false, message: "User not found" });
+//     }
+    
+//     if (findUser.isBlocked) {
+//       return res.render("user/login", { layout: false, message: "User is blocked by admin" });
+//     }
+//      console.log("🔍 Stored hash:", findUser.password);
+//     console.log("🔍 Hash length:", findUser.password.length);
+//     console.log("🔍 Hash starts with $2b$:", findUser.password.startsWith('$2b$'));
+    
+//     const passwordMatch = await bcrypt.compare(password, findUser.password);
+//     console.log("passwordmatch",passwordMatch);
+
+// // const testHash = await bcrypt.hash("1234567a", 10);
+// // console.log("Generated Hash:", testHash);
+// // console.log("Matches Stored Hash:", testHash === findUser.password);
+
+
+//     if (!passwordMatch) {
+//       return res.render("user/login", { layout: false, message: "Incorrect password" });
+//     }
+
+//     // Set session data
+//     req.session.user = {
+//       id: findUser._id,
+//       name: findUser.name, 
+//       email: findUser.email,
+//       isAdmin: findUser.isAdmin,
+//       googleId: findUser.googleId || null  
+//     };
+
+//     console.log("✅ Session data set:", req.session.user);
+//     console.log("🔄 Redirecting to home page");
+    
+//     // Direct redirect - session middleware will save automatically
+//     res.redirect("/");
+
+//   } catch (error) {
+//     console.error("login error", error);
+//     res.render("user/login", {
+//       layout: false,
+//       message: "Login failed. Please try again later",
+//     });
+//   }
+// };
 const login = async (req, res) => {
+  console.log("enter the controller");
   try {
-    const { email, password } = req.body;
-    const findUser = await User.findOne({ isAdmin: 0, email: email });
+    const { email, password } = req.body || {};
+    const trimmedEmail = email ? email.trim() : '';
+    const trimmedPassword = password ? password.trim() : '';
+
+    console.log("req.body", { email: trimmedEmail, password: trimmedPassword });
+    console.log("🔍 Input email:", trimmedEmail);
+    console.log("🔍 Input password:", trimmedPassword);
+    console.log("🔍 Input password type:", typeof trimmedPassword);
+    console.log("🔍 Input password length:", trimmedPassword.length);
+
+    if (!trimmedEmail || !trimmedPassword) {
+      return res.render("user/login", { layout: false, message: "Email and password are required" });
+    }
+
+    const findUser = await User.findOne({ isAdmin: 0, email: trimmedEmail });
+    console.log("🔍 Retrieved user from DB:", findUser);
+
     if (!findUser) {
-      return res.render("user/login", {layout:false, message: "User not found" });
+      return res.render("user/login", { layout: false, message: "User not found" });
     }
+
     if (findUser.isBlocked) {
-      return res.render("login", { layout:false,message: "User is blocked by admin" });
+      return res.render("user/login", { layout: false, message: "User is blocked by admin" });
     }
-    const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+    console.log("🔍 Stored hash:", findUser.password);
+    console.log("🔍 Hash length:", findUser.password.length);
+    console.log("🔍 Hash starts with $2b$:", findUser.password.startsWith('$2b$'));
+
+    const passwordMatch = await bcrypt.compare(trimmedPassword, findUser.password);
+    console.log("🔍 Password match result:", passwordMatch);
+
     if (!passwordMatch) {
-      return res.render("login", { layout:false,message: "Incorrect password" });
+      return res.render("user/login", { layout: false, message: "Incorrect password" });
     }
-    // Properly set session with user details
+
     req.session.user = {
-      _id: findUser._id,
-      name: findUser.name, 
+      id: findUser._id,
+      name: findUser.name,
       email: findUser.email,
       isAdmin: findUser.isAdmin,
-       googleId: findUser.googleId || null  
-   
+      googleId: findUser.googleId || null
     };
 
-    
+    console.log("✅ Session data set:", req.session.user);
+    console.log("🔄 Redirecting to home page");
 
-    
-    // Explicitly save the session
-    req.session.save((err) => {
-      if (err) {
-        console.error("Session save error:", err);
-        return res.render("user/login", {
-          layout:false,
-          message: "Login failed. Please try again.",
-        });
-      }
-      res.redirect("/");
-    });
+    res.redirect("/");
+
   } catch (error) {
-    console.error("login error", error);
+    console.error("login error", error.message, error.stack);
     res.render("user/login", {
-      layout:false,
-      message: "login failed.please try again later ",
-    
+      layout: false,
+      message: "Login failed. Please try again later",
     });
   }
 };
+
 
 const loadGenerateotp = (req, res) => {
   res.render("user/generateotp",{layout:false});
@@ -470,27 +633,6 @@ const resetforgotPassword = async (req, res) => {
 };
 
 
-const googleAuthSuccess = async (req, res) => {
-  if (!req.user) {
-    return res.redirect("/login");
-  }
-
-  req.session.user = {
-    _id: req.user._id,
-    email: req.user.email,
-    isAdmin: req.user.isAdmin || 0,
-    name: req.user.name,
-    // add any other details you need in session
-  };
-
-  req.session.save((err) => {
-    if (err) {
-      console.error("Session save error:", err);
-      return res.redirect("/login");
-    }
-    res.redirect("/");
-  });
-};
 
 const logout=async (req,res)=>{
   req.session.destroy((err)=>{
@@ -506,14 +648,11 @@ const logout=async (req,res)=>{
 
 
 
-
-
 module.exports = {
   loadHomepage,
   pageNotFound,
   loadSignup,
-  
-  signup,
+    signup,
   loadLogin,
   loadGenerateotp,
   resendOtp,
@@ -528,10 +667,6 @@ module.exports = {
   verifyOTP,
   resendForgotOtp,
   resetforgotPassword,
-    googleAuthSuccess,
-  
-  logout,
-  
-  
-};
+    logout,
+   };
 

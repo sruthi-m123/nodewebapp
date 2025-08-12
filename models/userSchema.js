@@ -48,20 +48,29 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Cart"
   },
-  wallet: {
-    type: Number,
-    default: 0
-  },
-  wishlist: [{
-    type: Schema.Types.ObjectId,
-    ref: "Wishlist"
-  }],
+  
+
   orderHistory: [{
     type: Schema.Types.ObjectId,
     ref: "Order"
   }],
-  referalCode: {
-    type: String
+  referralCode: {
+    type: String,
+    unique:true,
+    uppercase:true
+  },
+  referredBy:{
+    type:Schema.Types.ObjectId,
+    ref:"User"
+  },
+  referralStats:{
+     totalReferrals: { type: Number, default: 0 },
+  successfulReferrals: { type: Number, default: 0 },
+  earnedRewards: { type: Number, default: 0 }
+  },
+  wishlist:{
+    type:Schema.Types.ObjectId,
+    ref:"Wishlist"
   },
   redeemed: {
     type: Boolean
@@ -94,6 +103,13 @@ userSchema.pre('save', function (next) {
   }
   next();
 });
+
+userSchema.pre("save",function(next){
+if(!this.referralCode){
+  this.referralCode=this.name.substring(0,3).toUpperCase()+Math.floor(1000+Math.random()*9000);
+}
+next();
+})
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

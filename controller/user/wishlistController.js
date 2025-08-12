@@ -5,43 +5,39 @@ const Product=require('../../models/productSchema');
 
 const getWishlistPage=async (req,res)=>{
   try {
-const userId = req.session?.user?._id;
-if (!userId) {
-      return res.redirect('/login');
-    }
+    console.log("hit the wishcontroller")
+    console.log("this is user in wishlistL",req.session.user);
 
-    const wishlistItems=await Wishlist.find({userId}).populate({
+    if(!req.session.user){
+  return res.redirect('/login');
+}
+
+ 
+const userId = req.session?.user?.id;
+const userData=await User.findById(userId);
+
+
+    const wishlistItems=await Wishlist.find({user:userId}).populate({
         path:'product',
         select:'productName price images sku color',
         match:{isDeleted:false,isBlocked:false}
     });
-
-    if (!wishlistItems || wishlistItems.length === 0) {
-  return res.render('user/wishlist', {
-    wishlistItems: [],
-    user: req.user,
-    itemCount: 0,
-    message: 'No products available in your wishlist.'
-  });
-  
-}
-
-
+console.log("wishlist items:",wishlistItems);
     const validItems=wishlistItems.filter(item=>item.product!==null);
-
-
 
 const formattedItems=validItems.map(item=>({
     id:item._id,
     name:item.product.productName,
     price:item.product.price,
-    // sku:item,product.sku,
     image:item.product.images[0],
     color:item.product.color
 }))
+console.log("formatted items:",formattedItems);
 res.render('user/wishlist',{
+  pageCSS:"user/wishlist.css",
+  pageJS:"user/wishlist.js",
     wishlistItems:formattedItems,
-    user:req.session.user,
+    user:userData,
     itemCount:formattedItems.length,
      message: formattedItems.length === 0 ? 'No valid products in your wishlist.' : null
 });
@@ -53,7 +49,16 @@ res.render('user/wishlist',{
 }
 const addToWishlist=async(req,res)=>{
     try {
-        const{productId}=req.body;
+      console.log("inside the add to wishlist")
+      if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login to add to wishlist",
+      });
+    }
+    const userId=req.session.user?.id;
+        const{productId}=req.params;
+        console.log("params productId:",productId);
         const product=await Product.findOne({
             _id:productId,
             isDeleted:false,
@@ -67,7 +72,7 @@ return res.status(404).json({
 });
         }
 const existingItem=await Wishlist.findOne({
-    user:req.user._id,
+    user:userId,
     product:productId
 })
      if (existingItem) {
@@ -77,7 +82,7 @@ const existingItem=await Wishlist.findOne({
       });
     }
      const newWishlistItem = new Wishlist({
-      user: req.user._id,
+      user: userId,
       product: productId
     });
 
@@ -86,7 +91,7 @@ const existingItem=await Wishlist.findOne({
     res.status(201).json({
       success: true,
       message: 'Product added to wishlist',
-      wishlistCount: await Wishlist.countDocuments({ user: req.user._id })
+      wishlistCount: await Wishlist.countDocuments({ user:userId })
     });
     
 
@@ -103,10 +108,19 @@ const existingItem=await Wishlist.findOne({
 
 const removeFromWishlist=async(req,res)=>{
     try {
-        const {ItemId}=req.params;
-        const item=await Wishlist.fincOneAndDelete({
-            _id:ItemId,
-            user:req.user._id
+        const {itemId}=req.params;
+        
+          const userId=req.session.user?.id;
+          if (!itemId || !userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters'
+      });
+    }
+        
+        const item=await Wishlist.findOneAndDelete({
+            _id:itemId,
+            user:userId
         });
         if(!item){
             return res.status(404).json({
@@ -116,9 +130,9 @@ const removeFromWishlist=async(req,res)=>{
         }
 
         res.json({
-            succcess:true,
-            error:'items removed from the wishlist',
-            wishlistCount:await Wishlist.countDocuments({user:req.user._id})
+            success:true,
+            message:'items removed from the wishlist',
+            wishlistCount:await Wishlist.countDocuments({user:userId})
         })
     } catch (error) {
           console.error('Remove from Wishlist Error:', error);
@@ -133,10 +147,14 @@ const removeFromWishlist=async(req,res)=>{
     const addToCartFromWishlist=async(req,res)=>{
         try {
             const{itemId}=req.params;
+            console.log("itemId",itemId);
+const userId=req.session.user?.id;
+            console.log("userId inside the wishlis add to cart",userId);
             const wishlistItem=await Wishlist.findOne({
                 _id:itemId,
-                user:req.user._id
+                user:userId
             }).populate('product');
+            console.log("wishlist items :",wishlistItem);
 
 if(!wishlistItem||!wishlistItem.product){
     return res.status(404).json({
@@ -154,25 +172,47 @@ if(!wishlistItem||!wishlistItem.product){
         error: 'Product no longer available'
       });
         }
-if (cartItem) {
-      cartItem.quantity += 1;
-      await cartItem.save();
+
+        let cart=await Cart.findOne({userId:userId});
+        const totalPrice=wishlistItem.product.price*1;
+if (cart) {
+      const existingItem=cart.items.find(item=>
+        item.productId.equals(wishlistItem.product._id)
+      );
+
+      if(existingItem){
+        existingItem.quantity+=1;
+      
     } else {
-      cartItem = new Cart({
-        user: req.user._id,
-        product: wishlistItem.product._id,
-        quantity: 1,
-        price: wishlistItem.product.price
-      });
-      await cartItem.save();
+     cart.items.push({
+      productId:wishlistItem.product._id,
+      quantity:1,
+      price:wishlistItem.product.price,
+      totalPrice:wishlistItem.product.price,
+     })
+      await cart.save();
+    }
+  }else{
+      cart=new Cart({
+        userId,
+        items:[
+          {
+            productId:wishlistItem.product._id,
+            quantity:1,
+            price:wishlistItem.product.price,
+            totalPrice:wishlistItem.product.price
+          }
+        ]
+      })
+      await cart.save();
     }
     //remove from the wishlist 
 await Wishlist .findByIdAndDelete(itemId);
 
 //get updated counts
 const[wishlistCount,cartCount]=await Promise.all([
-    Wishlist.countDocuments({user:req.user._id}),
-    Cart.countDocuments({user:req.user._id})
+    Wishlist.countDocuments({user:userId}),
+    Cart.countDocuments({user:userId})
 ]);
 res.json({
     success:true,
@@ -195,7 +235,7 @@ const checkWishlistStatus = async (req, res) => {
     const { productId } = req.params;
 
     const item = await Wishlist.findOne({
-      user: req.user._id,
+      user: req.user.id,
       product: productId
     });
 

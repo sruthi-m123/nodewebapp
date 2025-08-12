@@ -205,7 +205,7 @@ function setupPaymentSelection() {
 
 // Offer Functions
 function applyOffer(offerId) {
-    fetch('/api/offers/apply', {
+    fetch(`/api/offers/apply`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -215,13 +215,11 @@ function applyOffer(offerId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update the UI to show the offer is applied
             const offerBtn = document.querySelector(`.apply-offer-btn[onclick*="${offerId}"]`);
             offerBtn.textContent = 'Applied';
             offerBtn.classList.add('applied');
             offerBtn.setAttribute('onclick', `removeOffer('${offerId}')`);
             
-            // Update the order summary with the discount
             updateOrderSummary(data.offer);
         } else {
             alert(data.message || 'Error applying offer');
@@ -242,23 +240,33 @@ function removeOffer(offerId) {
     updateOrderSummary(null, offerId);
 }
 
-function updateOrderSummary(offer = null, removedOfferId = null) {
-    
-    const subtotal = parseFloat(document.querySelector('.summary-row span:last-child').textContent.replace('₹', ''));
-    let discount = 0;
-    
+function updateOrderSummary(offer = null) {
+    const getRowValue = (label) => {
+        const row = [...document.querySelectorAll('.summary-row')]
+            .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
+        return row ? parseFloat(row.querySelector('span:last-child').textContent.replace('₹', '').replace('-', '')) || 0 : 0;
+    };
+
+    const setRowValue = (label, value, isNegative = false) => {
+        const row = [...document.querySelectorAll('.summary-row')]
+            .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
+        if (row) {
+            row.querySelector('span:last-child').textContent = `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
+        }
+    };
+
+    const subtotal = getRowValue('Subtotal');
+    const delivery = getRowValue('Delivery');
+    const tax = getRowValue('Tax (GST 18%)');
+    let discount = getRowValue('Discount');
+
     if (offer) {
-        discount += offer.discountAmount || 0;
+        discount = offer.discountAmount || 0;
+        setRowValue('Discount', discount, true);
     }
-    
-    document.querySelector('.summary-row:nth-child(4) span:last-child').textContent = `-₹${discount.toFixed(2)}`;
-    
-    // Recalculate total
-    const delivery = parseFloat(document.querySelector('.summary-row:nth-child(2) span:last-child').textContent.replace('₹', ''));
-    const tax = parseFloat(document.querySelector('.summary-row:nth-child(3) span:last-child').textContent.replace('₹', ''));
+
     const total = subtotal + delivery + tax - discount;
-    
-    document.querySelector('.summary-row.total span:last-child').textContent = `₹${total.toFixed(2)}`;
+    setRowValue('TOTAL', total);
 }
 
 // Place Order Function

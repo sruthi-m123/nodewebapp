@@ -1,89 +1,74 @@
+// Event Delegation for dynamic elements
+document.addEventListener('click', async (e) => {
+  // Handle remove button clicks
+  if (e.target.classList.contains('remove-btn')) {
+    e.preventDefault();
+    const itemId = e.target.getAttribute('data-id');
+    await removeFromWishlist(itemId);
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Add to cart buttons
-  document.querySelectorAll('.add-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const itemId = this.getAttribute('data-id');
-      addToCart(itemId);
-    });
-  });
-  
-  // Remove buttons
-  document.querySelectorAll('.remove-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const itemId = this.getAttribute('data-id');
-      removeFromWishlist(itemId);
-    });
-  });
+  // Handle add to cart button clicks
+  if (e.target.classList.contains('add-btn')) {
+    e.preventDefault();
+    const itemId = e.target.getAttribute('data-id');
+    await addToCart(itemId);
+  }
 });
 
-function addToCart(itemId) {
-  fetch(`/wishlist/add-to-cart/${itemId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.error) {
-      alert(data.error);
-    } else {
-      alert(data.message);
-      // Optionally update the UI or redirect
-      window.location.reload();
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
-
-function removeFromWishlist(itemId) {
-  fetch(`/wishlist/remove/${itemId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.error) {
-      alert(data.error);
-    } else {
-      // Remove the item from the DOM or reload
-      window.location.reload();
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
- document.querySelectorAll('.wishlist-btn').forEach(button => {
-    button.addEventListener('click', function () {
-      const productId = this.getAttribute('data-id');
-      addToWishlist(productId);
+async function removeFromWishlist(itemId) {
+  try {
+    const response = await fetch(`/user/wishlist/remove/${itemId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
     });
-  });
 
+    const data = await response.json();
 
-function addToWishlist(productId) {
-  fetch(`/wishlist/add/${productId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to remove item');
     }
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.error) {
-      alert(data.error);
-    } else {
-      alert(data.message);
-      // Optionally refresh or update icon
+
+    // Remove item from UI
+    const itemElement = document.querySelector(`tr[data-id="${itemId}"]`);
+    if (itemElement) {
+      itemElement.remove();
+      
+      // Update counter from response
+      const counter = document.querySelector('.wishlist-summary span');
+      if (counter) {
+        counter.textContent = `${data.wishlistCount} items in wishlist`;
+      }
+      
+      // Reload if wishlist is empty
+      if (data.wishlistCount === 0) {
+        window.location.reload();
+      }
     }
-  })
-  .catch(error => {
-    console.error('Error adding to wishlist:', error);
-  });
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message);
+  }
+}
+
+async function addToCart(itemId) {
+  try {
+    const response = await fetch(`/user/wishlist/add-to-cart/${itemId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to add to cart');
+    }
+
+    alert(data.message || 'Item added to cart');
+    window.location.reload(); // Refresh to update cart count
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message);
+  }
 }

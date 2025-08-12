@@ -105,7 +105,7 @@
                                 <div class="offer-code"><%= offer.code ? 'Code: ' + offer.code : 'T&C Apply' %></div>
                             </div>
                             <button class="apply-offer-btn <%= offer.applied ? 'applied' : '' %>" 
-                                    onclick="<%= offer.applied ? 'removeOffer(\'' + offer.id + '\')' : 'applyOffer(\'' + offer.id + '\')' %>">
+                                    onclick="<%= offer.applied ? 'removeOffer(\'' + offer._id + '\')' : 'applyOffer(\'' + offer._id + '\')' %>">
                                 <%= offer.applied ? 'Applied' : 'Apply' %>
                             </button>
                         </div>
@@ -182,26 +182,7 @@
 
     </div>
 
-    <!-- Order Success Page -->
-    <!-- Success Modal -->
-<!--      
-<% if (orderPlaced) { %>
-<div class="modal-overlay" id="successModal">
-  <div class="modal-content">
-<span class="close-btn" id="closeOrderSuccessModal">&times;</span>
-    <div class="success-icon">✓</div>
-    <h1 class="success-title">Order Placed Successfully!</h1>
-    <p class="success-message">
-      Thank you for your purchase! Your order has been confirmed and will be delivered to your selected address.
-      You will receive a confirmation email with your order details shortly.
-    </p>
-    <div class="success-buttons">
-      <a href="/orders/<%= orderId || '' %>" class="success-btn primary">View Order Details</a>
-      <a href="/shop" class="success-btn secondary">Continue Shopping</a>
-    </div>
-  </div>
-</div>
-<% } %> -->
+    
 
 
     <!-- Add/Edit Address Modal -->

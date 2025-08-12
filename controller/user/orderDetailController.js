@@ -9,7 +9,7 @@ const getOrderDetails = async (req, res) => {
     console.log("👉 Inside the orderDetail controller");
     console.log(req.session.user)
 
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     const orderId = req.params.orderId;
 
     console.log("User ID:", userId);

@@ -399,11 +399,20 @@
 
       
       
-      const formData = new FormData(this);
+      const formData = new FormData();
+      formData.append('productName', document.getElementById('productName').value);
+  formData.append('sku', document.getElementById('sku').value);
+  formData.append('category', document.getElementById('category').value);
+  formData.append('price', document.getElementById('price').value);
+  formData.append('stock', document.getElementById('stock').value);
+  formData.append('color', document.getElementById('color').value);
+  formData.append('description', document.getElementById('description').value);
+  formData.append('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
+  formData.append('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
       
-      // Explicitly handle checkboxes
-      formData.set('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
-      formData.set('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
+      // // Explicitly handle checkboxes
+      // formData.set('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
+      // formData.set('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
 
       if (currentProductId) {
         formData.append('id', currentProductId);
@@ -415,6 +424,10 @@ croppedImages.forEach((blob, index) => {
   formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
 });
       
+if (!currentProductId && croppedImages.length === 0) {
+  alert('Please upload at least one product image');
+  return;
+}
 
       const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
       const method = currentProductId ? 'PUT' : 'POST';
@@ -429,6 +442,10 @@ croppedImages.forEach((blob, index) => {
       })
       .then(data => {
         if (data.success) {
+          croppedImages=[];
+          filesQueue=[];
+          currentFileIndex=0;
+
           location.reload();
         } else {
           alert(data.message || 'Error saving product');
@@ -436,6 +453,11 @@ croppedImages.forEach((blob, index) => {
       })
       .catch(error => {
         console.error('Error saving product:', error);
+
+         croppedImages = [];
+  filesQueue = [];
+  currentFileIndex = 0;
+
         alert('Error saving product');
       });
     });

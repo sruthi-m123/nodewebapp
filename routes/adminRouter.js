@@ -5,6 +5,8 @@ const catController = require("../controller/admin/catController")
 const customerController = require("../controller/admin/customerController")
 const productController = require('../controller/admin/productController');
 const orderController=require('../controller/admin/orderController');
+const offerController=require('../controller/admin/offerController');
+const couponController=require('../controller/admin/couponController');
 const { upload, singleUpload, multiUpload,handleMulterError } = require('../config/multer');
 const { adminAuth } = require("../middlewares/auth");
 
@@ -35,9 +37,7 @@ router.get('/categories/:id/details', adminAuth, catController.getCategory); // 
 
 //product routes
 router.get('/products', adminAuth, productController.renderProducts);
-// router.get('/products/add', adminAuth, productController.renderForm);
 router.post('/addProducts',adminAuth,upload.products,productController.addProduct)
-// router.get('/products/:id', adminAuth, productController.renderEditForm);
 router.put('/products/:id', adminAuth, upload.products, productController.updateProduct);
 router.put('/products/status/:productId',adminAuth,productController.updateProductStatus)
 router.delete('/products/:id', adminAuth, productController.deleteProduct);
@@ -47,5 +47,22 @@ router.get('/orders',adminAuth,orderController.getOrderAdmin);
 router.get('order-details',orderController.getOrder);
 router.post('/orders/:orderId/status',orderController.updateOrderStatus)
 router.post('/orders/:orderId/verify-return',orderController.verifyReturnedRequest);
+router.get('/orders/:orderId/verify-return',orderController.getReturnDetails);
 router.get('/orders/:orderId/view',orderController.getOrderDetails);
+
+//offer managment
+router.get('/offers',offerController.getOfferPage);
+router.post('/offers/add-offer',offerController.createOffer);
+router.delete('/offers/delete-offer/:offerId',offerController.deleteOffer)
+router.get('/offers/get-offer/:id',offerController.getEditOffer);
+router.put('/offers/update-offer/:id',offerController.updateOffer);
+
+//coupon managment
+
+router.get('/coupons',couponController.getCouponPage);
+router.post('/coupons/add-coupon',couponController.createCoupon);
+router.get('/coupons/:id',couponController.getCouponById);
+router.put('/coupons/edit-coupon/:id',couponController.updateCoupon);
+router.delete('/coupons/delete-coupon/:id',couponController.deleteCoupon);
+
 module.exports = router;

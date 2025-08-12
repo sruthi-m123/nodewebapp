@@ -119,7 +119,7 @@
             <p class="product-price">₹<%= product.price.toLocaleString() %></p>
           </div>
           <div class="product-actions">
-            <button class="wishlist-btn" title="Add to wishlist">
+            <button class="wishlist-btn" data-product-id="<%= product._id %>"  title="Add to wishlist">
               <i class="far fa-heart"></i>
             </button>
 <% if (product.stock === 0) { %>

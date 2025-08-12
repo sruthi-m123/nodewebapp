@@ -83,7 +83,7 @@
 }
 
 .action-buttons {
-  display: flex;
+  /* display: flex; */
   gap: 12px;
 }
 

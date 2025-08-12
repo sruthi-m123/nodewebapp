@@ -1,6 +1,6 @@
 // controllers/checkoutController.js
 const mongoose = require("mongoose");
-
+const User=require('../../models/userSchema');
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const Cart = require('../../models/cartSchema');
@@ -10,7 +10,12 @@ const Offer = require('../../models/offerSchema');
 exports.getCheckoutPage = async (req, res) => {
     try {
         console.log("inside checkout controller");
-        const userId = req.session.user._id;
+        if(!req.session.user){
+            return res.status(401).json({ error: "Please log in to proceed to checkout" });
+        }
+        const userId = req.session.user.id;
+
+        const userData= await User.findById(userId);
         
         const addresses = await Address.find({ userId }).lean();
         
@@ -98,20 +103,19 @@ if(stockValidationFailed){
         const discount = 0;
         const total = subtotal + delivery + tax - discount;
         
-        // Get available offers
         const offers = await Offer.find({
-            $or: [
-                { userSpecific: userId },
-                { userSpecific: null }
-            ],
-            validUntil: { $gte: new Date() }
-        }).lean();
+startDate: { $lte: new Date() },       
+  endDate: { $gte: new Date() },            
+  isActive: true       
+ }).lean();
+
+        console.log("offers in checkout:",offers);
         
         // Payment methods
         const paymentMethods = [
-            { id: 'credit_card', title: 'Credit Card', icon: '💳', description: 'Pay with your credit card' },
-            { id: 'debit_card', title: 'Debit Card', icon: '💳', description: 'Pay with your debit card' },
-            { id: 'upi', title: 'UPI', icon: '📱', description: 'Pay using any UPI app' },
+            // { id: 'credit_card', title: 'Credit Card', icon: '💳', description: 'Pay with your credit card' },
+            // { id: 'debit_card', title: 'Debit Card', icon: '💳', description: 'Pay with your debit card' },
+            // { id: 'upi', title: 'UPI', icon: '📱', description: 'Pay using any UPI app' },
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
         ];
@@ -122,7 +126,7 @@ if(stockValidationFailed){
             pageJS: 'user/checkout.js',
             addresses,
             cartItems,
-            fromCart, // Pass whether items are from cart or buy now
+            fromCart, 
             subtotal,
             delivery,
             taxRate,
@@ -133,7 +137,8 @@ if(stockValidationFailed){
             paymentMethods,
             selectedPayment: '',
             selectedPaymentMethod: 'Cash on Delivery',
-            appliedOffers: []
+            appliedOffers: [],
+            user:userData
         });
         
     } catch (error) {
@@ -145,12 +150,12 @@ exports.addAddress = async (req, res) => {
     try {
 const user = req.session?.user;
 
-if (!user || !user._id) {
+if (!user || !user.id) {
     console.log(" No active user session.");
     return res.status(401).json({ success: false, message: 'User not logged in' });
 }
 
-const userId = user._id;  
+const userId = user.id;  
 console.log("rwq body:",req.body)   
    const { 
             name, 
@@ -205,7 +210,7 @@ exports.updateAddress = async (req, res) => {
     try {
         const user = req.session?.user;
 
-        if (!user || !user._id) {
+        if (!user || !user.id) {
             console.log(" No active user session.");
             return res.status(401).json({ success: false, message: 'User not logged in' });
         }
@@ -235,7 +240,7 @@ exports.updateAddress = async (req, res) => {
 
 
  const duplicate = await Address.findOne({
-            userId: user._id,
+            userId: user.id,
             "address.phone": phone,
             "address._id": { $ne: new mongoose.Types.ObjectId(addressId) }
         });
@@ -247,16 +252,16 @@ exports.updateAddress = async (req, res) => {
         // Unset existing default if this one is marked as default
         if (isDefault) {
             await Address.updateMany(
-                { userId: user._id, isDefault: true },
+                { userId: user.id, isDefault: true },
                 { $set: { isDefault: false } }
             );
         }
-console.log("userId:",user._id, "| type:", typeof user._id);
+console.log("userId:",user.id, "| type:", typeof user.id);
 console.log("_id:", addressId, "| type:", typeof addressId);
 
       const updatedAddress = await Address.findOneAndUpdate(
   {
-    userId: new mongoose.Types.ObjectId(user._id),
+    userId: new mongoose.Types.ObjectId(user.id),
     "address._id": new mongoose.Types.ObjectId(addressId)
   },
   {
@@ -277,7 +282,7 @@ console.log("_id:", addressId, "| type:", typeof addressId);
 );
 
         if (!updatedAddress) {
-            console.log(`⚠️ No address found for ID: ${addressId} and User: ${user._id}`);
+            console.log(`⚠️ No address found for ID: ${addressId} and User: ${user.id}`);
             return res.status(404).json({ success: false, message: 'Address not found' });
         }
 
@@ -292,7 +297,7 @@ console.log("_id:", addressId, "| type:", typeof addressId);
 
 exports.getAddress = async (req, res) => {
     try {
-        const userId = req.session.user._id;
+        const userId = req.session.user.id;
         const addressId = req.params.id;
         console.log(userId);
         console.log(addressId);
@@ -314,7 +319,8 @@ const address = userData.address.find(addr => addr._id.toString() === addressId)
 
 exports.applyOffer = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = req.session.user.id;
+        console.log("req body i apply offer:",req.body);
         const { offerId } = req.body;
         
         // Get the offer
@@ -346,7 +352,7 @@ exports.applyOffer = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Apply offer error:', error);
+        console.log('Apply offer error:', error);
         res.status(500).json({ success: false, message: 'Error applying offer' });
     }
 };
@@ -355,7 +361,7 @@ exports.placeOrder = async (req, res) => {
     try {
         console.log("inside place order controller")
         console.log("session details:",req.session);
-        const userId = req.session.user._id;
+        const userId = req.session.user.id;
 console.log("req body",req.body);
         const { 
             addressId, 
@@ -524,7 +530,7 @@ await Product.findByIdAndUpdate(productIdForStockUpdate, {
         });
     delete req.session.buyNowItem;
 } else {
-    for (const item of items) {
+    for (const item of order.items) {
        const product= await Product.findById(item.productId);
        if(product.stock<item.quantity){
         throw new Error('insufficent stock for product')

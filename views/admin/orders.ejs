@@ -84,10 +84,12 @@
           </tr>
         </thead>
         <tbody>
+          <!-- <pre><%= JSON.stringify(orders) %></pre> -->
+
           <% if (orders.length > 0) { %>
             <% orders.forEach(order => { %>
-              <tr>
-                <td data-label="ID">#<%= order.id %></td>
+              <tr data-order-id="<%= order.orderId %>">
+                <td data-label="ID">#<%= order.orderId %></td>
                 <td data-label="User"><%= order.user %></td>
                 <td data-label="Date"><%= order.date %></td>
                 <td data-label="Total">₹<%= order.total %></td>
@@ -98,7 +100,7 @@
                 </td>
                 <td data-label="Return Request">
                   <% if (order.status === 'delivered' && order.returnRequest===true) { %>
-                    <button class="verify-btn">
+                    <button class="verify-btn" data-order-id="<%= order._id%>" >
                       <i class="fas fa-check-circle"></i> Verify
                     </button>
                   <% } else { %>
@@ -183,6 +185,49 @@
     </div>
   <% } %>
 </div>
+
+<!-- Return Request Modal -->
+<div class="modal-overlay" id="returnRequestModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Return Request Details</h3>
+      <button type="button" class="close-btn" onclick="closeReturnModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="return-details">
+        <div class="detail-row">
+          <span class="detail-label">Order ID:</span>
+          <span class="detail-value" id="returnOrderId"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Customer:</span>
+          <span class="detail-value" id="returnCustomer"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Order Date:</span>
+          <span class="detail-value" id="returnOrderDate"></span>
+        </div>
+<div class="detail-row">
+  <span class="detail-label">Order Total:</span>
+  <span class="detail-value" id="returnOrderTotal"></span>
+</div>
+        <div class="detail-row">
+          <span class="detail-label">Return Reason:</span>
+          <span class="detail-value" id="returnReason"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Additional Notes:</span>
+          <span class="detail-value" id="returnNotes"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" onclick="processReturn('reject')">Reject Return</button>
+      <button type="button" class="btn btn-success" onclick="processReturn('approve')">Approve Return</button>
+    </div>
+  </div>
+</div>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     console.log("script added");
@@ -308,42 +353,108 @@ console.log("orderId:",orderId);
 
 
 
-  // Verify Return Request
-  verifyButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const row = this.closest('tr');
-      const orderId = row.querySelector('td:first-child').textContent.substring(1);
-      
-      if (confirm('Approve this return request?')) {
-        fetch(`/admin/orders/${orderId}/verify-return`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ action: 'approve' })
-        })
-        .then(response => {
-          if (!response.ok) throw new Error('Network response was not ok');
-          return response.json();
-        })
-        .then(data => {
-          if (data.error) {
-            alert(`Error: ${data.error}`);
-          } else {
-            // Update the return request cell
-            const returnCell = row.querySelector('td:nth-child(6)');
-            returnCell.innerHTML = '<span class="return-approved">Approved</span>';
-            alert('Return request approved');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to approve return request');
-        });
-      }
-    });
-  });
+// Verify Return Request - Corrected Version
+verifyButtons.forEach(button => {
+  button.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const row = this.closest('tr');
+    const orderId = row.querySelector('td:first-child').textContent.substring(1);
+    const customer = row.querySelector('td:nth-child(2)').textContent;
+    const orderDate = row.querySelector('td:nth-child(3)').textContent;
+    const orderTotal = row.querySelector('td:nth-child(4)').textContent;
 
+    fetch(`/admin/orders/${orderId}/verify-return`)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch return details');
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('returnOrderId').textContent = `#${orderId}`;
+        document.getElementById('returnCustomer').textContent = customer;
+        document.getElementById('returnOrderDate').textContent = orderDate;
+        document.getElementById('returnOrderTotal').textContent = orderTotal;
+        document.getElementById('returnReason').textContent = data.reason || 'Not specified';
+        document.getElementById('returnNotes').textContent = data.notes || 'None';
+
+        document.getElementById('returnRequestModal').dataset.orderId = orderId;
+        document.getElementById('returnRequestModal').classList.add('active');
+      
+      console.log("recieved data:",data);
+
+       document.getElementById('returnOrderId').textContent = `#${orderId}`;
+          document.getElementById('returnCustomer').textContent = customer;
+          document.getElementById('returnOrderDate').textContent = orderDate;
+          document.getElementById('returnOrderTotal').textContent = orderTotal;
+          document.getElementById('returnReason').textContent = data.reason || 'Not specified';
+          document.getElementById('returnNotes').textContent = data.notes || 'None';
+
+           // Store order ID in modal dataset
+          document.getElementById('returnRequestModal').dataset.orderId = orderId;
+          
+          // Show the modal
+          const modal = document.getElementById('returnRequestModal');
+          if (!modal) {
+            throw new Error('Modal element not found in DOM');
+          }
+          modal.classList.add('active');
+          console.log('Modal should now be visible');
+      
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load return details');
+      });
+  });
+});
+});
+
+
+
+function closeReturnModal() {
+  document.getElementById('returnRequestModal').classList.remove('active');
+}
+
+function processReturn(action) {
+  const orderId = document.getElementById('returnRequestModal').dataset.orderId;
+const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+  if (!row) {
+    console.error('Row not found for order:', orderId);
+    return;
+  }
+  // const returnCell=row.querySelector('[data-label="Return Request"]')
+  fetch(`/admin/orders/${orderId}/verify-return`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ action })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('Network response was not ok');
+    return response.json();
+  })
+  .then(data => {
+    if (data.error) {
+      alert(`Error: ${data.error}`);
+    } else {
+      const returnCell = row.querySelector('td:nth-child(6)');
+      returnCell.innerHTML = action === 'approve' 
+        ? '<span class="return-approved">Approved</span>'
+        : '<span class="return-rejected">Rejected</span>';
+      
+      // Hide the verify button
+      const verifyBtn = returnCell.querySelector('.verify-btn');
+      if (verifyBtn) verifyBtn.remove();
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert(`Failed to ${action} return request`);
+  })
+  .finally(() => {
+    closeReturnModal();
+  });
+}
   // Initialize date inputs
   if (startDateInput && endDateInput) {
     const today = new Date().toISOString().split('T')[0];
@@ -357,14 +468,20 @@ console.log("orderId:",orderId);
 
   // Keyboard shortcuts
   document.addEventListener('keydown', function(e) {
-    // Focus search input on Ctrl/Cmd + F
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
       e.preventDefault();
       searchInput.focus();
     }
   });
-});
+// });
 
+// document.querySelector('.verify-btn'.forEach(button=>{
+//   button.addEventListener('click',function(){
+//     const orderRow=this.closest.orderId;
+
+//     document.getElementById('modal')
+//   })
+// }))
 
 </script>
 <%- include('../partials/admin/admin-footer') %>

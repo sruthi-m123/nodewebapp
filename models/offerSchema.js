@@ -6,7 +6,7 @@ const offerSchema = new Schema({
     type: String,
     required: true
   },
-  description: String,
+  // description: String,
 
   code: {
     type: String,
@@ -26,7 +26,7 @@ const offerSchema = new Schema({
     required: true
   },
 
-  minCartValue: {
+  minOrderValue: {
     type: Number,
     default: 0
   },
@@ -54,7 +54,7 @@ const offerSchema = new Schema({
 
   usageLimit: {
     type: Number,
-    default: null // null means unlimited
+    default: null 
   },
 
   usedCount: {

@@ -80,6 +80,7 @@ app.use("/", userRouter);
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 
+
 app.get("/error", (req, res) => {
   res.status(500).render("user/error", { message: "something went wrong!" });
 });

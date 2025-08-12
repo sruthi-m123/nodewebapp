@@ -1,0 +1,189 @@
+.coupon-section {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.coupon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.coupon-section h2 {
+  color: #5D4037; /* Dark brown */
+  margin: 0;
+}
+
+.coupon-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #FFF8F0; /* Very light brown/cream */
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.coupon-table thead {
+  background-color: #D7CCC8; /* Light brown */
+}
+
+.coupon-table th, .coupon-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #EFEBE9; /* Very light brown */
+}
+
+.coupon-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.coupon-table th {
+  font-weight: bold;
+  color: #4E342E; /* Dark brown */
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.action-buttons .edit-btn:hover {
+  color: #8D6E63; /* Medium brown */
+}
+
+.action-buttons .delete-btn:hover {
+  color: #BF360C; /* Reddish brown */
+}
+
+.add-coupon-btn button {
+  background-color: #A1887F; /* Medium-dark brown */
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-coupon-btn button:hover {
+  background-color: #795548; /* Darker brown */
+}
+
+.no-coupons-message {
+  text-align: center;
+  padding: 40px;
+  background-color: #FFF8F0;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  color: #5D4037;
+}
+
+.no-coupons-message p:first-child {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #FFF8F0;
+  margin: 5% auto;
+  padding: 25px;
+  border-radius: 8px;
+  width: 50%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #5D4037;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #BF360C;
+}
+
+#modalTitle {
+  color: #5D4037;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #5D4037;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #D7CCC8;
+  border-radius: 4px;
+  background-color: white;
+  color: #5D4037;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.submit-btn {
+  background-color: #8D6E63;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #6D4C41;
+}
+
+.cancel-btn {
+  background-color: #D7CCC8;
+  color: #5D4037;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background-color: #BCAAA4;
+}

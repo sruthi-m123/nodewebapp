@@ -13,7 +13,7 @@ const checkoutController=require("../controller/user/checkoutController");
 const orderController=require("../controller/user/orderController")
 const orderdetailController=require('../controller/user/orderDetailController');
 const wishlistController=require('../controller/user/wishlistController');
-
+const walletController=require('../controller/user/walletController');
 
 router.get("/", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -51,7 +51,7 @@ router.get('/auth/google/callback',
   }),
   (req, res) => {
 req.session.user = {
-      _id: req.user._id.toString(),
+      id: req.user._id.toString(),
       name: req.user.name,
       email: req.user.email,
       phone: req.user.phone || null,
@@ -91,7 +91,7 @@ router.delete('/cart/remove/:itemId',cartController.removeCartItem);
 router.post('/cart/update',cartController.updateCart);
 
 //checkout page
-router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
+router.get('/checkout', checkoutController.getCheckoutPage);
 router.post('/buy-now',checkoutController.buyNow);
 //address checkout page 
 router.post('/api/addresses',checkoutController.addAddress);
@@ -113,9 +113,15 @@ router.get('/orders/:orderId/invoice',orderdetailController.invoice);
 router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
 router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
 //wishlist page
-router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
+router.get('/wishlist',wishlistController.getWishlistPage);
+router.post('/wishlist/add/:productId',wishlistController.addToWishlist);
 router.post('/wishlist/add-to-cart/:itemId',wishlistController.addToCartFromWishlist);
+router.delete('/wishlist/remove/:itemId',wishlistController.removeFromWishlist);
 //cart count
 router.get('/cart/count',cartController.cartCount);
+
+//wallet routes
+router.get('/wallet',walletController.getWallet);
+router.post('/add-funds',walletController.addFunds);
 
 module.exports = router;

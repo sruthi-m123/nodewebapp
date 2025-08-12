@@ -8,7 +8,7 @@ const getCart = async (req, res) => {
       return res.status(401).json({ message: 'Please login to continue shopping' });
     }
 
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     let cart = await Cart.findOne({ userId }).populate('items.productId');
     
     if (!cart) {
@@ -105,7 +105,8 @@ const addToCart = async (req, res) => {
       return res.status(401).json({ message: 'Please login to continue shopping' });
     }
 
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
+    console.log("userId inside add to cart:",userId);
     const productId = req.params.productId;
     const quantity = parseInt(req.body.quantity);
     const limit = 10;

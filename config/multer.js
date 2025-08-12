@@ -67,6 +67,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes[file.mimetype]) {
     cb(null, true);
   } else {
+     console.warn("❌ Rejected file type:", file.mimetype); 
     cb(new Error(`Invalid file type. Only ${Object.values(allowedTypes).join(', ')} are allowed.`), false);
   }
 };
@@ -75,7 +76,7 @@ const fileFilter = (req, file, cb) => {
 const limits = {
   avatar: { fileSize: 2 * 1024 * 1024 }, // 2MB
   product: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  category: { fileSize: 5 * 1024 * 1024 }, // Updated to 5MB
+  category: { fileSize: 5 * 1024 * 1024 }, //  5MB
   default: { fileSize: 2 * 1024 * 1024 } // 2MB
 };
 
@@ -92,6 +93,7 @@ const upload = {
 
 // Multer error handling middleware
 const handleMulterError = (err, req, res, next) => {
+  console.error("multer /file upolad error:",err);
   if (err instanceof multer.MulterError) {
 
     return res.status(400).json({

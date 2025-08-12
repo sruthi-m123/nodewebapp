@@ -2,7 +2,7 @@ const Order = require('../../models/orderSchema');
 
 const getOrderHistory = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;

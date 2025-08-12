@@ -11,12 +11,12 @@
     </thead>
     <tbody>
       <% wishlistItems.forEach(item => { %>
-        <tr>
+        <tr data-id="<%=item.id%>">
           <td class="product-info">
             <img src="<%= item.image %>" alt="<%= item.name %>" />
             <div class="product-details">
               <span class="product-name"><%= item.name %></span>
-              <span class="product-code">SKU: <%= item.sku %></span>
+              <!-- <span class="product-code">SKU: <%= item.sku %></span> -->
             </div>
           </td>
           <td class="price">Rs.<%= item.price %></td>
@@ -38,4 +38,3 @@
   </table>
 </div>
 
-<link rel="stylesheet" href="/css/wishlist.css">

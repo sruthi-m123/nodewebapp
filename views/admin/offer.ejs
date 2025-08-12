@@ -1,0 +1,724 @@
+<%- include('../partials/admin/admin-header') %>
+<link rel="stylesheet" href="/css/admin/offer.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="container mt-5">
+  <h3 class="page-title">Offers Management</h3>
+
+  <!-- Search and Add Offer Button -->
+  <div class="search-add-container mb-4">
+    <input type="text" class="form-control search-input" placeholder="Search offers..." id="offerSearch" />
+    <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addOfferModal">
+      ADD OFFER <i class="fas fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- Conditional Rendering -->
+  <% if (offers && offers.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table offers-table">
+        <thead>
+          <tr>
+            <th>NO</th>
+            <th>ICON</th>
+            <th>TITLE</th>
+            <th>CODE</th>
+            <th>TYPE</th>
+            <th>APPLICABLE TO</th>
+            <th>DISCOUNT</th>
+            <th>VALIDITY</th>
+            <th>USAGE</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% offers.forEach(function(offer, index) { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><i class="fas fa-tag"></i></td>
+              <td><%= offer.title %></td>
+              <td><code><%= offer.code %></code></td>
+              <td>
+                <span class="badge <%= (offer.type === 'percentage') ? 'bg-info' : 'bg-warning' %>">
+                  <%= offer.type.toUpperCase() %>
+                </span>
+              </td>
+              <td>
+                <% if (offer.applicableTo === 'all') { %>
+                  <span class="badge bg-primary">ALL PRODUCTS</span>
+                <% } else { %>
+                  <span class="badge bg-secondary">
+                    <%= offer.applicableTo.toUpperCase() %> (<%= offer.applicableItems.length %>)
+                  </span>
+                <% } %>
+              </td>
+              <td>
+                <%= (offer.type === 'percentage') ? 
+                    offer.discountValue + '%' : 
+                    '₹' + offer.discountValue %>
+                <% if (offer.maxDiscount && offer.type === 'percentage') { %>
+                  <br><small>(Max ₹<%= offer.maxDiscount %>)</small>
+                <% } %>
+              </td>
+              <td>
+                <%= new Date(offer.startDate).toLocaleDateString() %> - 
+                <%= new Date(offer.endDate).toLocaleDateString() %>
+                <% if (new Date(offer.endDate) < new Date()) { %>
+                  <br><span class="badge bg-danger">EXPIRED</span>
+                <% } %>
+              </td>
+              <td>
+                <%= offer.usedCount %> / 
+                <%= offer.usageLimit ? offer.usageLimit : '∞' %>
+              </td>
+              <td>
+                <span class="badge <%= (offer.isActive) ? 'bg-success' : 'bg-secondary' %>">
+                  <%= (offer.isActive) ? 'ACTIVE' : 'INACTIVE' %>
+                </span>
+              </td>
+              <td class="actions">
+                <button class="btn btn-sm btn-edit" data-id="<%= offer._id %>">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-delete" data-id="<%= offer._id %>">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+          <a class="page-link" href="?type=<%= offerType %>&page=<%= currentPage - 1 %>">«</a>
+        </li>
+        <% for(let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= (currentPage === i) ? 'active' : '' %>">
+            <a class="page-link" href="?type=<%= offerType %>&page=<%= i %>"><%= i %></a>
+          </li>
+        <% } %>
+        <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
+          <a class="page-link" href="?type=<%= offerType %>&page=<%= currentPage + 1 %>">»</a>
+        </li>
+      </ul>
+    </nav>
+  <% } else { %>
+    <div class="text-center py-5 empty-state">
+      <i class="fas fa-tags fa-4x mb-3 text-muted"></i>
+      <h4>No Offers Available</h4>
+      <p class="text-muted">There are currently no <%= (offerType === 'all') ? '' : offerType %> offers. Click "ADD OFFER" to create one.</p>
+    </div>
+  <% } %>
+</div>
+
+<!-- Add Offer Modal -->
+<div class="modal fade" id="addOfferModal" tabindex="-1" aria-labelledby="addOfferModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="addOfferModalLabel">Create New Offer</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="offerForm">
+          <!-- Basic Offer Info -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Offer Title*</label>
+                <input type="text" class="form-control" name="title" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Offer Code*</label>
+                <input type="text" class="form-control" name="code" required>
+                <small class="text-muted">Unique code customers will use</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Discount Settings -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Discount Type*</label>
+                <select class="form-select" name="type" id="discountType" required>
+                  <option value="percentage">Percentage</option>
+                  <option value="flat">Fixed Amount</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Discount Value*</label>
+                <div class="input-group">
+                  <span class="input-group-text discount-prefix">%</span>
+                  <input type="number" class="form-control" name="discountValue" min="1" required>
+                </div>
+                <div id="maxDiscountContainer" class="mt-2" style="display: none;">
+                  <label class="form-label">Maximum Discount Amount (₹)</label>
+                  <input type="number" class="form-control" name="maxDiscount" min="1">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validity Period -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Start Date*</label>
+                <input type="date" class="form-control" name="startDate" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">End Date*</label>
+                <input type="date" class="form-control" name="endDate" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Applicability -->
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Applicable To*</label>
+                <select class="form-select" name="applicableTo" id="applicableToSelect" required>
+                  <option value="all">All Products</option>
+                  <option value="category">Specific Categories</option>
+                  <option value="product">Specific Products</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <!-- Category Selection -->
+              <div class="mb-3" id="categorySelectionContainer" style="display:none;">
+                <label class="form-label">Select Categories</label>
+                <select class="form-select" id="categorySelect" name="categories" multiple>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>"><%= category.name %></option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <!-- Product Selection -->
+              <div class="mb-3" id="productSelectionContainer" style="display:none;">
+                <label class="form-label">Select Products</label>
+                <select class="form-select" id="productSelect" name="products" multiple>
+                  <% products.forEach(product => { %>
+                   <option 
+  value="<%= product._id %>" 
+  data-img="/<%= product.images[0] || '' %>" 
+  data-name="<%= product.productName %>" 
+  data-price="<%= product.price %>"
+>
+  <%= product.productName %> (₹<%= product.price.toLocaleString() %>)
+</option>
+
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Options -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Minimum Order Value (₹)</label>
+                <input type="number" class="form-control" name="minOrderValue" min="0">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Usage Limit (per customer)</label>
+                <input type="number" class="form-control" name="usageLimit" min="1">
+                <small class="text-muted">Leave empty for unlimited</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 form-check form-switch">
+            <input type="checkbox" class="form-check-input" name="isActive" id="isActive" checked>
+            <label class="form-check-label" for="isActive">Activate this offer</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveOfferBtn">
+          <span class="save-text">Save Offer</span>
+          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin/admin-footer') %>
+
+<!-- JavaScript Libraries -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- SweetAlert2 CSS (optional for styling) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+$(document).ready(function() {
+  // Load categories and products
+  const categories = <%- JSON.stringify(categories) %>;
+  const products = <%- JSON.stringify(products) %>;
+  console.log("products:", products);
+
+  // Helper function to destroy Select2 instances safely
+  function destroySelect2(selector) {
+    const $element = $(selector);
+    if ($element.hasClass('select2-hidden-accessible')) {
+      $element.select2('destroy');
+    }
+  }
+
+  // Helper function to initialize Select2 for categories
+  function initializeCategorySelect2() {
+    destroySelect2('#categorySelect');
+    $('#categorySelect').select2({
+      placeholder: "Select categories",
+      width: '100%',
+      dropdownParent: $('#addOfferModal'),
+      allowClear: true
+    });
+  }
+
+  // Helper function to initialize Select2 for products
+  function initializeProductSelect2() {
+    destroySelect2('#productSelect');
+    $('#productSelect').select2({
+      placeholder: "Select products",
+      width: '100%',
+      dropdownParent: $('#addOfferModal'),
+      allowClear: true,
+      templateResult: function(option) {
+        if (!option.id) return option.text;
+        const $option = $(option.element);
+        console.log("option element",$option)
+        const img = $option.data('img');
+        const imgSrc = img && !img.startsWith('/') ? '/' + img : img;
+
+        console.log("img in offer",img)
+        const price = $option.data('price');
+        console.log("price in offere",price)
+        const name = $option.data('name');
+console.log("name",name);
+        
+
+        
+        return $(`
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">` : ''}  
+            <span>${name}</span>
+            </div>
+            <small class="text-muted">₹${price}</small>
+          </div>
+        `);
+      },
+      templateSelection: function(option) {
+        return option.text;
+      }
+    });
+    
+    // Add event listener for calculating total when products are selected
+    $('#productSelect').on('change', calculateTotal);
+  }
+
+  // Populate selects ONCE when page loads
+  function populateSelects() {
+    const $categorySelect = $('#categorySelect');
+    const $productSelect = $('#productSelect');
+    
+    // Clear existing options first
+    $categorySelect.empty();
+    $productSelect.empty();
+    
+    // Add default options
+    $categorySelect.append('<option value="">Select categories</option>');
+    $productSelect.append('<option value="">Select products</option>');
+    
+    // Populate categories
+    categories.forEach(cat => {
+      $categorySelect.append(
+        `<option value="${cat._id}" data-img="${cat.image || ''}">${cat.name}</option>`
+      );
+    });
+
+    // Populate products
+    products.forEach(prod => {
+      // Handle different possible image structures
+      let imageUrl = '';
+      if (prod.images && prod.images.length > 0) {
+        imageUrl = prod.images[0];
+      } else if (prod.image) {
+        imageUrl = prod.image;
+      }
+      
+      $productSelect.append(
+        `<option value="${prod._id}" 
+                data-img="${imageUrl}" 
+                data-price="${prod.price || 0}"
+                data-name="${prod.productName}">
+          ${prod.productName} - ₹${prod.price || 0}
+        </option>`
+      );
+    });
+  }
+
+  // Initialize selects when page loads
+  populateSelects();
+
+  // Function to calculate total amount for selected products
+  function calculateTotal() {
+    const selectedProductIds = $('#productSelect').val();
+    let total = 0;
+    
+    if (selectedProductIds && selectedProductIds.length > 0) {
+      selectedProductIds.forEach(productId => {
+        const $option = $(`#productSelect option[value="${productId}"]`);
+        const price = parseFloat($option.data('price')) || 0;
+        total += price;
+      });
+    }
+    
+    // Update total display
+    updateTotalDisplay(total);
+  }
+  
+  // Function to update total display
+  function updateTotalDisplay(total) {
+    let $totalContainer = $('#selectedProductsTotal');
+    
+    // Create total container if it doesn't exist
+    if ($totalContainer.length === 0) {
+      $('#productSelectionContainer').append(`
+        <div id="selectedProductsTotal" class="mt-2">
+          <small class="text-muted">Total Amount: <span class="fw-bold text-primary">₹<span id="totalAmount">0</span></span></small>
+        </div>
+      `);
+      $totalContainer = $('#selectedProductsTotal');
+    }
+    
+    // Update the total amount
+    $('#totalAmount').text(total.toFixed(2));
+    
+    // Show/hide based on selection
+    if (total > 0) {
+      $totalContainer.show();
+    } else {
+      $totalContainer.hide();
+    }
+  }
+
+  // Handle applicableTo change
+  $('#applicableToSelect').change(function() {
+    // Destroy existing Select2 instances
+    destroySelect2('#categorySelect');
+    destroySelect2('#productSelect');
+    
+    // Hide all containers
+    $('#categorySelectionContainer, #productSelectionContainer').hide();
+    
+    // Show and initialize appropriate container
+    if (this.value === 'category') {
+      $('#categorySelectionContainer').show();
+      setTimeout(() => initializeCategorySelect2(), 100);
+    } else if (this.value === 'product') {
+      $('#productSelectionContainer').show();
+      setTimeout(() => {
+        initializeProductSelect2();
+        calculateTotal(); // Calculate total when switching to products
+      }, 100);
+    }
+    
+    // Hide total when not using products
+    if (this.value !== 'product') {
+      $('#selectedProductsTotal').hide();
+    }
+  });
+
+  // Initialize Select2 when modal opens (for new offers)
+  $('#addOfferModal').on('shown.bs.modal', function() {
+    const $modal = $(this);
+    
+    // Only initialize if this is NOT an edit operation
+    if (!$modal.data('offerId')) {
+      const applicableTo = $('#applicableToSelect').val();
+      
+      if (applicableTo === 'category') {
+        initializeCategorySelect2();
+      } else if (applicableTo === 'product') {
+        initializeProductSelect2();
+      }
+    }
+  });
+
+  $('#discountType').change(function() {
+    const prefix = $(this).val() === 'percentage' ? '%' : '₹';
+    $('.discount-prefix').text(prefix);
+    $('#maxDiscountContainer').toggle($(this).val() === 'percentage');
+  });
+
+  // Date Validation
+  const today = new Date().toISOString().split('T')[0];
+  $('input[name="startDate"]').attr('min', today).change(function() {
+    const endDate = $('input[name="endDate"]');
+    endDate.attr('min', this.value);
+    if (endDate.val() && endDate.val() < this.value) {
+      endDate.val(this.value);
+    }
+  });
+
+  // Edit Button Handler
+  $('.btn-edit').click(async function() {
+    const offerId = $(this).data('id');
+    
+    try {
+      // Fetch the existing offer data
+      const response = await fetch(`/admin/offers/get-offer/${offerId}`);
+      const data = await response.json();
+      const offer = data.offer;
+      console.log("offer:", offer);
+      
+      if (!response.ok) {
+        throw new Error(offer.message || 'Failed to fetch offer data');
+      }
+
+      // Destroy any existing Select2 instances
+      destroySelect2('#categorySelect');
+      destroySelect2('#productSelect');
+
+      const $modal = $('#addOfferModal');
+      const $form = $('#offerForm');
+      
+      // Basic info
+      $form.find('input[name="title"]').val(offer.title);
+      $form.find('input[name="code"]').val(offer.code);
+      
+      // Discount settings
+      $form.find('select[name="type"]').val(offer.type).trigger('change');
+      $form.find('input[name="discountValue"]').val(offer.discountValue);
+      if (offer.maxDiscount) {
+        $form.find('input[name="maxDiscount"]').val(offer.maxDiscount);
+      }
+      
+      // Validity period
+      $form.find('input[name="startDate"]').val(offer.startDate || '');
+      $form.find('input[name="endDate"]').val(offer.endDate || '');
+
+      // Applicability
+      $form.find('select[name="applicableTo"]').val(offer.applicableTo).trigger('change');
+      
+      // Additional options
+      $form.find('input[name="minOrderValue"]').val(offer.minOrderValue || '');
+      $form.find('input[name="usageLimit"]').val(offer.usageLimit || '');
+      $form.find('input[name="isActive"]').prop('checked', offer.isActive);
+      
+      // Change modal title and save button text
+      $modal.find('.modal-title').text('Edit Offer');
+      $modal.find('#saveOfferBtn .save-text').text('Update Offer');
+      
+      // Store the offer ID in the modal for update
+      $modal.data('offerId', offerId);
+      
+      // Show the modal
+      $modal.modal('show');
+      
+      // Wait for modal to be shown, then set values and initialize Select2
+      setTimeout(() => {
+        if (offer.applicableTo === 'category') {
+          // Set selected values BEFORE initializing Select2
+          $('#categorySelect').val(offer.applicableItems);
+          initializeCategorySelect2();
+        } else if (offer.applicableTo === 'product') {
+          // Set selected values BEFORE initializing Select2
+          $('#productSelect').val(offer.applicableItems);
+          initializeProductSelect2();
+          // Calculate total for selected products
+          setTimeout(() => calculateTotal(), 100);
+        }
+      }, 300);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Failed to load offer data'
+      });
+    }
+  });
+
+  // Save Offer Handler
+  $('#saveOfferBtn').click(async function() {
+    const $btn = $(this);
+    const $form = $('#offerForm');
+    const $modal = $('#addOfferModal');
+    const isEditMode = $modal.data('offerId') !== undefined;
+    
+    if (!$form[0].checkValidity()) {
+      $form[0].reportValidity();
+      return;
+    }
+
+    // Prepare data
+    const data = {
+      title: $('input[name="title"]').val(),
+      code: $('input[name="code"]').val().toUpperCase(),
+      type: $('select[name="type"]').val(),
+      discountValue: Number($('input[name="discountValue"]').val()),
+      applicableTo: $('select[name="applicableTo"]').val(),
+      startDate: $('input[name="startDate"]').val(),
+      endDate: $('input[name="endDate"]').val(),
+      minOrderValue: Number($('input[name="minOrderValue"]').val()) || 0,
+      maxDiscount: $('input[name="maxDiscount"]').val() ? Number($('input[name="maxDiscount"]').val()) : null,
+      usageLimit: $('input[name="usageLimit"]').val() ? Number($('input[name="usageLimit"]').val()) : null,
+      isActive: $('input[name="isActive"]').is(':checked'),
+      applicableItems: []
+    };
+
+    // Handle applicable items
+    if (data.applicableTo !== 'all') {
+      const selectId = data.applicableTo === 'category' ? '#categorySelect' : '#productSelect';
+      const selectedItems = $(selectId).val();
+      
+      if (!selectedItems || selectedItems.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Selection Required',
+          text: `Please select at least one ${data.applicableTo}`
+        });
+        return;
+      }
+      
+      data.applicableItems = selectedItems;
+    }
+
+    try {
+      // Show loading state
+      $btn.prop('disabled', true);
+      $btn.find('.save-text').text(isEditMode ? 'Updating...' : 'Saving...');
+      $btn.find('.spinner-border').removeClass('d-none');
+
+      const url = isEditMode 
+        ? `/admin/offers/update-offer/${$modal.data('offerId')}`
+        : '/admin/offers/add-offer';
+        
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        $modal.modal('hide');
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: isEditMode ? 'Offer updated successfully' : 'Offer created successfully',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.message || (isEditMode ? 'Failed to update offer' : 'Failed to create offer')
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Network error occurred'
+      });
+    } finally {
+      $btn.prop('disabled', false);
+      $btn.find('.save-text').text(isEditMode ? 'Update Offer' : 'Save Offer');
+      $btn.find('.spinner-border').addClass('d-none');
+    }
+  });
+
+  // Delete Button Handler
+  $('.btn-delete').click(function() {
+    const offerId = $(this).data('id');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/admin/offers/delete-offer/${offerId}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Deleted!', 'Offer has been deleted.', 'success')
+              .then(() => window.location.reload());
+          } else {
+            Swal.fire('Error!', data.message || 'Failed to delete offer', 'error');
+          }
+        });
+      }
+    });
+  });
+
+  // Reset form when modal is closed
+  $('#addOfferModal').on('hidden.bs.modal', function() {
+    const $modal = $(this);
+    
+    // Destroy Select2 instances
+    destroySelect2('#categorySelect');
+    destroySelect2('#productSelect');
+    
+    // Reset form
+    $('#offerForm')[0].reset();
+    $('#categorySelect, #productSelect').val(null);
+    $('#categorySelectionContainer, #productSelectionContainer').hide();
+    $('#selectedProductsTotal').hide(); // Hide total display
+    $('#maxDiscountContainer').hide();
+    $('.discount-prefix').text('%');
+    
+    // Reset modal state
+    $modal.find('.modal-title').text('Create New Offer');
+    $modal.find('#saveOfferBtn .save-text').text('Save Offer');
+    $modal.removeData('offerId');
+    
+    // Repopulate selects for next use
+    populateSelects();
+  });
+});
+</script>

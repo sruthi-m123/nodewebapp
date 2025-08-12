@@ -70,6 +70,8 @@ const getCategory = async (req, res) => {
 // Add new category with enhanced image validation
 const addCategory = async (req, res) => {
   try {
+
+   
     // Validate input
     if (req.fileValidationError) {
       return res.status(400).json(formatResponse(false, req.fileValidationError));

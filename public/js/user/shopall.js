@@ -321,3 +321,52 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
+document.querySelectorAll('.wishlist-btn').forEach(btn => {
+  btn.addEventListener('click', async function () {
+    const productId = this.dataset.productId;
+
+    try {
+      const response = await fetch(`/user/wishlist/add/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Added to wishlist!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else if (response.status === 400 && data.error === 'Product already in wishlist') {
+        Swal.fire({
+          icon: 'info',
+          title: 'Already in wishlist',
+          text: 'This product is already in your wishlist.',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to add to wishlist',
+          text: data.message || 'Something went wrong.',
+        });
+      }
+
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Something went wrong.',
+      });
+    }
+  });
+});
+
+

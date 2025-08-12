@@ -38,22 +38,37 @@
         </div>
       </div>
 
-      <div class="product-card card">
-        <img src="/<%= order.items[0].productId.images[0] %>" alt="Product Image">
-        <div class="product-details">
-          <div class="detail-row">
-            <span class="label">Product Name:</span>
-            <span class="value"><%= order.items[0].productId.productName %></span>
+      <!-- Updated Products Section -->
+      <div class="products-container card">
+        <h3>Products (<%= order.items.length %>)</h3>
+        <% order.items.forEach((item, index) => { %>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="/<%= item.productId.images[0] %>" alt="Product Image">
+            </div>
+            <div class="product-details">
+              <div class="detail-row">
+                <span class="label">Product Name:</span>
+                <span class="value"><%= item.productId.productName %></span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Quantity:</span>
+                <span class="value"><%= item.quantity %></span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Price:</span>
+                <span class="value">Rs.<%= item.price %></span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Subtotal:</span>
+                <span class="value">Rs.<%= (item.price * item.quantity).toFixed(2) %></span>
+              </div>
+            </div>
+            <% if (index < order.items.length - 1) { %>
+              <hr class="product-divider">
+            <% } %>
           </div>
-          <div class="detail-row">
-            <span class="label">Quantity:</span>
-            <span class="value"><%= order.items[0].quantity %></span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Price:</span>
-            <span class="value">Rs.<%= order.items[0].price %></span>
-          </div>
-        </div>
+        <% }); %>
       </div>
     </div>
 
@@ -81,60 +96,3 @@
   </div>
 </div>
 <%- include('../partials/admin/admin-footer') %>
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const updateBtn=document.querySelector('.update-btn');
-  const statusSelect=document.querySelector('.dropdown');
-  const statusBtn=document.querySelector('.status-btn');
- const dropdown = document.querySelector('.dropdown');
-  if (statusBtn && dropdown) {
-    statusBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle('visible');
-    });
-  }
-  
-  document.addEventListener('click', () => {
-    if (dropdown) dropdown.classList.remove('visible');
-  });
-  
-  if (dropdown) {
-    dropdown.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-  }
-
-if(updateBtn){
-  updateBtn.addEventListener('click',async()=>{
- const orderId = updateBtn.dataset.orderId; 
- const newStatus=statusSelect.value;
-try {
-  const response=await fetch(`/admin/orders/${orderId}/status`,{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-    },
-    body:JSON.stringify({orderId,status:newStatus})
-  });
-const data=await response.json();
-
-if(data.success){
-  statusBtn.textContent=data.status;
-  alert('status updated successfully!');
-
-}else{
-  alert('failed to update status.')
-}
-
-
-} catch (error) {
-  console.error('error:',error);
-  alert('an error occurred while updating status.')
-}
-  })
-}
-
-})
-
-</script>

@@ -23,10 +23,14 @@ const categorySchema = new Schema({
     }
   },
 
-  // categoryOffer: {
-  //   type: Number,
-  //   default: 0,
-  // },
+ categoryOffer: {
+  value: { type: Number, default: 0 },
+  type: { type: String, 
+    enum: ['percentage', 'flat'],
+     default: 'flat' 
+    } 
+},
+
   image: {
     type: String, 
     default: null,

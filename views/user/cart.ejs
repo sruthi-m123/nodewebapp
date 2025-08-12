@@ -17,7 +17,7 @@
         </thead>
       <tbody id="cart-items">
   <% cartItems.forEach(item => { %>
-    <pre><%= JSON.stringify(item._id) %></pre>
+    <!-- <pre><%= JSON.stringify(item._id) %></pre> -->
 
     <tr data-id="<%= item._id %>">
       <td>
@@ -61,9 +61,7 @@
         <button class="continue-btn" onclick="window.location.href='/user/shopall'">
           <i class="fas fa-arrow-left"></i> Continue Shopping
         </button>
-        <!-- <button class="update-btn" onclick="updateCart()">
-          <i class="fas fa-sync-alt"></i> Update Cart
-        </button> -->
+      
       </div>
 
       <div class="cart-total">

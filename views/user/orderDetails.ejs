@@ -1,5 +1,6 @@
 <div class="container">
     <h1>ORDER DETAILS</h1>
+    <% if (order.status !== 'cancelled') { %>
     <div class="order-header">
         <p><strong>Order #</strong> <%= order.orderId %></p>
         <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
@@ -10,20 +11,29 @@
             Download Invoice
         </button>
     </div>
-    <div class="order-info">
-        <div class="product-details">
-            <img src="/<%= order.items[0].imageUrl || '/images/default-product.jpg' %>" alt="<%= order.items[0].name %>">
-            <div>
-                <p><strong><%= order.items[0].name %></strong></p>
-                <p><strong>₹<%= order.items[0].price.toLocaleString('en-IN') %></strong></p>
-                <% if (order.items[0].color) { %>
-                    <p><strong>Color: </strong> <%= order.items[0].color %></p>
-                <% } %>
-                <p><strong>Quantity: </strong> <%= order.items[0].quantity %></p>
-                <p><strong>Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
-            </div>
-        </div>
+    <% } %>
+   <div class="order-info">
+  <% order.items.forEach(item => { %>
+    <div class="product-details">
+      <img src="/<%= item.imageUrl || '/images/default-product.jpg' %>" alt="<%= item.name %>">
+      <div>
+        <p><strong><%= item.name %></strong></p>
+        <p><strong>₹<%= item.price.toLocaleString('en-IN') %></strong></p>
+        <% if (item.color) { %>
+          <p><strong>Color: </strong> <%= item.color %></p>
+        <% } %>
+        <p><strong>Quantity: </strong> <%= item.quantity %></p>
+        <p><strong>Item Total: </strong> ₹<%=(item.price * item.quantity).toLocaleString('en-IN')%></p>
+      </div>
     </div>
+    <hr class="product-divider">
+  <% }); %>
+  
+  <!-- Show order total separately -->
+  <div class="order-total">
+    <p><strong>Order Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
+  </div>
+</div>
 
     <div class="shipping-details">
         <h2>SHIPPING DETAILS</h2>

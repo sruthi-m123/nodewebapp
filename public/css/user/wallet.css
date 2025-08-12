@@ -1,0 +1,169 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.wallet-card {
+  background: linear-gradient(135deg, #8B5A2B, #D2B48C);
+  color: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px 0;
+  position: relative;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.wallet-details h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.wallet-details p {
+  margin: 10px 0;
+  letter-spacing: 2px;
+}
+
+.wallet-details h3 {
+  margin: 15px 0 0;
+  font-size: 32px;
+}
+
+.validity {
+  margin-top: 20px;
+}
+
+.wallet-logo {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}
+
+.add-amount-form {
+  background: #F5F5DC; /* Beige background */
+  padding: 20px;
+  border-radius: 10px;
+  margin: 30px 0;
+  border: 1px solid #D2B48C; /* Tan border */
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #5C4033; /* Dark brown */
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #A0522D; /* Sienna brown */
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #FFF8DC; /* Cornsilk */
+}
+
+.add-button {
+  background: #A0522D; /* Sienna */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.add-button:hover {
+  background: #8B4513; /* Saddle brown */
+}
+
+.message {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #5C4033; /* Dark brown */
+}
+
+.transaction-history {
+  margin-top: 40px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #D2B48C; /* Tan */
+}
+
+th {
+  background-color: #DEB887; /* Burlywood */
+  color: #5C4033; /* Dark brown */
+}
+
+.deposit {
+  color: #556B2F; /* Dark olive green */
+  font-weight: bold;
+}
+
+.withdrawal {
+  color: #8B0000; /* Dark red */
+  font-weight: bold;
+}
+
+.refund {
+  color: #6B8E23; /* Olive drab */
+  font-weight: bold;
+}
+
+.status-completed {
+  color: #556B2F; /* Dark olive green */
+}
+
+.status-pending {
+  color: #CD853F; /* Peru */
+}
+
+.status-failed {
+  color: #8B0000; /* Dark red */
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination a {
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid #A0522D; /* Sienna */
+  border-radius: 5px;
+  color: #5C4033; /* Dark brown */
+}
+
+.pagination a.active {
+  background-color: #A0522D; /* Sienna */
+  color: white;
+  border-color: #A0522D;
+}
+
+.pagination a:hover:not(.active) {
+  background-color: #D2B48C; /* Tan */
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 20px;
+  color: #5C4033; /* Dark brown */
+}

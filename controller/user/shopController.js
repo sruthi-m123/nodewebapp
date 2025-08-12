@@ -43,7 +43,8 @@ const loadShopping = async (req, res) => {
     const totalProducts=await Product.countDocuments();
     const totalPages=Math.ceil(totalProducts/limit);
     if (req.session.user) {
-      userData = await User.findById(req.session.user._id);
+          console.log("userId iside the shopall page",req.session.user.id);
+      userData = await User.findById(req.session.user.id);
     }
     const categories = await Category.find({ isDeleted: false });
 

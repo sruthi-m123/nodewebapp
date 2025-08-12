@@ -52,6 +52,7 @@
                 <% const nextStatus = category.status === 'active' ? 'inactive' : 'active'; %>
               <button 
   id="status-btn-<%= category._id %>" 
+  data-status="<%=category.status%>"
   onclick="toggleCategoryStatus('<%= category._id %>', '<%= nextStatus %>')">
   <%= category.status === 'active' ? 'Active' : 'Inactive' %>
 </button>
@@ -119,7 +120,7 @@
           
           <div class="form-group">
             <label for="cropImageInput">Category Image (Crop & Upload)</label>
-            <input type="file" id="cropImageInput" name="images" accept="image/*">
+            <input type="file" id="cropImageInput" name="categoryImage" accept="image/*">
             <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
             <div style="margin-top: 10px;">
               <img id="cropPreview" style="display: none; max-width: 100%; max-height: 300px;" />
@@ -295,7 +296,9 @@
   e.preventDefault();
   
   const formData = new FormData(this);
-  
+  console.log('🔍 croppedImage:', croppedImage);
+console.log('croppedImage Type:', croppedImage?.constructor?.name); // Should be Blob or File
+
   // Simplified checkbox handling
   formData.append('isActive', document.getElementById('isActive').checked);
 
@@ -303,8 +306,11 @@
     formData.append('id', currentCategoryId);
   }
   
-  if (croppedImage) {
-    formData.append('categoryImage', croppedImage, `category-${Date.now()}.jpg`);
+  // 
+  
+  if(croppedImage){
+    const file=new File([croppedImage],`category=${Date.now()}.jpg`,{type:'image/jpeg'});
+    formData.append('categoryImage',file);
   }
 
   const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';

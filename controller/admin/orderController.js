@@ -1,5 +1,8 @@
 const User = require('../../models/userSchema');
 const Order = require('../../models/orderSchema');
+const Wallet = require('../../models/walletSchema');
+const Product=require('../../models/productSchema');
+const mongoose=require('mongoose')
 
 const getOrderAdmin = async (req, res) => {
   try {
@@ -69,7 +72,6 @@ const getOrderAdmin = async (req, res) => {
     if (page > totalPages && totalPages > 0) {
       return res.redirect(`/admin/orders?page=${totalPages}&search=${search}`);
     }
-console.log("return request",orders.returnRequested);
     
     const formattedOrders = orders.map(order => ({
       id: order._id,
@@ -78,7 +80,8 @@ console.log("return request",orders.returnRequested);
       total: order.total,
       status: order.status,
       statusClass: order.status.toLowerCase().replace(/\s+/g, '-'),
-      returnRequest: order.returnRequested || false
+      returnRequest: order.returnRequested || false,
+      orderId:order.orderId
     }));
     console.log("formatted Order:",formattedOrders);
      const buildPaginationUrl = (pageNum) => {
@@ -159,36 +162,219 @@ if(!updatedOrder){
     res.status(500).json({ error: 'Failed to update status' });
         }
     }
-const verifyReturnedRequest=async(req,res)=>{
-    try {
-        const{orderId}=req.params;
-        const{action}=req.body;
+const getReturnDetails=async(req,res)=>{
+  try {
+   const orderId=req.params.orderId;
+   console.log("orerId inside the verify :",orderId);
+   const order=await Order.findOne({orderId:orderId});
+   console.log("order imside the verify controller :",order);
+   if(!order){
+    return res.status(404).json({error:"order not found"});
+   }
+   
+   if(!order.returnRequested){
+    return res.status(400).json({error:"No return request for this order  "})
+   }
 
-        const order=await Order.findById(orderId);
-        
-         if (!order.returnRequested) {
-      return res.status(400).json({ error: 'No return request for this order' });
+res.json({
+  reason:order.returnDetails.reason,
+  notes:order.returnDetails.notes||"None"
+});
+
+  } catch (error) {
+    console.error("error fetching return details :",error);
+    res.status(500).json({error:"server error"})
+  }
+}
+
+
+
+
+
+
+
+
+const verifyReturnedRequest = async (req, res) => {
+  console.log("Return verification initiated");
+  console.log("req.body:", req.body);
+
+  const { orderId } = req.params;
+  let wallet;
+
+  try {
+    const { action, adminNotes } = req.body;
+
+    // Validate input
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ 
+        error: 'Invalid action. Must be either "approve" or "reject"',
+        code: 'INVALID_ACTION'
+      });
+    }
+
+    // Find order with necessary data (removed session)
+    const order = await Order.findOne({orderId: orderId})
+      .populate('user', 'name email')
+      .populate('items.product', 'name price stock');
+
+    if (!order) {
+      return res.status(404).json({ 
+        error: 'Order not found',
+        code: 'ORDER_NOT_FOUND'
+      });
+    }
+
+    if (!order.returnRequested) {
+      return res.status(400).json({ 
+        error: 'No return request exists for this order',
+        code: 'NO_RETURN_REQUEST'
+      });
     }
 
     if (action === 'approve') {
+      if (order.returnApproved) {
+        return res.status(400).json({ 
+          error: 'Return already approved',
+          code: 'ALREADY_APPROVED'
+        });
+      }
+
+      // Validate refund amount
+      if (order.totalAmount <= 0) {
+        return res.status(400).json({
+          error: 'Invalid refund amount',
+          code: 'INVALID_REFUND_AMOUNT'
+        });
+      }
+
+      // Update order status
       order.returnRequested = false;
       order.returnApproved = true;
       order.status = 'returned';
-      // Here you would typically add logic for refund processing
-    } else if (action === 'reject') {
+      order.returnProcessedAt = new Date();
+      order.adminNotes = adminNotes || 'Return approved by administrator';
+
+      const refundAmount = order.totalAmount;
+
+      // Handle wallet operations (removed session)
+      wallet = await Wallet.findOne({ user: order.user._id });
+      
+      if (!wallet) {
+        wallet = new Wallet({
+          user: order.user._id,
+          balance: 0
+        });
+        await wallet.save();
+      }
+
+      // Create unique reference for the transaction
+      const transactionRef = `REFUND-${order.orderId}-${Date.now()}`;
+      
+      await wallet.addFunds(refundAmount, {
+        order: order._id,
+        description: `Refund for order #${order.orderId}`,
+        reference: transactionRef,
+        status: 'completed'
+      });
+
+      // Create refund record
+      const refund = new Refund({
+        order: order._id,
+        user: order.user._id,
+        amount: refundAmount,
+        status: 'completed',
+        processedBy: req.user.id,
+        notes: adminNotes,
+        walletTransaction: wallet.transactions[wallet.transactions.length - 1]._id
+      });
+
+      // Restock products (removed session)
+      const restockOps = order.items.map(item => 
+        Product.findByIdAndUpdate(
+          item.product._id,
+          { $inc: { stock: item.quantity } },
+          { new: true }
+        )
+      );
+
+      // Execute all operations (removed session)
+      await Promise.all([
+        order.save(),
+        refund.save(),
+        ...restockOps
+      ]);
+
+      // Send notification
+      try {
+        await sendNotification({
+          email: order.user.email,
+          type: 'refund_approved',
+          data: {
+            orderId: order.orderId,
+            amount: refundAmount,
+            newBalance: wallet.balance
+          }
+        });
+      } catch (notificationError) {
+        console.error('Notification failed:', notificationError);
+        // Notification failure shouldn't fail the request
+      }
+
+    } else {
+      // Handle rejection (removed session)
       order.returnRequested = false;
       order.returnApproved = false;
-    } else {
-      return res.status(400).json({ error: 'Invalid action' });
+      order.returnRejectedAt = new Date();
+      order.adminNotes = adminNotes || 'Return rejected by administrator';
+      
+      await order.save();
+
+      try {
+        await sendNotification({
+          email: order.user.email,
+          type: 'refund_rejected',
+          data: {
+            orderId: order.orderId,
+            reason: adminNotes
+          }
+        });
+      } catch (notificationError) {
+        console.error('Notification failed:', notificationError);
+      }
     }
-    await order.save();
-    res.json({ success: true });
-    } catch (error) {
-         console.error('Error verifying return request:', error);
-    res.status(500).json({ error: 'Failed to process return request' 
+
+    return res.json({ 
+      success: true,
+      message: `Return request ${action}d successfully`,
+      orderId: order.orderId,
+      status: order.status,
+      ...(action === 'approve' && { 
+        refundAmount: order.totalAmount,
+        newBalance: wallet.balance 
+      })
     });
-}
-}
+
+  } catch (error) {
+    console.error('Return processing error:', {
+      error: error.message,
+      stack: error.stack,
+      orderId,
+      action: req.body.action
+    });
+
+    const response = {
+      error: 'Failed to process return request',
+      code: 'PROCESSING_ERROR'
+    };
+
+    if (process.env.NODE_ENV === 'development') {
+      response.details = error.message;
+      response.stack = error.stack;
+    }
+
+    return res.status(500).json(response);
+  }
+};
 const getOrderDetails=async(req,res)=>{
   try {
     const orderId=req.params.orderId;
@@ -212,5 +398,6 @@ module.exports = {
   getOrder,
   updateOrderStatus,
   verifyReturnedRequest,
-getOrderDetails
+getOrderDetails,
+getReturnDetails
 };
