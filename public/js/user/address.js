@@ -1,15 +1,9 @@
-
-
-
-
-// Get elements
 const modal = document.getElementById('addAddressModal');
 const openModalBtn = document.getElementById('openAddAddressModal');
 const closeModalBtn = document.querySelector('.close-modal');
 const addressForm = document.querySelector('#addAddressForm');
 const modalTitle = document.querySelector('#addAddressModal h3');
 
-// Open modal for adding
 openModalBtn.addEventListener('click', (e) => {
   e.preventDefault();
   modalTitle.textContent = 'Add New Address';
@@ -18,27 +12,22 @@ openModalBtn.addEventListener('click', (e) => {
   modal.style.display = 'flex';
 });
 
-// Close modal
 closeModalBtn.addEventListener('click', () => {
   modal.style.display = 'none';
 });
 
-// Close modal when clicking outside
 window.addEventListener('click', (e) => {
   if (e.target === modal) {
     modal.style.display = 'none';
   }
 });
 
-// Edit button handler
 document.querySelectorAll('.edit-btn').forEach((btn) => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const addressCard = e.target.closest('.address-card');
     const addressId = e.target.getAttribute('href').split('/').pop();
-    
-    // Extract address data from the card (you might need to add data attributes)
-    const name = addressCard.querySelector('[data-name]')?.textContent;
+        const name = addressCard.querySelector('[data-name]')?.textContent;
     const phone = addressCard.querySelector('[data-phone]')?.textContent;
     const city = addressCard.querySelector('[data-city]')?.textContent;
     const state = addressCard.querySelector('[data-state]')?.textContent;
@@ -46,9 +35,8 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
     const landmark = addressCard.querySelector('[data-landmark]')?.textContent;
     const building = addressCard.querySelector('[data-building]')?.textContent;
 
-    // Update modal
     modalTitle.textContent = 'Edit Address';
-        addressForm.querySelector('[name="building"]').value = building || '';
+    addressForm.querySelector('[name="building"]').value = building || '';
     addressForm.querySelector('[name="name"]').value = name || '';
     addressForm.querySelector('[name="phone"]').value = phone || '';
     addressForm.querySelector('[name="city"]').value = city || '';
@@ -56,13 +44,11 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
     addressForm.querySelector('[name="pincode"]').value = pincode || '';
     addressForm.querySelector('[name="landmark"]').value = landmark || '';
     
-    // Update form action for edit
     addressForm.action = `/addresses/edit/${addressId}`;
     modal.style.display = 'flex';
   });
 });
 
-// Form submission handler
 addressForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -81,7 +67,7 @@ addressForm.addEventListener('submit', async (e) => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(jsonData) // ✅ send only this
+      body: JSON.stringify(jsonData)
     });
 
     const data = await response.json();
@@ -97,7 +83,7 @@ addressForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Delete button handler
+// Delete button 
 document.querySelectorAll('.delete-btn').forEach((btn) => {
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -129,13 +115,14 @@ document.querySelectorAll('.delete-btn').forEach((btn) => {
     }
   });
 });
-//set defalult 
+
+
   document.querySelectorAll('.set-default-btn').forEach(button => {
     button.addEventListener('click', async (e) => {
-      e.preventDefault(); // prevent form submission
+      e.preventDefault(); 
 
       const form = e.target.closest('form');
-      const actionUrl = form.getAttribute('action'); // e.g. /set-default-address/123
+      const actionUrl = form.getAttribute('action'); 
 
       try {
         const response = await fetch(actionUrl, {
@@ -149,8 +136,8 @@ document.querySelectorAll('.delete-btn').forEach((btn) => {
          if (response.ok) {
         const result = await response.json();
         console.log('Default address updated:', result.message);
-        alert(result.message); // Simple browser alert
-        location.reload(); // refresh to reflect change
+        alert(result.message); 
+        location.reload(); 
       } else {
         const error = await response.json();
         console.error('Error:', error.message || 'Something went wrong');

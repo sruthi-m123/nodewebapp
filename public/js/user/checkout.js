@@ -351,7 +351,6 @@ function placeOrder() {
 }
 
 
-// Close modal when clicking outside
 window.addEventListener('click', function(event) {
     const modal = document.getElementById('addressModal');
     if (event.target === modal) {

@@ -1,16 +1,5 @@
 
-// function view(id) {
-//   console.log("id:", id);
-//   fetch(`/orders-details/${id}`)
-//     .then(res => res.json())
-//     .then(data => {
-//       console.log(data);
-//     })
-//     .catch(err => console.error("Error fetching order details:", err));
-// }
-
 function view(id) {
-  console.log("id:", id);
   window.location.href = `/orders-details/${id}`;
 }
 

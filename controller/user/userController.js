@@ -433,10 +433,10 @@ const login = async (req, res) => {
       googleId: findUser.googleId || null
     };
 
-    console.log("✅ Session data set:", req.session.user);
-    console.log("🔄 Redirecting to home page");
+    console.log(" Session data set:", req.session.user);
+    console.log("Redirecting to home page");
 
-    res.redirect("/");
+    res.redirect("/home");
 
   } catch (error) {
     console.error("login error", error.message, error.stack);

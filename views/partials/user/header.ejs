@@ -2,7 +2,7 @@
   <div class="logo">CHETTINAD</div>
   
   <nav class="main-nav">
-    <a href="/" class="nav-link">Home</a>
+    <a href="/user/home" class="nav-link">Home</a>
     <a href="/user/shopall" class="nav-link">Shop all</a>
     <!-- <a href="/user/catergoryproduct" class="nav-link">Collections</a> -->
     <a href="#" class="nav-link">About Us</a>
@@ -12,33 +12,34 @@
   
   <% if (!user) { %>
   <div class="auth-links">
-    <a href="/signup" class="nav-link">Sign Up</a>
-    <a href="/login" class="nav-link">Log In</a>
+    <a href="/user/signup" class="nav-link">Sign Up</a>
+    <a href="/user/login" class="nav-link">Log In</a>
   </div>
 <% } %>
 
-
+  <% if (user && user.name) { %>
   <div class="desktop-icons">
     <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
-    <a href="/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
-    <% if (user && user.name) { %>
+    <a href="/user/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
+    <!-- <% if (user && user.name) { %> -->
       <div class="profile-card-container">
         <a href="#" class="icon-link" id="profileIcon"><i class="fas fa-user"></i></a>
         <div class="profile-card" id="profileCard">
           <div class="card-greeting">Hi, <%= user.name || user.username %> 👋</div>
-          <a href="/profile" class="card-link">Profile</a>
-          <a href="/orders" class="card-link">My Orders</a>
+          <a href="/user/profile" class="card-link">Profile</a>
+          <a href="/user/orders" class="card-link">My Orders</a>
          <a href="/user/wallet" class="card-link">My Wallet</a>
-          <a href="/logout" class="card-link" id="logoutBtn">Logout</a>
+          <a href="/user/logout" class="card-link" id="logoutBtn">Logout</a>
         </div>
       </div>
-      <a href="/cart" id="viewCartBtn" class="icon-link cart-icon">
+      <a href="/user/cart" id="viewCartBtn" class="icon-link cart-icon">
 <i class="fas fa-shopping-bag"></i>
 <span class="cart-count"><%= cartCount||0 %></span>
 </a>
-    <% } %>
+    <!-- <% } %> -->
 
   </div>
+ <% } %>
 
   <!-- Mobile Toggle -->
   <button class="menu-toggle" aria-label="Toggle menu"><span class="hamburger"></span></button>

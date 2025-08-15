@@ -32,12 +32,10 @@ const createCoupon = async (req, res) => {
             isActive 
         } = req.body;
 
-        // Validate required fields
         if (!description || !code || !discountType || !validTill || !validFrom) {
             return res.status(400).json({ message: "Required fields are missing" });
         }
 
-        // Validate dates
         const parsedValidFrom = new Date(validFrom);
         const parsedValidTill = new Date(validTill);
         
@@ -49,7 +47,6 @@ const createCoupon = async (req, res) => {
             return res.status(400).json({ message: "Valid Till date must be after Valid From date" });
         }
 
-        // Check if coupon code already exists
         const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
         if (existingCoupon) {
             return res.status(400).json({ message: "Coupon code already exists" });
@@ -113,7 +110,6 @@ const updateCoupon = async (req, res) => {
             isActive 
         } = req.body;
 
-        // Validate dates if provided
         if (validTill && validFrom) {
             const parsedValidTill = new Date(validTill);
             const parsedValidFrom = new Date(validFrom);
@@ -152,7 +148,6 @@ const updateCoupon = async (req, res) => {
             isActive: isActive === 'on' || isActive === true || isActive === 'true'
         };
 
-        // Remove undefined values
         Object.keys(updateData).forEach(key => 
             updateData[key] === undefined && delete updateData[key]
         );

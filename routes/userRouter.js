@@ -15,7 +15,7 @@ const orderdetailController=require('../controller/user/orderDetailController');
 const wishlistController=require('../controller/user/wishlistController');
 const walletController=require('../controller/user/walletController');
 
-router.get("/", userController.loadHomepage);
+router.get("/home", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);

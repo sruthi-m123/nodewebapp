@@ -12,7 +12,7 @@ class profileController {
 
       const user = await User.findById(userId).select("-password -googleId -isBlocked -isAdmin");
 console.log("user avatar",user.avatar)
-      res.render("user/profile", {
+      res.render("/user/profile", {
         activeTab: "profile",
         user: {
 name: user.name || "",

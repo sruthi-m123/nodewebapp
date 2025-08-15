@@ -3,7 +3,7 @@ const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
 const Product=require('../../models/productSchema');
 const mongoose=require('mongoose')
-
+const Refund=require('../../models/refundSchema');
 const getOrderAdmin = async (req, res) => {
   try {
     const limit = 6;
@@ -28,13 +28,11 @@ const getOrderAdmin = async (req, res) => {
       userFilter.userId = { $in: userIds };
     }
 
-    // Apply status filter
   if (status) {
   userFilter.status = { $regex: new RegExp(`^${status}$`, 'i') };
 }
 
 
-    // Apply date range filter
     if (startDate || endDate) {
       userFilter.createdAt = {};
       if (startDate) {
@@ -47,7 +45,6 @@ const getOrderAdmin = async (req, res) => {
       }
     }
 
-    // Sort logic
     let sortOption = { createdAt: -1 }; 
     if (sort === 'oldest') {
       sortOption = { createdAt: 1 };
@@ -57,7 +54,6 @@ const getOrderAdmin = async (req, res) => {
       sortOption = { total: 1 };
     }
 
-    // Fetch orders
     const orders = await Order.find(userFilter)
       .populate('userId', 'name email')
        .populate('items.productId', 'name image')
@@ -95,7 +91,6 @@ const getOrderAdmin = async (req, res) => {
       pageTitle: 'Order Management - Chettinad Sarees',
       pageJs:'admin/order.js',
       layout: false,
-    //   pageCSS: 'css/admin/order.css',
       orders: formattedOrders,
       totalPages,
       currentPage: page,
@@ -204,7 +199,6 @@ const verifyReturnedRequest = async (req, res) => {
   try {
     const { action, adminNotes } = req.body;
 
-    // Validate input
     if (!['approve', 'reject'].includes(action)) {
       return res.status(400).json({ 
         error: 'Invalid action. Must be either "approve" or "reject"',
@@ -212,10 +206,10 @@ const verifyReturnedRequest = async (req, res) => {
       });
     }
 
-    // Find order with necessary data (removed session)
+
     const order = await Order.findOne({orderId: orderId})
-      .populate('user', 'name email')
-      .populate('items.product', 'name price stock');
+      .populate('userId', 'name email')
+      .populate('items.productId', 'name price stock');
 
     if (!order) {
       return res.status(404).json({ 
@@ -239,7 +233,6 @@ const verifyReturnedRequest = async (req, res) => {
         });
       }
 
-      // Validate refund amount
       if (order.totalAmount <= 0) {
         return res.status(400).json({
           error: 'Invalid refund amount',
@@ -247,7 +240,6 @@ const verifyReturnedRequest = async (req, res) => {
         });
       }
 
-      // Update order status
       order.returnRequested = false;
       order.returnApproved = true;
       order.status = 'returned';
@@ -256,18 +248,16 @@ const verifyReturnedRequest = async (req, res) => {
 
       const refundAmount = order.totalAmount;
 
-      // Handle wallet operations (removed session)
-      wallet = await Wallet.findOne({ user: order.user._id });
+      wallet = await Wallet.findOne({ user: order.userId });
       
       if (!wallet) {
         wallet = new Wallet({
-          user: order.user._id,
+          user: order.userId,
           balance: 0
         });
         await wallet.save();
       }
 
-      // Create unique reference for the transaction
       const transactionRef = `REFUND-${order.orderId}-${Date.now()}`;
       
       await wallet.addFunds(refundAmount, {
@@ -277,7 +267,6 @@ const verifyReturnedRequest = async (req, res) => {
         status: 'completed'
       });
 
-      // Create refund record
       const refund = new Refund({
         order: order._id,
         user: order.user._id,
@@ -288,7 +277,6 @@ const verifyReturnedRequest = async (req, res) => {
         walletTransaction: wallet.transactions[wallet.transactions.length - 1]._id
       });
 
-      // Restock products (removed session)
       const restockOps = order.items.map(item => 
         Product.findByIdAndUpdate(
           item.product._id,
@@ -297,14 +285,12 @@ const verifyReturnedRequest = async (req, res) => {
         )
       );
 
-      // Execute all operations (removed session)
       await Promise.all([
         order.save(),
         refund.save(),
         ...restockOps
       ]);
 
-      // Send notification
       try {
         await sendNotification({
           email: order.user.email,
@@ -317,11 +303,9 @@ const verifyReturnedRequest = async (req, res) => {
         });
       } catch (notificationError) {
         console.error('Notification failed:', notificationError);
-        // Notification failure shouldn't fail the request
       }
 
     } else {
-      // Handle rejection (removed session)
       order.returnRequested = false;
       order.returnApproved = false;
       order.returnRejectedAt = new Date();

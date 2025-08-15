@@ -46,7 +46,7 @@ const getApplicableItems = async (req, res) => {
         
         if (type === 'category') {
             items = await Category.find({}, 'name');
-        } else if (type === 'product') { // Fixed: was 'category' instead of 'product'
+        } else if (type === 'product') { 
             items = await Product.find({}, 'productName price images');
         }
 
@@ -76,7 +76,6 @@ const createOffer = async (req, res) => {
 
         console.log("Raw request body:", req.body);
 
-        // Enhanced validation with better error messages
         if (!title?.trim()) {
             return res.status(400).json({ message: 'Offer title is required' });
         }
@@ -99,17 +98,14 @@ const createOffer = async (req, res) => {
             return res.status(400).json({ message: 'End date is required' });
         }
 
-        // Validate numeric fields
         if (isNaN(Number(discountValue)) || Number(discountValue) <= 0) {
             return res.status(400).json({ message: 'Discount value must be a positive number' });
         }
 
-        // Validate percentage discount
         if (type === 'percentage' && Number(discountValue) > 100) {
             return res.status(400).json({ message: 'Percentage discount cannot exceed 100%' });
         }
 
-        // Validate dates
         const start = new Date(startDate);
         const end = new Date(endDate);
         
@@ -117,13 +113,11 @@ const createOffer = async (req, res) => {
             return res.status(400).json({ message: 'End date must be after start date' });
         }
 
-        // Check for existing offer code
         const existingOffer = await Offer.findOne({ code: code.toUpperCase().trim() });
         if (existingOffer) {
             return res.status(400).json({ message: 'Offer code already exists' });
         }
 
-        // Handle applicable items validation
         let finalApplicableItems = [];
         if (applicableTo !== 'all') {
             if (!applicableItems || !Array.isArray(applicableItems) || applicableItems.length === 0) {
@@ -134,7 +128,6 @@ const createOffer = async (req, res) => {
             finalApplicableItems = applicableItems;
         }
 
-        // Validate minOrderValue
         const minOrderValueNum = minOrderValue !== undefined && minOrderValue !== null && minOrderValue !== '' 
             ? Number(minOrderValue) : 0;
         
@@ -142,7 +135,6 @@ const createOffer = async (req, res) => {
             return res.status(400).json({ message: 'Minimum order value must be a positive number or zero' });
         }
 
-        // Validate maxDiscount
         let maxDiscountValue = null;
         if (type === 'percentage' && maxDiscount !== undefined && maxDiscount !== null && maxDiscount !== '') {
             maxDiscountValue = Number(maxDiscount);
@@ -151,7 +143,6 @@ const createOffer = async (req, res) => {
             }
         }
 
-        // Validate usageLimit
         let finalUsageLimit = null;
         if (usageLimit !== undefined && usageLimit !== null && usageLimit !== '') {
             finalUsageLimit = Number(usageLimit);
@@ -160,7 +151,6 @@ const createOffer = async (req, res) => {
             }
         }
 
-        // Convert isActive properly
         const isOfferActive = isActive === true || String(isActive).toLowerCase() === 'true';
 
         const newOffer = new Offer({
@@ -192,7 +182,6 @@ const createOffer = async (req, res) => {
     } catch (error) {
         console.error("Offer creation failed:", error);
         
-        // Handle mongoose validation errors
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
             return res.status(400).json({ 
@@ -200,7 +189,6 @@ const createOffer = async (req, res) => {
             });
         }
         
-        // Handle duplicate key errors
         if (error.code === 11000) {
             return res.status(400).json({ 
                 message: 'Offer code already exists'
@@ -275,13 +263,7 @@ if (offer.applicableItems && offer.applicableItems.length > 0) {
 }
 const updateOffer=async(req,res)=>{
     try {
-    //   const {error}=validateOfferData(req.body);
-    //   if(error){
-    //     return res.status(400).json({
-    //         success:false,
-    //         message:error.details[0].message
-    //     })
-    //   }  
+   
       const offerId=req.params.id;
       const updateData={
         ...req.body,

@@ -41,25 +41,32 @@ app.use(
 );
 
 app.use(async (req, res, next) => {
-  console.log(req.session)
   res.locals.user = req.session.user || null;
   res.locals.currentPath = req.path;
-
-  if (req.session.user) {
-    try {
-      const cart = await Cart.findOne({ userId: req.session.user._id });
-     
-      res.locals.cartCount = cart ? cart.items.length : 0;
-    } catch (error) {
-      console.error("Cart count middleware error:", error);
-      res.locals.cartCount = 0;
-    }
-  } else {
-    res.locals.cartCount = 0;
-  }
-
   next();
 });
+
+
+// app.use(async (req, res, next) => {
+//   // console.log(req.session)
+//   res.locals.user = req.session.user || null;
+//   res.locals.currentPath = req.path;
+
+//   if (req.session.user) {
+//     try {
+//       const cart = await Cart.findOne({ userId: req.session.user._id });
+     
+//       res.locals.cartCount = cart ? cart.items.length : 0;
+//     } catch (error) {
+//       console.error("Cart count middleware error:", error);
+//       res.locals.cartCount = 0;
+//     }
+//   } else {
+//     res.locals.cartCount = 0;
+//   }
+
+//   next();
+// });
 
 
 
@@ -76,9 +83,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 
-app.use("/", userRouter);
+
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
+
+
 
 
 app.get("/error", (req, res) => {

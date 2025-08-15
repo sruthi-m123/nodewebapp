@@ -25,7 +25,8 @@ const transactionSchema = new mongoose.Schema({
 reference: {
   type: String, 
   unique: true,
-  sparse: true 
+  sparse: true,
+  default: () => `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}` 
 },
 
   metadata: {
@@ -59,17 +60,18 @@ const walletSchema = new mongoose.Schema({
 
 
 walletSchema.index({ 'transactions.createdAt': -1 });
-
 walletSchema.methods.addFunds = async function(amount, transactionData) {
   this.balance += amount;
   this.transactions.push({
     amount,
     type: 'refund',
-    ...transactionData,
-    reference: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+reference: transactionData?.reference ?? `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    ...transactionData
+     
   });
   return this.save();
 };
+
 
 const Wallet = mongoose.model('Wallet', walletSchema);
 module.exports=Wallet;
