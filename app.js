@@ -47,26 +47,26 @@ app.use(async (req, res, next) => {
 });
 
 
-// app.use(async (req, res, next) => {
-//   // console.log(req.session)
-//   res.locals.user = req.session.user || null;
-//   res.locals.currentPath = req.path;
+app.use(async (req, res, next) => {
+  // console.log(req.session)
+  res.locals.user = req.session.user || null;
+  res.locals.currentPath = req.path;
 
-//   if (req.session.user) {
-//     try {
-//       const cart = await Cart.findOne({ userId: req.session.user._id });
+  if (req.session.user) {
+    try {
+      const cart = await Cart.findOne({ userId: req.session.user._id });
      
-//       res.locals.cartCount = cart ? cart.items.length : 0;
-//     } catch (error) {
-//       console.error("Cart count middleware error:", error);
-//       res.locals.cartCount = 0;
-//     }
-//   } else {
-//     res.locals.cartCount = 0;
-//   }
+      res.locals.cartCount = cart ? cart.items.length : 0;
+    } catch (error) {
+      console.error("Cart count middleware error:", error);
+      res.locals.cartCount = 0;
+    }
+  } else {
+    res.locals.cartCount = 0;
+  }
 
-//   next();
-// });
+  next();
+});
 
 
 

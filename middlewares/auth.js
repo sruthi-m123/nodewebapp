@@ -48,11 +48,10 @@ const redirectIfLoggedIn = (req, res, next) => {
     next();
 };
 const isLoggedIn=(req,res,next)=>{
-     // Check if session exists and has user data
-    if (req.session && req.session.user && req.session.user._id) {
+    console.log("user in isLogged middleware",req.session.user.id)
+    if (req.session && req.session.user && req.session.user.id) {
       return next();
     }
-    // Redirect to login with message
     return res.redirect('/login?error=not_logged_in');
 }
 const isNotLoggedIn=(req,res,next)=>{

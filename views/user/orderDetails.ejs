@@ -50,9 +50,9 @@
 
     <div class="status-timeline">
         <ul>
-            <li class="status-item <%= order.status.toUpperCase() === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : 'completed' %>">
+            <li class="status-item <%=  order.status === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : 'completed' %>">
                 <div class="status-icon">
-                    <% if (order.status === 'ORDERED' || order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
+                    <% if (order.status === order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
                         •
                     <% } else { %>
                         ✓
@@ -61,11 +61,11 @@
                 <div class="status-label">ORDER PLACED</div>
             </li>
             
-            <li class="status-item <%= order.status.toUpperCase() === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : (order.status === 'ORDERED' ? 'pending' : 'completed') %>">
+            <li class="status-item <%= order.status.toUpperCase() === 'SHIPPED' || order.status === 'DELIVERED' ? 'active' : (order.status === '' ? 'pending' : 'completed') %>">
                 <div class="status-icon">
                     <% if (order.status === 'SHIPPED' || order.status === 'DELIVERED') { %>
                         •
-                    <% } else if (order.status === 'ORDERED') { %>
+                    <% } else if (order.status === 'PENDING') { %>
                         ○
                     <% } else { %>
                         ✓
@@ -74,11 +74,11 @@
                 <div class="status-label">SHIPPED</div>
             </li>
            
-            <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'ORDERED' ? 'pending' : 'completed')) %>">
+            <li class="status-item <%= order.status.toUpperCase() === 'DELIVERED' ? 'active' : (order.status === 'SHIPPED' ? 'pending' : (order.status === 'PENDING' ? 'pending' : 'completed')) %>">
                 <div class="status-icon">
                     <% if (order.status === 'DELIVERED') { %>
                         •
-                    <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
+                    <% } else if (order.status === 'SHIPPED' || order.status === 'PENDING') { %>
                         ○
                     <% } else { %>
                         ✓
@@ -91,7 +91,7 @@
                 <div class="status-icon">
                     <% if (order.status === 'DELIVERED') { %>
                         •
-                    <% } else if (order.status === 'SHIPPED' || order.status === 'ORDERED') { %>
+                    <% } else if (order.status === 'SHIPPED' || order.status === 'PENDING') { %>
                         ○
                     <% } else { %>
                         ✓
@@ -102,7 +102,7 @@
         </ul>
     </div>
 
-    <% if (order.status.toUpperCase() === 'ORDERED' || order.status.toUpperCase() === 'PROCESSING') { %>
+    <% if (order.status.toUpperCase() === 'PENDING' || order.status.toUpperCase() === 'PROCESSING') { %>
         <div class="action-buttons">
             <button class="action-btn cancel-btn"
             data-order-id="<%= order._id %>"

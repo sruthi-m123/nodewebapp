@@ -7,12 +7,15 @@ const { sendEmailChangeOTP } = require('../../services/emailService');
 class profileController {
   static async getProfile(req, res) {
     try {
-      const userId = req.session?.user?._id || req.user?._id;
-      if (!userId) return res.redirect("/login?error=session_lost");
+      console.log("loooogg");
+      console.log('userrrrr',req.session.user)
+      const userId = req.session?.user?.id || req.user?.id;
+      if (!userId) return res.redirect("/user/login?error=session_lost");
+      
 
       const user = await User.findById(userId).select("-password -googleId -isBlocked -isAdmin");
 console.log("user avatar",user.avatar)
-      res.render("/user/profile", {
+      res.render("user/profile", {
         activeTab: "profile",
         user: {
 name: user.name || "",

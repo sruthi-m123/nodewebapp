@@ -116,6 +116,7 @@ const getOrder=async(req,res)=>{
 if(!order){
     return res.status(404).render('error',{error:'order not found'});
 }
+console.log('order staaatus',order.status)
 res.render('admin/order-details',{
     title:'Order Details',
     order,
@@ -133,7 +134,7 @@ const updateOrderStatus=async(req,res)=>{
         const{orderId}=req.params;
         const {status}=req.body;
 
-         const validStatuses = ['pending', 'shipped', 'out for delivery', 'delivered', 'cancelled', 'returned','processing','ordered'];
+         const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled', 'returned','processing'];
    if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
@@ -160,7 +161,6 @@ if(!updatedOrder){
 const getReturnDetails=async(req,res)=>{
   try {
    const orderId=req.params.orderId;
-   console.log("orerId inside the verify :",orderId);
    const order=await Order.findOne({orderId:orderId});
    console.log("order imside the verify controller :",order);
    if(!order){
@@ -233,7 +233,7 @@ const verifyReturnedRequest = async (req, res) => {
         });
       }
 
-      if (order.totalAmount <= 0) {
+      if (order.total <= 0) {
         return res.status(400).json({
           error: 'Invalid refund amount',
           code: 'INVALID_REFUND_AMOUNT'
@@ -241,12 +241,12 @@ const verifyReturnedRequest = async (req, res) => {
       }
 
       order.returnRequested = false;
-      order.returnApproved = true;
+      order.returnDetails.status = 'approved';
       order.status = 'returned';
       order.returnProcessedAt = new Date();
       order.adminNotes = adminNotes || 'Return approved by administrator';
 
-      const refundAmount = order.totalAmount;
+      const refundAmount = order.total;
 
       wallet = await Wallet.findOne({ user: order.userId });
       
@@ -258,7 +258,13 @@ const verifyReturnedRequest = async (req, res) => {
         await wallet.save();
       }
 
-      const transactionRef = `REFUND-${order.orderId}-${Date.now()}`;
+ const returnRequest = generateRefundId(orderId)
+
+    if (!returnRequest) {
+      return res.status(404).json({ error: "Return request not found" });
+    }
+
+const transactionRef = `REFUND-${order.orderId}-${returnRequest._id}`;
       
       await wallet.addFunds(refundAmount, {
         order: order._id,
@@ -267,19 +273,19 @@ const verifyReturnedRequest = async (req, res) => {
         status: 'completed'
       });
 
-      const refund = new Refund({
-        order: order._id,
-        user: order.user._id,
-        amount: refundAmount,
-        status: 'completed',
-        processedBy: req.user.id,
-        notes: adminNotes,
-        walletTransaction: wallet.transactions[wallet.transactions.length - 1]._id
-      });
+      // const refund = new Refund({
+      //   order: order._id,
+      //   user: order.userId._id,
+      //   amount: refundAmount,
+      //   status: 'completed',
+      //   processedBy: req.user._id,
+      //   notes: adminNotes,
+      //   walletTransaction: wallet.transactions[wallet.transactions.length - 1]._id
+      // });
 
       const restockOps = order.items.map(item => 
         Product.findByIdAndUpdate(
-          item.product._id,
+          item.productId._id,
           { $inc: { stock: item.quantity } },
           { new: true }
         )
@@ -287,44 +293,44 @@ const verifyReturnedRequest = async (req, res) => {
 
       await Promise.all([
         order.save(),
-        refund.save(),
+        // refund.save(),
         ...restockOps
       ]);
 
-      try {
-        await sendNotification({
-          email: order.user.email,
-          type: 'refund_approved',
-          data: {
-            orderId: order.orderId,
-            amount: refundAmount,
-            newBalance: wallet.balance
-          }
-        });
-      } catch (notificationError) {
-        console.error('Notification failed:', notificationError);
-      }
+      // try {
+      //   await sendNotification({
+      //     email: order.user.email,
+      //     type: 'refund_approved',
+      //     data: {
+      //       orderId: order.orderId,
+      //       amount: refundAmount,
+      //       newBalance: wallet.balance
+      //     }
+      //   });
+      // } catch (notificationError) {
+      //   console.error('Notification failed:', notificationError);
+      // }
 
     } else {
       order.returnRequested = false;
-      order.returnApproved = false;
+      order.returnDetails.status = 'rejected';
       order.returnRejectedAt = new Date();
       order.adminNotes = adminNotes || 'Return rejected by administrator';
       
       await order.save();
 
-      try {
-        await sendNotification({
-          email: order.user.email,
-          type: 'refund_rejected',
-          data: {
-            orderId: order.orderId,
-            reason: adminNotes
-          }
-        });
-      } catch (notificationError) {
-        console.error('Notification failed:', notificationError);
-      }
+      // try {
+      //   await sendNotification({
+      //     email: order.user.email,
+      //     type: 'refund_rejected',
+      //     data: {
+      //       orderId: order.orderId,
+      //       reason: adminNotes
+      //     }
+      //   });
+      // } catch (notificationError) {
+      //   console.error('Notification failed:', notificationError);
+      // }
     }
 
     return res.json({ 
@@ -369,11 +375,19 @@ const getOrderDetails=async(req,res)=>{
 if(!order){
   return res.status(404).send("order not found");
 }
+console.log("ORDEEERS",order.status)
 res.render('admin/orderDetailPage',{order,layout:false})
   } catch (error) {
     console.error(err);
     res.status(500).send("server error");
   }
+}
+
+const crypto = require("crypto");
+
+function generateRefundId(orderId) {
+  const random = crypto.randomBytes(2).toString("hex"); 
+  return `REF-${orderId.slice(-6)}-${Date.now()}-${random}`;
 }
 
 

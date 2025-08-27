@@ -480,7 +480,7 @@ const addresses = await Address.findOne(
        
         let status;
         if(paymentMethod==='cod'){
-            status='ordered';
+            status='pending';
         }else{
             status='processing';
         }

@@ -65,8 +65,9 @@ walletSchema.methods.addFunds = async function(amount, transactionData) {
   this.transactions.push({
     amount,
     type: 'refund',
+     ...transactionData,
 reference: transactionData?.reference ?? `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    ...transactionData
+   
      
   });
   return this.save();

@@ -17,12 +17,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   font-size: 14px;
   color: #5d4037; /* Dark brown */
+  margin-left: 98px;
 }
 
 .main-content {
-  display: flex;
   gap: 30px;
   flex-wrap: wrap;
+  margin-left:140px
 }
 
 .left-section {

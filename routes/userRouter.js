@@ -57,15 +57,15 @@ req.session.user = {
       phone: req.user.phone || null,
        googleId: req.user.googleId || null,
     };
-        res.redirect('/');
+        res.redirect('/user/home');
   }
 );
 //logout
 router.post('/logout',userController.logout);
 
-
 //profile page
-router.get('/profile', isLoggedIn,upload.avatar, profileController.getProfile);
+//router.get('/profile', isLoggedIn,upload.avatar, profileController.getProfile);
+router.get('/profile',isLoggedIn,upload.avatar,profileController.getProfile)
 router.get('/profile/edit',upload.avatar,profileController.getEditProfile);
 router.post('/profile/update', upload.avatar, profileController.updateProfile);
 router.post('/request-email-change',profileController.requestEmailChangeOTP);

@@ -231,7 +231,7 @@ async function updateCart() {
 // Fetch current cart count from server
 async function fetchCartCount() {
   try {
-    const response = await fetch('/cart/count', {
+    const response = await fetch('/user/cart/count', {
       credentials: 'include'
     });
     

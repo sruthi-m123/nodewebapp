@@ -50,6 +50,7 @@ router.post('/orders/:orderId/verify-return',orderController.verifyReturnedReque
 router.get('/orders/:orderId/verify-return',orderController.getReturnDetails);
 router.get('/orders/:orderId/view',orderController.getOrderDetails);
 
+
 //offer managment
 router.get('/offers',offerController.getOfferPage);
 router.post('/offers/add-offer',offerController.createOffer);

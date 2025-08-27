@@ -1,6 +1,6 @@
 
 function view(id) {
-  window.location.href = `/orders-details/${id}`;
+  window.location.href = `/user/orders-details/${id}`;
 }
 
 

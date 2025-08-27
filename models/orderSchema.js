@@ -68,7 +68,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'ordered', 'processing', 'shipped', 'out for delivery', 'delivered', 'cancelled', 'returned'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'],
     default: 'pending'
   },
 
@@ -95,6 +95,19 @@ const orderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  // returnApproved: {
+  //   type: Boolean,
+  //   default: false
+  // },
+
+  // returnProcessedAt: Date,
+  // returnRejectedAt: Date,
+
+  // adminNotes: {
+  //   type: String,
+  //   default: ''
+  // },
+
   returnDetails: {
     reason: String,
     requestDate: Date,

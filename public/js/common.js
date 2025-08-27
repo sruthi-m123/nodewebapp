@@ -36,13 +36,13 @@ window.addEventListener("click",(e)=>{
 
   document.getElementById('logoutBtn').addEventListener('click', function (e) {
     e.preventDefault();
-    fetch('/logout', {
+    fetch('/user/logout', {
       method: 'POST',
       credentials: 'include'
     })
       .then(res => {
         if (res.ok) {
-          window.location.href = '/'; 
+          window.location.href = '/home'; 
         }
       })
       .catch(err => console.error('Logout failed:', err));
@@ -51,7 +51,7 @@ window.addEventListener("click",(e)=>{
 
 async function updateCartCount(){
   try{
-const response=await fetch('/cart/count');
+const response=await fetch('/user/cart/count');
 const data=await response.json();
 const countElement=document.querySelector('.cart-count');
 if(countElement){

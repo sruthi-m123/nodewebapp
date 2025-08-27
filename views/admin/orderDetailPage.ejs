@@ -23,15 +23,19 @@
         </div>
 
         <div class="status-actions">
-          <div class="status-select">
-            <button class="status-btn"><%= order.status %></button>
-            <select name="status" class="dropdown">
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
+<div class="dropdown">
+  <button class="dropdown-btn">Select Status ⌄</button>
+  <ul class="dropdown-list">
+    <li data-value="pending">Pending</li>
+    <li data-value="shipped">Shipped</li>
+    <li data-value="delivered">Delivered</li>
+    <li data-value="cancelled">Cancelled</li>
+  </ul>
+</div>
+
+<p id="selected-status">Selected: None</p>
+
+
           <button class="update-btn" data-order-id="<%= order._id %>">
             Update Status
           </button>
@@ -96,3 +100,182 @@
   </div>
 </div>
 <%- include('../partials/admin/admin-footer') %>
+
+<style>
+/* Dropdown container */
+.update-btn {
+  background: #007bff; /* blue background */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;   /* 👈 makes it clickable with hand cursor */
+  transition: background 0.3s ease;
+}
+
+.update-btn:hover {
+  background: #0056b3; /* darker blue on hover */
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+}
+
+/* Button */
+.dropdown-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* List hidden by default */
+.dropdown-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 4px;
+  list-style: none;
+  padding: 0;
+  width: 160px;
+  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+/* List items */
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-list li:hover {
+  background: #f2f2f2;
+}
+
+/* Show dropdown when active */
+.dropdown.show .dropdown-list {
+  display: block;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.dropdown-list {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+  list-style: none;
+  padding: 0;
+  width: 120px;
+  z-index: 10;
+}
+
+.dropdown-list.show {
+  display: block;
+}
+
+.dropdown-list li {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dropdown-list li:hover {
+  background-color: #f0f0f0;
+}
+
+#selected-status {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".status-actions").forEach((container) => {
+    const dropdownBtn = container.querySelector(".dropdown-btn");
+    const dropdownList = container.querySelector(".dropdown-list");
+    const selectedText = container.querySelector("#selected-status");
+    const updateBtn = container.querySelector(".update-btn");
+
+    let selectedStatus = null;
+
+    // Toggle dropdown
+    dropdownBtn.addEventListener("click", () => {
+      dropdownList.classList.toggle("show");
+    });
+
+    // Select status
+    dropdownList.querySelectorAll("li").forEach((li) => {
+      li.addEventListener("click", () => {
+        selectedStatus = li.dataset.value;
+        selectedText.textContent = "Selected: " + selectedStatus;
+        dropdownList.classList.remove("show");
+      });
+    });
+
+    // Update status POST
+    updateBtn.addEventListener("click", async () => {
+      if (!selectedStatus) {
+        alert("Please select a status first!");
+        return;
+      }
+
+      const orderId = updateBtn.dataset.orderId;
+
+      try {
+        const res = await fetch("/admin/update-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId, status: selectedStatus }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("✅ Status updated to " + selectedStatus);
+        } else {
+          alert("❌ Error: " + (data.message || "Failed"));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠ Something went wrong");
+      }
+    });
+  });
+
+  // Close dropdown if clicked outside
+  document.addEventListener("click", (e) => {
+    document.querySelectorAll(".dropdown-list").forEach((list) => {
+      if (!list.parentElement.contains(e.target)) {
+        list.classList.remove("show");
+      }
+    });
+  });
+});
+</script>
+

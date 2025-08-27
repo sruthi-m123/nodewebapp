@@ -53,12 +53,7 @@ console.log("formated items:",formatItems)
       });
     }
 
-    if (order.status === 'out for delivery' && order.outForDeliveryAt) {
-      statusHistory.push({
-        date: order.outForDeliveryAt,
-        message: 'Your order is out for delivery.'
-      });
-    }
+
 
     if (order.status === 'delivered' && order.deliveredAt) {
       statusHistory.push({
@@ -84,10 +79,8 @@ console.log("status history",statusHistory);
     // Status message map
     const getStatusMessage = (status) => {
       const messages = {
-        ordered: 'Your order has been received and is being processed.',
         processing: 'Seller is preparing your item for shipment.',
         shipped: 'Your item has been shipped and is on its way.',
-        out_for_delivery: 'Your item is out for delivery.',
         delivered: 'Your item has been delivered.',
         cancelled: 'Your order has been cancelled.',
         returned: 'The returned product has been received.'
@@ -244,7 +237,7 @@ const order=await Order.findById(orderId);
 if(!order){
     return res.status(404).json({success:false,message:'order not found'})
 }
-if(order.status!=='pending'&&order.status!=='processing'&&  order.status !== 'ordered'){
+if(order.status!=='pending'&&order.status!=='processing'&&  order.status !== 'PENDING'){
     return res.status(400).json({
         success:false,
         message:'order cannt be cancelled at this stage '
@@ -328,7 +321,7 @@ const returnOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 console.log("order",order);
-        // Check if order can be returned
+
         if (order.status.toLowerCase() !== 'delivered') {
             return res.status(400).json({ 
                 success: false, 

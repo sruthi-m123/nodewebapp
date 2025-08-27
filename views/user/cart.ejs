@@ -27,7 +27,7 @@
       </td>
 
       <td class="product-info">
-        <img src="<%= item.productId.images[0] %>" alt="<%= item.name %>" class="product-img">
+        <img src="/<%= item.productId.images[0] %>" alt="<%= item.name %>" class="product-img">
         <span><%= item.name %></span>
         <% if (!item.productId.isActive) { %>
           <p class="text-red">This product is not currently available</p>
@@ -70,7 +70,7 @@
       </div>
 
       <div class="checkout-btn-container">
-<a href="/checkout" class="checkout-btn">
+<a href="/user/checkout" class="checkout-btn">
           <i class="fas fa-lock"></i> Proceed to Checkout
         </a>
       </div>

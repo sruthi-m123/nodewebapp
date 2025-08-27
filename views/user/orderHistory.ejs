@@ -41,7 +41,7 @@
             <td data-label="Price">₹<%= order.price.toLocaleString('en-IN') %></td>
             <td data-label="Delivery Date"><%= new Date(order.deliveryDate).toLocaleDateString('en-GB') %></td>
             <td data-label="Product Image">
-              <img src="<%= order.imageUrl %>" alt="<%= order.productName %>" class="product-img">
+              <img src="/<%= order.imageUrl %>" alt="<%= order.productName %>" class="product-img">
             </td>
             <td data-label="Status">
               <button class="status-btn status-<%= order.status.toLowerCase() %>">
