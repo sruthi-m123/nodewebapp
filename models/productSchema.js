@@ -34,6 +34,10 @@ const productSchema= new Schema({
       default: 'flat' 
     }
 },
+ bestOffer: {
+    type: Schema.Types.ObjectId,
+    ref: "Offer"
+  },
 
     stock:{
         type:Number,

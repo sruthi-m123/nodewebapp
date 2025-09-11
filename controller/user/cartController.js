@@ -10,6 +10,7 @@ const getCart = async (req, res) => {
 
     const userId = req.session.user.id;
     let cart = await Cart.findOne({ userId }).populate('items.productId');
+    console.log("cart is availabke :",cart);
     
     if (!cart) {
       cart = { items: [], totalPrice: 0 };
@@ -18,11 +19,9 @@ const getCart = async (req, res) => {
     const outOfStockItems = [];
     const validItems = [];
 
-    // Single loop through all items
     for (const item of cart.items) {
       const product = item.productId;
       
-      // Case 1: Product deleted or completely out of stock
       if (!product || product.stock < 1) {
         outOfStockItems.push({
           productId: item.productId?._id,
@@ -33,7 +32,6 @@ const getCart = async (req, res) => {
         continue;
       }
 
-      // Case 2: Partial stock available
       const allowedQty = Math.min(item.quantity, product.stock);
       if (allowedQty < item.quantity) {
         outOfStockItems.push({
@@ -52,7 +50,6 @@ const getCart = async (req, res) => {
       });
     }
 
-    // Update cart if changes needed
     if (outOfStockItems.length > 0) {
       await Cart.findOneAndUpdate(
         { userId },
@@ -101,6 +98,7 @@ const getCart = async (req, res) => {
 };
 const addToCart = async (req, res) => {
   try {
+    console.log("req session:",req.session)
     if (!req.session.user) {
       return res.status(401).json({ message: 'Please login to continue shopping' });
     }
@@ -109,20 +107,23 @@ const addToCart = async (req, res) => {
     console.log("userId inside add to cart:",userId);
     const productId = req.params.productId;
     const quantity = parseInt(req.body.quantity);
+    console.log("quantity:",req.body.quantity);
     const limit = 10;
 
-    // Atomic stock check and reservation
     const product = await Product.findOneAndUpdate(
       {
         _id: productId,
-        stock: { $gte: quantity } // Only match if sufficient stock
+        stock: { $gte: quantity } 
       },
       { $inc: { stock: -quantity } },
       { new: true }
-    );
+    ).populate('bestOffer');
+    console.log("hiiiii");
+    console.log("product details befor cal offer:",product);
 
     if (!product) {
       const currentProduct = await Product.findById(productId);
+     
       const available = currentProduct?.stock || 0;
       return res.status(400).json({
         status: 'error',
@@ -132,9 +133,9 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // Quantity limit check
+
     if (quantity > limit) {
-      // Rollback stock deduction
+      
       await Product.findByIdAndUpdate(productId, { $inc: { stock: quantity } });
       return res.status(400).json({
         status: 'error',
@@ -144,6 +145,8 @@ const addToCart = async (req, res) => {
 
     // Cart update logic
     let cart = await Cart.findOne({ userId });
+    console.log("checking bestoffer:",product.bestOffer)
+    const effectivePrice=product.bestOffer?.discountedPrice||product.price;
     
     if (!cart) {
       cart = new Cart({
@@ -152,7 +155,7 @@ const addToCart = async (req, res) => {
           
           productId,
           quantity,
-          price: product.price,
+          price: effectivePrice,
           totalPrice: product.price * quantity
         }]
       });
@@ -163,19 +166,21 @@ const addToCart = async (req, res) => {
 
       if (existingItem) {
         existingItem.quantity += quantity;
-        existingItem.totalPrice = existingItem.quantity * product.price;
+        existingItem.price=effectivePrice;
+        existingItem.totalPrice = existingItem.quantity * effectivePrice;
       } else {
         cart.items.push({
           
           productId,
           quantity,
-          price: product.price,
-          totalPrice: product.price * quantity
+          price: effectivePrice,
+          totalPrice: effectivePrice * quantity
         });
       }
     }
 
     await cart.save();
+    console.log("cart inside the add to cart :",cart)
     res.json({ 
       success: true,
       message: 'Added to cart',
@@ -193,11 +198,13 @@ const addToCart = async (req, res) => {
 };
 
 const removeCartItem=async(req,res)=>{
+  console.log("inside the session controller")
+  console.log("sesssion :",req.session);
   if (!req.session.user && !req.user) {
   return res.status(401).json({ message: 'please login to continue' });
 }
 
-    const userId=req.session.user?._id;
+    const userId=req.session.user?.id;
     const itemId=req.params.itemId;
     if(!userId){
         return res.status(401).json({message:'please login to continue'});

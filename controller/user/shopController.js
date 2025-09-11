@@ -1,7 +1,7 @@
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
-
+const Offer=require("../../models/offerSchema");
 
 
 
@@ -16,12 +16,18 @@ const loadShopping = async (req, res) => {
     }
 
     //price range
-    if (req.query.price === "0-1000") {
-      filters.price = { $lte: 100 };
-    } else if (req.query.price === "1000-3000") {
-      filters.price = { $gt: 1000, $lte: 3000 };
-    } else if (req.query.price === "3000+") {
-      filters.price = { $gt: 3000 };
+    // if (req.query.price === "0-1000") {
+    //   filters.price = { $lte: 1000};
+    // } else if (req.query.price === "1000-3000") {
+    //   filters.price = { $gt: 1000, $lte: 3000 };
+    // } else if (req.query.price === "3000+") {
+    //   filters.price = { $gt: 3000 };
+    // }
+
+    if(req.query.minPrice||req.query.maxPrice){
+      filters.price={};
+      if(req.query.minPrice) filters.price.$gte=Number(req.query.minPrice);
+      if(req.query.maxPrice) filters.price.$lte=Number(req.query.maxPrice);
     }
     // color
     if (req.query.color && req.query.color !== "all") {
@@ -40,22 +46,77 @@ const loadShopping = async (req, res) => {
     const limit=6;
     const page=parseInt(req.query.page)||1;
     
-    const totalProducts=await Product.countDocuments();
-    const totalPages=Math.ceil(totalProducts/limit);
+const totalProducts = await Product.countDocuments({ ...filters, ...searchQuery, isActive: true });    const totalPages=Math.ceil(totalProducts/limit);
     if (req.session.user) {
-          console.log("userId iside the shopall page",req.session.user.id);
       userData = await User.findById(req.session.user.id);
     }
     const categories = await Category.find({ isDeleted: false });
 
 
-    const products = await Product.find({
+    let products = await Product.find({
       ...filters,
       ...searchQuery,
+      isActive:true
     })
     .skip((page-1)*limit)
     .limit(limit)
-    .populate("category");
+    .populate("category")
+    .populate("bestOffer")
+    .lean();
+    const now = new Date();
+const offers=await Offer.find({isActive:true}).lean();
+products=products.map(product=>{
+  const applicableOffers=offers.filter(offer=>{
+
+ if (!offer.isActive) return false;
+  if (offer.startDate && new Date(offer.startDate) > now) return false; 
+  if (offer.endDate && new Date(offer.endDate) < now) return false; 
+
+    if(offer.applicableTo==='all') return true;
+   if (offer.applicableTo === 'product') {
+return offer.applicableItems.some(id => id.toString() === product._id.toString());
+  }
+  if (offer.applicableTo === 'category') {
+    return offer.applicableItems.some(id =>id.toString()=== product.category._id.toString());
+  }
+  })
+  console.log("applicable offers :",applicableOffers);
+
+// if(applicableOffers.length>0){
+//   const bestOffer=applicableOffers.reduce((max,offer)=>{
+//     return offer.discountValue>max.discountValue?offer:max;
+//   });
+//    product=product.toObject();
+// product.bestOffer=bestOffer;
+// }
+let bestOffer=null;
+if(applicableOffers.length>0){
+  const productPrice=product.price;
+
+   bestOffer=applicableOffers.reduce((max,offer)=>{
+    let discount=0;
+    if(offer.type==='percentage'){
+      discount=(productPrice*offer.discountValue)/100;
+if(offer.maxDiscount){
+  discount=Math.min(discount,offer.maxDiscount);
+}
+
+    }else if(offer.type==='flat'){
+discount=offer.discountValue;
+    }
+if(productPrice<offer.minOrderValue){
+  discount=0;
+}
+return discount>max.discount?{...offer,discount}:max;
+  },{discount:0})
+}
+product = product;
+// if (bestOffer) product.bestOffer = bestOffer.toObject ? bestOffer.toObject() : bestOffer;
+if(bestOffer) product.bestOffer=bestOffer;
+console.log("product bestoffer:",product.bestOffer);
+return product;
+});
+
     return res.render("user/shopall", {
 
       pageCSS: "user/shopall.css",
@@ -103,7 +164,6 @@ const applyFilters = async (req, res) => {
       ) {
         query.stock = { $lte: 0 }; // Out-of-stock
       }
-      // If both are selected, don't filter by stock
     }
 
     //  Color Filter

@@ -393,18 +393,18 @@ const login = async (req, res) => {
     const trimmedEmail = email ? email.trim() : '';
     const trimmedPassword = password ? password.trim() : '';
 
-    console.log("req.body", { email: trimmedEmail, password: trimmedPassword });
-    console.log("🔍 Input email:", trimmedEmail);
-    console.log("🔍 Input password:", trimmedPassword);
-    console.log("🔍 Input password type:", typeof trimmedPassword);
-    console.log("🔍 Input password length:", trimmedPassword.length);
+    // console.log("req.body", { email: trimmedEmail, password: trimmedPassword });
+    // console.log("🔍 Input email:", trimmedEmail);
+    // console.log("🔍 Input password:", trimmedPassword);
+    // console.log("🔍 Input password type:", typeof trimmedPassword);
+    // console.log("🔍 Input password length:", trimmedPassword.length);
 
     if (!trimmedEmail || !trimmedPassword) {
       return res.render("user/login", { layout: false, message: "Email and password are required" });
     }
 
     const findUser = await User.findOne({ isAdmin: 0, email: trimmedEmail });
-    console.log("🔍 Retrieved user from DB:", findUser);
+    // console.log("🔍 Retrieved user from DB:", findUser);
 
     if (!findUser) {
       return res.render("user/login", { layout: false, message: "User not found" });
@@ -414,12 +414,12 @@ const login = async (req, res) => {
       return res.render("user/login", { layout: false, message: "User is blocked by admin" });
     }
 
-    console.log("🔍 Stored hash:", findUser.password);
-    console.log("🔍 Hash length:", findUser.password.length);
-    console.log("🔍 Hash starts with $2b$:", findUser.password.startsWith('$2b$'));
+    // console.log("🔍 Stored hash:", findUser.password);
+    // console.log("🔍 Hash length:", findUser.password.length);
+    // console.log("🔍 Hash starts with $2b$:", findUser.password.startsWith('$2b$'));
 
     const passwordMatch = await bcrypt.compare(trimmedPassword, findUser.password);
-    console.log("🔍 Password match result:", passwordMatch);
+    // console.log("🔍 Password match result:", passwordMatch);
 
     if (!passwordMatch) {
       return res.render("user/login", { layout: false, message: "Incorrect password" });

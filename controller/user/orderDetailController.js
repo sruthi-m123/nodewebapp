@@ -23,7 +23,6 @@ console.log("orders",order);
       return res.status(404).render('error', { message: 'Order not found' });
     }
 
-    // Format items with image & color
     const formatItems = order.items.map(item => ({
       ...item,
       name: item.productId?.ProductName || item.name,
@@ -31,7 +30,6 @@ console.log("orders",order);
       color: item.productId?.color || 'N/A'
     }));
 console.log("formated items:",formatItems)
-    // Build status history timeline
     const statusHistory = [
       {
         date: order.createdAt,
@@ -126,16 +124,13 @@ const invoice = async (req, res) => {
         
         res.setHeader('Content-Type', 'application/pdf');
 res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order_${orderId}.pdf`);        
-        // Pipe the PDF to the response
         doc.pipe(res);
         
-        // Helper function to validate numbers
         const validateNumber = (value) => {
             const num = Number(value);
             return isNaN(num) ? 0 : num;
         };
 
-        // Header Section - Changed to Chettinad Sarees
         doc.fontSize(20).text('Chettinad Sarees', { align: 'center' });
         doc.moveDown(0.5);
         doc.fontSize(10).text('Traditional Handwoven Sarees | Kerala, India', { align: 'center' });
@@ -155,8 +150,8 @@ res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order
 
         // Items Table Setup
         const tableTop = doc.y;
-        const colPositions = [50, 300, 370, 450]; // Adjusted column positions
-        const colWidths = [250, 70, 80, 80]; // Column widths
+        const colPositions = [50, 300, 370, 450]; 
+        const colWidths = [250, 70, 80, 80];
 
         // Table Headers
         doc.font('Helvetica-Bold');
@@ -237,12 +232,10 @@ const order=await Order.findById(orderId);
 if(!order){
     return res.status(404).json({success:false,message:'order not found'})
 }
-if(order.status!=='pending'&&order.status!=='processing'&&  order.status !== 'PENDING'){
-    return res.status(400).json({
-        success:false,
-        message:'order cannt be cancelled at this stage '
-    });
+if (!['pending', 'processing'].includes(order.status.toLowerCase())) {
+    return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
 }
+
 
 // full order cancellation
 if(!itemsToCancel||itemsToCancel.length===0){

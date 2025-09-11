@@ -168,7 +168,9 @@ function handleAddToCart(response) {
 // Remove item from cart
 
 async function removeItem(itemId) {
+  
   console.log("itemId:",itemId);
+  // console.log("req session :",req.session.user);
   try {
     const response = await fetch(`/user/cart/remove/${itemId}`, {
       method: 'DELETE',
@@ -210,7 +212,7 @@ async function updateCart() {
   });
 
   try {
-    const response = await fetch('/cart/update', {
+    const response = await fetch('/user/cart/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

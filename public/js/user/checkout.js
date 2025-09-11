@@ -1,4 +1,3 @@
-// public/js/checkout.js
 
 document.addEventListener('DOMContentLoaded', function () {
     const checkoutData = document.getElementById('checkout-data');
@@ -304,7 +303,7 @@ function placeOrder() {
     return;
   }
 
-  fetch('/api/orders', {
+  fetch('/user/orders-placed', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -324,7 +323,7 @@ function placeOrder() {
           text: 'Your order was placed successfully.',
           confirmButtonText: 'View Order'
         }).then(() => {
-          window.location.href = `/order-success/${data.orderId}`;
+          window.location.href = `/user/order-success/${data.orderId}`;
         });
       } else {
         Swal.fire({

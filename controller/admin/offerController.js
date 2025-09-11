@@ -2,7 +2,7 @@
 const Offer=require('../../models/offerSchema');
 const Product=require('../../models/productSchema');
 const Category=require('../../models/categorySchema');
-
+const {updateProductsOffer}=require('../../utils/bestOffer');
 const getOfferPage=async(req,res)=>{
     try{
 const currentPage=parseInt(req.query.page)||1;
@@ -173,6 +173,8 @@ const createOffer = async (req, res) => {
         
         await newOffer.save();
         
+await updateProductsOffer(newOffer);
+
         res.status(201).json({
             success: true,
             message: 'Offer created successfully',
@@ -202,22 +204,52 @@ const createOffer = async (req, res) => {
     }
 }
 
-const deleteOffer=async(req,res)=>{
-    try{
-const{offerId}=req.params;
-console.log("offerId:",offerId);
-const offers= await Offer.findOne({_id:offerId});
-console.log("offers to delete:",offers);
-if(!offers){
-   return res.status(404).json({message:"offer not found"})
-}
-await Offer.findOneAndDelete({_id:offerId});
-res.status(200).json({success:true,message:"offer successfully deleted"})
+// const deleteOffer=async(req,res)=>{
+//     try{
+// const{offerId}=req.params;
+// console.log("offerId:",offerId);
+// const offers= await Offer.findOne({_id:offerId});
+// console.log("offers to delete:",offers);
+// if(!offers){
+//    return res.status(404).json({message:"offer not found"})
+// }
+// await Offer.findOneAndDelete({_id:offerId});
+// res.status(200).json({success:true,message:"offer successfully deleted"})
  
-}catch(error){
-console.error("error deleting the offer:",error);
-res.status(500).json({success:false,message:"server error while deleting the offer"})
-}
+// }catch(error){
+// console.error("error deleting the offer:",error);
+// res.status(500).json({success:false,message:"server error while deleting the offer"})
+// }
+// }
+
+
+const deleteOffer=async(req,res)=>{
+    try {
+        const {offerId}=req.params;
+        const offer=await Offer.findOne({_id:offerId});
+        if(!offer){
+            return res.status(200).json({
+                success:true,
+                message:"Offer already deleted"
+            });
+        }
+offer.isDeleted=true;
+offer.isActive=false;
+await offer.save();
+
+await Product.updateMany({bestOffer:offer._id},{$unset:{bestOffer:""}})
+
+res.status(200).json({
+    success:true,
+    message:"offer successfully deleted"
+})
+    } catch (error) {
+      console.error("error deleting the offer:",error);
+      res.status(500).json({
+        successs:false,
+        message:"server error while deleting the offer"
+      })  
+    }
 }
 
 const getEditOffer=async (req,res)=>{

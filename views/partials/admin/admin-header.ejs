@@ -100,7 +100,6 @@
     </div>
   </aside>
 
-  <!-- Main Content -->
   <div class="main-content">
     <!-- Admin Header -->
     <header class="admin-header">
@@ -181,25 +180,37 @@
 }
 
   </style>
-      <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.querySelector('.sidebar');
-    const chevronToggle = document.querySelector('.toggle-sidebar');
-    const hamburgerToggle = document.querySelector('.hamburger-toggle');
-    
-    // Desktop Chevron Click
-    if (chevronToggle) {
-      chevronToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        chevronToggle.classList.toggle('rotated');
-      });
-    }
+   <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.querySelector('.sidebar');
+  const chevronToggle = document.querySelector('.toggle-sidebar');
+  const hamburgerToggle = document.querySelector('.hamburger');
 
-    // Mobile Hamburger Click
-    if (hamburgerToggle) {
-      hamburgerToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('mobile-visible');
-      });
+  // Desktop Chevron Click
+  if (chevronToggle) {
+    chevronToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      chevronToggle.classList.toggle('rotated');
+    });
+  }
+
+  // Mobile Hamburger Click
+  if (hamburgerToggle) {
+    hamburgerToggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // don’t trigger outside click
+      sidebar.classList.toggle('mobile-visible');
+    });
+  }
+
+  // Click outside sidebar → close
+  document.addEventListener('click', (e) => {
+    if (sidebar.classList.contains('mobile-visible')) {
+      if (!sidebar.contains(e.target) && !hamburgerToggle.contains(e.target)) {
+        sidebar.classList.remove('mobile-visible');
+      }
     }
   });
-</script>
+});
+
+
+   </script>

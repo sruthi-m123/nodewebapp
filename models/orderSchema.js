@@ -95,19 +95,7 @@ const orderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  // returnApproved: {
-  //   type: Boolean,
-  //   default: false
-  // },
-
-  // returnProcessedAt: Date,
-  // returnRejectedAt: Date,
-
-  // adminNotes: {
-  //   type: String,
-  //   default: ''
-  // },
-
+  
   returnDetails: {
     reason: String,
     requestDate: Date,

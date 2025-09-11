@@ -62,9 +62,9 @@
 
   <div class="shop-main">
     <div class="shop-header">
-      <!-- <div class="results-count">
+      <div class="results-count">
         Showing <span id="showing-count"><%= products.length %></span> of <span id="total-count"><%= products.length %></span> products
-      </div> -->
+      </div>
       
       <div class="shop-controls">
         <div class="search-bar">
@@ -116,7 +116,52 @@
               <% } %>
               <span>(<%= product.reviews || 0 %>)</span>
             </div>
-            <p class="product-price">₹<%= product.price.toLocaleString() %></p>
+            <!-- <p class="product-price">₹<%= product.price.toLocaleString() %></p> -->
+
+<!-- Product pricing with discount calculation -->
+
+<!-- Debug output (remove after testing)
+<% if (product.bestOffer) { %>
+  <script>console.log('Best offer:', <%= JSON.stringify(product.bestOffer) %>);</script>
+<% } else { %>
+  <div class="no-offer-message">No offers available</div>
+<% } %> -->
+
+<!-- <pre><%= JSON.stringify(product.bestOffer) %></pre> -->
+
+
+<p class="product-pricing">
+  <% 
+    let originalPrice = product.price;
+    let finalPrice = originalPrice;
+    let discountLabel = '';
+    let discountValue=0;
+
+     if(product.bestOffer&&product.bestOffer.discountValue!=null){
+    discountValue=product.bestOffer.discountValue;
+
+    if(product.bestOffer.type==='percentage'){
+      finalPrice=Math.round(originalPrice-(originalPrice*discountValue/100));
+      discountLabel=discountValue+'%OFF';
+    }else if(product.bestOffer.type==='flat'){
+      finalPrice=Math.max(0,originalPrice-discountValue);
+      discountLabel='₹'+discountValue.toLocaleString()+'OFF';
+    }
+  }
+  %>
+
+
+  <!-- Offer Price -->
+  <span class="offer-price">₹<%= finalPrice.toLocaleString() %></span>
+
+  <% if (finalPrice < originalPrice) { %>
+    <span class="mrp">₹<%= originalPrice.toLocaleString() %></span>
+    <span class="discount">(<%= discountLabel %>)</span>
+  <% } %>
+</p>
+
+
+            
           </div>
           <div class="product-actions">
             <button class="wishlist-btn" data-product-id="<%= product._id %>"  title="Add to wishlist">

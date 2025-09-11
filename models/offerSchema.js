@@ -43,6 +43,10 @@ const offerSchema = new Schema({
     type: Boolean,
     default: true
   },
+  isDeleted:{
+    type:Boolean,
+    default:false
+  },
 
   applicableTo: {
     type: String,
@@ -50,7 +54,7 @@ const offerSchema = new Schema({
     default: 'all'
   },
 
-  applicableItems: [Schema.Types.ObjectId], // Array of Product or Category IDs
+  applicableItems: [Schema.Types.ObjectId], 
 
   usageLimit: {
     type: Number,

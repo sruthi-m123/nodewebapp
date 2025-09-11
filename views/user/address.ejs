@@ -7,18 +7,18 @@
     </div>
     <ul class="sidebar-menu">
       <li class="<%= activeTab === 'profile' ? 'active' : '' %>">
-        <a href="/profile"><i class="fas fa-user"></i><span>Profile</span></a>
+        <a href="/user/profile"><i class="fas fa-user"></i><span>Profile</span></a>
       </li>
       <li class="<%= activeTab === 'addresses' ? 'active' : '' %>">
-        <a href="/address"><i class="fas fa-map-marker-alt"></i><span>Addresses</span></a>
+        <a href="/user/address"><i class="fas fa-map-marker-alt"></i><span>Addresses</span></a>
       </li>
       <li class="<%= activeTab === 'orders' ? 'active' : '' %>">
-        <a href="/profile/orders"><i class="fas fa-shopping-bag"></i><span>Orders</span></a>
+        <a href="/user/orders"><i class="fas fa-shopping-bag"></i><span>Orders</span></a>
       </li>
       <li class="<%= activeTab === 'wishlist' ? 'active' : '' %>">
-        <a href="/profile/wishlist"><i class="fas fa-heart"></i><span>Wishlist</span></a>
+        <a href="/user/wishlist"><i class="fas fa-heart"></i><span>Wishlist</span></a>
       </li>
-      <form action="/logout" method="POST" class="logout-form">
+      <form action="/user/logout" method="POST" class="logout-form">
         <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
       </form>
     </ul>
@@ -82,7 +82,6 @@
       <h3 class="form-title">Add New Address</h3>
       <form  id=addAddressForm class="address-form" action="/user/addresses/add" method="POST" enctype="multipart/form-data">
         
-        <!-- Full Name and Phone -->
         <div class="form-row">
           <div class="form-group">
             <label for="name">Full Name</label>
@@ -93,7 +92,6 @@
             <input type="text" id="phone" name="phone" class="form-input" placeholder="1234567890" required pattern="\d{10}" title="Phone must be 10 digits">
           </div>
         </div>
-          <!-- Building  -->
 <div class="form-row">
           <div class="form-group">
             <label for="name">Building</label>
@@ -103,7 +101,6 @@
         </div>
 
 
-        <!-- Alternate Phone and Address Type -->
         <div class="form-row">
           <div class="form-group">
             <label for="altPhone">Alternate Phone (Optional)</label>

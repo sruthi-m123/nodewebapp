@@ -10,31 +10,31 @@
     </div>
     <ul class="sidebar-menu">
       <li class="<%= activeTab === 'profile' ? 'active' : '' %>">
-        <a href="user/profile">
+        <a href="/user/profile">
           <i class="fas fa-user"></i>
           <span>Profile</span>
         </a>
       </li>
       <li class="<%= activeTab === 'addresses' ? 'active' : '' %>">
-        <a href="/address">
+        <a href="/user/address">
           <i class="fas fa-map-marker-alt"></i>
           <span>Addresses</span>
         </a>
       </li>
       <li class="<%= activeTab === 'orders' ? 'active' : '' %>">
-        <a href="/orders">
+        <a href="/user/orders">
           <i class="fas fa-shopping-bag"></i>
           <span>Orders</span>
         </a>
       </li>
       <li class="<%= activeTab === 'wishlist' ? 'active' : '' %>">
-        <a href="/wishlist">
+        <a href="/user/wishlist">
           <i class="fas fa-heart"></i>
           <span>Wishlist</span>
         </a>
       </li>
     </ul>
-    <form action="/logout" method="POST" class="logout-form">
+    <form action="/user/logout" method="POST" class="logout-form">
       <button type="submit" class="logout-btn">
         <i class="fas fa-sign-out-alt"></i>
         <span>Logout</span>
@@ -45,7 +45,7 @@
   <div class="profile-content">
     <div class="profile-header">
       <h2>My Profile</h2>
-      <a href="/profile/edit" class="edit-btn">
+      <a href="/user/profile/edit" class="edit-btn">
         <i class="fas fa-pencil-alt"></i>
         <span>Edit Profile</span>
       </a>

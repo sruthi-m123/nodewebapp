@@ -152,7 +152,7 @@ Swal.fire({
             button.innerHTML='<span>Generating Invoice...</span>';
             button.disabled=true;
 
-            fetch(`/orders/${orderId}/invoice`,{
+            fetch(`/user/orders/${orderId}/invoice`,{
                 method:'GET',
                 headers:{
                     'Content-Type':'application/json',

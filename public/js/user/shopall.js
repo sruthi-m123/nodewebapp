@@ -182,6 +182,34 @@ function updateProductGrid(products) {
   }
 
   products.forEach(product => {
+if(!product.isActive) return;
+
+let originalPrice=product.price;
+let finalPrice=originalPrice;
+let discountLabel='';
+if(product.bestOffer&&product.bestOffer.discountValue>0){
+  if(product.bestOffer.type==='percentage'){
+    finalPrice=Math.round(originalPrice-(originalPrice*product.bestOffer.discountValue/100));
+   if (product.bestOffer.maxDiscount) {
+          finalPrice = Math.max(originalPrice - product.bestOffer.maxDiscount, finalPrice);
+        }
+    discountLabel=`${product.bestOffer.discountValue}%OFF`;
+  }else if(product.bestOffer.type==='flat'){
+    finalPrice=Math.max(0,originalPrice-product.bestOffer.dis);
+    discountLabel=`₹${product.bestOffer.value.toLocaleString()} OFF`;
+  }
+}
+const pricingHTML = `
+      <p class="product-pricing">
+        <span class="offer-price">₹${finalPrice.toLocaleString()}</span>
+        ${finalPrice < originalPrice ? `
+          <span class="mrp">₹${originalPrice.toLocaleString()}</span>
+          <span class="discount">(${discountLabel})</span>
+        ` : ''}
+      </p>
+    `;
+
+
     const card = document.createElement('div');
     card.className = 'product-card';
     if (!product.isActive) {
@@ -189,34 +217,35 @@ function updateProductGrid(products) {
     }
 
     card.innerHTML = `
-      <div class="product-badge">${product.badge || 'New'}</div>
-<div class="product-image ${product.stock === 0 ? 'grayscale' : ''}">
-        <a href="/user/product/${product._id}">
-      <img src="/${product.images[0]}" alt="${product.productName}">
-       </a>
-      <div class="quick-view">Quick View</div>
-      </div>
-      <div class="product-info">
-        <h4 class="product-name">${product.productName}</h4>
-        <div class="product-meta">
-          <div class="product-rating">
-            ${generateStarRating(product.rating)}
-            <span>(${product.reviews || 0})</span>
+        ${product.isNewArrival ? '<div class="product-badge">New</div>' : ''}
+        <div class="product-image ${product.stock === 0 ? 'grayscale' : ''}">
+          <a href="/user/product/${product._id}">
+            <img src="/${product.images[0]}" alt="${product.productName}">
+          </a>
+          <div class="quick-view">Quick View</div>
+        </div>
+        <div class="product-info">
+          <h4 class="product-name">
+            <a href="/user/product/${product._id}" class="product-link-name">${product.productName}</a>
+          </h4>
+          <div class="product-meta">
+            <div class="product-rating">
+              ${generateStarRating(product.rating)}
+              <span>(${product.reviews || 0})</span>
+            </div>
+            ${pricingHTML}
           </div>
-          <p class="product-price">₹${Number(product.price).toLocaleString()}</p>
+          <div class="product-actions">
+          <button class="wishlist-btn" data-product-id="${product._id}" title="Add to wishlist">
+              <i class="far fa-heart"></i>
+            </button>
+            ${product.stock === 0
+              ? `<p class="out-of-stock-message">Out of Stock</p>`
+              : `<button class="add-to-cart primary-btn" data-id="${product._id}">Add to Cart</button>`
+            }
+          </div>
         </div>
-        <div class="product-actions">
-          <button class="wishlist-btn" title="Add to wishlist">
-            <i class="far fa-heart"></i>
-          </button>
-${
-  product.stock === 0
-    ? `<p class="out-of-stock-message">Out of Stock</p>`
-    : `<button class="add-to-cart primary-btn" data-id="${product._id}">Add to Cart</button>`
-}
-        </div>
-      </div>
-    `;
+      `;
 
     grid.appendChild(card);
   });

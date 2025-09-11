@@ -57,14 +57,16 @@ req.session.user = {
       phone: req.user.phone || null,
        googleId: req.user.googleId || null,
     };
-        res.redirect('/user/home');
-  }
-);
+ req.session.save((err) => {
+      if (err) console.error("Session save error:", err);
+      res.redirect('/user/home');
+    });
+  
+  });
 //logout
 router.post('/logout',userController.logout);
 
 //profile page
-//router.get('/profile', isLoggedIn,upload.avatar, profileController.getProfile);
 router.get('/profile',isLoggedIn,upload.avatar,profileController.getProfile)
 router.get('/profile/edit',upload.avatar,profileController.getEditProfile);
 router.post('/profile/update', upload.avatar, profileController.updateProfile);
@@ -101,7 +103,7 @@ router.get('/api/addresses/:id',checkoutController.getAddress);
 //offer checkout routes
 router.post('/api/offers/apply',checkoutController.applyOffer);
 //order chekout routes
-router.post('/api/orders',checkoutController.placeOrder);
+router.post('/orders-placed',checkoutController.placeOrder);
 //success page
 router.get('/order-success/:orderId',checkoutController.successPage);
 //order history page
