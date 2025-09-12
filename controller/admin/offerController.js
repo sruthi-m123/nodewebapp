@@ -172,8 +172,9 @@ const createOffer = async (req, res) => {
         console.log("Processed offer:", newOffer);
         
         await newOffer.save();
-        
+        console.log("before update bestoffer ")
 await updateProductsOffer(newOffer);
+console.log("after updatebestoffer");
 
         res.status(201).json({
             success: true,

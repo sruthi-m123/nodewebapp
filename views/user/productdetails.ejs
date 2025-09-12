@@ -30,8 +30,25 @@
           <span class="review-count">4.5 (60 reviews)</span>
         </div>
 
-        <p class="price">₹<%= product.price.toLocaleString('en-IN') %></p>
+        <!-- <p class="price">₹<%= product.price.toLocaleString('en-IN') %></p> -->
 
+
+      <!-- Updated Price Display -->
+      <% if (product.bestOffer ) { %>
+        <div class="price-container">
+          <p class="original-price">₹<%= product.price.toLocaleString('en-IN') %></p>
+          <p class="discounted-price">₹<%= product.discountedPrice.toLocaleString('en-IN') %></p>
+ <p class="discount-percent">
+    <% if (product.bestOffer.type === 'percentage') { %>
+      (<%= product.bestOffer.discountValue %>% OFF)
+    <% } else if (product.bestOffer.type === 'flat') { %>
+      (₹<%= product.bestOffer.discountValue.toLocaleString('en-IN') %> OFF)
+    <% } %>
+  </p>
+        </div>
+      <% } else { %>
+        <p class="price">₹<%= product.price.toLocaleString('en-IN') %></p>
+      <% } %>
        <p class="availability <%= product.stock <= 0 ? 'out-of-stock' : 'in-stock' %>">
   <i class="fas fa-check-circle"></i> 
   <%= product.stock <= 0 ? "Out of Stock" : "In Stock" %>

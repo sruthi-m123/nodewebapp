@@ -15,16 +15,7 @@ const loadShopping = async (req, res) => {
       filters.stock = 0;
     }
 
-    //price range
-    // if (req.query.price === "0-1000") {
-    //   filters.price = { $lte: 1000};
-    // } else if (req.query.price === "1000-3000") {
-    //   filters.price = { $gt: 1000, $lte: 3000 };
-    // } else if (req.query.price === "3000+") {
-    //   filters.price = { $gt: 3000 };
-    // }
-
-    if(req.query.minPrice||req.query.maxPrice){
+        if(req.query.minPrice||req.query.maxPrice){
       filters.price={};
       if(req.query.minPrice) filters.price.$gte=Number(req.query.minPrice);
       if(req.query.maxPrice) filters.price.$lte=Number(req.query.maxPrice);

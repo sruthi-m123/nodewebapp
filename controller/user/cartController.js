@@ -146,8 +146,10 @@ const addToCart = async (req, res) => {
     // Cart update logic
     let cart = await Cart.findOne({ userId });
     console.log("checking bestoffer:",product.bestOffer)
-    const effectivePrice=product.bestOffer?.discountedPrice||product.price;
-    
+    console.log("discounted price for check:",product.discountedPrice);
+    console.log("discount value for check:",product.discount);
+    // const effectivePrice=product.bestOffer?.discountedPrice||product.price;
+    const effectivePrice=product.discountedPrice||product.price;
     if (!cart) {
       cart = new Cart({
         userId,
@@ -215,12 +217,25 @@ const removeCartItem=async(req,res)=>{
             return res.status(404).json({message:'cart not found'});
         }
 
+const removedItem=cart.items.find(item=>item._id.toString()===itemId);
+if(!removedItem){
+  return res.status(404).json({messaage:'item not found in cart'});
+}
+
+await Product.findByIdAndUpdate(
+  removedItem.productId,
+  {$inc:{stock:removedItem.quantity}}
+);
+
 cart.items=cart.items.filter(item=>item._id.toString()!==itemId)
 .map(item=>({
   ...item.toObject(),
   totalPrice:item.price*item.quantity
 }))
 await cart.save();
+
+const cartCount=cart.items.reduce((sum,item)=>sum+item.quantity,0);
+
 return res.status(200).json({ message: 'Item removed from cart' ,cartCount:cartCount});
     } catch (error) {
         console.error('Error removing item from cart:', error);

@@ -1,14 +1,40 @@
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Set up event listeners
   setupCartEventListeners();
   
-  // Initial calculations
   calculateGrandTotal();
   
-  // Initial cart count fetch
   fetchCartCount();
+  
+  checkFor401Message();
 });
+
+function checkFor401Message() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const errorMessage = urlParams.get('error');
+  
+if(errorMessage){
+  try {
+    const errorData=JSON.parse(errorMessage);
+    if(errorData.message){
+    showAlert('Unauthorized', errorData.message, 'error');
+
+    }else{
+    showAlert('Unauthorized', errorMessage, 'error');
+
+    }
+  } catch (error) {
+       showAlert('Unauthorized', errorMessage, 'error');
+  }
+}
+
+
+
+    
+    // Clean URL without reloading page
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  
+}
 
 // Set up all cart event listeners
 function setupCartEventListeners() {
@@ -82,10 +108,8 @@ function updateQuantity(itemId, change) {
 
 // Update quantity with direct input
 function updateQuantityInput(itemId, value) {
-  console.log("itemId inside the quantity function:",itemId);
-  console.log("value ",value);
-  value=parseInt(value);
-  if(isNaN(value))value=1;
+  value = parseInt(value);
+  if(isNaN(value)) value = 1;
   const container = document.querySelector(`.quantity-selector[data-id="${itemId}"]`);
   const maxStock = parseInt(container.dataset.stock);
   const limit = 10;
@@ -126,10 +150,11 @@ function calculateGrandTotal() {
   document.querySelectorAll('.item-total').forEach(el => {
     grandTotal += parseFloat(el.textContent);
   });
-const totalElement = document.getElementById('grand-total');
+  const totalElement = document.getElementById('grand-total');
   if (totalElement) {
     totalElement.textContent = grandTotal.toFixed(2);
-  }}
+  }
+}
 
 // Add item to cart
 async function addToCart(productId, quantity = 1) {
@@ -142,6 +167,13 @@ async function addToCart(productId, quantity = 1) {
       body: JSON.stringify({ quantity }),
       credentials: 'include'
     });
+
+    // Handle 401 responses
+    if (response.status === 401) {
+      const errorData = await response.json();
+      showAlert('Unauthorized', errorData.message || 'Please log in to add items to your cart.', 'error');
+      return;
+    }
 
     const data = await response.json();
     
@@ -166,34 +198,35 @@ function handleAddToCart(response) {
 }
 
 // Remove item from cart
-
 async function removeItem(itemId) {
-  
-  console.log("itemId:",itemId);
-  // console.log("req session :",req.session.user);
   try {
     const response = await fetch(`/user/cart/remove/${itemId}`, {
       method: 'DELETE',
-      headers:{
-        'Content-Type':'application/json'
+      headers: {
+        'Content-Type': 'application/json'
       },
       credentials: 'include' 
     });
+
+    // Handle 401 responses
+    if (response.status === 401) {
+      const errorData = await response.json();
+      showAlert('Unauthorized', errorData.message || 'Please log in to manage your cart.', 'error');
+      return;
+    }
     
- if (!response.ok) {
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to remove item');
     }
 
-    if (response.ok) {
-      const data = await response.json();
-      document.querySelector(`tr[data-id="${itemId}"]`).remove();
-      calculateGrandTotal();
-      updateCartCount(data.cartCount);
-      
-      if (document.querySelectorAll('#cart-items tr').length === 0) {
-        window.location.reload();
-      }
+    const data = await response.json();
+    document.querySelector(`tr[data-id="${itemId}"]`).remove();
+    calculateGrandTotal();
+    updateCartCount(data.cartCount);
+    
+    if (document.querySelectorAll('#cart-items tr').length === 0) {
+      window.location.reload();
     }
   } catch (error) {
     console.error('Error removing item:', error);
@@ -220,6 +253,13 @@ async function updateCart() {
       body: JSON.stringify({ updates }),
       credentials: 'include'
     });
+
+    // Handle 401 responses
+    if (response.status === 401) {
+      const errorData = await response.json();
+      showAlert('Unauthorized', errorData.message || 'Please log in to update your cart.', 'error');
+      return;
+    }
     
     if (response.ok) {
       const data = await response.json();
@@ -236,6 +276,13 @@ async function fetchCartCount() {
     const response = await fetch('/user/cart/count', {
       credentials: 'include'
     });
+
+    // Handle 401 responses
+    if (response.status === 401) {
+      const errorData = await response.json();
+      showAlert('Unauthorized', errorData.message || 'Please log in to view your cart.', 'error');
+      return;
+    }
     
     if (response.ok) {
       const data = await response.json();
@@ -268,7 +315,7 @@ function showAlert(title, text, icon) {
 
 // Proceed to checkout
 function checkout() {
-  window.location.href = '/checkout';
+  window.location.href = '/user/checkout';
 }
 
 // Make functions available globally if needed

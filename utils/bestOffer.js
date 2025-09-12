@@ -58,7 +58,7 @@ const updateProductsOffer = async (offer) => {
   } else if (offer.applicableTo === "category") {
     filter = { category: { $in: offer.applicableItems }, isActive: true, isDeleted: false };
   }
-
+const activeOffers=await Offer.find({isActive:true});
   const products = await Product.find(filter);
 
    for (const product of products) {
@@ -66,9 +66,14 @@ const updateProductsOffer = async (offer) => {
       product.bestOffer = best.bestOffer;
       product.discount = best.discount;
       product.discountedPrice = best.discountedPrice;
+    
     }
 
-     await Promise.all(products.map(p => p.save()));
+try {
+  await Promise.all(products.map(p => p.save()));
+} catch (err) {
+  console.error("Error saving products:", err);
+}
 
     console.log(`Updated ${products.length} products with best offer`);
 }catch(err){

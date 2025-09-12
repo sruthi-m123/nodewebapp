@@ -2,12 +2,13 @@ const Product = require("../../models/productSchema");
 const productDetail=async(req,res)=>{
   try {
     const productId=req.params.id;
-    const product=await Product.findById(productId).lean();
+    const product=await Product.findById(productId).populate('bestOffer');
+    console.log("product in product detail page :",product);
     if(!product||product.isDeleted||!product.isActive){
       return res.status(404).render('404');
     }
 const relatedProducts = await Product.find({
-      category: product.category._id,
+      category: product.category,
       _id: { $ne: productId },
       isActive: true,
       isDeleted: false

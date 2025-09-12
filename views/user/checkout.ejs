@@ -91,27 +91,7 @@
                     <% }); %>
                 </div>
 
-                <!-- Offers Section
-                 <% if (offers && offers.length > 0) { %>
-                <div class="offers-section">
-                    <div class="section-title">AVAILABLE OFFERS</div>
-                    
-                    <% offers.forEach(offer => { %>
-                        <div class="offer-item">
-                            <div class="offer-icon"><%= offer.icon || '🎁' %></div>
-                            <div class="offer-details">
-                                <div class="offer-title"><%= offer.title || 'Offer' %></div>
-                                <!-- <div class="offer-description"><%= offer.description || 'No description available' %></div> -->
-                                <!-- <div class="offer-code"><%= offer.code ? 'Code: ' + offer.code : 'T&C Apply' %></div>
-                            </div>
-                            <button class="apply-offer-btn <%= offer.applied ? 'applied' : '' %>" 
-                                    onclick="<%= offer.applied ? 'removeOffer(\'' + offer._id + '\')' : 'applyOffer(\'' + offer._id + '\')' %>">
-                                <%= offer.applied ? 'Applied' : 'Apply' %>
-                            </button>
-                        </div>
-                    <% }); %>
-                </div>
-                <% } %> --> -->
+             
 
                 <!-- Payment Options -->
                 <div class="payment-section">

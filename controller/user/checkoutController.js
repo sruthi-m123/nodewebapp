@@ -24,7 +24,7 @@ exports.getCheckoutPage = async (req, res) => {
         let stockValidationFailed=false;
         let outOfStockItems=[];
 
-        
+        console.log("req, session in buynow",req.session);
         if (req.session.buyNowItem) {
             fromCart = false;
             const product = await Product.findById(req.session.buyNowItem.productId);
@@ -44,10 +44,12 @@ if(product.stock<requestedQty){
 
                 cartItems = [{
                     id: product._id,
-                    name: product.name,
+                    name: product.productName,
                     image: product.images[0],
                     variant: req.session.buyNowItem.variant || 'Default',
-                    price: req.session.buyNowItem.price || product.price,
+                    price: product.discountedPrice || product.price,
+                      originalPrice:product.price,
+                        discountedPrice:product.discountedPrice||null,
                     quantity: req.session.buyNowItem.quantity || 1,
                     isBuyNow: true 
                 }];
@@ -55,6 +57,7 @@ if(product.stock<requestedQty){
         } 
         else {
             const cart = await Cart.findOne({ userId }).populate('items.productId');
+            console.log("cart items inside the checkout page:",cart);
             if (cart) {
 for (const item of cart.items){
     if(item.productId&&item.productId.isActive){
@@ -63,32 +66,29 @@ for (const item of cart.items){
             stockValidationFailed=true;
             outOfStockItems.push({
                 productId:product._id,
-                name:product.name,
+                name:product.productName,
                 available:product.stock,
                 requested:item.quantity
             })
         }
     }
 }
-
-
-
-
-
                 cartItems = cart.items
                     .filter(item => item.productId && item.productId.isActive)
                     .map(item => ({
                         id: item.productId._id,
-                        name: item.productId.name,
+                        name: item.productId.productName,
                         image: item.productId.images[0],
                         variant: item.variant,
-                        price: item.price,
+                        price: item.productId.discountedPrice||item.productId.price,
+                        originalPrice:item.productId.price,
+                        discountedPrice:item.productId.discountedPrice||null,
                         quantity: item.quantity,
                         isBuyNow: false
                     }));
             }
         }
-        
+        console.log("cart items:",cartItems)
 if(stockValidationFailed){
     req.session.outOfStockItems=outOfStockItems;
     return res.redirect('/user/cart?error=some items are out of stock')
@@ -96,13 +96,30 @@ if(stockValidationFailed){
 
 
         // Calculate order totals
-        const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const subtotal = cartItems.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
         const delivery = subtotal > 500 ? 0 : 50;
-        const taxRate = 18;
-        const tax = subtotal * (taxRate / 100);
-        const discount = 0;
-        const total = subtotal + delivery + tax - discount;
-        
+            
+       let offerDiscount=0;
+
+        for(const item of cartItems){
+            if(item.discountedPrice){
+                const itemDiscount=(item.originalPrice-item.discountedPrice)*item.quantity;
+                offerDiscount+=itemDiscount;
+            }
+        }
+const couponDiscount=0;
+discount=offerDiscount+couponDiscount;
+console.log("subtotal:",subtotal);
+console.log("delivery:",delivery);
+console.log("discount:",discount);
+
+        const netAmount = subtotal + delivery  - discount;
+       const taxRate = 18;
+        const tax = netAmount * (taxRate / 100);
+      const total=netAmount+tax;
+        console.log("tax:",tax);
+        console.log("netAmount:",netAmount);
+        console.log("total:",total);
         const offers = await Offer.find({
 startDate: { $lte: new Date() },       
   endDate: { $gte: new Date() },            
@@ -113,9 +130,6 @@ startDate: { $lte: new Date() },
         
         // Payment methods
         const paymentMethods = [
-            // { id: 'credit_card', title: 'Credit Card', icon: '💳', description: 'Pay with your credit card' },
-            // { id: 'debit_card', title: 'Debit Card', icon: '💳', description: 'Pay with your debit card' },
-            // { id: 'upi', title: 'UPI', icon: '📱', description: 'Pay using any UPI app' },
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
         ];
@@ -132,6 +146,7 @@ startDate: { $lte: new Date() },
             taxRate,
             tax,
             discount,
+            netAmount,
             total,
             offers,
             paymentMethods,
