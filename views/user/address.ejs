@@ -54,9 +54,9 @@
             </div>
 
             <div class="address-actions">
-              <a href="/addresses/edit/<%= addr._id %>" class="btn edit-btn">Edit</a>
+              <a href="/user/addresses/edit/<%= addr._id %>" class="btn edit-btn">Edit</a>
 
-              <form action="/addresses/delete/<%= addr._id %>" method="POST" style="display:inline;">
+              <form action="/user/addresses/delete/<%= addr._id %>" method="POST" style="display:inline;">
                 <button class="btn delete-btn" type="submit" onclick="return confirm('Are you sure to delete this address?')">Delete</button>
               </form>
 
@@ -152,7 +152,7 @@
         <!-- Actions -->
         <div class="form-actions">
           <button type="submit" class="btn-submit">Save Address</button>
-          <a href="/addresses" class="btn-cancel">Cancel</a>
+          <a href="/user/addresses" class="btn-cancel">Cancel</a>
         </div>
       </form>
     </div>

@@ -3,21 +3,30 @@ const Address=require("../../models/addressSchema");
  
 const getAddressPage = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    console.log("req session:",req.session);
+    if(!req.session.user){
+     return res.status(401).json({message:"please login to continue"});
+    }
+    const userId = req.session.user.id;
 
-    // Fetch basic user details
     const user = await User.findById(userId).lean();
-console.log("reached address page")
-    // Check if address already exists
-    let addressDoc = await Address.findOne({ userId }).lean();
-console.log("addressDoc:",addressDoc)
+// let addressDoc = await Address.findOne(
+//   { userId },
+//   { address: { $elemMatch: { isDeleted: false } } }
+// ).lean();
+// console.log("addressDoc:",addressDoc)
+
+let addressDoc = await Address.findOne({ userId }).lean();
+
+let filteredAddresses = addressDoc?.address.filter(a => !a.isDeleted) || [];
+
       
     res.render("user/address", {
  pageCSS: "user/address.css",
       pageJS:"user/address.js",
             user: {
         ...user,
-        addresses: addressDoc?.address || [],
+        addresses: filteredAddresses,
       },
       activeTab: "addresses"
     });
@@ -31,8 +40,8 @@ console.log("addressDoc:",addressDoc)
 
  const addAddress=async(req,res)=>{
     try {
-        const userId=req.session.user._id;
-        console.log("body:",req.body);
+        const userId=req.session.user.id;
+        // console.log("body:",req.body);
         const {
             name,
             addressType,
@@ -104,24 +113,41 @@ res.status(200).json({ success: true, message: "Saved successfully" });
  }
 }
 
- const deleteAddress = async (req, res) => {
+// Modified backend for soft delete
+const deleteAddress = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     const addressId = req.params.id;
     
-   const updatedDoc= await Address.findOneAndUpdate(
-      { userId },
-      { $pull: { address: { _id: addressId } } },
-      {new:true}
+    // Soft delete: mark as deleted instead of removing
+    const updatedDoc = await Address.findOneAndUpdate(
+      { userId, "address._id": addressId },
+      { 
+        $set: { 
+          "address.$.isDeleted": true,
+          "address.$.deletedAt": new Date()
+        } 
+      },
+      { new: true }
     );
-    if (updatedDoc && updatedDoc.address.length > 0 && !updatedDoc.address.some(a => a.isDefault)) {
-      updatedDoc.address[0].isDefault = true;
-      await updatedDoc.save();
+    
+    if (updatedDoc) {
+      const defaultAddress = updatedDoc.address.find(addr => 
+        !addr.isDeleted && addr.isDefault
+      );
+      
+      if (!defaultAddress && updatedDoc.address.some(addr => !addr.isDeleted)) {
+        await Address.findOneAndUpdate(
+          { userId, "address._id": updatedDoc.address.find(addr => !addr.isDeleted)._id },
+          { $set: { "address.$.isDefault": true } }
+        );
+      }
     }
-res.status(200).json({ success: true, message: "Address deleted successfully" });
+    
+    res.status(200).json({ success: true, message: "Address deleted successfully" });
   } catch (error) {
     console.error('Error deleting address:', error);
-    res.status(500).send('Server error');
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 }
 

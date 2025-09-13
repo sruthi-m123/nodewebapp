@@ -5,7 +5,7 @@
         <p class="subtitle">Review your order and complete your purchase</p>
 <form action="/user/place-order" method="POST" id="checkoutForm">
 
-       <div class="checkout-grid">
+      <div class="checkout-grid">
   <div class="left-column">
     <!-- Address Selection -->
     <div class="address-list" id="addressList">
@@ -23,8 +23,7 @@
         </div>
       <% } else { %>
         <!-- Show address cards when addresses exist -->
-        <% addresses.forEach(addressDoc => { 
-          addressDoc.address.forEach((addr, index) => { %>
+        <% addresses.forEach((addr, index) => { %>
 
           <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
                data-address-id="<%= addr._id %>" 
@@ -54,16 +53,30 @@
               <% } %>
             </div>
 
-            <!-- Edit Button -->
-            <a href="#" class="edit-address" onclick="openAddressModal('<%= addr._id %>')">Edit</a>
-
+            <!-- Actions -->
+            <div class="address-actions">
+              <a href="#" class="edit-address" onclick="event.stopPropagation(); openAddressModal('<%= addr._id %>')">Edit</a>
+              <a href="#" class="delete-address" onclick="event.stopPropagation(); confirmDeleteAddress('<%= addr._id %>')">Delete</a>
+            </div>
           </div>
 
-        <% }) }) %>
+        <% }) %>
       <% } %>
     </div>
   </div>
 </div>
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal" style="display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+  <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; width:300px; text-align:center;">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this address?</p>
+    <div style="margin-top:15px;">
+      <button type="button" class="delete-confirm-btn" onclick="deleteAddress()" style="background:#d9534f; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Yes, Delete</button>
+      <button type="button" onclick="closeDeleteModal()" style="margin-left:10px; background:#6c757d; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 
 
                     <div class="delivery-info">
@@ -91,7 +104,151 @@
                     <% }); %>
                 </div>
 
-             
+            <!-- Coupon Selection Section
+<div class="coupon-section">
+    <div class="section-title">APPLY COUPONS</div>
+    
+    <div class="coupon-list">
+        <% if (coupons && coupons.length > 0) { %>
+            <% coupons.forEach(coupon => { 
+                // Check if coupon is applicable based on cart value
+                const isApplicable = subtotal >= coupon.minCartValue;
+                const isExpired = new Date(coupon.validTill) < new Date();
+                const isValid = isApplicable && !isExpired;
+            %>
+                <div class="coupon-item <%= isValid ? '' : 'coupon-invalid' %>" data-coupon-id="<%= coupon._id %>">
+                    <div class="coupon-info">
+                        <div class="coupon-header">
+                            <span class="coupon-code"><%= coupon.code %></span>
+                            <span class="coupon-discount">
+                                <% if (coupon.discountType === 'percentage') { %>
+                                    <%= coupon.discountValue %>% OFF
+                                <% } else { %>
+                                    ₹<%= coupon.discountValue %> OFF
+                                <% } %>
+                            </span>
+                        </div>
+                        <div class="coupon-terms">
+                            <% if (!isApplicable) { %>
+                                <span class="coupon-error">Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply</span>
+                            <% } else if (isExpired) { %>
+                                <span class="coupon-error">Expired</span>
+                            <% } else { %>
+                                Valid on orders above ₹<%= coupon.minCartValue %>
+                                <% if (coupon.maxDiscount) { %>
+                                    | Max discount ₹<%= coupon.maxDiscount %>
+                                <% } %>
+| Expires: <%= new Date(coupon.validTill).toLocaleString('en-IN', { 
+    dateStyle: 'medium', 
+    timeStyle: 'short' 
+}) %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <button type="button" class="apply-coupon-btn <%= isValid ? '' : 'btn-disabled' %>" 
+                            onclick="<%= isValid ? `applyCoupon('${coupon._id}', '${coupon.code}')` : '' %>"
+                            <%= isValid ? '' : 'disabled' %>>
+                        <%= isValid ? 'Apply' : 'Cannot Apply' %>
+                    </button>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-coupons">
+                No coupons available at this time
+            </div>
+        <% } %>
+    </div>
+    
+    <div class="applied-coupon" id="appliedCouponContainer" style="display: none;">
+        <div class="applied-coupon-info">
+            <span id="appliedCouponText"></span>
+            <button type="button" class="remove-coupon-btn" onclick="removeCoupon()">Remove</button>
+        </div>
+        <input type="hidden" id="appliedCouponId" name="appliedCouponId">
+    </div>
+</div> -->
+
+
+<!-- Coupon Selection Section -->
+<div class="coupon-section">
+    <div class="section-title">APPLY COUPONS</div>
+    
+    <!-- Coupon Input Field -->
+    <div class="coupon-input-container">
+        <input type="text" id="couponCodeInput" placeholder="Enter coupon code" class="coupon-input">
+        <button type="button" class="apply-coupon-input-btn" onclick="applyCouponByCode()">Apply</button>
+    </div>
+    
+    <!-- Available Coupons Dropdown -->
+    <div class="coupon-dropdown-container">
+        <div class="coupon-dropdown-header" onclick="toggleCouponDropdown()">
+            <span>Available Coupons</span>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        
+        <div class="coupon-dropdown-content" id="couponDropdown">
+            <% if (coupons && coupons.length > 0) { %>
+                <% coupons.forEach(coupon => { 
+                    // Filter out expired coupons
+                    const isExpired = new Date(coupon.validTill) < new Date();
+                    if (isExpired) return; // Skip expired coupons
+                    
+                    const isApplicable = subtotal >= coupon.minCartValue;
+                    const isValid = isApplicable;
+                %>
+                    <div class="coupon-dropdown-item <%= isValid ? '' : 'coupon-invalid' %>" 
+                         data-coupon-id="<%= coupon._id %>" 
+                         data-coupon-code="<%= coupon.code %>">
+                        <div class="coupon-dropdown-info">
+                            <div class="coupon-dropdown-name"><%= coupon.name || coupon.code %></div>
+                            <div class="coupon-dropdown-details">
+                                <span class="coupon-dropdown-code">Code: <%= coupon.code %></span>
+                                <span class="coupon-dropdown-validity">
+                                    Valid until: <%= new Date(coupon.validTill).toLocaleDateString() %> 
+                                    <%= new Date(coupon.validTill).toLocaleTimeString() %>
+                                </span>
+                            </div>
+                            <div class="coupon-dropdown-discount">
+                                <% if (coupon.discountType === 'percentage') { %>
+                                    <%= coupon.discountValue %>% OFF
+                                <% } else { %>
+                                    ₹<%= coupon.discountValue %> OFF
+                                <% } %>
+                                <% if (coupon.maxDiscount) { %>
+                                    (Max ₹<%= coupon.maxDiscount %>)
+                                <% } %>
+                            </div>
+                            <% if (!isValid) { %>
+                                <div class="coupon-dropdown-condition">
+                                    Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply
+                                </div>
+                            <% } %>
+                        </div>
+                        <button type="button" class="apply-coupon-dropdown-btn <%= isValid ? '' : 'btn-disabled' %>" 
+                                onclick="<%= isValid ? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}')` : '' %>"
+                                <%= isValid ? '' : 'disabled' %>>
+                            Apply
+                        </button>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-coupons-dropdown">
+                    No valid coupons available at this time
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Applied Coupon Display -->
+    <div class="applied-coupon" id="appliedCouponContainer" style="display: none;">
+        <div class="applied-coupon-info">
+            <span id="appliedCouponText"></span>
+            <button type="button" class="remove-coupon-btn" onclick="removeCoupon()">Remove</button>
+        </div>
+        <input type="hidden" id="appliedCouponId" name="appliedCouponId">
+    </div>
+</div>
+
 
                 <!-- Payment Options -->
                 <div class="payment-section">

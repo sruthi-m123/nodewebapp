@@ -93,12 +93,12 @@ router.delete('/cart/remove/:itemId',cartController.removeCartItem);
 router.post('/cart/update',cartController.updateCart);
 
 //checkout page
-router.get('/checkout', checkoutController.getCheckoutPage);
+router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
 router.post('/buy-now',checkoutController.buyNow);
-//address checkout page 
 router.post('/api/addresses',checkoutController.addAddress);
 router.put('/api/addresses/:id',checkoutController.updateAddress);
 router.get('/api/addresses/:id',checkoutController.getAddress);
+router.get('/chekout/apply-coupon',checkoutController.)
 
 //offer checkout routes
 router.post('/api/offers/apply',checkoutController.applyOffer);

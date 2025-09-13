@@ -171,7 +171,7 @@ const updateCoupon = async (req, res) => {
 
 const deleteCoupon = async (req, res) => {
     try {
-        const coupon = await Coupon.findByIdAndDelete(req.params.id);
+        const coupon = await Coupon.findByIdAndDelete(req.params.id,{isDeleted:true},{new:true});
         if (!coupon) {
             return res.status(404).json({ error: 'Coupon not found' });
         }

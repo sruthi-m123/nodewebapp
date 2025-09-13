@@ -57,6 +57,10 @@ const couponSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isDeleted:{
+    type:Boolean,
+    default:false
+  },
   usageLimit: {
     type: Number,
     default: null
@@ -69,6 +73,8 @@ const couponSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+
+
 });
 
 // Pre-save hook for new documents

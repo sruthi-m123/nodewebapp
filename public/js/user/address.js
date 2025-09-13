@@ -8,7 +8,7 @@ openModalBtn.addEventListener('click', (e) => {
   e.preventDefault();
   modalTitle.textContent = 'Add New Address';
   addressForm.reset();
-  addressForm.action = '/addresses/add';
+  addressForm.action = '/user/addresses/add';
   modal.style.display = 'flex';
 });
 
@@ -92,6 +92,7 @@ document.querySelectorAll('.delete-btn').forEach((btn) => {
     if (!confirmDelete) return;
     
     const form = e.target.closest('form');
+    console.log("form action:",form.action);
     
     try {
       const response = await fetch(form.action, {

@@ -47,6 +47,10 @@ const addressSchema= new Schema({
          isDefault: { 
             type: Boolean, 
             default: false
+         },
+         isDeleted:{
+            type:Boolean,
+            default:false
          }
     }]
 })
