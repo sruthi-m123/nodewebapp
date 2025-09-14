@@ -104,70 +104,6 @@
                     <% }); %>
                 </div>
 
-            <!-- Coupon Selection Section
-<div class="coupon-section">
-    <div class="section-title">APPLY COUPONS</div>
-    
-    <div class="coupon-list">
-        <% if (coupons && coupons.length > 0) { %>
-            <% coupons.forEach(coupon => { 
-                // Check if coupon is applicable based on cart value
-                const isApplicable = subtotal >= coupon.minCartValue;
-                const isExpired = new Date(coupon.validTill) < new Date();
-                const isValid = isApplicable && !isExpired;
-            %>
-                <div class="coupon-item <%= isValid ? '' : 'coupon-invalid' %>" data-coupon-id="<%= coupon._id %>">
-                    <div class="coupon-info">
-                        <div class="coupon-header">
-                            <span class="coupon-code"><%= coupon.code %></span>
-                            <span class="coupon-discount">
-                                <% if (coupon.discountType === 'percentage') { %>
-                                    <%= coupon.discountValue %>% OFF
-                                <% } else { %>
-                                    ₹<%= coupon.discountValue %> OFF
-                                <% } %>
-                            </span>
-                        </div>
-                        <div class="coupon-terms">
-                            <% if (!isApplicable) { %>
-                                <span class="coupon-error">Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply</span>
-                            <% } else if (isExpired) { %>
-                                <span class="coupon-error">Expired</span>
-                            <% } else { %>
-                                Valid on orders above ₹<%= coupon.minCartValue %>
-                                <% if (coupon.maxDiscount) { %>
-                                    | Max discount ₹<%= coupon.maxDiscount %>
-                                <% } %>
-| Expires: <%= new Date(coupon.validTill).toLocaleString('en-IN', { 
-    dateStyle: 'medium', 
-    timeStyle: 'short' 
-}) %>
-                            <% } %>
-                        </div>
-                    </div>
-                    <button type="button" class="apply-coupon-btn <%= isValid ? '' : 'btn-disabled' %>" 
-                            onclick="<%= isValid ? `applyCoupon('${coupon._id}', '${coupon.code}')` : '' %>"
-                            <%= isValid ? '' : 'disabled' %>>
-                        <%= isValid ? 'Apply' : 'Cannot Apply' %>
-                    </button>
-                </div>
-            <% }); %>
-        <% } else { %>
-            <div class="no-coupons">
-                No coupons available at this time
-            </div>
-        <% } %>
-    </div>
-    
-    <div class="applied-coupon" id="appliedCouponContainer" style="display: none;">
-        <div class="applied-coupon-info">
-            <span id="appliedCouponText"></span>
-            <button type="button" class="remove-coupon-btn" onclick="removeCoupon()">Remove</button>
-        </div>
-        <input type="hidden" id="appliedCouponId" name="appliedCouponId">
-    </div>
-</div> -->
-
 
 <!-- Coupon Selection Section -->
 <div class="coupon-section">
@@ -258,7 +194,7 @@
                         <% paymentMethods.forEach(method => { %>
                             <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %>" data-payment="<%= method.id %>">
                                 <div class="payment-radio">
-                                    <input type="radio" name="payment" id="<%= method.id %>" value="<%= method.id %>" <%= method.id === selectedPayment ? 'checked' : '' %>>
+                                    <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>" <%= method.id === selectedPayment ? 'checked' : '' %>>
                                     <label for="<%= method.id %>"></label>
                                 </div>
                                 <div class="payment-info">
@@ -275,43 +211,35 @@
                 </div>
             </div>
 
-            <!-- Order Summary -->
-            <div class="order-summary">
-                <div class="summary-title">ORDER SUMMARY</div>
-                
-                <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #2c3e50;">CART TOTAL</div>
-                
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>₹<%= subtotal || 0 %></span>
-                </div>
-                
-                <div class="summary-row">
-                    <span>Delivery</span>
-                    <span>₹<%= delivery || 0 %></span>
-                </div>
-                
-                <div class="summary-row">
-                    <span>Tax (GST <%= taxRate || 0 %>%)</span>
-                    <span>₹<%= tax || 0 %></span>
-                </div>
-                
-                <div class="summary-row">
-                    <span>Discount</span>
-                    <span style="color: #28a745;">-₹<%= discount || 0 %></span>
-                </div>
-                
-                <div class="summary-row total">
-                    <span>TOTAL</span>
-                    <span>₹<%= total || 0 %></span>
-                </div>
+          
+                 <div class="right-column">
+                <div class="order-summary">
+                                    <div class="summary-title">ORDER SUMMARY</div>
+<div class="summary-row">
+  <span>Subtotal</span>
+  <span id="summary-subtotal">₹<%= subtotal || 0 %></span>
+</div>
 
-                <!-- <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border: 1px solid #eee;">
-                    <strong>Payment Method:</strong> <span id="selectedPaymentMethod"><%= selectedPaymentMethod || 'Not Selected' %></span>
-                </div> -->
-                
-                <button  type="button" class="continue-btn" onclick="placeOrder()">Place Order</button>
-            </div>
+<div class="summary-row">
+  <span>Delivery</span>
+  <span id="summary-delivery">₹<%= delivery || 0 %></span>
+</div>
+
+<div class="summary-row">
+  <span>Tax (GST <%= taxRate || 0 %>%)</span>
+  <span id="summary-tax">₹<%= tax || 0 %></span>
+</div>
+
+<div class="summary-row">
+  <span>Discount</span>
+  <span id="summary-discount" style="color: #28a745;">-₹<%= discount || 0 %></span>
+</div>
+
+<div class="summary-row total">
+  <span>TOTAL</span>
+  <span id="summary-total">₹<%= total || 0 %></span>
+
+</div>
             </form>
 
         </div>
@@ -319,7 +247,8 @@
 
     </div>
 
-    
+                <button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
+
 
 
     <!-- Add/Edit Address Modal -->

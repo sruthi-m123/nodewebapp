@@ -292,34 +292,48 @@ document.getElementById('deleteConfirmModal').addEventListener('click', function
 
 
 
-function updateOrderSummary(offer = null) {
-    const getRowValue = (label) => {
-        const row = [...document.querySelectorAll('.summary-row')]
-            .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
-        return row ? parseFloat(row.querySelector('span:last-child').textContent.replace('₹', '').replace('-', '')) || 0 : 0;
-    };
+// function updateOrderSummary(offer = null) {
+//     const getRowValue = (label) => {
+//         const row = [...document.querySelectorAll('.summary-row')]
+//             .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
+//         return row ? parseFloat(row.querySelector('span:last-child').textContent.replace('₹', '').replace('-', '')) || 0 : 0;
+//     };
 
-    const setRowValue = (label, value, isNegative = false) => {
-        const row = [...document.querySelectorAll('.summary-row')]
-            .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
-        if (row) {
-            row.querySelector('span:last-child').textContent = `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
-        }
-    };
+//     const setRowValue = (label, value, isNegative = false) => {
+//         const row = [...document.querySelectorAll('.summary-row')]
+//             .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
+//         if (row) {
+//             row.querySelector('span:last-child').textContent = `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
+//         }
+//     };
 
-    const subtotal = getRowValue('Subtotal');
-    const delivery = getRowValue('Delivery');
-    const tax = getRowValue('Tax (GST 18%)');
-    let discount = getRowValue('Discount');
+//     const subtotal = getRowValue('Subtotal');
+//     const delivery = getRowValue('Delivery');
+//     const tax = getRowValue('Tax (GST 18%)');
+//     let discount = getRowValue('Discount');
 
-    if (offer) {
-        discount = offer.discountAmount || 0;
-        setRowValue('Discount', discount, true);
-    }
+//     if (offer) {
+//         discount = offer.discountAmount || 0;
+//         setRowValue('Discount', discount, true);
+//     }
 
-    const total = subtotal + delivery + tax - discount;
-    setRowValue('TOTAL', total);
+//     const total = subtotal + delivery + tax - discount;
+//     setRowValue('TOTAL', total);
+// }
+
+
+
+function updateOrderSummary(orderSummary) {
+    const formatCurrency = (value, isNegative = false) =>
+        `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
+
+    document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
+    document.getElementById("summary-delivery").textContent = formatCurrency(orderSummary.delivery);
+    document.getElementById("summary-tax").textContent = formatCurrency(orderSummary.tax);
+    document.getElementById("summary-discount").textContent = formatCurrency(orderSummary.discount, true);
+    document.getElementById("summary-total").textContent = formatCurrency(orderSummary.total);
 }
+
 
 // ==================== COUPON MANAGEMENT ====================
 var appliedCoupon = null;
@@ -357,11 +371,12 @@ function applyCouponByCode() {
     const applyButton = document.querySelector('.apply-coupon-input-btn');
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall('/user/checkout/applyCoupon', 'POST', { couponCode }, 'Coupon applied successfully')
+    apiCall('/user/checkout/applyCouponCode', 'POST', { couponCode }, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
                 updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
-                updateOrderSummary(data.updatedSummary);
+                // updateOrderSummary(data.updatedSummary);
+                   updateOrderSummary(data.orderSummary);
                 updateCouponButtons(data.couponId, data.couponCode);
             }
         })
@@ -375,11 +390,12 @@ function applyCouponFromDropdown(couponId, couponCode) {
     const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall('/user/apply-coupon', 'POST', { couponId }, 'Coupon applied successfully')
+    apiCall('/user/checkout/apply-coupon', 'POST', { couponId }, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
-                updateOrderSummary(data.updatedSummary);
+                // updateOrderSummary(data.updatedSummary);
+                   updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
             }
         })
@@ -565,7 +581,10 @@ function placeOrder() {
 
   const checkoutData = document.getElementById('checkout-data');
   const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
-  const paymentMethod = checkoutData.dataset.payment;
+  const selectedPaymentRadio = document.querySelector('input[name="paymentMethod"]:checked');
+const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : '';
+
+//   const paymentMethod = checkoutData.dataset.payment;
   const appliedOffers = [];
 
   if (!selectedAddress) {

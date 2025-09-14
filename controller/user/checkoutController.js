@@ -7,6 +7,9 @@ const Cart = require('../../models/cartSchema');
 const Product = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 const Coupon=require('../../models/couponSchema');
+const{calculateOrder}=require('../../helper/calculateTotal');
+
+
 exports.getCheckoutPage = async (req, res) => {
     try {
         console.log("inside checkout controller");
@@ -17,12 +20,7 @@ exports.getCheckoutPage = async (req, res) => {
 
         const userData= await User.findById(userId);
         
-//      let addressesDoc = await Address.findOne(
-//   { userId },
-//   { address: { $elemMatch: { isDeleted: false } } }
-// ).lean();
 
-// let addresses = addressesDoc ? addressesDoc.address : [];
 let addressesDoc = await Address.findOne({ userId }).lean();
 
 let addresses = [];
@@ -30,13 +28,11 @@ if (addressesDoc && addressesDoc.address) {
   addresses = addressesDoc.address.filter(addr => !addr.isDeleted);
 }
 
-        console.log("address in checkout page:",addresses);
         let cartItems = [];
         let fromCart = true;
         let stockValidationFailed=false;
         let outOfStockItems=[];
 
-        console.log("req, session in buynow",req.session);
         if (req.session.buyNowItem) {
             fromCart = false;
             const product = await Product.findById(req.session.buyNowItem.productId);
@@ -70,8 +66,6 @@ if(product.stock<requestedQty){
         else {
             const cart = await Cart.findOne({ userId }).populate('items.productId');
             const coupons=await Coupon.find({});
-            // console.log("coupons:",coupons);
-            console.log("cart items inside the checkout page:",cart);
             if (cart) {
 for (const item of cart.items){
     if(item.productId&&item.productId.isActive){
@@ -103,48 +97,46 @@ for (const item of cart.items){
                     }));
             }
         }
-        console.log("cart items:",cartItems)
 if(stockValidationFailed){
     req.session.outOfStockItems=outOfStockItems;
     return res.redirect('/user/cart?error=some items are out of stock')
 }
 
 
-        // Calculate order totals
-        const subtotal = cartItems.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
-        const delivery = subtotal > 500 ? 0 : 50;
+//         // Calculate order totals
+//         const subtotal = cartItems.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
+//         const delivery = subtotal > 500 ? 0 : 50;
             
-       let offerDiscount=0;
+//        let offerDiscount=0;
 
-        for(const item of cartItems){
-            if(item.discountedPrice){
-                const itemDiscount=(item.originalPrice-item.discountedPrice)*item.quantity;
-                offerDiscount+=itemDiscount;
-            }
-        }
+//         for(const item of cartItems){
+//             if(item.discountedPrice){
+//                 const itemDiscount=(item.originalPrice-item.discountedPrice)*item.quantity;
+//                 offerDiscount+=itemDiscount;
+//             }
+//         }
          const coupons=await Coupon.find({isActive:true});
-         console.log("coupons:",coupons);
-const couponDiscount=0;
-discount=offerDiscount+couponDiscount;
-console.log("subtotal:",subtotal);
-console.log("delivery:",delivery);
-console.log("discount:",discount);
+//          console.log("coupons:",coupons);
+// const couponDiscount=0;
+// discount=offerDiscount+couponDiscount;
+// console.log("subtotal:",subtotal);
+// console.log("delivery:",delivery);
+// console.log("discount:",discount);
 
-        const netAmount = subtotal + delivery  - discount;
+//         const netAmount = subtotal + delivery  - discount;
        const taxRate = 18;
-        const tax = netAmount * (taxRate / 100);
-      const total=netAmount+tax;
-        console.log("tax:",tax);
-        console.log("netAmount:",netAmount);
-        console.log("total:",total);
+//         const tax = netAmount * (taxRate / 100);
+//       const total=netAmount+tax;
+//         console.log("tax:",tax);
+//         console.log("netAmount:",netAmount);
+//         console.log("total:",total);
         const offers = await Offer.find({
 startDate: { $lte: new Date() },       
   endDate: { $gte: new Date() },            
   isActive: true       
  }).lean();
 
-        console.log("offers in checkout:",offers);
-        
+const orderSummary=calculateOrder(cartItems);        
         // Payment methods
         const paymentMethods = [
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
@@ -158,13 +150,8 @@ startDate: { $lte: new Date() },
             addresses,
             cartItems,
             fromCart, 
-            subtotal,
-            delivery,
             taxRate,
-            tax,
-            discount,
-            netAmount,
-            total,
+            ...orderSummary,
             offers,
             paymentMethods,
             selectedPayment: '',
@@ -204,7 +191,6 @@ console.log("rwq body:",req.body)
             isDefault 
         } = req.body;
            let userAddressDoc = await Address.findOne({ userId });
-        // If setting as default, unset any existing default
         if (isDefault && userAddressDoc) {
       userAddressDoc.address.forEach(addr => addr.isDefault = false);
     }
@@ -664,68 +650,4 @@ exports.buyNow=async(req,res)=>{
          console.error('Buy Now error:', err);
         res.redirect('user/shopAll' + req.body.productId);
     }
-}
-exports.applyCouponByCode=async(req,res)=>{
-    try {
-        const {couponCode}=req.body;
-        const userId=req.session.user.id;
-
-        const coupon=await Coupon.findOne({
-            code:couponCode,
-            isActive:true,
-            validTill:{$gte:new Date()}
-        });
-
-        if(!coupon){
-            return res.json({success:false,message:'Invalid or expired coupon code '});
-                    }
-                    const cart=await Cart.findOne({userId}).populate('items.productId');
-                    
-                    const cartTotal=cart.total;
-                    if(cartTotal<coupon.minCartValue){
-                        const amountNeeded=(coupon.minCartValue-cartTotal).toFixed(2);
-                        return res.json({
-                            success:false,
-                            message:`Add ₹${amountNeeded} more to apply this coupon.`
-                        })
-                    }
-
-                  const hasUsedCoupon = await Order.exists({ 
-            userId: userId, 
-            'coupon.couponId': coupon._id,
-            status: { $nin: ['cancelled', 'returned'] }
-        });
-          if (hasUsedCoupon && !coupon.reusable) {
-            return res.json({ success: false, message: 'You have already used this coupon' });
-        }
-          const discountAmount = calculateDiscount(coupon, cartTotal);
-        
-        // Apply coupon to cart
-        cart.coupon = {
-            couponId: coupon._id,
-            code: coupon.code,
-            discountAmount: discountAmount
-        };
-        
-        await cart.save();
-         res.json({
-            success: true,
-            couponId: coupon._id,
-            couponCode: coupon.code,
-            discountText: coupon.discountType === 'percentage' 
-                ? `${coupon.discountValue}% off` 
-                : `₹${coupon.discountValue} off`,
-            updatedSummary: {
-                subtotal: cartTotal,
-                discount: discountAmount,
-                total: cartTotal - discountAmount
-            }
-        });
-    } catch (error) {
-        console.error('Error applying coupon:', error);
-        res.json({ success: false, message: 'Error applying coupon' });
-    }
-}
-exports.applyCoupon=async(req,res)=>{
-   
 }

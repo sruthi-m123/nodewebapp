@@ -18,21 +18,21 @@
   <div class="dashboard-stats">
     <div class="stat-card pink">
       <h4><i class="fas fa-users"></i> Total Users</h4>
-      <p>29</p>
+      <p id="total-users">Loading...</p>
     </div>
     <div class="stat-card purple">
       <h4><i class="fas fa-box"></i> Items Sold</h4>
-      <p>19</p>
+      <p id="items-sold">Loading...</p>
     </div>
     <div class="stat-card blue">
       <h4><i class="fas fa-rupee-sign"></i> Total Sales</h4>
-      <p>₹ 998,156</p>
+      <p id="total-sales">Loading...</p>
     </div>
     <div class="stat-card violet">
       <h4><i class="fas fa-clock"></i> Pending Orders</h4>
-      <p>12</p>
+      <p id="pending-orders">Loading...</p>
     </div>
-    <button class="pdf-btn">PDF <i class="fas fa-file-pdf"></i></button>
+    <button class="pdf-btn" id="generate-pdf">PDF <i class="fas fa-file-pdf"></i></button>
   </div>
 
   <!-- Top Sold Products Table -->
@@ -49,48 +49,17 @@
           <th>Qty Sold</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="top-products-body">
         <tr>
-          <td>#1025</td>
-          <td><img src="/images/products/1.jpg" alt="Product"></td>
-          <td>Purple Chikankari Saree</td>
-          <td>₹2,200</td>
-          <td>₹2,200</td>
-          <td>1</td>
-        </tr>
-        <tr>
-          <td>#1026</td>
-          <td><img src="/images/products/2.jpg" alt="Product"></td>
-          <td>Green Kanchipuram Silk</td>
-          <td>₹5,200</td>
-          <td>₹15,600</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>#1027</td>
-          <td><img src="/images/products/3.jpg" alt="Product"></td>
-          <td>Beige Kalamkari</td>
-          <td>₹1,600</td>
-          <td>₹8,000</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>#1028</td>
-          <td><img src="/images/products/4.jpg" alt="Product"></td>
-          <td>Peach Georgette Saree</td>
-          <td>₹6,000</td>
-          <td>₹12,000</td>
-          <td>2</td>
+          <td colspan="6" class="loading-text">Loading products...</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="pagination">
-      <span><</span>
-      <span class="active">1</span>
-      <span>2</span>
-      <span>3</span>
-      <span>></span>
+    <div class="pagination" id="products-pagination">
+      <span class="page-prev"><</span>
+      <span class="page-number active">1</span>
+      <span class="page-next">></span>
     </div>
   </div>
 
@@ -100,4 +69,378 @@
     <canvas id="salesChart"></canvas>
   </div>
 </div>
+
+<!-- JavaScript for Dynamic Dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the dashboard
+    initDashboard();
+    
+    // Set up event listeners
+    document.getElementById('generate-pdf').addEventListener('click', generatePDFReport);
+  });
+
+  // Global variables
+  let currentPage = 1;
+  let totalPages = 1;
+  let salesChart = null;
+
+  // Initialize dashboard
+  async function initDashboard() {
+    try {
+      await Promise.all([
+        loadStats(),
+        loadTopProducts(),
+        loadSalesChart()
+      ]);
+    } catch (error) {
+      console.error('Error initializing dashboard:', error);
+      showNotification('Failed to load dashboard data', 'error');
+    }
+  }
+
+  // Load statistics cards
+  async function loadStats() {
+    try {
+      const response = await fetch('/admin/api/stats');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Update the DOM with the fetched data
+      document.getElementById('total-users').textContent = data.totalUsers || 0;
+      document.getElementById('items-sold').textContent = data.itemsSold || 0;
+      document.getElementById('total-sales').textContent = `₹ ${(data.totalSales || 0).toLocaleString()}`;
+      document.getElementById('pending-orders').textContent = data.pendingOrders || 0;
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      document.getElementById('total-users').textContent = 'Error';
+      document.getElementById('items-sold').textContent = 'Error';
+      document.getElementById('total-sales').textContent = 'Error';
+      document.getElementById('pending-orders').textContent = 'Error';
+      showNotification('Failed to load statistics', 'error');
+    }
+  }
+
+  // Load top products table
+  async function loadTopProducts(page = 1) {
+    try {
+      const tbody = document.getElementById('top-products-body');
+      tbody.innerHTML = '<tr><td colspan="6" class="loading-text">Loading products...</td></tr>';
+      
+      const response = await fetch(`/admin/api/top-products?page=${page}&limit=4`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("data in the dashboard:",data);
+      // Update the table
+      tbody.innerHTML = '';
+      
+      if (data.products && data.products.length > 0) {
+        data.products.forEach(product => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>#${product.id.toString().slice(-4)}</td>
+            <td><img src="${product.image || '/images/placeholder.jpg'}" alt="${product.name || 'Product'}" onerror="this.src='/images/placeholder.jpg'"></td>
+            <td>${product.name || 'Unnamed Product'}</td>
+            <td>₹${(product.price || 0).toLocaleString()}</td>
+            <td>₹${(product.revenue || 0).toLocaleString()}</td>
+            <td>${product.quantity || 0}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No products found</td></tr>';
+      }
+      
+      // Update pagination
+      totalPages = data.totalPages || 1;
+      updatePagination(page);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      document.getElementById('top-products-body').innerHTML = 
+        '<tr><td colspan="6" class="error-text">Failed to load products</td></tr>';
+      showNotification('Failed to load products', 'error');
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination(currentPage) {
+    const pagination = document.getElementById('products-pagination');
+    
+    // Clear existing pagination
+    pagination.innerHTML = '';
+    
+    // Add previous button
+    const prevButton = document.createElement('span');
+    prevButton.className = 'page-prev';
+    prevButton.innerHTML = '<';
+    prevButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
+    prevButton.addEventListener('click', () => changePage('prev'));
+    pagination.appendChild(prevButton);
+    
+    // Add page numbers
+    const pageNumbersContainer = document.createElement('div');
+    pageNumbersContainer.className = 'page-numbers';
+    
+    for (let i = 1; i <= totalPages; i++) {
+      const pageSpan = document.createElement('span');
+      pageSpan.className = `page-number ${i === currentPage ? 'active' : ''}`;
+      pageSpan.textContent = i;
+      pageSpan.addEventListener('click', () => changePage(i));
+      pageNumbersContainer.appendChild(pageSpan);
+    }
+    
+    pagination.appendChild(pageNumbersContainer);
+    
+    // Add next button
+    const nextButton = document.createElement('span');
+    nextButton.className = 'page-next';
+    nextButton.innerHTML = '>';
+    nextButton.style.visibility = currentPage === totalPages ? 'hidden' : 'visible';
+    nextButton.addEventListener('click', () => changePage('next'));
+    pagination.appendChild(nextButton);
+  }
+
+  // Change page in products table
+  function changePage(page) {
+    if (page === 'prev') {
+      if (currentPage > 1) {
+        currentPage--;
+      }
+    } else if (page === 'next') {
+      if (currentPage < totalPages) {
+        currentPage++;
+      }
+    } else {
+      currentPage = page;
+    }
+    
+    loadTopProducts(currentPage);
+  }
+
+  // Load and render sales chart
+  async function loadSalesChart() {
+    try {
+      const response = await fetch('/admin/api/sales-data');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Get canvas context
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      
+      // Destroy previous chart if it exists
+      if (salesChart) {
+        salesChart.destroy();
+      }
+      
+      // Create new chart
+      salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels || [],
+          datasets: [{
+            label: 'Monthly Sales (₹)',
+            data: data.values || [],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `₹${context.raw.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '₹' + value.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error loading sales chart:', error);
+      const chartContainer = document.getElementById('salesChart').parentElement;
+      chartContainer.innerHTML += '<p class="error-text">Failed to load sales chart</p>';
+      showNotification('Failed to load sales data', 'error');
+    }
+  }
+
+  // Generate PDF report
+  async function generatePDFReport() {
+    // Show loading state
+    const pdfButton = document.getElementById('generate-pdf');
+    const originalText = pdfButton.innerHTML;
+    pdfButton.innerHTML = 'Generating... <i class="fas fa-spinner fa-spin"></i>';
+    pdfButton.disabled = true;
+    
+    try {
+      const response = await fetch('/admin/api/generate-pdf-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'sales-report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      showNotification('PDF report generated successfully!', 'success');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      showNotification('Failed to generate PDF report', 'error');
+    } finally {
+      // Reset button state
+      pdfButton.innerHTML = originalText;
+      pdfButton.disabled = false;
+    }
+  }
+
+  // Show notification
+  function showNotification(message, type = 'info') {
+    // Remove any existing notifications first
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+      <span>${message}</span>
+      <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    // Add styles if not already added
+    if (!document.querySelector('#notification-styles')) {
+      const styles = document.createElement('style');
+      styles.id = 'notification-styles';
+      styles.textContent = `
+        .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 15px 20px;
+          border-radius: 5px;
+          color: white;
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-width: 300px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          animation: slideIn 0.3s ease;
+        }
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #F44336; }
+        .notification.info { background: #2196F3; }
+        .notification button {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 20px;
+          cursor: pointer;
+          margin-left: 15px;
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(styles);
+    }
+    
+    // Add to page and auto-remove after 5 seconds
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 5000);
+  }
+</script>
+
+
+<style>
+  .loading-text {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+  }
+  
+  .error-text {
+    text-align: center;
+    color: #f44336;
+    padding: 20px;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .pagination span {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+  }
+  
+  .pagination span.active {
+    background-color: #4a6cf7;
+    color: white;
+    border-color: #4a6cf7;
+  }
+  
+  .pagination span:hover:not(.active) {
+    background-color: #f0f0f0;
+  }
+  
+  .page-numbers {
+    display: flex;
+    gap: 5px;
+  }
+</style>
 <%- include('../partials/admin/admin-footer') %>

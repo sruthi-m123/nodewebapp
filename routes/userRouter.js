@@ -14,6 +14,8 @@ const orderController=require("../controller/user/orderController")
 const orderdetailController=require('../controller/user/orderDetailController');
 const wishlistController=require('../controller/user/wishlistController');
 const walletController=require('../controller/user/walletController');
+const couponController=require('../controller/user/couponController');
+
 
 router.get("/home", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -98,7 +100,9 @@ router.post('/buy-now',checkoutController.buyNow);
 router.post('/api/addresses',checkoutController.addAddress);
 router.put('/api/addresses/:id',checkoutController.updateAddress);
 router.get('/api/addresses/:id',checkoutController.getAddress);
-router.get('/chekout/apply-coupon',checkoutController.)
+//coupon
+router.post('/checkout/apply-coupon',couponController.applyCoupon);
+router.post('/checkout/applyCouponCode',couponController.applyCouponByCode)
 
 //offer checkout routes
 router.post('/api/offers/apply',checkoutController.applyOffer);

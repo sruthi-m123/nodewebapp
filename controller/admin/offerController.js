@@ -2,7 +2,7 @@
 const Offer=require('../../models/offerSchema');
 const Product=require('../../models/productSchema');
 const Category=require('../../models/categorySchema');
-const {updateProductsOffer}=require('../../utils/bestOffer');
+const {updateProductsOffer}=require('../../helper/bestOffer');
 const getOfferPage=async(req,res)=>{
     try{
 const currentPage=parseInt(req.query.page)||1;
