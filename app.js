@@ -48,7 +48,6 @@ app.use(async (req, res, next) => {
 
 
 app.use(async (req, res, next) => {
-  // console.log(req.session)
   res.locals.user = req.session.user || null;
   res.locals.currentPath = req.path;
 
@@ -71,7 +70,6 @@ app.use(async (req, res, next) => {
 
 
 app.use(passport.initialize());
-// app.use(passport.session());
 app.use(methodOverride('_method'));
 app.use(flash())
 app.use(expressLayouts);

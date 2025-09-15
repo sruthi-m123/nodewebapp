@@ -8,6 +8,7 @@ const Product = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 const Coupon=require('../../models/couponSchema');
 const{calculateOrder}=require('../../helper/calculateTotal');
+const razorpayController=require('../../controller/user/razorpayController');
 
 
 exports.getCheckoutPage = async (req, res) => {
@@ -122,21 +123,17 @@ if(stockValidationFailed){
 // console.log("subtotal:",subtotal);
 // console.log("delivery:",delivery);
 // console.log("discount:",discount);
-
-//         const netAmount = subtotal + delivery  - discount;
+//  const netAmount = subtotal + delivery  - discount;
        const taxRate = 18;
-//         const tax = netAmount * (taxRate / 100);
-//       const total=netAmount+tax;
-//         console.log("tax:",tax);
-//         console.log("netAmount:",netAmount);
-//         console.log("total:",total);
+//         
         const offers = await Offer.find({
 startDate: { $lte: new Date() },       
   endDate: { $gte: new Date() },            
   isActive: true       
  }).lean();
 
-const orderSummary=calculateOrder(cartItems);        
+const orderSummary=calculateOrder(cartItems);  
+console.log("order summary",orderSummary);      
         // Payment methods
         const paymentMethods = [
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
@@ -158,8 +155,8 @@ const orderSummary=calculateOrder(cartItems);
             selectedPaymentMethod: 'Cash on Delivery',
             appliedOffers: [],
             user:userData,
-            coupons:coupons
-            
+            coupons:coupons,
+             razorpayKey: process.env.RAZORPAY_KEY_ID
         });
         
     } catch (error) {
@@ -378,220 +375,145 @@ exports.applyOffer = async (req, res) => {
 };
 
 exports.placeOrder = async (req, res) => {
-    try {
-        console.log("inside place order controller")
-        console.log("session details:",req.session);
-        const userId = req.session.user.id;
-console.log("req body",req.body);
-        const { 
-            addressId, 
-            paymentMethod, 
-            appliedOffers = [] ,
-        
-        } = req.body;
-        // validation of required fields
- if (!addressId || !paymentMethod) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Address and payment method are required' 
-            });
-        }
-if(req.session.buyNowItem){
-    const{productId,quantity=1,variant='Default',price}=req.session.buyNowItem;
-    console.log("productId:",productId);
-    const product=await Product.findByIdAndUpdate(productId);
+  try {
+    console.log("Inside place order controller");
 
-    if(!product||!product.isActive){
-        return res.status(400).json({success:false,message:'Product is not available'})
+    const userId = req.session?.user?.id;
+    const { addressId, paymentMethod, appliedOffers = [] } = req.body;
+
+    if (!addressId || !paymentMethod) {
+      return res.status(400).json({
+        success: false,
+        message: 'Address and payment method are required'
+      });
     }
 
-    if(product.stock<quantity){
-        return res.status(400).json({success:false,message:'not enough products available '})
-    }
+    let items = [];
+    let isBuyNow = false;
 
-    var productIdForStockUpdate = productId;
-    var quantityForStockUpdate = quantity;
+    if (req.session.buyNowItem) {
+      // Buy Now flow
+      const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
+      const product = await Product.findById(productId);
 
+      if (!product || !product.isActive) {
+        return res.status(400).json({ success: false, message: 'Product not available' });
+      }
+      if (product.stock < quantity) {
+        return res.status(400).json({ success: false, message: 'Not enough stock' });
+      }
 
-    items=[{
-        productId:product._id,
-        name:product.productName,
+      items = [{
+        productId: product._id,
+        name: product.productName,
         variant,
         quantity,
-        price:price||product.price,
-        totalPrice:(price||product.price)*quantity
-    }]
-    isBuyNow=true;
-}else{
+        price: price || product.price,
+        totalPrice: (price || product.price) * quantity
+      }];
+      isBuyNow = true;
 
+    } else {
+      // Cart flow
+      const cart = await Cart.findOne({ userId }).populate({
+        path: 'items.productId',
+        match: { isActive: true },
+        select: 'productName price stock'
+      });
 
-        
-        // Get cart items
-const cart = await Cart.findOne({ userId: userId }).populate({
-  path: 'items.productId',
-   match: { isActive: true },
-  select: 'productName price stock'
-});
+      if (!cart || cart.items.length === 0) {
+        return res.status(400).json({ success: false, message: 'Cart is empty' });
+      }
 
-if (!cart || cart.items.length === 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Cart is empty' 
-            });
-        }
-
-
-        console.log("cart items:",cart);
-        if (!cart || cart.items.length === 0) {
-            return res.status(400).json({ success: false, message: 'Cart is empty' });
-        }
-        const activeCartItems = cart.items.filter(item => item.productId !== null);
-
-  for (const item of activeCartItems) {
-    await Product.findByIdAndUpdate(item.productId._id, {
-      $inc: { stock: -item.quantity },
-    });
-  
-
-  await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
-} 
- 
-
-
- items = activeCartItems.map(item => ({
+      const activeCartItems = cart.items.filter(item => item.productId);
+      items = activeCartItems.map(item => ({
         productId: item.productId._id,
         name: item.productId.productName,
         variant: item.variant || 'Default',
         quantity: item.quantity,
         price: item.price,
         totalPrice: item.price * item.quantity
-    }));
-}
-        // Get address
-        console.log("addressId:",addressId);
-        console.log("user:",userId);
-const addresses = await Address.findOne(
-  { userId: userId, 'address._id': new mongoose.Types.ObjectId(addressId) },
-  { address: { $elemMatch: { _id: new mongoose.Types.ObjectId(addressId) } } }
-);
-        console.log("addresses:",addresses)
-        if (!addresses) {
-            return res.status(400).json({ success: false, message: 'Address not found' });
-        }
- if (!addresses || addresses.address.length === 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Address not found' 
-            });
-        }
-
-
-        const selectedAddress=addresses.address[0];
-        // Calculate order totals
-        const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const delivery = subtotal > 500 ? 0 : 50;
-        const taxRate = 18;
-        const tax = subtotal * (taxRate / 100);
-        
-        // Calculate discount from offers (simplified)
-        let discount = 0;
-        
-        const total = subtotal + delivery + tax - discount;
-       
-        let status;
-        if(paymentMethod==='cod'){
-            status='pending';
-        }else{
-            status='processing';
-        }
-       
-       
-       
-       
-        const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-        // Create order
-        const order = new Order({
-            orderId:orderId,
-            userId: userId,
-          items:items,
-          shippingAddress: {
-    name: selectedAddress.name,
-    building: selectedAddress.building,
-    landmark: selectedAddress.landmark,
-    city: selectedAddress.city,
-    state: selectedAddress.state,
-    pincode: selectedAddress.pincode,
-    phone: selectedAddress.phone,
-    altPhone: selectedAddress.altPhone
-},
-            paymentMethod,
-            subtotal,
-            delivery,
-            tax,
-            discount,
-            total,
-            status,
-            appliedOffers: appliedOffers.map(offer => offer.id)
-        });
-        console.log("order Items:",order);
-        await order.save();
-
-//updating stock
-try{
-if (req.session.buyNowItem) {
-    const product=await Product.findById(productIdForStockUpdate);
-
-if(product.stock<quantityForStockUpdate){
-    throw new Error('insufficient stock forbuy now item')
-}
-await Product.findByIdAndUpdate(productIdForStockUpdate, { 
-            $inc: { stock: -quantityForStockUpdate } 
-        });
-    delete req.session.buyNowItem;
-} else {
-    for (const item of order.items) {
-       const product= await Product.findById(item.productId);
-       if(product.stock<item.quantity){
-        throw new Error('insufficent stock for product')
-       }
-            
-        await Product.findByIdAndUpdate(item.productId,{
-            $inc:{stock:-item.quantity},
-        })
+      }));
     }
-    await Cart.findOneAndUpdate(
-        { userId: userId },
-        { $set: { items: [] } }
+
+    const addresses = await Address.findOne(
+      { userId, 'address._id': addressId },
+      { address: { $elemMatch: { _id: addressId } } }
     );
-}
-}catch(error){
-    console.error('stock update error:',error.message);
-    throw error ;
-}
-                // Clear the cart
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { $set: { items: [] } }
-        );
-        
-      res.json({ 
-  success: true, 
-  orderId: order.orderId,
-  order: {
-    id: order._id,
-    total,
-    status: order.status,
-    createdAt: order.createdAt
-  }
-});
 
-        
-    } catch (error) {
-        console.error('Place order error:', error);
-        res.status(500).json({ success: false, message: 'Error placing order' });
+    if (!addresses || addresses.address.length === 0) {
+      return res.status(400).json({ success: false, message: 'Address not found' });
     }
+    const selectedAddress = addresses.address[0];
+
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const delivery = subtotal > 500 ? 0 : 50;
+    const tax = subtotal * 0.18; 
+    let discount = 0; 
+    const total = subtotal + delivery + tax - discount;
+
+    let status = paymentMethod === 'cod' ? 'pending' : 'processing';
+
+    const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const order = new Order({
+      orderId,
+      userId,
+      items,
+      shippingAddress: selectedAddress,
+      paymentMethod,
+      subtotal,
+      delivery,
+      tax,
+      discount,
+      total,
+      status,
+      appliedOffers: appliedOffers.map(o => o.id)
+    });
+    await order.save();
+
+    if (paymentMethod === 'netbanking') {
+      const Razorpay = require('razorpay');
+      const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+      const razorpayOrder = await razorpay.orders.create({
+        amount: total * 100, 
+        currency: "INR",
+        receipt: orderId,
+      });
+
+      return res.json({
+        success: true,
+        orderId: order.orderId,
+        razorpayOrder,
+        key: process.env.RAZORPAY_KEY_ID
+      });
+    }
+
+    for (const item of items) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { stock: -item.quantity }
+      });
+    }
+    if (!isBuyNow) {
+      await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+    } else {
+      delete req.session.buyNowItem;
+    }
+
+    return res.json({
+      success: true,
+      orderId: order.orderId,
+      order: { id: order._id, total, status: order.status, createdAt: order.createdAt }
+    });
+
+  } catch (error) {
+    console.error('Place order error:', error);
+    res.status(500).json({ success: false, message: 'Error placing order',details:error?.error || error });
+  }
 };
+
 exports.successPage=async(req,res)=>{
      try {
         console.log("enter success controller")

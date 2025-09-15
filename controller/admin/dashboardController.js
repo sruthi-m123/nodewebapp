@@ -33,8 +33,8 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-// Get top products
 const getTopProducts = async (req, res) => {
+  console.log("hiiiiiiiiiiiiii")
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 4;
@@ -74,12 +74,12 @@ const getTopProducts = async (req, res) => {
     const products = topProducts.map(item => ({
       id: item.product._id,
       image: item.product.images && item.product.images.length > 0 ? item.product.images[0] : '/images/placeholder.jpg',
-      name: item.product.name,
+      name: item.product.productName,
       price: item.product.price,
       revenue: item.totalRevenue,
       quantity: item.totalQuantity
     }));
-    
+    console.log("products inside dashboardconyroller",products)
     res.json({
       products,
       totalPages
@@ -176,6 +176,7 @@ const generatePDFReport = async (req, res) => {
       {
         $group: {
           _id: '$items.productId',
+        
           totalQuantity: { $sum: '$items.quantity' },
           totalRevenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } }
         }
@@ -192,12 +193,12 @@ const generatePDFReport = async (req, res) => {
       },
       { $unwind: '$product' }
     ]);
-    
+    console.log("top products:",topProducts);
     doc.text('Top 10 Products:');
     doc.moveDown(0.5);
     
     topProducts.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item.product.name} - Quantity: ${item.totalQuantity} - Revenue: ₹${item.totalRevenue.toLocaleString()}`);
+      doc.text(`${index + 1}. ${item.name} - Quantity: ${item.totalQuantity} - Revenue: ₹${item.totalRevenue.toLocaleString()}`);
     });
     
     // Finalize the PDF

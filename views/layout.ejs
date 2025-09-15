@@ -26,6 +26,12 @@
 
   <%- include('partials/user/footer', { user }) %>
     <script src="/js/common.js"></script>
+
+<% if (typeof pageJS !== 'undefined' && pageJS === 'user/checkout.js') { %>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<% } %>
+
+
     <% if (typeof pageJS !== 'undefined') { %>
       <script src="/js/<%= pageJS %>"></script>
     <% } %>

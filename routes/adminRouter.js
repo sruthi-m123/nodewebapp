@@ -7,11 +7,11 @@ const productController = require('../controller/admin/productController');
 const orderController = require('../controller/admin/orderController');
 const offerController = require('../controller/admin/offerController');
 const couponController = require('../controller/admin/couponController');
-const dashboardController = require('../controller/admin/dashboardController'); // Add this line
+const dashboardController = require('../controller/admin/dashboardController'); 
 const { upload, singleUpload, multiUpload, handleMulterError } = require('../config/multer');
 const { adminAuth } = require("../middlewares/auth");
 
-// Disable layout for all admin views
+
 router.use((req, res, next) => {
   res.locals.layout = false;
   next();

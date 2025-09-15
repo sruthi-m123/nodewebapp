@@ -583,6 +583,7 @@ function placeOrder() {
   const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
   const selectedPaymentRadio = document.querySelector('input[name="paymentMethod"]:checked');
 const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : '';
+console.log("payment method:",paymentMethod);
 
 //   const paymentMethod = checkoutData.dataset.payment;
   const appliedOffers = [];
@@ -610,6 +611,27 @@ const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : '';
     btn.textContent = 'Place Order';
     return;
   }
+
+  if (paymentMethod === 'netbanking') {
+  fetch('/user/orders-placed', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      addressId: selectedAddress,
+      paymentMethod,
+      appliedOffers
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.order) {
+      payWithRazorpay(data.order);
+    } else {
+      Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+    }
+  });
+  return;
+}
 
   fetch('/user/orders-placed', {
     method: 'POST',
@@ -690,3 +712,40 @@ function showToast(message, type = "success") {
     toast.remove();
   }, 3000);
 }
+
+
+function payWithRazorpay(order) {
+  var options = {
+    key: "<%= process.env.RAZORPAY_KEY_ID %>", 
+    amount: order.amount,
+    currency: "INR",
+    name: "Chettinad Sarees",
+    description: "Order Payment",
+    order_id: order.id,
+    handler: function (response) {
+      // Verify Payment in backend
+      fetch("/verifyPayment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response),
+      }).then(res => res.json()).then(data => {
+        if(data.success){
+          alert("Payment Successful");
+        } else {
+          alert("Payment Failed");
+        }
+      });
+    },
+    prefill: {
+      name: "Customer Name",
+      email: "customer@example.com",
+      contact: "9876543210"
+    },
+    theme: {
+      color: "#3399cc"
+    }
+  };
+  var rzp = new Razorpay(options);
+  rzp.open();
+}
+

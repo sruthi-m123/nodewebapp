@@ -70,24 +70,20 @@
   </div>
 </div>
 
-<!-- JavaScript for Dynamic Dashboard -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+  console.log("📌 dashboard.js loaded");
+
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the dashboard
     initDashboard();
     
-    // Set up event listeners
     document.getElementById('generate-pdf').addEventListener('click', generatePDFReport);
   });
 
-  // Global variables
   let currentPage = 1;
   let totalPages = 1;
   let salesChart = null;
 
-  // Initialize dashboard
   async function initDashboard() {
     try {
       await Promise.all([
@@ -101,9 +97,9 @@
     }
   }
 
-  // Load statistics cards
   async function loadStats() {
     try {
+      console.log("reached where expected")
       const response = await fetch('/admin/api/stats');
       
       if (!response.ok) {
@@ -111,8 +107,8 @@
       }
       
       const data = await response.json();
+      console.log("data at loadstats",data);
       
-      // Update the DOM with the fetched data
       document.getElementById('total-users').textContent = data.totalUsers || 0;
       document.getElementById('items-sold').textContent = data.itemsSold || 0;
       document.getElementById('total-sales').textContent = `₹ ${(data.totalSales || 0).toLocaleString()}`;
@@ -127,10 +123,10 @@
     }
   }
 
-  // Load top products table
   async function loadTopProducts(page = 1) {
     try {
       const tbody = document.getElementById('top-products-body');
+      console.log("inside the top products")
       tbody.innerHTML = '<tr><td colspan="6" class="loading-text">Loading products...</td></tr>';
       
       const response = await fetch(`/admin/api/top-products?page=${page}&limit=4`);
@@ -141,7 +137,6 @@
       
       const data = await response.json();
       console.log("data in the dashboard:",data);
-      // Update the table
       tbody.innerHTML = '';
       
       if (data.products && data.products.length > 0) {
@@ -149,7 +144,11 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>#${product.id.toString().slice(-4)}</td>
-            <td><img src="${product.image || '/images/placeholder.jpg'}" alt="${product.name || 'Product'}" onerror="this.src='/images/placeholder.jpg'"></td>
+<td>
+  <img src="/${product.image}" 
+       alt="${product.name || 'Product'}" 
+       onerror="this.src='/images/placeholder.jpg'">
+</td>
             <td>${product.name || 'Unnamed Product'}</td>
             <td>₹${(product.price || 0).toLocaleString()}</td>
             <td>₹${(product.revenue || 0).toLocaleString()}</td>
@@ -161,7 +160,6 @@
         tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No products found</td></tr>';
       }
       
-      // Update pagination
       totalPages = data.totalPages || 1;
       updatePagination(page);
     } catch (error) {
@@ -172,14 +170,11 @@
     }
   }
 
-  // Update pagination controls
   function updatePagination(currentPage) {
     const pagination = document.getElementById('products-pagination');
     
-    // Clear existing pagination
     pagination.innerHTML = '';
     
-    // Add previous button
     const prevButton = document.createElement('span');
     prevButton.className = 'page-prev';
     prevButton.innerHTML = '<';
@@ -187,8 +182,7 @@
     prevButton.addEventListener('click', () => changePage('prev'));
     pagination.appendChild(prevButton);
     
-    // Add page numbers
-    const pageNumbersContainer = document.createElement('div');
+blob:http://localhost:3000/0057e747-692a-4d88-b763-1fe654ba9559    const pageNumbersContainer = document.createElement('div');
     pageNumbersContainer.className = 'page-numbers';
     
     for (let i = 1; i <= totalPages; i++) {
@@ -227,7 +221,6 @@
     loadTopProducts(currentPage);
   }
 
-  // Load and render sales chart
   async function loadSalesChart() {
     try {
       const response = await fetch('/admin/api/sales-data');
@@ -330,19 +323,15 @@
       console.error('Error generating PDF:', error);
       showNotification('Failed to generate PDF report', 'error');
     } finally {
-      // Reset button state
       pdfButton.innerHTML = originalText;
       pdfButton.disabled = false;
     }
   }
 
-  // Show notification
   function showNotification(message, type = 'info') {
-    // Remove any existing notifications first
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notification => notification.remove());
     
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = `
@@ -350,7 +339,6 @@
       <button onclick="this.parentElement.remove()">&times;</button>
     `;
     
-    // Add styles if not already added
     if (!document.querySelector('#notification-styles')) {
       const styles = document.createElement('style');
       styles.id = 'notification-styles';
@@ -389,7 +377,6 @@
       document.head.appendChild(styles);
     }
     
-    // Add to page and auto-remove after 5 seconds
     document.body.appendChild(notification);
     setTimeout(() => {
       if (notification.parentElement) {
