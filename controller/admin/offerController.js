@@ -79,15 +79,25 @@ const createOffer = async (req, res) => {
         if (!title?.trim()) {
             return res.status(400).json({ message: 'Offer title is required' });
         }
-        if (!code?.trim()) {
-            return res.status(400).json({ message: 'Offer code is required' });
-        }
+        // if (!code?.trim()) {
+        //     return res.status(400).json({ message: 'Offer code is required' });
+        // }
         if (!type?.trim()) {
             return res.status(400).json({ message: 'Discount type is required' });
         }
         if (discountValue === undefined || discountValue === null || discountValue === '') {
             return res.status(400).json({ message: 'Discount value is required' });
         }
+const discount= Number(discountValue);
+
+if(isNaN(discount)){
+    return res.status(400).json({message:'Discount value must be a Number'})
+};
+if(discount>95){
+    return res.status(400).json({message:'Discount percentage cannot exceed 95%'});
+}
+
+
         if (!applicableTo?.trim()) {
             return res.status(400).json({ message: 'Applicable to field is required' });
         }
@@ -113,10 +123,10 @@ const createOffer = async (req, res) => {
             return res.status(400).json({ message: 'End date must be after start date' });
         }
 
-        const existingOffer = await Offer.findOne({ code: code.toUpperCase().trim() });
-        if (existingOffer) {
-            return res.status(400).json({ message: 'Offer code already exists' });
-        }
+        // const existingOffer = await Offer.findOne({ code: code.toUpperCase().trim() });
+        // if (existingOffer) {
+        //     return res.status(400).json({ message: 'Offer code already exists' });
+        // }
 
         let finalApplicableItems = [];
         if (applicableTo !== 'all') {
@@ -155,7 +165,7 @@ const createOffer = async (req, res) => {
 
         const newOffer = new Offer({
             title: title.trim(),
-            code: code.toUpperCase().trim(),
+            // code: code.toUpperCase().trim(),
             type,
             discountValue: Number(discountValue),
             applicableTo,

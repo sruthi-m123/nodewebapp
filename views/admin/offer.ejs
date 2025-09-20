@@ -136,13 +136,13 @@
                 <input type="text" class="form-control" name="title" required>
               </div>
             </div>
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Offer Code*</label>
                 <input type="text" class="form-control" name="code" required>
                 <small class="text-muted">Unique code customers will use</small>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <!-- Discount Settings -->
@@ -312,13 +312,10 @@ $(document).ready(function() {
       templateResult: function(option) {
         if (!option.id) return option.text;
         const $option = $(option.element);
-        console.log("option element",$option)
         const img = $option.data('img');
         const imgSrc = img && !img.startsWith('/') ? '/' + img : img;
 
-        console.log("img in offer",img)
         const price = $option.data('price');
-        console.log("price in offere",price)
         const name = $option.data('name');
 console.log("name",name);
         
@@ -339,7 +336,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       }
     });
     
-    // Add event listener for calculating total when products are selected
     $('#productSelect').on('change', calculateTotal);
   }
 
@@ -365,7 +361,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
 
     // Populate products
     products.forEach(prod => {
-      // Handle different possible image structures
       let imageUrl = '';
       if (prod.images && prod.images.length > 0) {
         imageUrl = prod.images[0];
@@ -384,7 +379,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     });
   }
 
-  // Initialize selects when page loads
   populateSelects();
 
   // Function to calculate total amount for selected products
@@ -431,7 +425,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
 
   // Handle applicableTo change
   $('#applicableToSelect').change(function() {
-    // Destroy existing Select2 instances
     destroySelect2('#categorySelect');
     destroySelect2('#productSelect');
     
@@ -512,7 +505,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       
       // Basic info
       $form.find('input[name="title"]').val(offer.title);
-      $form.find('input[name="code"]').val(offer.code);
+      // $form.find('input[name="code"]').val(offer.code);
       
       // Discount settings
       $form.find('select[name="type"]').val(offer.type).trigger('change');
@@ -583,7 +576,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     // Prepare data
     const data = {
       title: $('input[name="title"]').val(),
-      code: $('input[name="code"]').val().toUpperCase(),
+      // code: $('input[name="code"]').val().toUpperCase(),
       type: $('select[name="type"]').val(),
       discountValue: Number($('input[name="discountValue"]').val()),
       applicableTo: $('select[name="applicableTo"]').val(),

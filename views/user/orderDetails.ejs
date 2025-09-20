@@ -31,7 +31,7 @@
 
         <!-- Action buttons for each item -->
         <div class="item-actions">
-          <% if (order.status !== 'cancelled' && order.status !== 'delivered' && item.status !== 'cancelled'&& item.status!=='returned') { %>
+          <% if (order.status !== 'cancelled' && order.status !== 'delivered' && item.status !== 'cancelled'&& item.status!=='returned'&& order.items.length>1) { %>
             <button class="cancel-item-btn" 
                     data-order-id="<%= order._id %>" 
                     data-item-id="<%= item._id %>"
@@ -40,7 +40,7 @@
             </button>
           <% } %>
 
-          <% if (order.status === 'delivered' && item.status !== 'returned' && item.status !=='cancelled') { %>
+          <% if (order.status === 'delivered' && item.status !== 'returned' && item.status !=='cancelled'&& order.items.length>1) { %>
             <button class="return-item-btn" 
                     data-order-id="<%= order._id %>" 
                     data-item-id="<%= item._id %>"
@@ -217,7 +217,7 @@
         </ul>
     </div>
 </div>
-<!-- JSON.stringify({ "<%= order.status %>" }) -->
+<!-- JSON.stringify({ "<%= order.items.length %>" }) -->
 
 <!-- Cancel Order Modal -->
 <div id="cancelModal" class="modal">
