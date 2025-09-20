@@ -15,7 +15,7 @@ const orderdetailController=require('../controller/user/orderDetailController');
 const wishlistController=require('../controller/user/wishlistController');
 const walletController=require('../controller/user/walletController');
 const couponController=require('../controller/user/couponController');
-const razorpayController=require('../controller/user/razorpayController');
+const razorpayController=require('../controller/user/razorpayController')
 
 router.get("/home", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -89,7 +89,7 @@ router.put('/addresses/edit/:id',addressController.updateAddress);
 router.delete('/addresses/delete/:id',addressController.deleteAddress);
 router.post('/set-default-address/:id',addressController.setDefaultAddress)
 //cart page
-router.get('/cart',cartController.getCart);
+router.get('/cart',isLoggedIn,cartController.getCart);
 router.post('/cart/add/:productId',cartController.addToCart);
 router.delete('/cart/remove/:itemId',cartController.removeCartItem);
 router.post('/cart/update',cartController.updateCart);
@@ -103,7 +103,7 @@ router.get('/api/addresses/:id',checkoutController.getAddress);
 //coupon
 router.post('/checkout/apply-coupon',couponController.applyCoupon);
 router.post('/checkout/applyCouponCode',couponController.applyCouponByCode)
-
+router.post('/checkout/remove-coupon',couponController.removeCoupon);
 //offer checkout routes
 router.post('/api/offers/apply',checkoutController.applyOffer);
 //order chekout routes
@@ -119,15 +119,15 @@ router.post("/verifyPayment", razorpayController.verifyPayment);
 //success page
 router.get('/order-success/:orderId',checkoutController.successPage);
 //order history page
-router.get('/orders',orderController.getOrderHistory);
+router.get('/orders',isLoggedIn,orderController.getOrderHistory);
 //order detail page
-router.get('/orders-details/:orderId',orderdetailController.getOrderDetails);
+router.get('/orders-details/:orderId',isLoggedIn,orderdetailController.getOrderDetails);
 router.post('/orders/:orderId/return',orderdetailController.returnOrder);
 router.get('/orders/:orderId/invoice',orderdetailController.invoice);
 router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
 router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
 //wishlist page
-router.get('/wishlist',wishlistController.getWishlistPage);
+router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
 router.post('/wishlist/add/:productId',wishlistController.addToWishlist);
 router.post('/wishlist/add-to-cart/:itemId',wishlistController.addToCartFromWishlist);
 router.delete('/wishlist/remove/:itemId',wishlistController.removeFromWishlist);

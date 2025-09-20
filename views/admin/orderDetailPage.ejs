@@ -63,6 +63,10 @@
                 <span class="label">Price:</span>
                 <span class="value">Rs.<%= item.price %></span>
               </div>
+               <div class="detail-row">
+                <span class="label">Status:</span>
+                <span class="value"><%= item.status %></span>
+              </div>
               <div class="detail-row">
                 <span class="label">Subtotal:</span>
                 <span class="value">Rs.<%= (item.price * item.quantity).toFixed(2) %></span>
@@ -132,7 +136,6 @@
   font-size: 14px;
 }
 
-/* List hidden by default */
 .dropdown-list {
   display: none;
   position: absolute;
@@ -160,7 +163,6 @@
   background: #f2f2f2;
 }
 
-/* Show dropdown when active */
 .dropdown.show .dropdown-list {
   display: block;
 }
@@ -255,9 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
 
         if (res.ok) {
-          alert("✅ Status updated to " + selectedStatus);
+          alert(" Status updated to " + selectedStatus);
         } else {
-          alert("❌ Error: " + (data.message || "Failed"));
+          alert(" Error: " + (data.message || "Failed"));
         }
       } catch (err) {
         console.error(err);

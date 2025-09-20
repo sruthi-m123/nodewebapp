@@ -307,14 +307,14 @@
         return;
       }
 
-      // Submit form to server
+   
       Swal.fire({
         title: 'Creating Account',
         html: 'Please wait while we create your account...',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-          signform.submit(); // Submit the form directly
+          signform.submit(); 
         },
       });
     });

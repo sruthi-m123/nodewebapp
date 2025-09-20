@@ -101,7 +101,6 @@ static async requestEmailChangeOTP(req,res){
 try {
   const{newEmail}=req.body;
 
-  //checking the existing email
   const existingUser=await User.findOne({email:newEmail});
   if(existingUser){
     return res.status(400).json({
@@ -109,11 +108,9 @@ try {
       message:'email is already in use '
     })
   }
-const otp=Math.floor(100000+Math.random()*900000);//otp generates
+const otp=Math.floor(100000+Math.random()*900000);
   console.log("otp:",otp);
-// send otp to new email
    await sendEmailChangeOTP(newEmail,otp);
-// store in session
 req.session.emailChangeOTP=otp;
 req.session.emailChangeTarget=newEmail;
 
@@ -142,7 +139,6 @@ if(parseInt(enteredOtp)===req.session.emailChangeOTP){
 
 //update user in DB
 await User.findByIdAndUpdate(req.session.user._id,{email:newEmail});
-//clear session
 delete req.session.emailChangeOTP;
 delete req.session.emailChangeTarget;
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const razorpay = require('../helper/razorpay');
 
 const orderSchema = new mongoose.Schema({
   orderId: {
@@ -39,7 +40,12 @@ const orderSchema = new mongoose.Schema({
       totalPrice: {
         type: Number,
         required: true
-      }
+      },
+      status: {
+    type: String,
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled'],
+    default: 'pending'
+  },
     }
   ],
 
@@ -68,7 +74,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled'],
     default: 'pending'
   },
 
@@ -101,7 +107,7 @@ const orderSchema = new mongoose.Schema({
     requestDate: Date,
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'processed'],
+      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned'],
       default: 'pending'
     },
     initiatedBy: {
@@ -112,8 +118,36 @@ const orderSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ['full', 'partial']
+    },
+     items: [ 
+    {
+      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      name: String,
+      quantity: Number,
+      reason: String
     }
+  ]
+  },
+  cancellation: {
+  reason: String,
+  date: Date,
+  initiatedBy: { type: String, enum: ['customer', 'admin'] },
+  type: { type: String, enum: ['full', 'partial'] },
+  cancelledItems: [
+    {
+      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      quantity: Number,
+      name: String
+    }
+  ]
+},
+refund:{
+  amount:{type:Number,default:0},
+  method:{type:String,enum:['cod','netbanking','wallet'],default:'wallet'},
+status: { type: String, enum: ['pending', 'processed', 'failed'], default: 'pending' },
+    processedAt: Date
   }
+
 });
 
 const Order = mongoose.model('Order', orderSchema);

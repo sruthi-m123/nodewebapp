@@ -12,8 +12,7 @@ const getOrderDetails = async (req, res) => {
     const userId = req.session.user.id;
     const orderId = req.params.orderId;
 
-    console.log("User ID:", userId);
-    console.log("Order ID:", orderId);
+ 
 
     const order = await Order.findOne({ orderId, userId })
       .populate('items.productId')
@@ -29,7 +28,7 @@ console.log("orders",order);
       imageUrl: item.productId?.images?.[0] || 'img/admin-workshop',
       color: item.productId?.color || 'N/A'
     }));
-console.log("formated items:",formatItems)
+
     const statusHistory = [
       {
         date: order.createdAt,
@@ -73,7 +72,7 @@ console.log("formated items:",formatItems)
         message: 'Your order has been returned.'
       });
     }
-console.log("status history",statusHistory);
+
     // Status message map
     const getStatusMessage = (status) => {
       const messages = {
@@ -101,7 +100,7 @@ console.log("status history",statusHistory);
       user: req.session.user
     });
   } catch (error) {
-    console.log("❗ Inside catch block");
+    console.log("Inside catch block");
     console.error(error.stack);
     res.status(500).render('user/error', {
       message: 'Error loading order details'
@@ -216,251 +215,331 @@ res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order
         res.status(500).json({ error: 'Failed to generate invoice' });
     }
 };
-
-const cancelOrder=async(req,res)=>{
-    try {
-        console.log("inside the cancel order controller ",req.params);
-
-        const{orderId}=req.params;
-        const{reason,itemsToCancel}=req.body;
-//validation
-if(!reason){
-    return res.status(400).json({success:false,message:'cancellation reason is required'})
-}
-//find the other 
-const order=await Order.findById(orderId);
-if(!order){
-    return res.status(404).json({success:false,message:'order not found'})
-}
-if (!['pending', 'processing'].includes(order.status.toLowerCase())) {
-    return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
-}
-
-
-// full order cancellation
-if(!itemsToCancel||itemsToCancel.length===0){
-    order.status='cancelled';
-    order.cancellation={
-        reason,
-        date:new Date(),
-        initiatedBy:'customer',
-        type:'full'
+const cancelOrder = async (req, res) => {
+    console.log("cancel controller ");
+  try {
+    const { orderId } = req.params;
+    const { reason, itemId, customReason } = req.body;
+console.log("req.body inside cancel",req.body);
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-
-await Promise.all(order.items.map(async item=>{
-    await Product.findByIdAndUpdate(item.productId,{
-        $inc:{stock:item.quantity}
-    })
-}))
-    }else{
-        // partial item cancelation 
-        const cancelledItems=[];
-for(const itemId of itemsToCancel){
-    const itemIndex=order.items.findIndex(item=>item._id.toString()===itemId)
-if(itemIndex===-1) continue;
-
-const item=order.items[itemIndex];
-cancelledItems.push({
-
-    product:item.productId,
-    quantity:item.quantity,
-    name:item.name
-});
-await Product.findByIdAndUpdate(item.productId,{
-    $inc:{stock:item.quantity}
-});
-
-order.items.splice(itemIndex,1);
-}
-if(cancelledItems.length===0){
-    return res.status(400).json({
-        success:false,
-        message:'No valid items specified for cancellation'
-    });
-}
-order.cancellation={
-    reason,
-    date:new Date(),
-    initiatedBy:'customer',
-    type:'partial',
-    cancelledItems
-}
+    const cancellationReason = customReason || reason;
+    if (!cancellationReason) {
+      return res.status(400).json({ success: false, message: 'Cancellation reason is required' });
     }
+
+    // only allow cancel when order not delivered/shipped/returned
+    if (!['pending', 'processing'].includes(order.status.toLowerCase())) {
+      return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
+    }
+
+    let cancelledItems = order.cancellation?.cancelledItems || []; // keep history
+
+    if (!itemId) {
+      // 🔹 Full cancellation
+      order.items.forEach(item => {
+        if (item.status !== 'cancelled') {
+          item.status = 'cancelled';
+          cancelledItems.push({
+            product: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            reason: cancellationReason
+          });
+        }
+      });
+
+      order.status = 'cancelled';
+      order.cancelledAt = new Date();
+      order.cancellation = {
+        reason: cancellationReason,
+        date: new Date(),
+        initiatedBy: 'customer',
+        type: 'full',
+        cancelledItems
+      };
+
+      // restore stock
+      await Promise.all(order.items.map(item =>
+        Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+      ));
+
+    } else {
+      // 🔹 Partial cancellation (single item at a time)
+      const item = order.items.id(itemId);
+      console.log("order partial cancelling controller ")
+      console.log("item to be cancelled :",item);
+      if (!item) {
+        return res.status(400).json({ success: false, message: 'Item not found in order' });
+      }
+
+      if (item.status === 'cancelled') {
+        return res.status(400).json({ success: false, message: 'Item already cancelled' });
+      }
+
+      // restore stock
+      await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+
+      // mark item cancelled
+      item.status = 'cancelled';
+      order.status='partially_cancelled';
+      cancelledItems.push({
+        product: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        reason: cancellationReason
+      });
+console.log("cancelled items",cancelledItems);
+      const allCancelled = order.items.every(i => i.status === 'cancelled');
+      if (allCancelled) {
+        order.status = 'cancelled';
+      }
+
+      order.cancellation = {
+        reason: cancellationReason,
+        date: new Date(),
+        initiatedBy: 'customer',
+        type: allCancelled ? 'full' : 'partial',
+        cancelledItems
+      };
+    }
+
     await order.save();
-res.json({success:true,message:'order cancelled successfully'})
+    return res.json({ success: true, message: 'Cancellation processed successfully', order });
 
-
-    } catch (error) {
-        console.error('Error cancelling order:', error);
-        res.status(500).json({ success: false, message: 'Failed to cancel order' }); 
-    }
-}
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    res.status(500).json({ success: false, message: 'Failed to cancel order' });
+  }
+};
 const returnOrder = async (req, res) => {
-    try {
-        console.log("inside the return controller ")
-        console.log(req.body);
-        const { orderId } = req.params;
-        const { reason, itemsToReturn,status} = req.body;
+  try {
+    const { orderId } = req.params;
+    const { reason, itemId, customReason } = req.body;
+    const returnReason = customReason || reason;
 
-        // Validate input
-        if (!reason) {
-            return res.status(400).json({ success: false, message: 'Return reason is required' });
+    if (!returnReason) {
+      return res.status(400).json({ success: false, message: "Return reason is required" });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // ✅ Only delivered orders can be returned
+    if (!["delivered", "partially_returned"].includes(order.status.toLowerCase())) {
+      return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
+    }
+
+    // ✅ FULL RETURN
+    if (!itemId) {
+      order.returnRequested = true;
+      let returnItems = order.returnDetails?.items || [];
+
+      order.items.forEach(item => {
+        if (item.status !== "returned" && item.status !== "return_requested") {
+          item.status = "return_requested";   // 🔹 mark as request
+          returnItems.push({
+            product: item.productId,
+            quantity: item.quantity,
+            name: item.name,
+            reason: returnReason
+          });
         }
+      });
 
-        // Find the order
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-console.log("order",order);
+      order.status = "return_requested";
+      order.returnDetails = {
+        reason: returnReason,
+        requestDate: new Date(),
+        status: "pending",
+        initiatedBy: "customer",
+        type: "full",
+        items: returnItems
+      };
 
-        if (order.status.toLowerCase() !== 'delivered') {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Only delivered orders can be returned' 
-            });
-        }
+      await order.save();
+      return res.json({
+        success: true,
+        message: "Full order return request submitted successfully",
+        returnType: "full"
+      });
+    }
 
-        // Check return window (14 days from delivery)
-        const returnWindowDays = 14;
-        const deliveryDate = new Date(order.deliveryDate);
-        const returnDeadline = new Date(deliveryDate.setDate(deliveryDate.getDate() + returnWindowDays));
-        
-        if (new Date() > returnDeadline) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Return window has expired (${returnWindowDays} days from delivery)` 
-            });
-        }
+    // ✅ PARTIAL RETURN
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(400).json({ success: false, message: "Item not found in order" });
+    }
 
-        // Check if return was already requested
-        if (order.returnRequested) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Return already requested for this order' 
-            });
-        }
+    if (item.status === "returned" || item.status === "return_requested") {
+      return res.status(400).json({ success: false, message: "Item already in return process" });
+    }
 
-        // Handle full order return
-        if (!itemsToReturn || itemsToReturn.length === 0) {
-            // Full return
-            order.returnRequested = true;
-            order.returnDetails = {
-                reason,
-                requestDate: new Date(),
-                status: 'pending',
-                initiatedBy: 'customer',
-                type: 'full',
-                items: order.items.map(item => ({
-                    product: item.productId,
-                    quantity: item.quantity,
-                    name: item.name
-                }))
-            };
-        } else {
-            // Partial return
-            const returnedItems = [];
+    // Initialize return details if not exists
+    if (!order.returnDetails) {
+      order.returnDetails = {
+        reason: returnReason,
+        requestDate: new Date(),
+        status: "pending",
+        initiatedBy: "customer",
+        type: "partial",
+        items: []
+      };
+    }
+
+    // 🔹 Mark this item as return requested
+    item.status = "partially_returned";
+    order.returnRequested = true;
+    order.status = "partially_returned";
+
+    order.returnDetails.items.push({
+      product: item.productId,
+      quantity: item.quantity,
+      name: item.name,
+      reason: returnReason
+    });
+
+    const allReturned = order.items.every(i => i.status === "returned" || i.status === "return_requested");
+    order.returnDetails.type = allReturned ? "full" : "partial";
+
+    await order.save();
+    return res.json({
+      success: true,
+      message: "Partial return request submitted successfully",
+      returnType: order.returnDetails.type
+    });
+
+  } catch (error) {
+    console.error("Error processing return:", error);
+    res.status(500).json({ success: false, message: "Failed to process return" });
+  }
+};
+
+//admin side verification controller 
+// const processReturn = async (req, res) => {
+//     try {
+//         const { orderId } = req.params;
+//         const { action } = req.body;
+
+//         const order = await Order.findById(orderId);
+//         if (!order) {
+//             return res.status(404).json({ success: false, message: 'Order not found' });
+//         }
+
+//         if (!order.returnRequested || order.returnDetails.status !== 'pending') {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: 'No pending return request for this order' 
+//             });
+//         }
+
+//         if (action === 'approve') {
+//             // Update return status
+//             order.returnDetails.status = 'approved';
+//             order.returnDetails.processedDate = new Date();
+//             order.returnDetails.processedBy = req.user.id; 
+
             
-            // Validate items to return exist in order
-            for (const itemReturn of itemsToReturn) {
-                const item = order.items.find(i => i._id.toString() === itemReturn.itemId);
-                if (!item) continue;
+//             await Promise.all(order.returnDetails.items.map(async item => {
+//                 await Product.findByIdAndUpdate(item.product, {
+//                     $inc: { stock: item.quantity }
+//                 });
+//             }));
 
-                returnedItems.push({
-                    product: item.productId,
-                    quantity: itemReturn.quantity || item.quantity,
-                    name: item.name,
-                    reason: itemReturn.reason || reason
-                });
-            }
+//             // Optionally process refund here
 
-            if (returnedItems.length === 0) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'No valid items specified for return' 
-                });
-            }
+//             await order.save();
+//             return res.json({ success: true, message: 'Return approved and items restocked' });
+//         } else if (action === 'reject') {
+//             order.returnDetails.status = 'rejected';
+//             order.returnDetails.processedDate = new Date();
+//             order.returnDetails.processedBy = req.user.id;
+//             order.returnDetails.rejectionReason = req.body.rejectionReason || 'Not specified';
 
-            order.returnRequested = true;
-            order.returnDetails = {
-                reason,
-                requestDate: new Date(),
-                status: 'pending',
-                initiatedBy: 'customer',
-                type: 'partial',
-                items: returnedItems
-            };
-        }
+//             await order.save();
+//             return res.json({ success: true, message: 'Return rejected' });
+//         } else {
+//             return res.status(400).json({ success: false, message: 'Invalid action' });
+//         }
 
-        await order.save();
-
-console.log("updated order:",order.returnRequested);
-        res.json({ 
-            success: true, 
-            message: 'Return request submitted successfully',
-            returnType: order.returnDetails.type,
-            returnRequest:order.returnRequested
-        });
-
-    } catch (error) {
-        console.error('Error processing return request:', error);
-        res.status(500).json({ success: false, message: 'Failed to process return request' });
-    }
-};
-
-// Additional controller to process approved returns (for admin)
+//     } catch (error) {
+//         console.error('Error processing return:', error);
+//         res.status(500).json({ success: false, message: 'Failed to process return' });
+//     }
+// };
 const processReturn = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { action } = req.body;
+  try {
+    console.log("inside the process return controller ")
+    const { orderId } = req.params;
+    const { itemId, action, rejectionReason } = req.body;
+    console.log("itemId",itemId);
 
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-
-        if (!order.returnRequested || order.returnDetails.status !== 'pending') {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'No pending return request for this order' 
-            });
-        }
-
-        if (action === 'approve') {
-            // Update return status
-            order.returnDetails.status = 'approved';
-            order.returnDetails.processedDate = new Date();
-            order.returnDetails.processedBy = req.user.id; 
-
-            // Restock returned items
-            await Promise.all(order.returnDetails.items.map(async item => {
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { stock: item.quantity }
-                });
-            }));
-
-            // Optionally process refund here
-
-            await order.save();
-            return res.json({ success: true, message: 'Return approved and items restocked' });
-        } else if (action === 'reject') {
-            order.returnDetails.status = 'rejected';
-            order.returnDetails.processedDate = new Date();
-            order.returnDetails.processedBy = req.user.id;
-            order.returnDetails.rejectionReason = req.body.rejectionReason || 'Not specified';
-
-            await order.save();
-            return res.json({ success: true, message: 'Return rejected' });
-        } else {
-            return res.status(400).json({ success: false, message: 'Invalid action' });
-        }
-
-    } catch (error) {
-        console.error('Error processing return:', error);
-        res.status(500).json({ success: false, message: 'Failed to process return' });
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
     }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: "Item not found in order" });
+    }
+console.log("item",item);
+    if (item.status !== "return_requested") {
+      return res.status(400).json({
+        success: false,
+        message: "This item does not have a pending return request",
+      });
+    }
+
+    if (action === "approve") {
+      item.status = "returned";
+      item.returnDetails = {
+        status: "approved",
+        processedDate: new Date(),
+        processedBy: req.user.id,
+      };
+console.log("return details",item.returnDetails);
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { stock: item.quantity },
+      });
+    } else if (action === "reject") {
+      // Reject single item return
+      item.status = "delivered"; // back to delivered if return rejected
+      item.returnDetails = {
+        status: "rejected",
+        processedDate: new Date(),
+        processedBy: req.user.id,
+        rejectionReason: rejectionReason || "Not specified",
+      };
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid action" });
+    }
+
+    // Check if all items are returned
+    const allReturned = order.items.every((i) => i.status === "returned");
+    if (allReturned) {
+      order.returnDetails = {
+        status: "completed",
+        processedDate: new Date(),
+        processedBy: req.user.id,
+      };
+      order.returnRequested = false; // no more pending
+    }
+
+    await order.save();
+    return res.json({ success: true, message: `Item return ${action}d successfully`, order });
+
+  } catch (error) {
+    console.error("Error processing return:", error);
+    res.status(500).json({ success: false, message: "Failed to process return" });
+  }
 };
+
 module.exports={
     processReturn,returnOrder,cancelOrder,invoice,getOrderDetails
 }

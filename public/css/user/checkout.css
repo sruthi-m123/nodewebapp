@@ -968,3 +968,169 @@ h1 {
     transform: none;
     box-shadow: none;
 }
+.add-more-address-container {
+        margin-top: 8px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .add-more-address-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background-color: transparent;
+        border: 1px dashed #9e6d4e;
+        border-radius: 6px;
+        color: #9e6d4e;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .add-more-address-btn:hover {
+        background-color: #f5ede6;
+        border-style: solid;
+    }
+    
+    .plus-icon {
+        font-size: 16px;
+        font-weight: bold;
+    }
+    /* Individual item action buttons - ORDER DETAILS PAGE */
+.item-action-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.item-action-btn.cancel-btn {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+.item-action-btn.return-btn {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.item-action-btn:hover.cancel-btn {
+    background-color: #ffcdd2;
+    transform: translateY(-1px);
+}
+
+.item-action-btn:hover.return-btn {
+    background-color: #bbdefb;
+    transform: translateY(-1px);
+}
+
+.item-action-btn:active {
+    transform: translateY(1px);
+}
+
+/* Item status indicators */
+.item-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.item-status.cancelled {
+    background-color: #ffe6e6;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+.item-status.returned {
+    background-color: #e6f7ff;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.item-status.return-requested, 
+.item-status.cancel-requested {
+    background-color: #fff8e1;
+    color: #f57c00;
+    border: 1px solid #ffe082;
+}
+
+/* Full order action buttons */
+.action-buttons {
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.action-btn.cancel-btn {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+.action-btn.return-btn {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.action-btn:hover.cancel-btn {
+    background-color: #ffcdd2;
+    transform: translateY(-1px);
+}
+
+.action-btn:hover.return-btn {
+    background-color: #bbdefb;
+    transform: translateY(-1px);
+}
+
+.action-btn:active {
+    transform: translateY(1px);
+}
+
+/* Order Details page specific product layout */
+.order-details-page .product-details {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #fafafa;
+    border: 1px solid #d9c4b3; /* Consistent with your theme */
+}
+
+.order-details-page .product-info {
+    flex: 1;
+}
+
+.order-details-page .product-details img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-right: 15px;
+    background: white;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #d9c4b3; /* Consistent with your theme */
+}

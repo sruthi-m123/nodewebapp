@@ -97,7 +97,7 @@
                   </span>
                 </td>
                 <td data-label="Return Request">
-                  <% if (order.status === 'delivered' && order.returnRequest===true) { %>
+                  <% if (order.status === 'delivered' && order.returnRequest===true ||order.status==='partially_returned'&&  order.returnRequest===true) { %>
                     <button class="verify-btn" data-order-id="<%= order._id%>" >
                       <i class="fas fa-check-circle"></i> Verify
                     </button>

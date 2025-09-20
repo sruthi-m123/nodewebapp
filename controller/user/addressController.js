@@ -37,81 +37,78 @@ let filteredAddresses = addressDoc?.address.filter(a => !a.isDeleted) || [];
     res.status(500).send("Server error");
   }
 };
+const addAddress = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const {
+      name,
+      addressType,
+      city,
+      building,
+      landmark,
+      state,
+      pincode,
+      phone,
+      altPhone,
+      setAsDefault
+    } = req.body;
 
- const addAddress=async(req,res)=>{
-    try {
-        const userId=req.session.user.id;
-        // console.log("body:",req.body);
-        const {
-            name,
-            addressType,
-            city,
-            building,
-            landmark,
-            state,
-            pincode,
-            phone,
-            altPhone,
-            setAsDefault
-        }=req.body;
-
-if(!name||!addressType||!city||! state||!pincode||!phone||!building){
-    return res.status(400).send("please fill all requires fileds ")
-}
-
-if(!/^\d{10}$/.test(phone)){
-    return res.status(400).send("phone number must be 10 digits.")
-}
-
-if (altPhone && !/^\d{10}$/.test(altPhone)) {
-      return res.status(400).send("Alternate phone must be 10 digits.");
+    if (!name || !addressType || !city || !state || !pincode || !phone || !building) {
+      return res.status(400).json({ success: false, message: "Please fill all required fields" });
     }
 
- if (!/^\d{6}$/.test(pincode)) {
-      return res.status(400).send("Pincode must be 6 digits.");
-    }   
+    if (!/^\d{10}$/.test(phone)) {
+      return res.status(400).json({ success: false, message: "Phone number must be 10 digits." });
+    }
+
+    if (altPhone && !/^\d{10}$/.test(altPhone)) {
+      return res.status(400).json({ success: false, message: "Alternate phone must be 10 digits." });
+    }
+
+    if (!/^\d{6}$/.test(pincode)) {
+      return res.status(400).json({ success: false, message: "Pincode must be 6 digits." });
+    }
+
     const validTypes = ["Home", "Work", "Other"];
     if (!validTypes.includes(addressType)) {
-      return res.status(400).send("Invalid address type.");
+      return res.status(400).json({ success: false, message: "Invalid address type." });
     }
 
-//new address object
-const newAddress={
-    addressType,
-    name,
-    city,
-    building,
-    landmark,
-    state,
-    pincode,
-    phone,
-    altPhone,
-    isDefault:!!setAsDefault
+    const newAddress = {
+      addressType,
+      name,
+      city,
+      building,
+      landmark,
+      state,
+      pincode,
+      phone,
+      altPhone,
+      isDefault: !!setAsDefault
+    };
 
-}
-console.log("new adress:",newAddress)
-let userAddressDoc=await Address.findOne({userId})
+    let userAddressDoc = await Address.findOne({ userId });
 
-if(!userAddressDoc){
-    newAddress.isDefault=true;
-
-    await Address.create({
-        userId,address:[newAddress]
-    });
-}else{
-    if(newAddress.isDefault){
-        userAddressDoc.address.forEach(addr=>addr.isDefault=false)
+    if (!userAddressDoc) {
+      newAddress.isDefault = true;
+      await Address.create({
+        userId,
+        address: [newAddress]
+      });
+    } else {
+      if (newAddress.isDefault) {
+        userAddressDoc.address.forEach(addr => (addr.isDefault = false));
+      }
+      userAddressDoc.address.push(newAddress);
+      await userAddressDoc.save();
     }
 
-    userAddressDoc.address.push(newAddress);
-    await userAddressDoc.save();
-}
-res.status(200).json({ success: true, message: "Saved successfully" });
- }catch(err){
+    return res.status(200).json({ success: true, message: "Saved successfully" });
+  } catch (err) {
     console.error("Error adding address:", err);
-    res.status(500).send("Internal Server Error");
- }
-}
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 // Modified backend for soft delete
 const deleteAddress = async (req, res) => {

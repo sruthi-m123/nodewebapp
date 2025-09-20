@@ -8,6 +8,8 @@ const Product = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 const Coupon=require('../../models/couponSchema');
 const{calculateOrder}=require('../../helper/calculateTotal');
+      const Razorpay = require('razorpay');
+
 const razorpayController=require('../../controller/user/razorpayController');
 
 
@@ -133,7 +135,6 @@ startDate: { $lte: new Date() },
  }).lean();
 
 const orderSummary=calculateOrder(cartItems);  
-console.log("order summary",orderSummary);      
         // Payment methods
         const paymentMethods = [
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
@@ -174,7 +175,6 @@ if (!user || !user.id) {
 }
 
 const userId = user.id;  
-console.log("rwq body:",req.body)   
    const { 
             name, 
             building,
@@ -377,10 +377,10 @@ exports.applyOffer = async (req, res) => {
 exports.placeOrder = async (req, res) => {
   try {
     console.log("Inside place order controller");
-
     const userId = req.session?.user?.id;
+    console.log("userId",userId)
     const { addressId, paymentMethod, appliedOffers = [] } = req.body;
-
+console.log("req body",req.body);
     if (!addressId || !paymentMethod) {
       return res.status(400).json({
         success: false,
@@ -392,7 +392,6 @@ exports.placeOrder = async (req, res) => {
     let isBuyNow = false;
 
     if (req.session.buyNowItem) {
-      // Buy Now flow
       const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
       const product = await Product.findById(productId);
 
@@ -420,6 +419,7 @@ exports.placeOrder = async (req, res) => {
         match: { isActive: true },
         select: 'productName price stock'
       });
+      console.log("cart ",cart)
 
       if (!cart || cart.items.length === 0) {
         return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -440,7 +440,7 @@ exports.placeOrder = async (req, res) => {
       { userId, 'address._id': addressId },
       { address: { $elemMatch: { _id: addressId } } }
     );
-
+console.log("adress:",addresses)
     if (!addresses || addresses.address.length === 0) {
       return res.status(400).json({ success: false, message: 'Address not found' });
     }
@@ -469,10 +469,11 @@ exports.placeOrder = async (req, res) => {
       status,
       appliedOffers: appliedOffers.map(o => o.id)
     });
+    console.log("order",order)
     await order.save();
 
     if (paymentMethod === 'netbanking') {
-      const Razorpay = require('razorpay');
+      // const Razorpay = require('razorpay');
       const razorpay = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -482,20 +483,23 @@ exports.placeOrder = async (req, res) => {
         currency: "INR",
         receipt: orderId,
       });
-
+console.log("razor pay order created :",razorpayOrder);
+console.log("key:",process.env.RAZORPAY_KEY_ID);
+console.log("orderId from razorpay",razorpayOrder.id);
       return res.json({
+        dborderID:order.orderId,
         success: true,
-        orderId: order.orderId,
-        razorpayOrder,
+        orderId: razorpayOrder.id,
+        order:razorpayOrder,
         key: process.env.RAZORPAY_KEY_ID
       });
     }
 
-    for (const item of items) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: { stock: -item.quantity }
-      });
-    }
+    // for (const item of items) {
+    //   await Product.findByIdAndUpdate(item.productId, {
+    //     $inc: { stock: -item.quantity }
+    //   });
+    // }
     if (!isBuyNow) {
       await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
     } else {

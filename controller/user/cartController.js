@@ -58,7 +58,6 @@ const getCart = async (req, res) => {
       req.session.outOfStockItems = outOfStockItems;
     }
 
-    // Handle checkout redirect case
     if (req.query.error === 'Some items are out of stock' && req.session.outOfStockItems) {
       return res.render('user/cart', {
         cartItems: validItems,
@@ -72,7 +71,6 @@ const getCart = async (req, res) => {
       });
     }
 
-    // Normal render
     const total = validItems.reduce((sum, item) => sum + (item.productId.price * item.quantity), 0);
 
     res.render('user/cart', {
@@ -86,7 +84,6 @@ const getCart = async (req, res) => {
       showStockAlert: outOfStockItems.length > 0
     });
 
-    // Cleanup session
     if (req.session.outOfStockItems) {
       delete req.session.outOfStockItems;
     }
@@ -143,12 +140,7 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // Cart update logic
     let cart = await Cart.findOne({ userId });
-    console.log("checking bestoffer:",product.bestOffer)
-    console.log("discounted price for check:",product.discountedPrice);
-    console.log("discount value for check:",product.discount);
-    // const effectivePrice=product.bestOffer?.discountedPrice||product.price;
     const effectivePrice=product.discountedPrice||product.price;
     if (!cart) {
       cart = new Cart({
@@ -235,8 +227,7 @@ cart.items=cart.items.filter(item=>item._id.toString()!==itemId)
 await cart.save();
 
 const cartCount=cart.items.reduce((sum,item)=>sum+item.quantity,0);
-
-return res.status(200).json({ message: 'Item removed from cart' ,cartCount:cartCount});
+res.status(200).json({ message: 'Item removed from cart' ,cartCount:cartCount});
     } catch (error) {
         console.error('Error removing item from cart:', error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -246,7 +237,7 @@ return res.status(200).json({ message: 'Item removed from cart' ,cartCount:cartC
 //quantity update in cart
 const updateCart = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     const updates = req.body.updates;
 
     console.log(" Updates received:", updates);
@@ -256,38 +247,59 @@ const updateCart = async (req, res) => {
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.status(200).json({ message: "Cart is empty or not found", cart: [] });
     }
-
+const errors=[];
     for (const update of updates) {
       const item = cart.items.find((i) => i._id.toString() === update.id);
 
       if (item) {
         const product=await Product.findById(item.productId);
         if(update.quantity>product.stock){
-          return res.status(400).json({
-            message:`cannot update quantity:Only ${product.stock}
-            units available for ${product.name}`,
-            productId:item.productId
-          })
+                    errors.push({
+            productId: item.productId,
+            message: `Only ${product.stock} units available for ${product.productName}`,
+          });
         }
        
       }
+    }
+    if (errors.length > 0) {
+      return res.status(400).json({ message: "Some items exceed stock", errors });
     }
 
 for(const update of updates){
   const item=cart.items.find((i)=>i._id.toString()===update.id);
 
-if(item){
-  item.quantity=update.quantity;
+if(item){ 
+
+
+const product=await Product.findById(item.productId);
+
+const oldQty=item.quantity;
+const newQty=update.quantity;
+const diff=newQty-oldQty;
+
+if(diff>0){
+  if(product.stock<diff){
+    return res.status(400).json({
+      message:`only ${product.stock} units left for ${product.productName}`,
+      productId:item.productId
+    })
+  }
+  product.stock-=diff;
+}
+if(diff<0){
+  product.stock+=Math.abs(diff);
+}
+await product.save();
+
+item.quantity=newQty;
 item.totalPrice=item.quantity*item.price;
 }
 }
-
-
-
+cart.markModified("items");
     await cart.save();
 
-    console.log(" Cart updated successfully:", cart);
-
+  const cartCount = cart.items.reduce((acc, i) => acc + i.quantity, 0);
     res.status(200).json({ message: "Cart updated successfully", cart,cartCount:cartCount });
 
   } catch (error) {
@@ -311,22 +323,6 @@ const cartCount=async(req,res)=>{
   }
 }
 
-const setUserAndCartCount=async function (req, res) {
-  res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path;
-
-  if (req.session.user) {
-    try {
-      const cart = await Cart.findOne({ userId: req.session.user._id });
-      res.locals.cartCount = cart ? cart.items.length : 0;
-    } catch (error) {
-      console.error("Cart count error:", error);
-      res.locals.cartCount = 0;
-    }
-  } else {
-    res.locals.cartCount = 0;
-  }
-}
 
 
 module.exports={
@@ -337,5 +333,5 @@ module.exports={
     cartCount,
     getCartCount,
     cartCount,
-    setUserAndCartCount
+
    }

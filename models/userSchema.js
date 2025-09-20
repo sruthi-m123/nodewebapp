@@ -94,7 +94,6 @@ const userSchema = new Schema({
   timestamps: true 
 });
 
-// Auto-split name into firstName and lastName before saving
 userSchema.pre('save', function (next) {
   if (this.isModified('name')) {
     const nameParts = this.name.split(' ');

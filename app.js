@@ -11,6 +11,7 @@ const session = require("express-session");
 const methodOverride = require('method-override');
 const flash =require('connect-flash')
 const expressLayouts = require('express-ejs-layouts');
+const {setUserAndCartCount}=require("./middlewares/global")
 const Cart = require('./models/cartSchema');
 
 
@@ -40,39 +41,15 @@ app.use(
   })
 );
 
-app.use(async (req, res, next) => {
-  res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path;
-  next();
-});
-
-
-app.use(async (req, res, next) => {
-  res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path;
-
-  if (req.session.user) {
-    try {
-      const cart = await Cart.findOne({ userId: req.session.user._id });
-     
-      res.locals.cartCount = cart ? cart.items.length : 0;
-    } catch (error) {
-      console.error("Cart count middleware error:", error);
-      res.locals.cartCount = 0;
-    }
-  } else {
-    res.locals.cartCount = 0;
-  }
-
-  next();
-});
-
-
-
+app.use(setUserAndCartCount);
 app.use(passport.initialize());
 app.use(methodOverride('_method'));
 app.use(flash())
 app.use(expressLayouts);
+// app.use((req, res, next) => {
+//   res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' http://localhost:3000");
+//   next();
+// });
 
 
 app.set("view engine", "ejs");

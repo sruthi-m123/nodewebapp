@@ -1,7 +1,10 @@
-const { response } = require("express");
+console.log("checkout.js is running ");
+// const { response } = require("express");
+
 // let addressToDelete=null;
 document.addEventListener('DOMContentLoaded', function () {
     const checkoutData = document.getElementById('checkout-data');
+    console.log("checkout datas:",checkoutData);
     const offers = JSON.parse(checkoutData.dataset.offers || '[]');
     const addresses = JSON.parse(checkoutData.dataset.addresses || '[]');
     const cartItems = JSON.parse(checkoutData.dataset.cart || '[]');
@@ -112,7 +115,7 @@ function setupFormValidation() {
 }
 
 function addAddress(addressData) {
-    fetch('/api/addresses', {
+    fetch('/user/addresses/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -134,7 +137,8 @@ function addAddress(addressData) {
 }
 
 function updateAddress(addressId, addressData) {
-    fetch(`/api/addresses/${addressId}`, {
+    // fetch(`/api/addresses/${addressId}`, {
+    fetch(`/user/addresses/edit/${addressId}`,{
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -406,17 +410,42 @@ function applyCouponFromDropdown(couponId, couponCode) {
         });
 }
 
-// Remove applied coupon
 function removeCoupon() {
-    apiCall('/user/remove-coupon', 'POST', null, 'Coupon removed successfully')
+
+    const removeBtn = document.querySelector('.remove-coupon-btn');
+    if (removeBtn) {
+        removeBtn.textContent = 'Removing...';
+        removeBtn.disabled = true;
+    }
+
+    apiCall('/user/checkout/remove-coupon', 'POST', null, 'Coupon removed successfully')
         .then(data => {
+            console.log("coupon is going to be removed ",data)
             if (data.success) {
                 resetCouponUI();
-                updateOrderSummary(data.updatedSummary);
+                updateOrderSummary(data.orderSummary);
                 resetCouponButtons();
+
+          
+            }
+        })
+    
+  
+        .catch(() => {
+            if (removeBtn) {
+                removeBtn.textContent = 'Remove';
+                removeBtn.disabled = false;
+            }
+        })
+         .finally(() => {
+            if (removeBtn) {
+                removeBtn.textContent = 'Remove';
+                removeBtn.disabled = false;
             }
         });
 }
+
+      
 
 // Update UI when coupon is applied
 function updateAppliedCouponUI(couponCode, discountText, couponId) {
@@ -453,14 +482,21 @@ function updateCouponButtons(couponId, couponCode) {
 
 // Reset coupon buttons
 function resetCouponButtons() {
-    document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn => {
-        if (!btn.classList.contains('btn-disabled')) {
+    try{
+    console.log("inside the resetCouponbutton");
+    setTimeout(() => {
+        document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn => {
             btn.textContent = 'Apply';
-            btn.classList.remove('applied');
+            btn.classList.remove('applied', 'loading', 'btn-disabled');
             btn.disabled = false;
-        }
-    });
+            console.log("After reset:", btn.className, btn.textContent);
+        });
+    }, 50); // wait 50ms to let DOM update
+}catch(error){
+    console.log("reset coupon button errpr:",error);
 }
+}
+
 // Set button to loading state
 function setButtonLoadingState(button, loadingText = 'Loading...') {
     if (!button) return;
@@ -572,112 +608,58 @@ function initializeCheckout() {
 
 
 
-
-// Place Order Function
 function placeOrder() {
   const btn = document.querySelector('.continue-btn');
   btn.disabled = true;
   btn.textContent = 'Processing...';
 
-  const checkoutData = document.getElementById('checkout-data');
   const selectedAddress = document.querySelector('.address-card.selected')?.dataset.addressId;
-  const selectedPaymentRadio = document.querySelector('input[name="paymentMethod"]:checked');
-const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : '';
-console.log("payment method:",paymentMethod);
-
-//   const paymentMethod = checkoutData.dataset.payment;
+  const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || '';
   const appliedOffers = [];
 
   if (!selectedAddress) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Select Delivery Address',
-      text: 'Please select a delivery address to proceed',
-      confirmButtonText: 'Continue'
-    });
-    btn.disabled = false;
-    btn.textContent = 'Place Order';
-    return;
+    Swal.fire({ icon: 'warning', title: 'Select Delivery Address', text: 'Please select a delivery address to proceed', confirmButtonText: 'Continue' });
+    btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
-
   if (!paymentMethod) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Select Payment Method',
-      text: 'Please select a payment method to proceed',
-      confirmButtonText: 'Continue'
-    });
-    btn.disabled = false;
-    btn.textContent = 'Place Order';
-    return;
+    Swal.fire({ icon: 'warning', title: 'Select Payment Method', text: 'Please select a payment method to proceed', confirmButtonText: 'Continue' });
+    btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
 
-  if (paymentMethod === 'netbanking') {
+  // single fetch call
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      addressId: selectedAddress,
-      paymentMethod,
-      appliedOffers
-    })
+    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers })
   })
   .then(res => res.json())
   .then(data => {
-    if (data.success && data.order) {
-      payWithRazorpay(data.order);
-    } else {
-      Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+    if (!data.success) {
+      Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Error placing order', confirmButtonText: 'Try Again' });
+      btn.disabled = false; btn.textContent = 'Place Order';
+      return;
     }
+
+    if (paymentMethod === 'netbanking') {
+      payWithRazorpay(data.order, data.key);
+    } else {
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Placed!',
+        text: 'Your order was placed successfully.',
+        confirmButtonText: 'View Order'
+      }).then(() => {
+        window.location.href = `/user/order-success/${data.orderId}`;
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({ icon: 'error', title: 'Something went wrong', text: 'Please try again later.', confirmButtonText: 'Okay' });
+    btn.disabled = false; btn.textContent = 'Place Order';
   });
-  return;
 }
 
-  fetch('/user/orders-placed', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      addressId: selectedAddress,
-      paymentMethod,
-      appliedOffers
-    })
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Order Placed!',
-          text: 'Your order was placed successfully.',
-          confirmButtonText: 'View Order'
-        }).then(() => {
-          window.location.href = `/user/order-success/${data.orderId}`;
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: data.message || 'Error placing order',
-          confirmButtonText: 'Try Again'
-        });
-        btn.disabled = false;
-        btn.textContent = 'Place Order';
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Something went wrong',
-        text: 'Please try again later.',
-        confirmButtonText: 'Okay'
-      });
-      btn.disabled = false;
-      btn.textContent = 'Place Order';
-    });
-}
 
 
 window.addEventListener('click', function(event) {
@@ -714,26 +696,50 @@ function showToast(message, type = "success") {
 }
 
 
-function payWithRazorpay(order) {
+function payWithRazorpay(order,key) {
+    console.log("order",order);
+    console.log("ordeer recipt:",order.receipt);
   var options = {
-    key: "<%= process.env.RAZORPAY_KEY_ID %>", 
+    key: key, 
     amount: order.amount,
     currency: "INR",
     name: "Chettinad Sarees",
     description: "Order Payment",
     order_id: order.id,
     handler: function (response) {
-      // Verify Payment in backend
-      fetch("/verifyPayment", {
+        console.log("response:",response);
+        console.log("orderId",order.orderId);
+      fetch("/user/verifyPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(response),
-      }).then(res => res.json()).then(data => {
+body: JSON.stringify({
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,  
+        razorpay_signature: response.razorpay_signature,
+        dborderId:response.dborderID
+      })
+        })
+        .then(res => res.json())
+        .then(data => {
         if(data.success){
-          alert("Payment Successful");
-        } else {
-          alert("Payment Failed");
-        }
+  Swal.fire({
+            icon: 'success',
+            title: 'Order Placed!',
+            text: 'Your order was placed successfully.',
+            confirmButtonText: 'View Order'
+          }).then(() => {
+            window.location.href = data.redirectUrl || `/user/order-success/${order.receipt}`;
+          });        } else {
+ 
+          Swal.fire({
+            icon: 'error',
+            title: 'Payment Failed',
+            text: 'Your payment could not be verified. Please try again.',
+            confirmButtonText: 'Retry'
+          }).then(() => {
+            window.location.href = "/user/checkout";
+          });
+}
       });
     },
     prefill: {

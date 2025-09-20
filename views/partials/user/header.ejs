@@ -57,8 +57,8 @@
 
   <% if (!user ) { %>
     <div class="auth-links">
-      <a href="/signup" class="nav-link">Sign Up</a>
-      <a href="/login" class="nav-link">Log In</a>
+      <a href="/user/signup" class="nav-link">Sign Up</a>
+      <a href="/user/login" class="nav-link">Log In</a>
     </div>
   <% } %>
 
@@ -66,14 +66,14 @@
     <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
     <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
     <% if (user) { %>
-      <a href="/profile" class="icon-link"><i class="fas fa-user"></i></a>
-   <a href="/cart" id="viewCartBtn" class="icon-link cart-icon">
+      <a href="/user/profile" class="icon-link"><i class="fas fa-user"></i></a>
+   <a href="/user/cart" id="viewCartBtn" class="icon-link cart-icon">
   <i class="fas fa-shopping-bag"></i><span class="cart-count"><%= cartCount %></span>
 </a> 
       <% } else { %>
-      <a href="/login" class="icon-link"><i class="fas fa-user-circle"></i></a>
+      <a href="/user/login" class="icon-link"><i class="fas fa-user-circle"></i></a>
     <% } %>
  </div>
 </div>
 
-   
+    

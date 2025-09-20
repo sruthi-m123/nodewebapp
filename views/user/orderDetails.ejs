@@ -12,40 +12,74 @@
         </button>
     </div>
     <% } %>
-   <div class="order-info">
+ 
+<div class="order-info">
   <% order.items.forEach(item => { %>
     <div class="product-details">
       <img src="/<%= item.imageUrl || '/images/default-product.jpg' %>" alt="<%= item.name %>">
+
       <div>
         <p><strong><%= item.name %></strong></p>
         <p><strong>₹<%= item.price.toLocaleString('en-IN') %></strong></p>
+
         <% if (item.color) { %>
           <p><strong>Color: </strong> <%= item.color %></p>
         <% } %>
+
         <p><strong>Quantity: </strong> <%= item.quantity %></p>
         <p><strong>Item Total: </strong> ₹<%=(item.price * item.quantity).toLocaleString('en-IN')%></p>
+
+        <!-- Action buttons for each item -->
+        <div class="item-actions">
+          <% if (order.status !== 'cancelled' && order.status !== 'delivered' && item.status !== 'cancelled'&& item.status!=='returned') { %>
+            <button class="cancel-item-btn" 
+                    data-order-id="<%= order._id %>" 
+                    data-item-id="<%= item._id %>"
+                    onclick="openModal('cancel', '<%= order._id %>', '<%= item._id %>')">
+              Cancel Item
+            </button>
+          <% } %>
+
+          <% if (order.status === 'delivered' && item.status !== 'returned' && item.status !=='cancelled') { %>
+            <button class="return-item-btn" 
+                    data-order-id="<%= order._id %>" 
+                    data-item-id="<%= item._id %>"
+                    onclick="openModal('return', '<%= order._id %>', '<%= item._id %>')">
+              Return Item
+            </button>
+          <% } %>
+
+          <!-- Status indicators -->
+          <% if (item.status === 'cancelled') { %>
+            <span class="status-badge cancelled">Cancelled</span>
+          <% } %>
+
+          <% if (item.status === 'returned') { %>
+            <span class="status-badge return-requested">Return Requested</span>
+          <% } %>
+        </div>
       </div>
     </div>
     <hr class="product-divider">
   <% }); %>
-  
+
   <div class="order-total">
     <p><strong>Order Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
   </div>
 </div>
 
-    <div class="shipping-details">
-        <h2>SHIPPING DETAILS</h2>
-        <p><strong><%= order.shippingAddress.name %></strong></p>
-        <p>
-            <%= order.shippingAddress.building %>, 
-            <%= order.shippingAddress.city %>, 
-            <%= order.shippingAddress.state %>, 
-            <%= order.shippingAddress.pincode %>, 
-            <%= order.shippingAddress.addressType %>
-        </p>
-        <p><strong>Phone: </strong> <%= order.shippingAddress.phone %></p>
-    </div>
+<div class="shipping-details">
+  <h2>SHIPPING DETAILS</h2>
+  <p><strong><%= order.shippingAddress.name %></strong></p>
+  <p>
+    <%= order.shippingAddress.building %>, 
+    <%= order.shippingAddress.city %>, 
+    <%= order.shippingAddress.state %>, 
+    <%= order.shippingAddress.pincode %>, 
+    <%= order.shippingAddress.addressType %>
+  </p>
+  <p><strong>Phone: </strong> <%= order.shippingAddress.phone %></p>
+</div>
 
    <!-- <div class="status-timeline">
   <ul>
@@ -151,14 +185,14 @@
 
 
 
-    <% if (order.status.toUpperCase() === 'PENDING' || order.status.toUpperCase() === 'PROCESSING') { %>
+    <% if (order.status.toUpperCase() === 'PENDING' || order.status.toUpperCase() === 'PROCESSING'||order.status.toUpperCase()==='PARTIALLY_CANCELLED') { %>
         <div class="action-buttons">
             <button class="action-btn cancel-btn"
             data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
             onclick="openModal('cancel')">Cancel Order</button>
         </div>
-    <% } else if (order.status.toUpperCase() === 'DELIVERED') { %>
+    <% } else if (order.status.toUpperCase() === 'DELIVERED'||order.status.toUpperCase()==='PARTIALLY_RETURNED') { %>
         <div class="action-buttons">
             <button class="action-btn return-btn"
             data-order-id="<%= order._id %>"
@@ -190,6 +224,13 @@
     <div class="modal-content">
         <h3>Cancel Order</h3>
         <p>Please tell us why you're canceling this order:</p>
+          <div class="reason-suggestions">
+            <div class="reason-chip" data-reason="Changed my mind">Changed my mind</div>
+            <div class="reason-chip" data-reason="Found a better price">Found a better price</div>
+            <div class="reason-chip" data-reason="Ordered by mistake">Ordered by mistake</div>
+            <div class="reason-chip" data-reason="Delivery time too long">Delivery time too long</div>
+            <div class="reason-chip" data-reason="Other reason">Other reason</div>
+        </div>
         <textarea id="cancelReason" placeholder="Your reason..."></textarea>
         <div class="modal-actions">
             <button class="modal-btn modal-cancel"  data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
@@ -202,6 +243,13 @@
     <div class="modal-content">
         <h3>Return Item</h3>
         <p>Please tell us why you're returning this item:</p>
+           <div class="reason-suggestions">
+            <div class="reason-chip" data-reason="Item damaged">Item damaged</div>
+            <div class="reason-chip" data-reason="Wrong item received">Wrong item received</div>
+            <div class="reason-chip" data-reason="Not as described">Not as described</div>
+            <div class="reason-chip" data-reason="Size doesn't fit">Size doesn't fit</div>
+            <div class="reason-chip" data-reason="Other reason">Other reason</div>
+        </div>
         <textarea id="returnReason" placeholder="Your reason..."></textarea>
         <div class="modal-actions">
             <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>

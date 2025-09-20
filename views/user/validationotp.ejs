@@ -37,7 +37,7 @@
           <span id="otp-timer" class="timer">00:30</span>
           <span>remaining</span>
         </div>
-        <form action="/validationotp" method="POST" id="otp-form">
+        <form action="/user/validationotp" method="POST" id="otp-form">
         <div  class="otp-inputs">
           <input type="text" name="otp1" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code">
           <input type="text" name="otp2" maxlength="1" pattern="[0-9]" inputmode="numeric">
@@ -111,7 +111,7 @@
       method: "POST",
       headers: {
         "Content-Type": "application/json"
-      }
+      },
     })
     .then(response => response.json())
     .then(data => {
