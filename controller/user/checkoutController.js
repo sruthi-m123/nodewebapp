@@ -487,6 +487,44 @@ pageJS:'user/successPage.js'
 
         }
 }
+
+exports.failurePage = async (req, res) => {
+    try {
+        console.log("enter failure controller");
+        const orderId = req.params.orderId;
+        console.log(orderId);
+        const order = await Order.findOne({ orderId: orderId })
+            .populate('userId')
+            .populate('items.productId');
+        console.log("order:", order);
+        if (!order) {
+            return res.status(404).render('error', {
+                message: 'Order not found'
+            });
+        }
+        const failureData = {
+            storeName: "Chettinad Sarees",
+            customerName: order.userId.name,
+            customerEmail: order.userId.email,
+            orderId: order.orderNumber || order._id,
+            failureMessage: "Your payment didn't go through as it was declined by the bank. Try another payment method or contact your bank.",
+            retryPaymentUrl: `/checkout/${orderId}`,
+            goToHomeUrl: "/shopAll"
+        };
+        console.log("failure data:", failureData);
+
+        res.render('user/failurePage', {
+            ...failureData,
+            layout: false,
+            pageCSS: 'user/failurePage.css',
+            pageJS: 'user/failurePage.js'
+        });
+    } catch (error) {
+        console.error('Error fetching order:', error);
+    }
+}
+
+
 exports.buyNow=async(req,res)=>{
     try {
         const{productId,variant,quantity,price}=req.body;

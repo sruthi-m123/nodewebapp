@@ -752,7 +752,7 @@ body: JSON.stringify({
             text: 'Your payment could not be verified. Please try again.',
             confirmButtonText: 'Retry'
           }).then(() => {
-            window.location.href = "/user/checkout";
+            window.location.href = `/user/order-failure/${order.receipt}`;
           });
 }
       });
@@ -767,6 +767,17 @@ body: JSON.stringify({
     }
   };
   var rzp = new Razorpay(options);
+   rzp.on('payment.failed', function(response){
+        console.log('Payment failed event:', response);
+        Swal.fire({
+            icon: 'error',
+            title: 'Payment Failed',
+            text: response.error.description || 'Your payment could not be processed.',
+            confirmButtonText: 'Retry'
+        }).then(() => {
+            window.location.href = `/user/order-failure/${order.receipt}`;
+        });
+    });
   rzp.open();
 }
 

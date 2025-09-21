@@ -116,8 +116,9 @@ router.post("/verifyPayment", razorpayController.verifyPayment);
 
 
 
-//success page
+//success page and failure page
 router.get('/order-success/:orderId',checkoutController.successPage);
+router.get('/order-failure/:orderId',checkoutController.failurePage);
 //order history page
 router.get('/orders',isLoggedIn,orderController.getOrderHistory);
 //order detail page

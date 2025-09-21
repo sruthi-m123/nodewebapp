@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <style>
+        /* Order Success Page - Warm Brown/Beige Theme */
+        :root {
+            --primary-color: #9e6d4e;
+            --primary-dark: #7d573e;
+            --secondary-color: #d9c4b3;
+            --background-light: #faf5f2;
+            --background-card: #f5ede6;
+            --background-icon: #f0e6dc;
+            --text-dark: #5a4a42;
+            --text-medium: #7d573e;
+            --text-light: #9e6d4e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .failure-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .failure-card {
+            background: var(--background-card);
+            border-radius: 12px;
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(158, 109, 78, 0.15);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .failure-illustration {
+            width: 120px;
+            height: 120px;
+            background: var(--background-icon);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .failure-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: #d32f2f;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .failure-message {
+            color: #d32f2f;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .failure-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(158, 109, 78, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(158, 109, 78, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(158, 109, 78, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .failure-card {
+                padding: 2rem;
+                max-width: 600px;
+            }
+            .failure-title {
+                font-size: 1.8rem;
+            }
+            .failure-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .failure-container {
+                padding: 1rem;
+            }
+            .failure-card {
+                padding: 1.5rem;
+            }
+            .failure-illustration {
+                width: 100px;
+                height: 100px;
+            }
+            .failure-title {
+                font-size: 1.5rem;
+            }
+            .failure-message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="failure-container">
+        <div class="failure-card">
+            <div class="failure-illustration">
+<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12" y2="16"></line>
+    </svg>            </div>
+            <h1 class="failure-title">Payment Failed</h1>
+            <p class="failure-message">Your payment didn't go through as it was declined by the bank. Try another payment method or contact your bank.</p>
+            <div class="failure-actions">
+                <a href="/user/checkout" class="btn btn-primary">Go to Checkout</a>
+                <a href="/user/home" class="btn btn-secondary">Go to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
