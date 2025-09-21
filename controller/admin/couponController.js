@@ -36,6 +36,10 @@ const createCoupon = async (req, res) => {
             return res.status(400).json({ message: "Required fields are missing" });
         }
 
+if(usageLimit<1){
+    return res.status(400).json({message:"usage limit should be one or more"});
+}
+
         const parsedValidFrom = new Date(validFrom);
         const parsedValidTill = new Date(validTill);
         

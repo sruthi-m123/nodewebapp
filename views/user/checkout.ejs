@@ -171,11 +171,13 @@
                                 </div>
                             <% } %>
                         </div>
-                        <button type="button" class="apply-coupon-dropdown-btn <%= isValid ? '' : 'btn-disabled' %>" 
-                                onclick="<%= isValid ? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}')` : '' %>"
-                                <%= isValid ? '' : 'disabled' %>>
-                            Apply
-                        </button>
+                       <button type="button" 
+        class="apply-coupon-dropdown-btn <%= isValid ? '' : 'btn-disabled' %>" 
+        onclick="<%= isValid ? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}', '${coupon.discountType}', ${coupon.discountValue})` : '' %>"
+        <%= isValid ? '' : 'disabled' %>>
+    Apply
+</button>
+
                     </div>
                 <% }); %>
             <% } else { %>
@@ -242,7 +244,12 @@
 </div>
 
 <div class="summary-row">
-  <span>Discount</span>
+  <span>Coupon Discount</span>
+  <span id="summary-couponDiscount">₹<%= couponDiscount||0 %></span>
+</div>
+
+<div class="summary-row">
+  <span> Total Discount</span>
   <span id="summary-discount" style="color: #28a745;">-₹<%= discount || 0 %></span>
 </div>
 

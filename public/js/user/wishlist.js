@@ -1,20 +1,16 @@
-// Event Delegation for dynamic elements
 document.addEventListener('click', async (e) => {
-  // Handle remove button clicks
   if (e.target.classList.contains('remove-btn')) {
     e.preventDefault();
     const itemId = e.target.getAttribute('data-id');
     await removeFromWishlist(itemId);
   }
 
-  // Handle add to cart button clicks
   if (e.target.classList.contains('add-btn')) {
     e.preventDefault();
     const itemId = e.target.getAttribute('data-id');
     await addToCart(itemId);
   }
 });
-
 async function removeFromWishlist(itemId) {
   try {
     const response = await fetch(`/user/wishlist/remove/${itemId}`, {
@@ -28,26 +24,41 @@ async function removeFromWishlist(itemId) {
       throw new Error(data.error || 'Failed to remove item');
     }
 
-    // Remove item from UI
     const itemElement = document.querySelector(`tr[data-id="${itemId}"]`);
     if (itemElement) {
       itemElement.remove();
       
-      // Update counter from response
       const counter = document.querySelector('.wishlist-summary span');
       if (counter) {
         counter.textContent = `${data.wishlistCount} items in wishlist`;
       }
       
-      // Reload if wishlist is empty
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Removed from wishlist',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+
       if (data.wishlistCount === 0) {
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 2100); 
       }
     }
 
   } catch (error) {
     console.error('Error:', error);
-    alert(error.message);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: error.message,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true
+    });
   }
 }
 
@@ -64,11 +75,28 @@ async function addToCart(itemId) {
       throw new Error(data.error || 'Failed to add to cart');
     }
 
-    alert(data.message || 'Item added to cart');
-    window.location.reload(); // Refresh to update cart count
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: data.message || 'Item added to cart',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });
+
+    setTimeout(() => window.location.reload(), 2100);
 
   } catch (error) {
     console.error('Error:', error);
-    alert(error.message);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: error.message,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true
+    });
   }
 }

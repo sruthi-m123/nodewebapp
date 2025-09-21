@@ -1,6 +1,7 @@
 const Order=require('../../models/orderSchema');
 const Product=require('../../models/productSchema');
 const User=require('../../models/userSchema');
+const Wallet=require('../../models/walletSchema');
 const PDFDocument=require('pdfkit');
 const fs=require('fs');
 const { log } = require('console');
@@ -216,11 +217,18 @@ res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order
     }
 };
 const cancelOrder = async (req, res) => {
-    console.log("cancel controller ");
   try {
+    console.log("Cancel controller called");
+
     const { orderId } = req.params;
     const { reason, itemId, customReason } = req.body;
-console.log("req.body inside cancel",req.body);
+
+    console.log("req.body inside cancel", req.body);
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: 'Order ID is required' });
+    }
+
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
@@ -231,15 +239,18 @@ console.log("req.body inside cancel",req.body);
       return res.status(400).json({ success: false, message: 'Cancellation reason is required' });
     }
 
-    // only allow cancel when order not delivered/shipped/returned
+    // Only allow cancel if order is not delivered/shipped/returned
     if (!['pending', 'processing'].includes(order.status.toLowerCase())) {
       return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
     }
 
-    let cancelledItems = order.cancellation?.cancelledItems || []; // keep history
+    let cancelledItems = order.cancellation?.cancelledItems || [];
+    const deliveryCharge = order.delivery || 0;
+    const totalPaid = order.total;
+    let refundAmount = 0;
 
     if (!itemId) {
-      // 🔹 Full cancellation
+      // 🔹 Full order cancellation
       order.items.forEach(item => {
         if (item.status !== 'cancelled') {
           item.status = 'cancelled';
@@ -254,6 +265,8 @@ console.log("req.body inside cancel",req.body);
 
       order.status = 'cancelled';
       order.cancelledAt = new Date();
+      refundAmount = totalPaid - deliveryCharge;
+
       order.cancellation = {
         reason: cancellationReason,
         date: new Date(),
@@ -262,42 +275,43 @@ console.log("req.body inside cancel",req.body);
         cancelledItems
       };
 
-      // restore stock
+      // Restore stock for all items
       await Promise.all(order.items.map(item =>
         Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
       ));
 
     } else {
-      // 🔹 Partial cancellation (single item at a time)
+      // 🔹 Partial (single item) cancellation
       const item = order.items.id(itemId);
-      console.log("order partial cancelling controller ")
-      console.log("item to be cancelled :",item);
+
       if (!item) {
-        return res.status(400).json({ success: false, message: 'Item not found in order' });
+        return res.status(404).json({ success: false, message: 'Item not found in order' });
       }
 
       if (item.status === 'cancelled') {
         return res.status(400).json({ success: false, message: 'Item already cancelled' });
       }
 
-      // restore stock
+      // Restore stock
       await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
 
-      // mark item cancelled
+      // Mark item as cancelled
       item.status = 'cancelled';
-      order.status='partially_cancelled';
       cancelledItems.push({
         product: item.productId,
         name: item.name,
         quantity: item.quantity,
         reason: cancellationReason
       });
-console.log("cancelled items",cancelledItems);
-      const allCancelled = order.items.every(i => i.status === 'cancelled');
-      if (allCancelled) {
-        order.status = 'cancelled';
-      }
 
+      const allCancelled = order.items.every(i => i.status === 'cancelled');
+      order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
+
+      const activeItemsCount = order.items.length;
+      const perItemRefund = (totalPaid - deliveryCharge) / activeItemsCount;
+      const perItemDelivery = deliveryCharge / activeItemsCount;
+      refundAmount = perItemRefund - perItemDelivery;
+console.log("refundAmount:",refundAmount);
       order.cancellation = {
         reason: cancellationReason,
         date: new Date(),
@@ -307,14 +321,38 @@ console.log("cancelled items",cancelledItems);
       };
     }
 
+    // Save order
     await order.save();
-    return res.json({ success: true, message: 'Cancellation processed successfully', order });
+
+    // Wallet refund
+    if (refundAmount > 0) {
+      const wallet = await Wallet.findOne({ user: order.userId });
+      if (wallet) {
+        wallet.balance += refundAmount;
+        wallet.transactions.push({
+          amount: refundAmount,
+          type: 'refund',
+          order: order._id,
+          description: `Refund for order cancellation (${order.orderId})`,
+          status: 'completed'
+        });
+        await wallet.save();
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: 'Cancellation processed successfully',
+      order
+    });
 
   } catch (error) {
     console.error('Error cancelling order:', error);
-    res.status(500).json({ success: false, message: 'Failed to cancel order' });
+    res.status(500).json({ success: false, message: 'Failed to cancel order', error: error.message });
   }
 };
+
+
 const returnOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -330,19 +368,18 @@ const returnOrder = async (req, res) => {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // ✅ Only delivered orders can be returned
     if (!["delivered", "partially_returned"].includes(order.status.toLowerCase())) {
       return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
     }
 
-    // ✅ FULL RETURN
+    //  full return 
     if (!itemId) {
       order.returnRequested = true;
       let returnItems = order.returnDetails?.items || [];
 
       order.items.forEach(item => {
         if (item.status !== "returned" && item.status !== "return_requested") {
-          item.status = "return_requested";   // 🔹 mark as request
+          item.status = "return_requested";   
           returnItems.push({
             product: item.productId,
             quantity: item.quantity,
@@ -370,7 +407,7 @@ const returnOrder = async (req, res) => {
       });
     }
 
-    // ✅ PARTIAL RETURN
+    // partial return
     const item = order.items.id(itemId);
     if (!item) {
       return res.status(400).json({ success: false, message: "Item not found in order" });
@@ -380,7 +417,6 @@ const returnOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Item already in return process" });
     }
 
-    // Initialize return details if not exists
     if (!order.returnDetails) {
       order.returnDetails = {
         reason: returnReason,
@@ -392,7 +428,6 @@ const returnOrder = async (req, res) => {
       };
     }
 
-    // 🔹 Mark this item as return requested
     item.status = "partially_returned";
     order.returnRequested = true;
     order.status = "partially_returned";

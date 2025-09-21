@@ -8,9 +8,11 @@ const Product = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 const Coupon=require('../../models/couponSchema');
 const{calculateOrder}=require('../../helper/calculateTotal');
+const{validateAddress}=require('../../helper/validation')
       const Razorpay = require('razorpay');
 
 const razorpayController=require('../../controller/user/razorpayController');
+const addressController=require('../../controller/user/addressController');
 
 
 exports.getCheckoutPage = async (req, res) => {
@@ -68,6 +70,7 @@ if(product.stock<requestedQty){
         } 
         else {
             const cart = await Cart.findOne({ userId }).populate('items.productId');
+            console.log("cart inisde the checkout controller:",cart);
             const coupons=await Coupon.find({});
             if (cart) {
 for (const item of cart.items){
@@ -106,26 +109,8 @@ if(stockValidationFailed){
 }
 
 
-//         // Calculate order totals
-//         const subtotal = cartItems.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
-//         const delivery = subtotal > 500 ? 0 : 50;
-            
-//        let offerDiscount=0;
-
-//         for(const item of cartItems){
-//             if(item.discountedPrice){
-//                 const itemDiscount=(item.originalPrice-item.discountedPrice)*item.quantity;
-//                 offerDiscount+=itemDiscount;
-//             }
-//         }
          const coupons=await Coupon.find({isActive:true});
-//          console.log("coupons:",coupons);
-// const couponDiscount=0;
-// discount=offerDiscount+couponDiscount;
-// console.log("subtotal:",subtotal);
-// console.log("delivery:",delivery);
-// console.log("discount:",discount);
-//  const netAmount = subtotal + delivery  - discount;
+//      
        const taxRate = 18;
 //         
         const offers = await Offer.find({
@@ -165,175 +150,83 @@ const orderSummary=calculateOrder(cartItems);
         res.status(500).send('Error loading checkout page');
     }
 };
+
 exports.addAddress = async (req, res) => {
-    try {
-const user = req.session?.user;
-
-if (!user || !user.id) {
-    console.log(" No active user session.");
-    return res.status(401).json({ success: false, message: 'User not logged in' });
-}
-
-const userId = user.id;  
-   const { 
-            name, 
-            building,
-            landmark, 
-            city, 
-            state, 
-            pincode, 
-            phone,
-            altPhone, 
-            addressType, 
-            isDefault 
-        } = req.body;
-           let userAddressDoc = await Address.findOne({ userId });
-        if (isDefault && userAddressDoc) {
-      userAddressDoc.address.forEach(addr => addr.isDefault = false);
+  try {
+    const user = req.session?.user;
+    if (!user || !user.id) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
     }
-        
-        const newAddress = {
-            userId: userId,
-            name,
-           building,
-           landmark,
-            city,
-            state,
-            pincode,
-            phone,
-            altPhone,
-            addressType,
-            isDefault
-        };
-        
-       if (userAddressDoc) {
+
+    const {
+      name, building, landmark, city, state, pincode,
+      phone, altPhone, addressType, isDefault
+    } = req.body;
+
+    // Validation
+    const errorMsg = validateAddress({ name, building, city, state, pincode, phone, altPhone, addressType });
+    if (errorMsg) return res.status(400).json({ success: false, message: errorMsg });
+
+    const duplicate = await Address.findOne({ userId: user.id, "address.phone": phone });
+    if (duplicate) {
+      return res.status(409).json({ success: false, message: "Phone number already exists in another address." });
+    }
+
+    let userAddressDoc = await Address.findOne({ userId: user.id });
+
+    if (isDefault && userAddressDoc) {
+      userAddressDoc.address.forEach(addr => (addr.isDefault = false));
+    }
+
+    const newAddress = {
+      userId: user.id,
+      name, building, landmark, city, state, pincode,
+      phone, altPhone, addressType, isDefault
+    };
+
+    if (userAddressDoc) {
       userAddressDoc.address.push(newAddress);
       await userAddressDoc.save();
     } else {
       userAddressDoc = new Address({
-        userId,
+        userId: user.id,
         address: [newAddress]
       });
       await userAddressDoc.save();
     }
 
-    res.json({ success: true, address: newAddress});
-}catch (error) {
-    console.error('Add address error:', error);
-    res.status(500).json({ success: false, message: 'Error adding address' });
-  };
-}
-exports.updateAddress = async (req, res) => {
-    try {
-        const user = req.session?.user;
-
-        if (!user || !user.id) {
-            console.log(" No active user session.");
-            return res.status(401).json({ success: false, message: 'User not logged in' });
-        }
-
-        const addressId = req.params.id;
-
-        const { 
-            name, 
-            building,
-            landmark,
-            city, 
-            state, 
-            pincode, 
-            phone, 
-            altPhone,
-            addressType,
-            isDefault 
-        } = req.body;
-//validation
- if (!name?.trim() || !building || !city || !state || !pincode || !phone || !addressType) {
-            return res.status(400).json({ success: false, message: 'All required fields must be filled properly.' });
-        }
-
-        if (!/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ success: false, message: 'Phone number must be exactly 10 digits.' });
-        }
-
-
- const duplicate = await Address.findOne({
-            userId: user.id,
-            "address.phone": phone,
-            "address._id": { $ne: new mongoose.Types.ObjectId(addressId) }
-        });
-
-        if (duplicate) {
-            return res.status(409).json({ success: false, message: 'Phone number already exists in another address.' });
-        }
-
-        // Unset existing default if this one is marked as default
-        if (isDefault) {
-            await Address.updateMany(
-                { userId: user.id, isDefault: true },
-                { $set: { isDefault: false } }
-            );
-        }
-console.log("userId:",user.id, "| type:", typeof user.id);
-console.log("_id:", addressId, "| type:", typeof addressId);
-
-      const updatedAddress = await Address.findOneAndUpdate(
-  {
-    userId: new mongoose.Types.ObjectId(user.id),
-    "address._id": new mongoose.Types.ObjectId(addressId)
-  },
-  {
-    $set: {
-      "address.$.name": name,
-      "address.$.building": building,
-      "address.$.landmark": landmark,
-      "address.$.city": city,
-      "address.$.state": state,
-      "address.$.pincode": pincode,
-      "address.$.phone": phone,
-      "address.$.altPhone": altPhone,
-      "address.$.addressType": addressType,
-      "address.$.isDefault": isDefault
-    }
-  },
-  { new: true }
-);
-
-        if (!updatedAddress) {
-            console.log(`⚠️ No address found for ID: ${addressId} and User: ${user.id}`);
-            return res.status(404).json({ success: false, message: 'Address not found' });
-        }
-
-        console.log(" Address updated:", updatedAddress);
-        res.json({ success: true, address: updatedAddress });
-
-    } catch (error) {
-        console.error(' Update address error:', error);
-        res.status(500).json({ success: false, message: 'Error updating address' });
-    }
+    res.json({ success: true, address: newAddress });
+  } catch (error) {
+    console.error("Add address error:", error);
+    res.status(500).json({ success: false, message: "Error adding address" });
+  }
 };
 
 exports.getAddress = async (req, res) => {
-    try {
-        const userId = req.session.user.id;
-        const addressId = req.params.id;
-        console.log(userId);
-        console.log(addressId);
-
-const userData = await Address.findOne({ userId });
-const address = userData.address.find(addr => addr._id.toString() === addressId);
-        
-        if (!address) {
-            return res.
-            status(404).json({ success: false, message: 'Address not found' });
-        }
-        
-        res.json({ success: true, address });
-    } catch (error) {
-        console.error('Get address error:', error);
-        res.status(500).json({ success: false, message: 'Error getting address' });
+  try {
+    const userId = req.session?.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
     }
-};
 
+    const addressId = req.params.id;
+    const userData = await Address.findOne({ userId });
+
+    if (!userData) {
+      return res.status(404).json({ success: false, message: "No addresses found for this user" });
+    }
+
+    const address = userData.address.find(addr => addr._id.toString() === addressId);
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Address not found" });
+    }
+
+    res.json({ success: true, address });
+  } catch (error) {
+    console.error("Get address error:", error);
+    res.status(500).json({ success: false, message: "Error getting address" });
+  }
+};
 exports.applyOffer = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -376,11 +269,16 @@ exports.applyOffer = async (req, res) => {
 
 exports.placeOrder = async (req, res) => {
   try {
-    console.log("Inside place order controller");
+    console.log("Inside placeOrder controller");
+
     const userId = req.session?.user?.id;
-    console.log("userId",userId)
-    const { addressId, paymentMethod, appliedOffers = [] } = req.body;
-console.log("req body",req.body);
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Please log in' });
+    }
+
+    console.log("req body inside checkout controller", req.body);
+
+    const { addressId, paymentMethod, appliedOffers = [], appliedCoupon = null } = req.body;
     if (!addressId || !paymentMethod) {
       return res.status(400).json({
         success: false,
@@ -391,6 +289,7 @@ console.log("req body",req.body);
     let items = [];
     let isBuyNow = false;
 
+    // ===== Buy Now Flow =====
     if (req.session.buyNowItem) {
       const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
       const product = await Product.findById(productId);
@@ -402,59 +301,84 @@ console.log("req body",req.body);
         return res.status(400).json({ success: false, message: 'Not enough stock' });
       }
 
+      const effectivePrice = price || product.discountedPrice || product.price;
       items = [{
         productId: product._id,
         name: product.productName,
         variant,
         quantity,
-        price: price || product.price,
-        totalPrice: (price || product.price) * quantity
+        price: product.price,
+        discountedPrice: product.discountedPrice || null,
+        totalPrice: effectivePrice * quantity
       }];
+
       isBuyNow = true;
+    }
 
-    } else {
-      // Cart flow
+    // ===== Cart Flow =====
+    else {
+      // const cart = await Cart.findOne({ userId }).populate({
+      //   path: 'items.productId',
+      //   match: { isActive: true },
+      //   select: 'productName price discountedPrice stock'
+      // });
       const cart = await Cart.findOne({ userId }).populate({
-        path: 'items.productId',
-        match: { isActive: true },
-        select: 'productName price stock'
-      });
-      console.log("cart ",cart)
+  path: 'items.productId',
+  select: 'productName price discountedPrice stock isActive'
+});
 
+
+      console.log("cart inside the controoler:",cart);
       if (!cart || cart.items.length === 0) {
         return res.status(400).json({ success: false, message: 'Cart is empty' });
       }
 
-      const activeCartItems = cart.items.filter(item => item.productId);
-      items = activeCartItems.map(item => ({
-        productId: item.productId._id,
-        name: item.productId.productName,
-        variant: item.variant || 'Default',
-        quantity: item.quantity,
-        price: item.price,
-        totalPrice: item.price * item.quantity
-      }));
+      const activeCartItems = cart.items.filter(item => item.productId && item.productId.isActive);
+console.log("activecartitems:",activeCartItems);
+      items = activeCartItems.map(item => {
+        const effectivePrice = item.productId.discountedPrice || item.productId.price;
+        return {
+          productId: item.productId._id,
+          name: item.productId.productName,
+          variant: item.variant || 'Default',
+          quantity: item.quantity,
+          price: item.productId.price,
+          discountedPrice: item.productId.discountedPrice || null,
+          totalPrice: effectivePrice * item.quantity
+        };
+      });
+      console.log("items inside the placeorder:",items)
     }
 
+    // ===== Address Selection =====
     const addresses = await Address.findOne(
       { userId, 'address._id': addressId },
       { address: { $elemMatch: { _id: addressId } } }
     );
-console.log("adress:",addresses)
+
     if (!addresses || addresses.address.length === 0) {
       return res.status(400).json({ success: false, message: 'Address not found' });
     }
+
     const selectedAddress = addresses.address[0];
 
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const delivery = subtotal > 500 ? 0 : 50;
-    const tax = subtotal * 0.18; 
-    let discount = 0; 
-    const total = subtotal + delivery + tax - discount;
+    // ===== Calculate Order Summary =====
+    const cartItemsForCalculation = items.map(item => ({
+      originalPrice: item.price,
+      discountedPrice: item.discountedPrice || null,
+      quantity: item.quantity
+    }));
+console.log("cart items for cal:",cartItemsForCalculation);
 
-    let status = paymentMethod === 'cod' ? 'pending' : 'processing';
+    const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
+    console.log("orderSummary in place order:", orderSummary);
 
+    const { subtotal, delivery, offerDiscount, couponDiscount, discount, tax, total } = orderSummary;
+
+    // ===== Order Creation =====
+    const status = paymentMethod === 'cod' ? 'pending' : 'processing';
     const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
     const order = new Order({
       orderId,
       userId,
@@ -467,45 +391,46 @@ console.log("adress:",addresses)
       discount,
       total,
       status,
-      appliedOffers: appliedOffers.map(o => o.id)
+      appliedOffers: appliedOffers.map(o => o.id),
+      appliedCoupon: appliedCoupon || null
     });
-    console.log("order",order)
+
     await order.save();
 
-    if (paymentMethod === 'netbanking') {
-      // const Razorpay = require('razorpay');
-      const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET,
-      });
-      const razorpayOrder = await razorpay.orders.create({
-        amount: total * 100, 
-        currency: "INR",
-        receipt: orderId,
-      });
-console.log("razor pay order created :",razorpayOrder);
-console.log("key:",process.env.RAZORPAY_KEY_ID);
-console.log("orderId from razorpay",razorpayOrder.id);
-      return res.json({
-        dborderID:order.orderId,
-        success: true,
-        orderId: razorpayOrder.id,
-        order:razorpayOrder,
-        key: process.env.RAZORPAY_KEY_ID
-      });
-    }
-
-    // for (const item of items) {
-    //   await Product.findByIdAndUpdate(item.productId, {
-    //     $inc: { stock: -item.quantity }
-    //   });
-    // }
+    // ===== Clear Cart or BuyNow =====
     if (!isBuyNow) {
-      await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+      await Cart.updateOne(
+        { userId },
+        { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
+      );
     } else {
       delete req.session.buyNowItem;
     }
 
+    // ===== Razorpay Flow =====
+    if (paymentMethod === 'netbanking') {
+      const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      const razorpayOrder = await razorpay.orders.create({
+        amount: total * 100, // amount in paise
+        currency: "INR",
+        receipt: orderId,
+      });
+
+      console.log("razorpayOrder", razorpayOrder);
+      return res.json({
+        dborderID: order.orderId,
+        success: true,
+        orderId: razorpayOrder.id,
+        order: razorpayOrder,
+        key: process.env.RAZORPAY_KEY_ID
+      });
+    }
+
+    // ===== Success Response =====
     return res.json({
       success: true,
       orderId: order.orderId,
@@ -514,7 +439,11 @@ console.log("orderId from razorpay",razorpayOrder.id);
 
   } catch (error) {
     console.error('Place order error:', error);
-    res.status(500).json({ success: false, message: 'Error placing order',details:error?.error || error });
+    res.status(500).json({
+      success: false,
+      message: 'Error placing order',
+      details: error?.message || error
+    });
   }
 };
 

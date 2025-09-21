@@ -146,6 +146,7 @@ const removeFromWishlist=async(req,res)=>{
 
     const addToCartFromWishlist=async(req,res)=>{
         try {
+          console.log("inside add to cart wishlist controlller");
             const{itemId}=req.params;
             console.log("itemId",itemId);
 const userId=req.session.user?.id;
@@ -179,10 +180,10 @@ if (cart) {
       const existingItem=cart.items.find(item=>
         item.productId.equals(wishlistItem.product._id)
       );
-
+console.log("existing item in cart fromm wishlist controller :",existingItem);
       if(existingItem){
         existingItem.quantity+=1;
-      
+      await cart.save();
     } else {
      cart.items.push({
       productId:wishlistItem.product._id,

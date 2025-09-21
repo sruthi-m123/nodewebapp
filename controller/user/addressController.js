@@ -56,10 +56,14 @@ const addAddress = async (req, res) => {
     if (!name || !addressType || !city || !state || !pincode || !phone || !building) {
       return res.status(400).json({ success: false, message: "Please fill all required fields" });
     }
+if (!/^\d{10}$/.test(phone)) {
+  return res.status(400).json({ success: false, message: "Phone number must be 10 digits." });
+}
 
-    if (!/^\d{10}$/.test(phone)) {
-      return res.status(400).json({ success: false, message: "Phone number must be 10 digits." });
-    }
+if (/^(\d)\1{9}$/.test(phone)) {
+  return res.status(400).json({ success: false, message: "Phone number cannot have all digits the same." });
+}
+
 
     if (altPhone && !/^\d{10}$/.test(altPhone)) {
       return res.status(400).json({ success: false, message: "Alternate phone must be 10 digits." });
@@ -168,34 +172,78 @@ const deleteAddress = async (req, res) => {
     res.status(500).send('Server Error');
   }
 }
+const mongoose = require("mongoose");
 
 const updateAddress = async (req, res) => {
+  console.log("inside the upadate addres in address controllr");
   try {
-    const userId = req.session.user._id;
+    const userId = new mongoose.Types.ObjectId(req.session.user._id);
+console.log("userId in addresscontrooler:",userId);
+
     const addressId = req.params.id;
-    const updates = req.body;
-    
-    await Address.updateOne(
-      { userId, "address._id": addressId },
-      { $set: {
-        "address.$.name": updates.name,
-        "address.$.building":updates.building,
-        "address.$.addressType": updates.addressType,
-        "address.$.city": updates.city,
-        "address.$.landmark": updates.landmark,
-        "address.$.state": updates.state,
-        "address.$.pincode": updates.pincode,
-        "address.$.phone": updates.phone,
-        "address.$.altPhone": updates.altPhone
-      }}
+    console.log("addressId inside the addressController",addressId);
+      const updates = {
+      ...req.body,
+      pincode: Number(req.body.pincode) 
+    };
+
+    console.log("updates in address controller:",updates);
+
+    // Validations (keep your existing ones)
+    if (!updates.name || !updates.building || !updates.city || !updates.state || !updates.pincode || !updates.phone) {
+      return res.status(400).json({ success: false, message: "Required fields are missing" });
+    }
+
+    if (!/^\d{6}$/.test(updates.pincode)) {
+      return res.status(400).json({ success: false, message: "Invalid pincode format" });
+    }
+
+    if (!/^\d{10}$/.test(updates.phone)) {
+      return res.status(400).json({ success: false, message: "Phone number must be 10 digits" });
+    }
+    if (/^(\d)\1{9}$/.test(updates.phone)) {
+      return res.status(400).json({ success: false, message: "Invalid phone number (all digits same)" });
+    }
+
+    if (updates.altPhone) {
+      if (!/^\d{10}$/.test(updates.altPhone)) {
+        return res.status(400).json({ success: false, message: "Alternate phone must be 10 digits" });
+      }
+      if (/^(\d)\1{9}$/.test(updates.altPhone)) {
+        return res.status(400).json({ success: false, message: "Invalid alternate phone (all digits same)" });
+      }
+    }
+
+    // Update query
+    const result = await Address.updateOne(
+      { userId, "address._id": addressId, "address.isDeleted": false },
+      {
+        $set: {
+          "address.$.name": updates.name,
+          "address.$.building": updates.building,
+          "address.$.addressType": updates.addressType,
+          "address.$.city": updates.city,
+          "address.$.landmark": updates.landmark,
+          "address.$.state": updates.state,
+          "address.$.pincode": updates.pincode,
+          "address.$.phone": updates.phone,
+          "address.$.altPhone": updates.altPhone,
+        },
+      }
     );
-    
-    res.status(200).json({success:true,message:"Address updated succesfully"});
+console.log("result",result);
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ success: false, message: "Address not found or no changes applied" });
+    }
+
+    res.status(200).json({ success: true, message: "Address updated successfully" });
   } catch (err) {
-    console.error('Error updating address:', err);
-    res.status(500).send('Server error');
+    console.error("Error updating address:", err);
+    res.status(500).send("Server error");
   }
-}
+};
+
+
 const setDefaultAddress=async(req,res)=>{
   console.log("session check:",req.session.user)
       const userId=req.session.user._id;
@@ -226,6 +274,6 @@ res.json({ message: "Default address set successfully" });
     addAddress,
     deleteAddress,
     getEditAddress,
-    updateAddress,
+ updateAddress,
     setDefaultAddress
  }

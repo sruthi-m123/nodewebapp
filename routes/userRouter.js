@@ -98,7 +98,7 @@ router.post('/cart/update',cartController.updateCart);
 router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
 router.post('/buy-now',checkoutController.buyNow);
 router.post('/api/addresses',checkoutController.addAddress);
-router.put('/api/addresses/:id',checkoutController.updateAddress);
+// router.put('/api/addresses/:id',checkoutController.updateAddress);
 router.get('/api/addresses/:id',checkoutController.getAddress);
 //coupon
 router.post('/checkout/apply-coupon',couponController.applyCoupon);

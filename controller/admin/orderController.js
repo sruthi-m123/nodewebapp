@@ -150,7 +150,8 @@ if(!updatedOrder){
     res.json({
       success: true,
       status: updatedOrder.status,
-      statusClass: updatedOrder.status.toLowerCase().replace(/\s+/g, '-')
+      statusClass: updatedOrder.status.toLowerCase().replace(/\s+/g, '-'),
+      
     });
    
         }catch(error){

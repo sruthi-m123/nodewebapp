@@ -113,7 +113,6 @@ function setupFormValidation() {
         }
     });
 }
-
 function addAddress(addressData) {
     fetch('/user/addresses/add', {
         method: 'POST',
@@ -125,20 +124,35 @@ function addAddress(addressData) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.reload();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Address added successfully',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload();
+            });
         } else {
-            alert(data.message || 'Error adding address');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Error adding address'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding address');
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Error adding address'
+        });
     });
 }
 
 function updateAddress(addressId, addressData) {
-    // fetch(`/api/addresses/${addressId}`, {
-    fetch(`/user/addresses/edit/${addressId}`,{
+    fetch(`/user/addresses/edit/${addressId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -148,14 +162,30 @@ function updateAddress(addressId, addressData) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.reload();
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated!',
+                text: 'Address updated successfully',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload();
+            });
         } else {
-            alert(data.message || 'Error updating address');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Error updating address'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error updating address');
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Error updating address'
+        });
     });
 }
 
@@ -268,13 +298,10 @@ function deleteAddress(){
             addressCard.appendChild(deletedBadge);
         }
         
-        // Show success message
         showToast('Address deleted successfully', 'success');
         
-        // Close modal
         closeDeleteModal();
     } else {
-        // Show error message
         showToast(data.message || 'Failed to delete address', 'error');
         confirmBtn.textContent = originalText;
         confirmBtn.disabled = false;
@@ -296,34 +323,7 @@ document.getElementById('deleteConfirmModal').addEventListener('click', function
 
 
 
-// function updateOrderSummary(offer = null) {
-//     const getRowValue = (label) => {
-//         const row = [...document.querySelectorAll('.summary-row')]
-//             .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
-//         return row ? parseFloat(row.querySelector('span:last-child').textContent.replace('₹', '').replace('-', '')) || 0 : 0;
-//     };
 
-//     const setRowValue = (label, value, isNegative = false) => {
-//         const row = [...document.querySelectorAll('.summary-row')]
-//             .find(r => r.querySelector('span').textContent.trim().toLowerCase() === label.toLowerCase());
-//         if (row) {
-//             row.querySelector('span:last-child').textContent = `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
-//         }
-//     };
-
-//     const subtotal = getRowValue('Subtotal');
-//     const delivery = getRowValue('Delivery');
-//     const tax = getRowValue('Tax (GST 18%)');
-//     let discount = getRowValue('Discount');
-
-//     if (offer) {
-//         discount = offer.discountAmount || 0;
-//         setRowValue('Discount', discount, true);
-//     }
-
-//     const total = subtotal + delivery + tax - discount;
-//     setRowValue('TOTAL', total);
-// }
 
 
 
@@ -334,15 +334,15 @@ function updateOrderSummary(orderSummary) {
     document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
     document.getElementById("summary-delivery").textContent = formatCurrency(orderSummary.delivery);
     document.getElementById("summary-tax").textContent = formatCurrency(orderSummary.tax);
+    document.getElementById("summary-couponDiscount").textContent=formatCurrency(orderSummary.couponDiscount);
     document.getElementById("summary-discount").textContent = formatCurrency(orderSummary.discount, true);
     document.getElementById("summary-total").textContent = formatCurrency(orderSummary.total);
 }
 
 
-// ==================== COUPON MANAGEMENT ====================
+// Coupon Managment
 var appliedCoupon = null;
 
-// Toggle coupon dropdown
 function toggleCouponDropdown() {
     const dropdown = document.getElementById('couponDropdown');
     const arrow = document.querySelector('.dropdown-arrow');
@@ -351,7 +351,6 @@ function toggleCouponDropdown() {
     arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('couponDropdown');
     const dropdownHeader = document.querySelector('.coupon-dropdown-header');
@@ -390,13 +389,15 @@ function applyCouponByCode() {
 }
 
 // Apply coupon from dropdown
-function applyCouponFromDropdown(couponId, couponCode) {
+function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
     const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     setButtonLoadingState(applyButton, 'Applying...');
     
     apiCall('/user/checkout/apply-coupon', 'POST', { couponId }, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
+                 appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
+                 console.log("appliedCoupon",appliedCoupon);
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
                 // updateOrderSummary(data.updatedSummary);
                    updateOrderSummary(data.orderSummary);
@@ -422,6 +423,7 @@ function removeCoupon() {
         .then(data => {
             console.log("coupon is going to be removed ",data)
             if (data.success) {
+                appliedCoupon=null;
                 resetCouponUI();
                 updateOrderSummary(data.orderSummary);
                 resetCouponButtons();
@@ -454,7 +456,7 @@ function updateAppliedCouponUI(couponCode, discountText, couponId) {
     document.getElementById('appliedCouponContainer').style.display = 'block';
     document.getElementById('couponCodeInput').value = '';
     
-    appliedCoupon = { id: couponId, code: couponCode };
+    // appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
 }
 
 // Reset coupon UI
@@ -625,12 +627,12 @@ function placeOrder() {
     Swal.fire({ icon: 'warning', title: 'Select Payment Method', text: 'Please select a payment method to proceed', confirmButtonText: 'Continue' });
     btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
-
+console.log("appliedCoupon in place order",appliedCoupon);
   // single fetch call
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers })
+    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers,appliedCoupon })
   })
   .then(res => res.json())
   .then(data => {

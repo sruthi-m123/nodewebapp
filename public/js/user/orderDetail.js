@@ -7,7 +7,13 @@
     
             document.getElementById(`${type}Modal`).style.display = 'flex';
             const submitBtn=modal.querySelector('.modal-submit');
-            submitBtn.setAttribute('data-order-id',orderId);
+            // submitBtn.setAttribute('data-order-id',orderId);
+
+            if(itemId){
+    submitBtn.setAttribute('data-item-id', itemId);
+} else {
+    submitBtn.removeAttribute('data-item-id'); 
+}
             if(itemId){
                 submitBtn.setAttribute('data-item-id',itemId);
 
