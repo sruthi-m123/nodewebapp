@@ -21,7 +21,7 @@ function calculateOrder(cartItems, options = {}) {
     if (coupon) {
         if (coupon.type === "percentage") {
             couponDiscount = ((subtotal - offerDiscount) * coupon.value) / 100;
-        } else if (coupon.type === "flat") {
+        } else if (coupon.type === "flat"||coupon.type === "fixed") {
             couponDiscount = coupon.value;
         }
     }

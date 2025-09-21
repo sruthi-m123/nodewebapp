@@ -756,3 +756,14 @@ th {
     width: 100%;
   }
 }
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.detail-label {
+  font-weight: bold;
+}
+.detail-value {
+  margin-left: 10px;
+}

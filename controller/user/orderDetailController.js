@@ -363,7 +363,7 @@ const returnOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Return reason is required" });
     }
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("items.productId");
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
@@ -372,16 +372,17 @@ const returnOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
     }
 
-    //  full return 
-    if (!itemId) {
-      order.returnRequested = true;
-      let returnItems = order.returnDetails?.items || [];
+    order.returnRequested = true;
 
+    if (!itemId) {
+      // FULL RETURN
+      console.log("inside the full order return controler ");
+      const returnItems = [];
       order.items.forEach(item => {
-        if (item.status !== "returned" && item.status !== "return_requested") {
-          item.status = "return_requested";   
+        if (!["returned", "return_requested"].includes(item.status)) {
+          item.status = "return_requested";
           returnItems.push({
-            product: item.productId,
+            product: item.productId._id,
             quantity: item.quantity,
             name: item.name,
             reason: returnReason
@@ -398,62 +399,47 @@ const returnOrder = async (req, res) => {
         type: "full",
         items: returnItems
       };
+    } else {
+      // PARTIAL RETURN
+      const item = order.items.id(itemId);
+      console.log("inside the partial return controller ")
+      if (!item) {
+        return res.status(400).json({ success: false, message: "Item not found in order" });
+      }
+      if (["returned", "return_requested"].includes(item.status)) {
+        return res.status(400).json({ success: false, message: "Item already in return process" });
+      }
 
-      await order.save();
-      return res.json({
-        success: true,
-        message: "Full order return request submitted successfully",
-        returnType: "full"
+      item.status = "return_requested";
+      console.log("item status:",item.status);
+      if (!order.returnDetails) {
+        order.returnDetails = {
+          reason: returnReason,
+          requestDate: new Date(),
+          status: "pending",
+          initiatedBy: "customer",
+          type: "partial",
+          items: []
+        };
+      }
+      order.returnDetails.items.push({
+        product: item.productId._id,
+        quantity: item.quantity,
+        name: item.name,
+        reason: returnReason
       });
+      order.status = "partially_returned";
     }
-
-    // partial return
-    const item = order.items.id(itemId);
-    if (!item) {
-      return res.status(400).json({ success: false, message: "Item not found in order" });
-    }
-
-    if (item.status === "returned" || item.status === "return_requested") {
-      return res.status(400).json({ success: false, message: "Item already in return process" });
-    }
-
-    if (!order.returnDetails) {
-      order.returnDetails = {
-        reason: returnReason,
-        requestDate: new Date(),
-        status: "pending",
-        initiatedBy: "customer",
-        type: "partial",
-        items: []
-      };
-    }
-
-    item.status = "partially_returned";
-    order.returnRequested = true;
-    order.status = "partially_returned";
-
-    order.returnDetails.items.push({
-      product: item.productId,
-      quantity: item.quantity,
-      name: item.name,
-      reason: returnReason
-    });
-
-    const allReturned = order.items.every(i => i.status === "returned" || i.status === "return_requested");
-    order.returnDetails.type = allReturned ? "full" : "partial";
 
     await order.save();
-    return res.json({
-      success: true,
-      message: "Partial return request submitted successfully",
-      returnType: order.returnDetails.type
-    });
+    return res.json({ success: true, message: "Return request submitted successfully", order });
 
   } catch (error) {
-    console.error("Error processing return:", error);
-    res.status(500).json({ success: false, message: "Failed to process return" });
+    console.error("Error creating return request:", error);
+    res.status(500).json({ success: false, message: "Failed to submit return request" });
   }
 };
+
 
 //admin side verification controller 
 // const processReturn = async (req, res) => {
@@ -509,26 +495,66 @@ const returnOrder = async (req, res) => {
 // };
 const processReturn = async (req, res) => {
   try {
-    console.log("inside the process return controller ")
     const { orderId } = req.params;
     const { itemId, action, rejectionReason } = req.body;
-    console.log("itemId",itemId);
 
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+    const order = await Order.findById(orderId).populate("items.productId");
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    // FULL RETURN
+    if (!itemId) {
+      if (action === "approve") {
+        let refundAmount = 0;
+        order.items.forEach(item => {
+          if (item.status === "return_requested") {
+            item.status = "returned";
+            refundAmount += item.totalPrice; // include discounted price
+            item.returnDetails = {
+              status: "approved",
+              processedDate: new Date(),
+              processedBy: req.user.id
+            };
+          }
+        });
+
+        order.status = "returned";
+        order.returnRequested = false;
+        order.returnDetails.status = "completed";
+
+        // Refund to wallet
+        let wallet = await Wallet.findOne({ user: order.userId });
+        if (!wallet) wallet = new Wallet({ user: order.userId });
+        await wallet.addFunds(refundAmount, {
+          type: "refund",
+          order: order._id,
+          description: `Full refund for order ${order.orderId}`
+        });
+
+      } else if (action === "reject") {
+        order.items.forEach(item => {
+          if (item.status === "return_requested") {
+            item.status = "delivered";
+            item.returnDetails = {
+              status: "rejected",
+              processedDate: new Date(),
+              processedBy: req.user.id,
+              rejectionReason: rejectionReason || "Not specified"
+            };
+          }
+        });
+        order.status = "delivered";
+        order.returnRequested = false;
+      }
+
+      await order.save();
+      return res.json({ success: true, message: `Full order return ${action}d successfully`, order });
     }
 
+    // PARTIAL RETURN
     const item = order.items.id(itemId);
-    if (!item) {
-      return res.status(404).json({ success: false, message: "Item not found in order" });
-    }
-console.log("item",item);
+    if (!item) return res.status(404).json({ success: false, message: "Item not found" });
     if (item.status !== "return_requested") {
-      return res.status(400).json({
-        success: false,
-        message: "This item does not have a pending return request",
-      });
+      return res.status(400).json({ success: false, message: "This item does not have a pending return request" });
     }
 
     if (action === "approve") {
@@ -536,34 +562,41 @@ console.log("item",item);
       item.returnDetails = {
         status: "approved",
         processedDate: new Date(),
-        processedBy: req.user.id,
+        processedBy: req.user.id
       };
-console.log("return details",item.returnDetails);
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: { stock: item.quantity },
+
+      // Refund single item to wallet
+      const itemRefund = item.totalPrice;
+      let wallet = await Wallet.findOne({ user: order.userId });
+      if (!wallet) wallet = new Wallet({ user: order.userId });
+      await wallet.addFunds(itemRefund, {
+        type: "refund",
+        order: order._id,
+        description: `Refund for item ${item.name} in order ${order.orderId}`
       });
+
+      // Restock product
+      await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } });
+
     } else if (action === "reject") {
-      // Reject single item return
-      item.status = "delivered"; // back to delivered if return rejected
+      item.status = "delivered";
       item.returnDetails = {
         status: "rejected",
         processedDate: new Date(),
         processedBy: req.user.id,
-        rejectionReason: rejectionReason || "Not specified",
+        rejectionReason: rejectionReason || "Not specified"
       };
-    } else {
-      return res.status(400).json({ success: false, message: "Invalid action" });
     }
 
-    // Check if all items are returned
-    const allReturned = order.items.every((i) => i.status === "returned");
+    // Check if all items are returned → mark order fully returned
+    const allReturned = order.items.every(i => i.status === "returned");
     if (allReturned) {
-      order.returnDetails = {
-        status: "completed",
-        processedDate: new Date(),
-        processedBy: req.user.id,
-      };
-      order.returnRequested = false; // no more pending
+      order.status = "returned";
+      order.returnRequested = false;
+      order.returnDetails.type = "full";
+      order.returnDetails.status = "completed";
+    } else {
+      order.returnDetails.type = "partial";
     }
 
     await order.save();
@@ -574,6 +607,8 @@ console.log("return details",item.returnDetails);
     res.status(500).json({ success: false, message: "Failed to process return" });
   }
 };
+
+
 
 module.exports={
     processReturn,returnOrder,cancelOrder,invoice,getOrderDetails

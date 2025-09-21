@@ -376,16 +376,24 @@ function applyCouponByCode() {
     
     apiCall('/user/checkout/applyCouponCode', 'POST', { couponCode }, 'Coupon applied successfully')
         .then(data => {
+            console.log("data by apply coupon code ",data);
             if (data.success) {
+  appliedCoupon = { 
+        id: data.appliedCoupon.couponId,
+        code: data.appliedCoupon.code,
+        type: data.appliedCoupon.type,
+        value: data.appliedCoupon.value
+    };
                 updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
-                // updateOrderSummary(data.updatedSummary);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(data.couponId, data.couponCode);
             }
         })
         .finally(() => {
-            resetButtonState(applyButton, 'Apply');
-        });
+ if (!appliedCoupon) {
+                resetButtonState(applyButton, 'Apply');
+            }
+                });
 }
 
 // Apply coupon from dropdown
@@ -475,7 +483,12 @@ function updateCouponButtons(couponId, couponCode) {
         dropdownButton.classList.add('applied');
         dropdownButton.disabled = true;
     }
-    
+    // const inputButton = document.querySelector('.apply-coupon-input-btn');
+    // if (inputButton) {
+    //     inputButton.textContent = 'Applied';
+    //     inputButton.classList.add('applied');
+    //     inputButton.disabled = true;
+    // }
     // Disable all other apply buttons
     document.querySelectorAll('.apply-coupon-dropdown-btn:not(.applied)').forEach(btn => {
         btn.disabled = true;

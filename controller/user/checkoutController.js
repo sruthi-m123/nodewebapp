@@ -279,6 +279,7 @@ exports.placeOrder = async (req, res) => {
     console.log("req body inside checkout controller", req.body);
 
     const { addressId, paymentMethod, appliedOffers = [], appliedCoupon = null } = req.body;
+    console.log("coupon in placeorder:",req.body.appliedCoupon);
     if (!addressId || !paymentMethod) {
       return res.status(400).json({
         success: false,
@@ -317,11 +318,7 @@ exports.placeOrder = async (req, res) => {
 
     // ===== Cart Flow =====
     else {
-      // const cart = await Cart.findOne({ userId }).populate({
-      //   path: 'items.productId',
-      //   match: { isActive: true },
-      //   select: 'productName price discountedPrice stock'
-      // });
+     
       const cart = await Cart.findOne({ userId }).populate({
   path: 'items.productId',
   select: 'productName price discountedPrice stock isActive'
@@ -366,10 +363,10 @@ console.log("activecartitems:",activeCartItems);
     const cartItemsForCalculation = items.map(item => ({
       originalPrice: item.price,
       discountedPrice: item.discountedPrice || null,
-      quantity: item.quantity
+      quantity: item.quantity,
     }));
 console.log("cart items for cal:",cartItemsForCalculation);
-
+console.log("appliedCoupon:",appliedCoupon);
     const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
     console.log("orderSummary in place order:", orderSummary);
 

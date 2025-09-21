@@ -43,7 +43,7 @@ const orderSchema = new mongoose.Schema({
       },
       status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled','return_requested'],
     default: 'pending'
   },
     }
@@ -74,7 +74,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled','return_requested'],
     default: 'pending'
   },
 
@@ -107,7 +107,7 @@ const orderSchema = new mongoose.Schema({
     requestDate: Date,
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned'],
+      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned','delivered'],
       default: 'pending'
     },
     initiatedBy: {
