@@ -290,7 +290,6 @@ exports.placeOrder = async (req, res) => {
     let items = [];
     let isBuyNow = false;
 
-    // ===== Buy Now Flow =====
     if (req.session.buyNowItem) {
       const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
       const product = await Product.findById(productId);
@@ -316,7 +315,6 @@ exports.placeOrder = async (req, res) => {
       isBuyNow = true;
     }
 
-    // ===== Cart Flow =====
     else {
      
       const cart = await Cart.findOne({ userId }).populate({
@@ -372,7 +370,7 @@ console.log("appliedCoupon:",appliedCoupon);
 
     const { subtotal, delivery, offerDiscount, couponDiscount, discount, tax, total } = orderSummary;
 
-    // ===== Order Creation =====
+    // order creation 
     const status = paymentMethod === 'cod' ? 'pending' : 'processing';
     const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
@@ -394,15 +392,15 @@ console.log("appliedCoupon:",appliedCoupon);
 
     await order.save();
 
-    // ===== Clear Cart or BuyNow =====
-    if (!isBuyNow) {
-      await Cart.updateOne(
-        { userId },
-        { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
-      );
-    } else {
-      delete req.session.buyNowItem;
-    }
+//clearing cart 
+    // if (!isBuyNow) {
+    //   await Cart.updateOne(
+    //     { userId },
+    //     { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
+    //   );
+    // } else {
+    //   delete req.session.buyNowItem;
+    // }
 
     // ===== Razorpay Flow =====
     if (paymentMethod === 'netbanking') {
@@ -426,8 +424,14 @@ console.log("appliedCoupon:",appliedCoupon);
         key: process.env.RAZORPAY_KEY_ID
       });
     }
-
-    // ===== Success Response =====
+ if (!isBuyNow) {
+      await Cart.updateOne(
+        { userId },
+        { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
+      );
+    } else {
+      delete req.session.buyNowItem;
+    }
     return res.json({
       success: true,
       orderId: order.orderId,
