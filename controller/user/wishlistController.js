@@ -6,7 +6,6 @@ const Product=require('../../models/productSchema');
 const getWishlistPage=async (req,res)=>{
   try {
     console.log("hit the wishcontroller")
-    console.log("this is user in wishlistL",req.session.user);
 
     if(!req.session.user){
   return res.redirect('/login');
@@ -17,22 +16,31 @@ const userId = req.session?.user?.id;
 const userData=await User.findById(userId);
 
 
-    const wishlistItems=await Wishlist.find({user:userId}).populate({
-        path:'product',
-        select:'productName price images sku color',
+    const wishlistItems=await Wishlist.findOne({user:userId}).populate({
+        path:'items.productId',
         match:{isDeleted:false,isBlocked:false}
     });
-console.log("wishlist items:",wishlistItems);
-    const validItems=wishlistItems.filter(item=>item.product!==null);
+    console.log("wishlist items:",wishlistItems);
+    let validItems=[];
+    if(wishlistItems&&wishlistItems.items){
+     validItems=wishlistItems.items.filter(i=>i.productId!==null);
 
-const formattedItems=validItems.map(item=>({
-    id:item._id,
-    name:item.product.productName,
-    price:item.product.price,
-    image:item.product.images[0],
-    color:item.product.color
-}))
-console.log("formatted items:",formattedItems);
+    }
+console.log("valid items:",validItems );
+const formattedItems = validItems.map(item => ({
+ 
+    id: item._id,
+    name: item.productId.productName,
+    discountedPrice:item.productId.discountedPrice,
+    price: item.productId.discountedPrice > 0 
+           ? item.productId.discountedPrice 
+           : item.productId.price,
+    originalPrice: item.productId.price,  
+    image: item.productId.images[0],
+    color: item.productId.color
+}));
+
+// console.log("formatted items:",formattedItems);
 res.render('user/wishlist',{
   pageCSS:"user/wishlist.css",
   pageJS:"user/wishlist.js",
@@ -49,15 +57,15 @@ res.render('user/wishlist',{
 }
 const addToWishlist=async(req,res)=>{
     try {
-      console.log("inside the add to wishlist")
       if (!req.session.user) {
       return res.status(401).json({
-        success: false,
+        error: false,
         message: "Please login to add to wishlist",
       });
     }
     const userId=req.session.user?.id;
         const{productId}=req.params;
+       
         console.log("params productId:",productId);
         const product=await Product.findOne({
             _id:productId,
@@ -65,33 +73,42 @@ const addToWishlist=async(req,res)=>{
             isBlocked:false,
             status:'In Stock'
         });
+        console.log("product:",product);
         if(!product){
 return res.status(404).json({
     succcess:false,
     error:'product not available'
 });
         }
-const existingItem=await Wishlist.findOne({
+
+
+let wishlist=await Wishlist.findOne({user:userId});
+
+if(!wishlist){
+  wishlist=new Wishlist({
     user:userId,
-    product:productId
-})
+    items:[{productId}]
+  })
+}else{
+    const existingItem = wishlist.items.find(
+        (item) => item.productId.toString() === productId.toString()
+      );
      if (existingItem) {
       return res.status(400).json({
         success: false,
         error: 'Product already in wishlist'
       });
     }
-     const newWishlistItem = new Wishlist({
-      user: userId,
-      product: productId
-    });
+    wishlist.items.push({productId});
+  }
+    
 
-    await newWishlistItem.save();
+    await wishlist.save();
 
     res.status(201).json({
       success: true,
       message: 'Product added to wishlist',
-      wishlistCount: await Wishlist.countDocuments({ user:userId })
+      wishlistCount: wishlist.items.length
     });
     
 
@@ -109,6 +126,7 @@ const existingItem=await Wishlist.findOne({
 const removeFromWishlist=async(req,res)=>{
     try {
         const {itemId}=req.params;
+        console.log("items in removal of productId:",itemId)
         
           const userId=req.session.user?.id;
           if (!itemId || !userId) {
@@ -118,11 +136,13 @@ const removeFromWishlist=async(req,res)=>{
       });
     }
         
-        const item=await Wishlist.findOneAndDelete({
-            _id:itemId,
-            user:userId
-        });
-        if(!item){
+        const updatedWishlist=await Wishlist.findOneAndUpdate(
+          {user:userId},
+          {$pull:{items:{_id:itemId}}},
+          {new:true}
+        );
+        console.log("updated wishlist after the removal",updatedWishlist);
+        if(!updatedWishlist){
             return res.status(404).json({
                 success:false,
                 error:'item not found in your wishilst'
@@ -132,7 +152,7 @@ const removeFromWishlist=async(req,res)=>{
         res.json({
             success:true,
             message:'items removed from the wishlist',
-            wishlistCount:await Wishlist.countDocuments({user:userId})
+            wishlistCount:updatedWishlist.items.length
         })
     } catch (error) {
           console.error('Remove from Wishlist Error:', error);
@@ -150,24 +170,27 @@ const removeFromWishlist=async(req,res)=>{
             const{itemId}=req.params;
             console.log("itemId",itemId);
 const userId=req.session.user?.id;
-            console.log("userId inside the wishlis add to cart",userId);
-            const wishlistItem=await Wishlist.findOne({
-                _id:itemId,
+            console.log("userId inside the wishlist add to cart",userId);
+            const wishlist=await Wishlist.findOne({
+                
                 user:userId
-            }).populate('product');
-            console.log("wishlist items :",wishlistItem);
+            }).populate('items.productId');
+            console.log("wishlist items :",wishlist);
+            const wishlistItem=wishlist.items.find(i=>i._id.toString()===itemId);
 
-if(!wishlistItem||!wishlistItem.product){
+if(!wishlist||wishlist.items.length==0){
     return res.status(404).json({
         success:false,
         error:'Item not found or product unavailable '
     })
 }
 //check product availablity again
- if (wishlistItem.product.isDeleted || 
-        wishlistItem.product.isBlocked || 
-        wishlistItem.product.status !== 'In Stock') {
-      await Wishlist.findByIdAndDelete(itemId);
+ if (wishlistItem.productId.isDeleted || 
+        wishlistItem.productId.isActive=='false' 
+      ) {
+      await Wishlist.findOneAndUpdate({user:userId},
+        {$pull:{items:{_id:item._id}}}
+      );
       return res.status(400).json({
         success: false,
         error: 'Product no longer available'
@@ -175,40 +198,71 @@ if(!wishlistItem||!wishlistItem.product){
         }
 
         let cart=await Cart.findOne({userId:userId});
-        const totalPrice=wishlistItem.product.price*1;
+        console.log("cart inside the wishlistcontroller in add to cart:",cart);
+        const price=wishlistItem.productId.discountedPrice||wishlistItem.productId.price;
+        const totalPrice=price*1;
 if (cart) {
       const existingItem=cart.items.find(item=>
-        item.productId.equals(wishlistItem.product._id)
+        item.productId.equals(wishlistItem.productId._id)
       );
 console.log("existing item in cart fromm wishlist controller :",existingItem);
       if(existingItem){
+        if(existingItem.quantity+1>wishlistItem.productId.stock){
+          return res.status(400).json({
+            success:false,
+            error:'Not enough stock available'
+          });
+        }
         existingItem.quantity+=1;
+        existingItem.totalPrice = existingItem.price * existingItem.quantity;
+      
       await cart.save();
     } else {
+      console.log("helooooo")
+if(wishlistItem.productId.stock<=0){
+  return res.status(400).json({
+    success:false,
+    error:'Product is out of stock'
+  });
+}
+
      cart.items.push({
-      productId:wishlistItem.product._id,
+      productId:wishlistItem.productId._id,
       quantity:1,
-      price:wishlistItem.product.price,
-      totalPrice:wishlistItem.product.price,
+      price:wishlistItem.productId.price,
+      totalPrice:totalPrice,
      })
       await cart.save();
     }
+    console.log("newly created cart:",cart);
   }else{
+     if (wishlistItem.productId.stock <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Product is out of stock'
+    });
+  }
       cart=new Cart({
         userId,
         items:[
           {
-            productId:wishlistItem.product._id,
+            productId:wishlistItem.productId._id,
             quantity:1,
-            price:wishlistItem.product.price,
-            totalPrice:wishlistItem.product.price
+            price:wishlistItem.productId.discountedPrice??wishlistItem.productId.price,
+            totalPrice:totalPrice
           }
         ]
       })
+      console.log("befor saving to the cart ",cart);
       await cart.save();
     }
     //remove from the wishlist 
-await Wishlist .findByIdAndDelete(itemId);
+// await Wishlist .findByIdAndDelete(itemId);
+await Wishlist.findOneAndUpdate(
+  { user: userId }, 
+  { $pull: { items: { _id: itemId } } }, 
+  { new: true } 
+);
 
 //get updated counts
 const[wishlistCount,cartCount]=await Promise.all([
@@ -237,7 +291,7 @@ const checkWishlistStatus = async (req, res) => {
 
     const item = await Wishlist.findOne({
       user: req.user.id,
-      product: productId
+      product: items.productId
     });
 
     res.json({

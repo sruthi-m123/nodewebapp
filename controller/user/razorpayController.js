@@ -2,6 +2,7 @@ const Razorpay = require("razorpay");
 const RazorpayHelper=require('../../helper/razorpay');
 const crypto = require("crypto");
 const Order=require('../../models/orderSchema');
+const Coupon = require("../../models/couponSchema");
 exports.createOrder = async (req, res) => {
   try {
     console.log("created order razorpay controller .")
@@ -40,22 +41,44 @@ console.log("req.body inside the verify payment razor",req.body)
     const generatedSignature = hmac.digest("hex");
 
     if (generatedSignature === razorpay_signature) {
-      await Order.findOneAndUpdate(
+     const order= await Order.findOneAndUpdate(
        { razorpayOrderId: razorpay_order_id },
           {
           status: "paid",
           razorpayPaymentId: razorpay_payment_id,
           razorpaySignature: razorpay_signature,
-        }
+          appliedCoupon:req.session.appliedCoupon?.couponId||null
+        },
+        {new:true}
       );
+
+if(order.appliedCoupon){
+  await Coupon.findByIdAndUpdate(order.appliedCoupon,{$inc:{usedCount:1}});
+}
+
+      console.log("order successfull")
   return res.json({ success: true });
-    } else {
-      console.log("error happened");
-      return res.json({ success: false });
-    }
-  } catch (err) {
+    
+     }
+     } catch (err) {
     console.error("Payment verification error:", err);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false ,message:"Payment verifiation failed"});
   }
 };
-
+exports.markPaymentFailed=async(req,res)=>{
+  try {
+    const {dborderId}=req.body;
+    const order=await Order.findById(dborderId);
+    if(!order)return res.status(404).json({success:false,message:"Order not found"});
+order.status="payment_failed";
+if(order.appliedCoupon){
+  await Coupon.findByIdAndUpdate(order.appliedCoupon,{$inc:{usedCount:-1}});
+  order.appliedCoupon=null;
+}
+await order.save();
+res.json({success:true,message:"Order marked as payment failed"});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({success:false,message:"Something went wrong "});
+  }
+}

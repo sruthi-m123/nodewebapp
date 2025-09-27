@@ -81,5 +81,16 @@ default:"In Stock"
     },
     createdAt: { type: Date, default: Date.now }
 },{timestamps:true});
+
+productSchema.pre("save", function(next) {
+  if (this.stock <= 0) {
+    this.status = "out of stock";
+  } else {
+    this.status = "In Stock";
+  }
+  next();
+});
+
+
 const Product=mongoose.model("Product",productSchema)
 module.exports=Product;

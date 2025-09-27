@@ -2,13 +2,12 @@ const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Offer=require("../../models/offerSchema");
-
+const Wishlist=require('../../models/wishlistSchema');
 
 
 const loadShopping = async (req, res) => {
   try {
     const filters = { isDeleted: false }; 
-    //availability
     if (req.query.availability === "In Stock") {
       filters.stock = { $gt: 0 };
     } else if (req.query.availability === "out of stock") {
@@ -73,13 +72,7 @@ return offer.applicableItems.some(id => id.toString() === product._id.toString()
   })
   console.log("applicable offers :",applicableOffers);
 
-// if(applicableOffers.length>0){
-//   const bestOffer=applicableOffers.reduce((max,offer)=>{
-//     return offer.discountValue>max.discountValue?offer:max;
-//   });
-//    product=product.toObject();
-// product.bestOffer=bestOffer;
-// }
+
 let bestOffer=null;
 if(applicableOffers.length>0){
   const productPrice=product.price;
@@ -92,7 +85,7 @@ if(offer.maxDiscount){
   discount=Math.min(discount,offer.maxDiscount);
 }
 
-    }else if(offer.type==='flat'){
+    }else if(offer.type==='fixed'){
 discount=offer.discountValue;
     }
 if(productPrice<offer.minOrderValue){
@@ -108,6 +101,15 @@ console.log("product bestoffer:",product.bestOffer);
 return product;
 });
 
+let wishlist=[];
+if(req.session.user){
+  const userWishlist=await Wishlist.findOne({userId:req.session.user._id});
+  console.log("userwishlistitems:",userWishlist);
+  if(userWishlist){
+    wishlist=userWishlist.items.map(item=>item.productId.toString());
+  }
+}
+
     return res.render("user/shopall", {
 
       pageCSS: "user/shopall.css",
@@ -116,6 +118,7 @@ return product;
         user: userData,
          currentPath: req.path,
       products,
+      wishlist,
       categories,
       isProductDetail: false,
       totalPages,

@@ -11,6 +11,8 @@ document.addEventListener('click', async (e) => {
     await addToCart(itemId);
   }
 });
+
+
 async function removeFromWishlist(itemId) {
   try {
     const response = await fetch(`/user/wishlist/remove/${itemId}`, {
@@ -100,3 +102,31 @@ async function addToCart(itemId) {
     });
   }
 }
+// async function addToWishlist(itemId) {
+//   try {
+//     const response = await fetch(`/user/wishlist/add/${itemId}`, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' }
+//     });
+
+//     const data = await response.json();
+//     if (!response.ok) {
+//       throw new Error(data.error || 'Failed to add to wishlist');
+//     }
+
+//     return { success: true, data }; // return success to toggle handler
+//   } catch (error) {
+//     console.error('Error:', error);
+//     Swal.fire({
+//       toast: true,
+//       position: 'top-end',
+//       icon: 'error',
+//       title: error.message,
+//       showConfirmButton: false,
+//       timer: 2500,
+//       timerProgressBar: true
+//     });
+//     return { success: false };
+//   }
+// }
+

@@ -46,10 +46,15 @@ const getCart = async (req, res) => {
         _id:item._id,
         quantity: allowedQty,
         productId: product,
-        price:item.price 
-      });
+  unitPrice: (product.discountedPrice && product.discountedPrice > 0) 
+              ? product.discountedPrice 
+              : product.price,
+  totalPrice: ((product.discountedPrice && product.discountedPrice > 0) 
+               ? product.discountedPrice 
+               : product.price) * allowedQty
+                    });
     }
-
+console.log("validitems in the getcart page:",validItems);
     if (outOfStockItems.length > 0) {
       await Cart.findOneAndUpdate(
         { userId },
@@ -71,7 +76,10 @@ const getCart = async (req, res) => {
       });
     }
 
-    const total = validItems.reduce((sum, item) => sum + (item.productId.price * item.quantity), 0);
+    // const total = validItems.reduce((sum, item) => sum + (item.productId.price * item.quantity), 0);
+   const total = validItems.reduce((sum, item) => sum + item.totalPrice, 0);
+
+    console.log("total:",total);
 
     res.render('user/cart', {
       cartItems: validItems,
@@ -107,14 +115,11 @@ const addToCart = async (req, res) => {
     console.log("quantity:",req.body.quantity);
     const limit = 10;
 
-    const product = await Product.findOneAndUpdate(
-      {
+    const product = await Product.findOneAndUpdate({
         _id: productId,
-        stock: { $gte: quantity } 
-      },
-      { $inc: { stock: -quantity } },
-      { new: true }
-    ).populate('bestOffer');
+        stock: { $gte: quantity } ,
+        isActive:true
+        }).populate('bestOffer');
     console.log("hiiiii");
     console.log("product details befor cal offer:",product);
 
@@ -253,13 +258,23 @@ const errors=[];
 
       if (item) {
         const product=await Product.findById(item.productId);
+       
+
+        if(!product){
+          errors.push({
+            productId:item.productId,
+            message:`product not found`
+          });
+          continue;
+        }
         if(update.quantity>product.stock){
                     errors.push({
             productId: item.productId,
             message: `Only ${product.stock} units available for ${product.productName}`,
           });
         }
-       
+
+
       }
     }
     if (errors.length > 0) {
@@ -270,31 +285,33 @@ for(const update of updates){
   const item=cart.items.find((i)=>i._id.toString()===update.id);
 
 if(item){ 
-
-
-const product=await Product.findById(item.productId);
-
-const oldQty=item.quantity;
-const newQty=update.quantity;
-const diff=newQty-oldQty;
-
-if(diff>0){
-  if(product.stock<diff){
-    return res.status(400).json({
-      message:`only ${product.stock} units left for ${product.productName}`,
-      productId:item.productId
-    })
-  }
-  product.stock-=diff;
-}
-if(diff<0){
-  product.stock+=Math.abs(diff);
-}
-await product.save();
-
-item.quantity=newQty;
+item.quantity=update.quantity;
 item.totalPrice=item.quantity*item.price;
 }
+
+// const oldQty=item.quantity;
+// const newQty=update.quantity;
+// const diff=newQty-oldQty;
+
+// if(diff>0){
+//   if(product.stock<diff){
+//     return res.status(400).json({
+//       message:`only ${product.stock} units left for ${product.productName}`,
+//       productId:item.productId
+//     })
+//   }
+//   product.stock-=diff;
+// }
+// if(diff<0){
+//   product.stock+=Math.abs(diff);
+// }
+// await product.save();
+
+// item.quantity=newQty;
+// item.totalPrice=item.quantity*item.price;
+
+
+
 }
 cart.markModified("items");
     await cart.save();

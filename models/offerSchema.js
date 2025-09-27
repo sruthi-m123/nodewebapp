@@ -8,12 +8,12 @@ const offerSchema = new Schema({
   },
   // description: String,
 
-  code: {
-    type: String,
-    unique: true,
-    trim: true,
-    uppercase: true
-  },
+  // code: {
+  //   type: String,
+  //   unique: true,
+  //   trim: true,
+  //   uppercase: true
+  // },
 
   type: {
     type: String,

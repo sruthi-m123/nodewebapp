@@ -2,6 +2,8 @@
 <div class="cart-container">
   <h2 class="cart-title">CART</h2>
   <div class="cart-table">
+       <!-- <pre><%= JSON.stringify(cartItems) %></pre> -->
+ 
     <% if (cartItems && cartItems.length > 0) { %>
       <table>
         <thead>
@@ -17,7 +19,9 @@
         </thead>
       <tbody id="cart-items">
   <% cartItems.forEach(item => { %>
-    <!-- <pre><%= JSON.stringify(item._id) %></pre> -->
+    <!-- <pre><%= JSON.stringify(item.productId.price) %></pre> -->
+        <!-- <pre><%= JSON.stringify(item.productId.discountedPrice) %></pre> -->
+
 
     <tr data-id="<%= item._id %>">
       <td>
@@ -38,7 +42,8 @@
         </td>
 
       <% if (item.productId.isActive) { %>
-        <td>Rs. <span class="item-price"><%= item.price %></span></td>
+        <!-- <td>Rs. <span class="item-price"><%= (item.productId.discountedPrice && item.productId.discountedPrice>0)?item.productId.discountedPrice:item.productId.price%></span></td> -->
+       <td>Rs. <span class="item-price"><%= item.unitPrice %></span></td>
         <td>
           <div class="quantity-selector" data-id="<%= item._id %>" data-stock="<%= item.productId.stock %>">
             <button onclick="updateQuantity('<%= item._id %>', -1)">-</button>
@@ -47,8 +52,9 @@
             <button onclick="updateQuantity('<%= item._id %>', 1)">+</button>
           </div>
         </td>
-        <td>Rs. <span class="item-total"><%= item.price * item.quantity %></span></td>
-      <% } else { %>
+        <!-- <td>Rs. <span class="item-total"><%= (item.productId.discountedPrice && item.productId.discountedPrice>0)?item.productId.discountedPrice:item.productId.price%></span></td> -->
+    <td>Rs. <span class="item-total"><%= item.totalPrice %></span></td>
+        <% } else { %>
         <td colspan="3" style="color: gray;">Unavailable</td>
       <% } %>
     </tr>

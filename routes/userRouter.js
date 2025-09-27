@@ -109,8 +109,9 @@ router.post('/api/offers/apply',checkoutController.applyOffer);
 //order chekout routes
 router.post('/orders-placed',checkoutController.placeOrder);
 //razor paymentmethod
-router.post("/createOrder", razorpayController.createOrder);
-router.post("/verifyPayment", razorpayController.verifyPayment);
+// router.post("/createOrder", razorpayController.createOrder);
+router.post("/verifyPayment", razorpayController.verifyPayment);//success
+router.post('/mark-payment-failed',razorpayController.markPaymentFailed);//failure
 
 
 
@@ -129,9 +130,9 @@ router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
 router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
 //wishlist page
 router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
-router.post('/wishlist/add/:productId',wishlistController.addToWishlist);
-router.post('/wishlist/add-to-cart/:itemId',wishlistController.addToCartFromWishlist);
-router.delete('/wishlist/remove/:itemId',wishlistController.removeFromWishlist);
+router.post('/wishlist/add/:productId',isLoggedIn,wishlistController.addToWishlist);
+router.post('/wishlist/add-to-cart/:itemId',isLoggedIn,wishlistController.addToCartFromWishlist);
+router.delete('/wishlist/remove/:itemId',isLoggedIn,wishlistController.removeFromWishlist);
 //cart count
 router.get('/cart/count',cartController.cartCount);
 

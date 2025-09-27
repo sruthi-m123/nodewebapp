@@ -93,7 +93,7 @@ const discount= Number(discountValue);
 if(isNaN(discount)){
     return res.status(400).json({message:'Discount value must be a Number'})
 };
-if(discount>95){
+if(discount>95&& type==='percentage'){
     return res.status(400).json({message:'Discount percentage cannot exceed 95%'});
 }
 

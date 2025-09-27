@@ -353,12 +353,25 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify(Object.fromEntries(formData))
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save coupon');
-      }
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.message || 'Failed to save coupon');
+      // }
 
-      return await response.json();
+      // return await response.json();
+const data = await response.json();
+
+if (!data.success) {
+  showAlert('error', data.message || 'Something went wrong');
+  return; 
+}
+showAlert('success', data.message || 'Coupon saved successfully!');
+    closeModal();
+    setTimeout(() => window.location.reload(), 1000);
+
+    return data;
+
+
     } catch (error) {
       showAlert('error', error.message);
       console.error('Error saving coupon:', error);

@@ -152,9 +152,14 @@
 </p>
                     </div>
           <div class="product-actions">
-            <button class="wishlist-btn" data-product-id="<%= product._id %>"  title="Add to wishlist">
-              <i class="far fa-heart"></i>
-            </button>
+           <button 
+  class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" 
+  data-product-id="<%= product._id %>"  
+  title="Add to wishlist"
+>
+  <i class="<%= wishlist.includes(product._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
+</button>
+
 <% if (product.stock === 0) { %>
                 <p class="out-of-stock-message">Out of Stock</p>
               <% } else { %>

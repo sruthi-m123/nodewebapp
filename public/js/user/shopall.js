@@ -353,49 +353,54 @@ document.addEventListener('click', async (e) => {
 document.querySelectorAll('.wishlist-btn').forEach(btn => {
   btn.addEventListener('click', async function () {
     const productId = this.dataset.productId;
+    const icon = this.querySelector('i');
 
     try {
       const response = await fetch(`/user/wishlist/add/${productId}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Added to wishlist!',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      } else if (response.status === 400 && data.error === 'Product already in wishlist') {
-        Swal.fire({
-          icon: 'info',
-          title: 'Already in wishlist',
-          text: 'This product is already in your wishlist.',
-          showConfirmButton: false,
-          timer: 2000
-        });
+        // toggle heart icon
+        this.classList.toggle('active');
+        if (this.classList.contains('active')) {
+          icon.classList.remove('far');
+          icon.classList.add('fas');
+          showToast('Added to wishlist!', 'success');
+        } else {
+          icon.classList.remove('fas');
+          icon.classList.add('far');
+          showToast('Removed from wishlist', 'info');
+        }
+      } else if (response.status === 400 && data.error === 'product already in wishlist') {
+        showToast('Already in the wishlist', 'info');
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Failed to add to wishlist',
-          text: data.message || 'Something went wrong.',
-        });
+        showToast('Failed to add to wishlist', 'error');
       }
 
     } catch (error) {
       console.error('Error adding to wishlist:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops!',
-        text: 'Something went wrong.',
-      });
+      showToast('Something went wrong', 'error');
     }
   });
 });
 
+function showToast(message,type='success'){
+  const toast=document.createElement('div');
+  toast.className=`toast ${type}`;
+  document.body.appendChild(toast);
 
+  setTimeout(()=>{
+    toast.classList.add('show');
+  },10);
+
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>document.body.removeChild(toast),300);
+  },2000);
+
+
+}

@@ -35,7 +35,9 @@ name: user.name || "",
     static async getEditProfile(req, res) {
     try {
       console.log("req sesison isde the edit profile:",req.session);
-      const userId = req.session?.user?._id ;
+      console.log(req.session);
+      
+      const userId = req.session?.user?.id ;
       
       if (!userId) return res.redirect("/login?error=session_lost");
 
@@ -55,7 +57,7 @@ name: user.name || "",
       });
     } catch (error) {
       console.error("Edit profile page load error:", error);
-      res.redirect("/error");
+      res.redirect("/user/error");
     }
   }
 

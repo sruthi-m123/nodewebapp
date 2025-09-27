@@ -331,11 +331,11 @@ function updateOrderSummary(orderSummary) {
     const formatCurrency = (value, isNegative = false) =>
         `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
 
-    document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
+    // document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
     document.getElementById("summary-delivery").textContent = formatCurrency(orderSummary.delivery);
     document.getElementById("summary-tax").textContent = formatCurrency(orderSummary.tax);
     document.getElementById("summary-couponDiscount").textContent=formatCurrency(orderSummary.couponDiscount);
-    document.getElementById("summary-discount").textContent = formatCurrency(orderSummary.discount, true);
+    // document.getElementById("summary-discount").textContent = formatCurrency(orderSummary.discount, true);
     document.getElementById("summary-total").textContent = formatCurrency(orderSummary.total);
 }
 
@@ -645,7 +645,7 @@ console.log("appliedCoupon in place order",appliedCoupon);
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers,appliedCoupon })
+    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers})
   })
   .then(res => res.json())
   .then(data => {
@@ -712,8 +712,7 @@ function showToast(message, type = "success") {
 
 
 function payWithRazorpay(order,key) {
-    console.log("order",order);
-    console.log("ordeer recipt:",order.receipt);
+   
   var options = {
     key: key, 
     amount: order.amount,
@@ -722,8 +721,7 @@ function payWithRazorpay(order,key) {
     description: "Order Payment",
     order_id: order.id,
     handler: function (response) {
-        console.log("response:",response);
-        console.log("orderId",order.orderId);
+       
       fetch("/user/verifyPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -769,6 +767,13 @@ body: JSON.stringify({
   var rzp = new Razorpay(options);
    rzp.on('payment.failed', function(response){
         console.log('Payment failed event:', response);
+        fetch("/user/mark-payment-failed",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({dborderId:order.dborderId})
+        })
+        .then(res=>res.json())
+        .then(data=>console.log(data));
         Swal.fire({
             icon: 'error',
             title: 'Payment Failed',

@@ -51,7 +51,7 @@ exports.applyCouponByCode = async (req, res) => {
     // Check if user has already used the coupon
     const hasUsedCoupon = await Order.exists({
       userId,
-      'coupon.couponId': coupon._id,
+      'appliedCoupon.couponId': coupon._id,
       status: { $nin: ['cancelled', 'returned'] }
     });
     if (hasUsedCoupon && !coupon.reusable) {
@@ -61,7 +61,7 @@ exports.applyCouponByCode = async (req, res) => {
     // Calculate order summary with coupon
     const orderSummary = calculateOrder(cartItems, {
       coupon: {
-        type: coupon.discountType === 'percentage' ? 'percentage' : 'flat',
+        type: coupon.discountType === 'percentage' ? 'percentage' : 'fixed',
         value: coupon.discountValue,
 
       }
@@ -143,7 +143,7 @@ exports.applyCoupon = async (req, res) => {
 
     const hasUsedCoupon = await Order.exists({
       userId,
-      'coupon.couponId': coupon._id,
+      'appliedCoupon.couponId': coupon._id,
       status: { $nin: ['cancelled', 'returned'] }
     });
     if (hasUsedCoupon && !coupon.reusable) {
@@ -158,7 +158,9 @@ exports.applyCoupon = async (req, res) => {
     });
       req.session.appliedCoupon = {
       couponId: coupon._id,
-      code: coupon.code
+      code: coupon.code,
+      type:coupon.discountType,
+      value:coupon.discountValue
     };
     console.log("req.session:",req.session);
     console.log("ordersummary after the coupon applied :",orderSummary);

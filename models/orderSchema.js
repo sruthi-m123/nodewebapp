@@ -74,7 +74,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled','return_requested'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled','return_requested','payment_failed','paid'],
     default: 'pending'
   },
 
@@ -92,6 +92,11 @@ const orderSchema = new mongoose.Schema({
       ref: 'Offer'
     }
   ],
+  appliedCoupon:{
+    couponId:{type:mongoose.Schema.Types.ObjectId,ref:'Coupon'},
+    code:String,
+    value:Number
+  },
 
   createdAt: {
     type: Date,
@@ -149,6 +154,9 @@ status: { type: String, enum: ['pending', 'processed', 'failed'], default: 'pend
   }
 
 });
+
+delete mongoose.models.Order;
+delete mongoose.Schema.Order;
 
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;

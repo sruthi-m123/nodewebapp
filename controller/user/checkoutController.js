@@ -120,11 +120,13 @@ startDate: { $lte: new Date() },
  }).lean();
 
 const orderSummary=calculateOrder(cartItems);  
+const discountedPrice=orderSummary.subtotal-orderSummary.discount;
         // Payment methods
         const paymentMethods = [
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
             { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
         ];
+        console.log("orderSummary:",orderSummary);
         
         res.render('user/checkout', {
             orderPlaced: false,
@@ -135,6 +137,7 @@ const orderSummary=calculateOrder(cartItems);
             fromCart, 
             taxRate,
             ...orderSummary,
+            discountedPrice,
             offers,
             paymentMethods,
             selectedPayment: '',
@@ -233,18 +236,15 @@ exports.applyOffer = async (req, res) => {
         console.log("req body i apply offer:",req.body);
         const { offerId } = req.body;
         
-        // Get the offer
         const offer = await Offer.findById(offerId);
         if (!offer) {
             return res.status(404).json({ success: false, message: 'Offer not found' });
         }
         
-        // Check if offer is valid for this user
         if (offer.userSpecific && offer.userSpecific.toString() !== userId.toString()) {
             return res.status(403).json({ success: false, message: 'Offer not valid for this user' });
         }
         
-        // Check if offer is expired
         if (offer.validUntil && offer.validUntil < new Date()) {
             return res.status(400).json({ success: false, message: 'Offer has expired' });
         }
@@ -270,7 +270,7 @@ exports.applyOffer = async (req, res) => {
 exports.placeOrder = async (req, res) => {
   try {
     console.log("Inside placeOrder controller");
-
+console.log("session inside place order",req.session);
     const userId = req.session?.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Please log in' });
@@ -278,10 +278,9 @@ exports.placeOrder = async (req, res) => {
 
     console.log("req body inside checkout controller", req.body);
 
-    const { addressId, paymentMethod, appliedOffers = [], appliedCoupon = null } = req.body;
-    console.log("coupon in placeorder:",req.body.appliedCoupon);
+    const { addressId, paymentMethod ,appliedOffers=[] } = req.body;
     if (!addressId || !paymentMethod) {
-      return res.status(400).json({
+      return res.status(400).jsonginl ({
         success: false,
         message: 'Address and payment method are required'
       });
@@ -323,13 +322,11 @@ exports.placeOrder = async (req, res) => {
 });
 
 
-      console.log("cart inside the controoler:",cart);
       if (!cart || cart.items.length === 0) {
         return res.status(400).json({ success: false, message: 'Cart is empty' });
       }
 
       const activeCartItems = cart.items.filter(item => item.productId && item.productId.isActive);
-console.log("activecartitems:",activeCartItems);
       items = activeCartItems.map(item => {
         const effectivePrice = item.productId.discountedPrice || item.productId.price;
         return {
@@ -342,10 +339,9 @@ console.log("activecartitems:",activeCartItems);
           totalPrice: effectivePrice * item.quantity
         };
       });
-      console.log("items inside the placeorder:",items)
     }
 
-    // ===== Address Selection =====
+//address selection
     const addresses = await Address.findOne(
       { userId, 'address._id': addressId },
       { address: { $elemMatch: { _id: addressId } } }
@@ -357,16 +353,33 @@ console.log("activecartitems:",activeCartItems);
 
     const selectedAddress = addresses.address[0];
 
-    // ===== Calculate Order Summary =====
+//coupon
+let appliedCouponData=null;
+let appliedCoupon=req.session.appliedCoupon||null;
+console.log("just chehing applied coupon:",appliedCoupon);
+
+// if(appliedCoupon){
+//   const coupon=await Coupon.findOne({_id:appliedCoupon.couponId,isActive:true,validTill:{$gte:new Date()}})
+//  if (coupon) {
+//         appliedCouponData = {
+//             couponId: coupon._id,
+//             code: coupon.code,
+//             type: coupon.discountType||'fixed',
+//             value: coupon.discountValue||0
+//         };
+ 
+//   if(!coupon) appliedCoupon=null;
+// }
+console.log("coupon inside the place order controller :",appliedCoupon);
+
+    //order summary
     const cartItemsForCalculation = items.map(item => ({
       originalPrice: item.price,
       discountedPrice: item.discountedPrice || null,
       quantity: item.quantity,
     }));
-console.log("cart items for cal:",cartItemsForCalculation);
-console.log("appliedCoupon:",appliedCoupon);
-    const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
-    console.log("orderSummary in place order:", orderSummary);
+    console.log("appliedCouponData before calculateOrder:", appliedCouponData);
+    const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCouponData, taxRate: 18 });
 
     const { subtotal, delivery, offerDiscount, couponDiscount, discount, tax, total } = orderSummary;
 
@@ -387,22 +400,35 @@ console.log("appliedCoupon:",appliedCoupon);
       total,
       status,
       appliedOffers: appliedOffers.map(o => o.id),
-      appliedCoupon: appliedCoupon || null
+      appliedCoupon: appliedCoupon
     });
 
     await order.save();
+//reducing the stock quantity
+if(paymentMethod==="cod"){
+await Product.bulkWrite(
+  items.map(item=>({
+    updateOne:{
+      filter:{_id:item.productId},
+      update:{$inc:{stock:-item.quantity}}
+    }
+  }))
+)
+}
+
+
 
 //clearing cart 
-    // if (!isBuyNow) {
-    //   await Cart.updateOne(
-    //     { userId },
-    //     { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
-    //   );
-    // } else {
-    //   delete req.session.buyNowItem;
-    // }
+    if (!isBuyNow) {
+      await Cart.updateOne(
+        { userId },
+        { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
+      );
+    } else {
+      delete req.session.buyNowItem;
+    }
 
-    // ===== Razorpay Flow =====
+//razorpay method 
     if (paymentMethod === 'netbanking') {
       const razorpay = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
@@ -424,21 +450,17 @@ console.log("appliedCoupon:",appliedCoupon);
         key: process.env.RAZORPAY_KEY_ID
       });
     }
- if (!isBuyNow) {
-      await Cart.updateOne(
-        { userId },
-        { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
-      );
-    } else {
-      delete req.session.buyNowItem;
-    }
+
     return res.json({
       success: true,
       orderId: order.orderId,
       order: { id: order._id, total, status: order.status, createdAt: order.createdAt }
     });
 
-  } catch (error) {
+  
+
+
+}catch (error) {
     console.error('Place order error:', error);
     res.status(500).json({
       success: false,

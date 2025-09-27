@@ -512,3 +512,14 @@
   color: #666;
   margin-left: 10px;
 }
+/* Default heart (not in wishlist) */
+.wishlist-btn i.far {
+  color: #4d2e2e; /* default */
+  font-size: 18px;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.wishlist-btn.active i.fas {
+  color: #e3c67e; /* when added to wishlist */
+  transform: scale(1.2);
+}

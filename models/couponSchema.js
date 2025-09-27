@@ -51,7 +51,6 @@ const couponSchema = new mongoose.Schema({
   validTill: {
     type: Date,
     required: true
-    // Remove the validator here - we'll handle it in pre-save hooks
   },
   isActive: {
     type: Boolean,

@@ -183,6 +183,7 @@
     </div>
   <% } %>
 </div>
+<div id="toast-container"></div>
 
 <!-- Return Request Modal -->
 <div class="modal-overlay" id="returnRequestModal">
@@ -324,20 +325,21 @@ console.log("orderId:",orderId);
           .then(res => res.json())
           .then(data => {
             if (data.error) {
-              alert(`Error: ${data.error}`);
+              // alert(`Error: ${data.error}`);
+               showToast(`Error: ${data.error}`, 'error');
             } else {
-              const statusEl = row.querySelector('.status');
-              statusEl.textContent = data.status;
-              statusEl.className = 'status ' + data.statusClass;
-              alert('Status updated');
-            }
-            select.remove();
-          })
-          .catch(err => {
-            console.error(err);
-            alert('Failed to update');
-            select.remove();
-          });
+             const statusEl = row.querySelector('.status');
+    statusEl.textContent = data.status;
+    statusEl.className = 'status ' + data.statusClass;
+    showToast('Status updated', 'success');
+  }
+  select.remove();
+})
+.catch(err => {
+  console.error(err);
+  showToast('Failed to update', 'error');
+  select.remove();
+});
       });
     });
   });
@@ -412,7 +414,6 @@ const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
     console.error('Row not found for order:', orderId);
     return;
   }
-  // const returnCell=row.querySelector('[data-label="Return Request"]')
   fetch(`/admin/orders/${orderId}/verify-return`, {
     method: 'POST',
     headers: {
@@ -421,6 +422,7 @@ const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
     body: JSON.stringify({ action })
   })
   .then(response => {
+    console.log("response",response);
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
   })
@@ -464,15 +466,23 @@ const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
       searchInput.focus();
     }
   });
-// });
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
 
-// document.querySelector('.verify-btn'.forEach(button=>{
-//   button.addEventListener('click',function(){
-//     const orderRow=this.closest.orderId;
+  container.appendChild(toast);
 
-//     document.getElementById('modal')
-//   })
-// }))
+  setTimeout(() => toast.classList.add('show'), 100);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+
+
 
 </script>
 <%- include('../partials/admin/admin-footer') %>
