@@ -40,6 +40,7 @@ function openAddressModal(addressId = null) {
         fetch(`/user/api/addresses/${addressId}`)
             .then(response => response.json())
             .then(data => {
+                console.log("data inside the edit address ate checkout page:",data);
                 if (data.success) {
                     const address = data.address;
                     form.reset();
@@ -51,7 +52,7 @@ function openAddressModal(addressId = null) {
                     document.getElementById('pincode').value = address.pincode;
                     document.getElementById('phone').value = address.phone;
                     document.getElementById('altPhone').value=address.altphone;
-                    document.getElementById('addressType').value = address.type || 'home';
+                    document.getElementById('addressType').value = address.addressType || 'home';
                     document.getElementById('setDefault').checked = address.isDefault || false;
                     
                     // Store the address ID in the form for update
@@ -378,6 +379,7 @@ function applyCouponByCode() {
         .then(data => {
             console.log("data by apply coupon code ",data);
             if (data.success) {
+                
   appliedCoupon = { 
         id: data.appliedCoupon.couponId,
         code: data.appliedCoupon.code,
@@ -387,6 +389,8 @@ function applyCouponByCode() {
                 updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(data.couponId, data.couponCode);
+            }else{
+                showToast(data.message,'error')
             }
         })
         .finally(() => {
@@ -404,19 +408,35 @@ function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
     apiCall('/user/checkout/apply-coupon', 'POST', { couponId }, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
+                console.log("orderSummary",data.orderSummary)
                  appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
                  console.log("appliedCoupon",appliedCoupon);
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
                 // updateOrderSummary(data.updatedSummary);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
+            }else{
+                console.log("hiiiiiiii")
+                                showToast(data.message,'error')
+   if (data.message === "You have already used this coupon") {
+                    applyButton.disabled = true;
+                    applyButton.textContent = 'Used';
+                    applyButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    resetButtonState(applyButton, 'Apply');
+                }
             }
         })
-        .finally(() => {
-            if (!appliedCoupon) {
-                resetButtonState(applyButton, 'Apply');
-            }
-        });
+        .catch(err=>{
+            console.log("hiiii inside cathc block",err);
+            showToast("something went wrong",'error');
+            resetButtonState(applyButton,'Apply');
+        })
+        // .finally(() => {
+        //     if (!appliedCoupon) {
+        //         resetButtonState(applyButton, 'Apply');
+        //     }
+        // });
 }
 
 function removeCoupon() {
@@ -699,6 +719,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
+   toast.style.zIndex = 9999; 
   toast.className = `fixed top-5 right-5 px-4 py-2 rounded shadow text-white 
     ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
   toast.textContent = message;

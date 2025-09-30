@@ -173,9 +173,9 @@
                             <% } %>
                         </div>
                        <button type="button" 
-        class="apply-coupon-dropdown-btn <%= isValid ? '' : 'btn-disabled' %>" 
-        onclick="<%= isValid ? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}', '${coupon.discountType}', ${coupon.discountValue})` : '' %>"
-        <%= isValid ? '' : 'disabled' %>>
+        class="apply-coupon-dropdown-btn <%=( isValid&&!coupon.isUsed) ? '' : 'btn-disabled' %>" 
+        onclick="<%= (isValid &&!coupon.isUsed)? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}', '${coupon.discountType}', ${coupon.discountValue})` : '' %>"
+        <%= (isValid&&!coupon.isUsed )? '' : 'disabled' %>>
     Apply
 </button>
 

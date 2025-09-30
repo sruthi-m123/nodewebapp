@@ -16,7 +16,6 @@
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
             </div>
-            
             <!-- Success Message -->
             <h1 class="success-title">Order Confirmed!</h1>
             <p class="success-message">Thank you for your purchase, <%= customerName ? customerName : 'Valued Customer' %>. Your order has been received and is being processed.</p>
@@ -62,7 +61,7 @@
                         <div class="item-details">
                             <h4><%= item.name %></h4>
                             <p>Quantity: <%= item.quantity %></p>
-                            <p class="item-price">$<%= (item.price * item.quantity).toFixed(2) %></p>
+                            <p class="item-price"><%= (item.price * item.quantity).toFixed(2) %></p>
                         </div>
                     </div>
                     <% }); %>

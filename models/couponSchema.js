@@ -76,7 +76,6 @@ const couponSchema = new mongoose.Schema({
 
 });
 
-// Pre-save hook for new documents
 couponSchema.pre('save', function(next) {
   if (this.validTill && this.validFrom && this.validTill <= this.validFrom) {
     const error = new Error('Valid till date must be after valid from date');

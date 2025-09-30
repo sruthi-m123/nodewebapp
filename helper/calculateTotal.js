@@ -2,6 +2,8 @@
 function calculateOrder(cartItems, options = {}) {
     const { coupon = null, taxRate = 18 } = options;
 console.log("coupon passed to calaculateorder",coupon);
+console.log("cartitems passed to cal:",cartItems);
+
     const subtotal = cartItems.reduce(
         (sum, item) => sum + (item.originalPrice * item.quantity),
         0

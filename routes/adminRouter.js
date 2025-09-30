@@ -40,7 +40,7 @@ router.post('/addCategory', upload.category, handleMulterError, catController.ad
 router.delete('/categories/:id/delete', adminAuth, catController.deleteCategory);
 router.put('/categories/status/:categoryId', adminAuth, catController.updateCategoryStatus);
 router.put('/categories/:id/update', adminAuth, upload.category, handleMulterError, catController.updateCategory);
-router.get('/categories/:id/details', adminAuth, catController.getCategory); // keep this last
+router.get('/categories/:id/details', adminAuth, catController.getCategory); 
 
 //product routes
 router.get('/products', adminAuth, productController.renderProducts);

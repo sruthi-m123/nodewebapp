@@ -109,10 +109,23 @@ if(stockValidationFailed){
 }
 
 
-         const coupons=await Coupon.find({isActive:true});
-//      
+         const coupons=await Coupon.find({isActive:true}).lean();
+const usedOrders=await Order.find({
+  userId,
+  'appliedCoupon.couponId':{$in:coupons.map(c=>c._id)},
+  status:{$nin:['cancelled','returned']}
+}).lean();
+
+const usedCouponIds=usedOrders.map(o=>o.appliedCoupon.couponId.toString());
+
+const couponsWithStatus=coupons.map(coupon=>({
+  ...coupon,
+  isUsed:usedCouponIds.includes(coupon._id.toString())
+}));
+console.log("couponWithStatus",couponsWithStatus);
+
        const taxRate = 18;
-//         
+       
         const offers = await Offer.find({
 startDate: { $lte: new Date() },       
   endDate: { $gte: new Date() },            
@@ -144,7 +157,7 @@ const discountedPrice=orderSummary.subtotal-orderSummary.discount;
             selectedPaymentMethod: 'Cash on Delivery',
             appliedOffers: [],
             user:userData,
-            coupons:coupons,
+            coupons:couponsWithStatus,
              razorpayKey: process.env.RAZORPAY_KEY_ID
         });
         
@@ -269,14 +282,13 @@ exports.applyOffer = async (req, res) => {
 
 exports.placeOrder = async (req, res) => {
   try {
-    console.log("Inside placeOrder controller");
 console.log("session inside place order",req.session);
     const userId = req.session?.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Please log in' });
     }
 
-    console.log("req body inside checkout controller", req.body);
+    console.log("req body inside place order controller", req.body);
 
     const { addressId, paymentMethod ,appliedOffers=[] } = req.body;
     if (!addressId || !paymentMethod) {
@@ -378,8 +390,7 @@ console.log("coupon inside the place order controller :",appliedCoupon);
       discountedPrice: item.discountedPrice || null,
       quantity: item.quantity,
     }));
-    console.log("appliedCouponData before calculateOrder:", appliedCouponData);
-    const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCouponData, taxRate: 18 });
+    const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
 
     const { subtotal, delivery, offerDiscount, couponDiscount, discount, tax, total } = orderSummary;
 
@@ -404,7 +415,7 @@ console.log("coupon inside the place order controller :",appliedCoupon);
     });
 
     await order.save();
-//reducing the stock quantity
+//reducing the stock quantity 
 if(paymentMethod==="cod"){
 await Product.bulkWrite(
   items.map(item=>({
@@ -414,8 +425,13 @@ await Product.bulkWrite(
     }
   }))
 )
+if(appliedCoupon){
+  await Coupon.findByIdAndUpdate(appliedCoupon.couponId,{
+    $inc:{usedCount:1}
+  });
 }
 
+}
 
 
 //clearing cart 
@@ -488,9 +504,9 @@ const order = await Order.findOne({orderId:orderId})
     storeName: "Chettinad sarees",
     customerName: order.userId.name,           
     customerEmail: order.userId.email,
-    orderId: order.orderNumber || order._id,
+    orderId: orderId,
     deliveryDate: new Date(order.createdAt.getTime() + 5 * 24 * 60 * 60 * 1000),
-    continueShoppingUrl: "/shopAll",
+    continueShoppingUrl: "/user/shopAll",
     orderItems: order.items.map(item => ({
         name: item.name,
         imageUrl: item.productId.images[0] || '/images/default-product.jpg',  
@@ -534,8 +550,8 @@ exports.failurePage = async (req, res) => {
             customerEmail: order.userId.email,
             orderId: order.orderNumber || order._id,
             failureMessage: "Your payment didn't go through as it was declined by the bank. Try another payment method or contact your bank.",
-            retryPaymentUrl: `/checkout/${orderId}`,
-            goToHomeUrl: "/shopAll"
+            retryPaymentUrl: `/user/checkout/${orderId}`,
+            goToHomeUrl: "/user/shopAll"
         };
         console.log("failure data:", failureData);
 

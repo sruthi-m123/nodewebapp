@@ -23,6 +23,7 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
+    console.log("req.session",req.session);
     console.log("reached home page ");
     let userData = null;
     if (req.session.user) {
