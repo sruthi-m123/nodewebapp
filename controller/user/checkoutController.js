@@ -137,10 +137,13 @@ const discountedPrice=orderSummary.subtotal-orderSummary.discount;
         // Payment methods
         const paymentMethods = [
             { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
-            { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
+            { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
+            {id:'wallet',title:'Wallet',description:"Purchase through through your wallet amount"}
         ];
         console.log("orderSummary:",orderSummary);
         
+
+
         res.render('user/checkout', {
             orderPlaced: false,
             pageCSS: 'user/checkout.css',
@@ -166,6 +169,79 @@ const discountedPrice=orderSummary.subtotal-orderSummary.discount;
         res.status(500).send('Error loading checkout page');
     }
 };
+
+exports.getRetryCheckoutPage=async(req,res)=>{
+try {
+  console.log("req.session:",req.session);
+ 
+  const userId=req.session.user.id;
+  if (!userId) {
+  return res.redirect('/user/login');
+}
+  const orderId=req.params.orderId;
+
+  const order=await Order.findOne({orderId:orderId})
+  .populate('items.productId')
+  .populate('userId');
+  
+if(!order||order.userId._id.toString()!==userId){
+  return res.status(404).send("order not found or not authorized")
+}
+
+if(order.status!=='payment_failed'){
+  return res.redirect('user/orders');
+}
+ const addressesDoc = await Address.findOne({ userId }).lean();
+    const addresses = addressesDoc ? addressesDoc.address.filter(addr => !addr.isDeleted) : [];
+
+const cartItems=order.items.map(item=>({
+        id: item.productId._id,
+      name: item.productId.productName,
+      image: item.productId.images[0],
+      variant: item.variant,
+      price: item.discountedPrice || item.price,
+      originalPrice: item.price,
+      discountedPrice: item.discountedPrice || null,
+      quantity: item.quantity,
+      isBuyNow: false
+
+
+}));
+    const orderSummary = calculateOrder(cartItems, {
+      coupon: order.appliedCoupon,
+      taxRate: 18
+    });
+   const paymentMethods = [
+      { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
+      { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
+    ];
+
+    res.render('user/checkout', {
+      orderPlaced: false,
+      pageCSS: 'user/checkout.css',
+      pageJS: 'user/checkout.js',
+      addresses,
+      cartItems,
+      fromCart: false,  
+      taxRate: 18,
+      ...orderSummary,
+      discountedPrice: orderSummary.subtotal - orderSummary.discount,
+      offers: [],
+      paymentMethods,
+      selectedPayment: order.paymentMethod,
+      selectedPaymentMethod: order.paymentMethod,
+      appliedOffers: order.appliedOffers || [],
+      user: order.userId,
+      coupons: [],
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      retryOrderId: order._id 
+    });
+} catch (error) {
+ console.error("Retry checkout error:", error);
+    res.status(500).send("Error loading retry checkout page"); 
+}
+}
+
 
 exports.addAddress = async (req, res) => {
   try {
@@ -292,7 +368,7 @@ console.log("session inside place order",req.session);
 
     const { addressId, paymentMethod ,appliedOffers=[] } = req.body;
     if (!addressId || !paymentMethod) {
-      return res.status(400).jsonginl ({
+      return res.status(400).json ({
         success: false,
         message: 'Address and payment method are required'
       });
@@ -368,20 +444,9 @@ console.log("session inside place order",req.session);
 //coupon
 let appliedCouponData=null;
 let appliedCoupon=req.session.appliedCoupon||null;
-console.log("just chehing applied coupon:",appliedCoupon);
+console.log("just cheching applied coupon:",appliedCoupon);
 
-// if(appliedCoupon){
-//   const coupon=await Coupon.findOne({_id:appliedCoupon.couponId,isActive:true,validTill:{$gte:new Date()}})
-//  if (coupon) {
-//         appliedCouponData = {
-//             couponId: coupon._id,
-//             code: coupon.code,
-//             type: coupon.discountType||'fixed',
-//             value: coupon.discountValue||0
-//         };
- 
-//   if(!coupon) appliedCoupon=null;
-// }
+
 console.log("coupon inside the place order controller :",appliedCoupon);
 
     //order summary
@@ -416,22 +481,25 @@ console.log("coupon inside the place order controller :",appliedCoupon);
 
     await order.save();
 //reducing the stock quantity 
-if(paymentMethod==="cod"){
-await Product.bulkWrite(
-  items.map(item=>({
-    updateOne:{
-      filter:{_id:item.productId},
-      update:{$inc:{stock:-item.quantity}}
-    }
-  }))
-)
+
+if (paymentMethod === "cod") {
+      const stockUpdates = items.map(item => ({
+        updateOne: {
+          filter: { _id: item.productId, stock: { $gte: item.quantity } },  // Atomic: Only if sufficient
+          update: { $inc: { stock: -item.quantity } }
+        }
+      }));
+      const results = await Product.bulkWrite(stockUpdates);
+      console.log('COD stock reduction results:', results);
+
 if(appliedCoupon){
   await Coupon.findByIdAndUpdate(appliedCoupon.couponId,{
     $inc:{usedCount:1}
   });
 }
 
-}
+    }
+
 
 
 //clearing cart 
@@ -458,6 +526,7 @@ if(appliedCoupon){
       });
 
       console.log("razorpayOrder", razorpayOrder);
+      console.log("order id created in the order placement :",order.orderId);
       return res.json({
         dborderID: order.orderId,
         success: true,
@@ -550,7 +619,7 @@ exports.failurePage = async (req, res) => {
             customerEmail: order.userId.email,
             orderId: order.orderNumber || order._id,
             failureMessage: "Your payment didn't go through as it was declined by the bank. Try another payment method or contact your bank.",
-            retryPaymentUrl: `/user/checkout/${orderId}`,
+            retryPaymentUrl: `/user/retry-checkout/${orderId}`,
             goToHomeUrl: "/user/shopAll"
         };
         console.log("failure data:", failureData);

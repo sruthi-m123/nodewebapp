@@ -153,6 +153,11 @@ h2 {
     transition: all 0.3s ease;
     border: none;
     font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cancel-btn {
@@ -165,9 +170,26 @@ h2 {
     color: white;
 }
 
+.retry-payment-btn {
+    background-color: var(--success-color);
+    color: white;
+}
+
 .action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-btn:hover {
+    background-color: #3a1307;
+}
+
+.return-btn:hover {
+    background-color: #1976d2;
+}
+
+.retry-payment-btn:hover {
+    background-color: #388e3c;
 }
 
 .inquiries {
@@ -256,12 +278,12 @@ h2 {
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
+    border: none;
 }
 
 .modal-submit {
     background-color: var(--primary-color);
     color: white;
-    border: none;
 }
 
 .modal-cancel {
@@ -301,6 +323,181 @@ h2 {
     margin-right: 0.3rem;
 }
 
+/* Item Action Buttons */
+.item-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.cancel-item-btn, .return-item-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cancel-item-btn {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.return-item-btn {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.cancel-item-btn:hover {
+    background-color: #e64a19;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.return-item-btn:hover {
+    background-color: #1976d2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-badge.cancelled {
+    background-color: #ffebee;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+.status-badge.return-requested {
+    background-color: #e3f2fd;
+    color: var(--info-color);
+    border: 1px solid var(--info-color);
+}
+
+.product-divider {
+    border: none;
+    border-top: 1px solid var(--secondary-color);
+    margin: 1rem 0;
+}
+
+.order-total {
+    text-align: right;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--secondary-color);
+}
+
+/* Reason Suggestions */
+.reason-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.reason-chip {
+    background-color: #f1f1f1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.reason-chip:hover {
+    background-color: #e0e0e0;
+}
+
+.reason-chip.selected {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+/* Disabled State */
+button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+button.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.modal-submit:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Status Timeline Alternative Styles */
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    flex: 1;
+}
+
+.status-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--secondary-color);
+}
+
+.status-item.completed .status-icon {
+    background-color: var(--success-color);
+    color: white;
+    box-shadow: 0 0 0 2px var(--success-color);
+}
+
+.status-item.active .status-icon {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.status-item.pending .status-icon {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.status-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+}
+
+.status-item.completed .status-label,
+.status-item.active .status-label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.status-item.pending .status-label {
+    color: var(--secondary-color);
+}
+
 @media (max-width: 768px) {
     .product-details {
         flex-direction: column;
@@ -328,9 +525,23 @@ h2 {
     .download-invoice {
         align-self: flex-end;
     }
+
+    .item-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .cancel-item-btn, .return-item-btn {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+
     .container {
         padding: 1.5rem;
     }
@@ -343,117 +554,26 @@ h2 {
         align-self: stretch;
         justify-content: center;
     }
-}
-button.disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        
-        .modal p {
-            margin-bottom: 15px;
-            color: #666;
-        }
-        
-        .reason-suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .reason-chip {
-            background-color: #f1f1f1;
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        
-        .reason-chip:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .reason-chip.selected {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        
-        .modal-cancel {
-            background-color: #f1f1f1;
-            color: #333;
-        }
-        
-        .modal-cancel:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .modal-submit {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        .modal-submit:hover {
-            background-color: #45a049;
-        }
-        
-        .modal-submit:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
+    .order-header {
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        gap: 0.8rem;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .reason-suggestions {
+        gap: 6px;
+    }
+
+    .reason-chip {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}

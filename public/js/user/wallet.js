@@ -10,7 +10,7 @@
       }
 
       try {
-        const response = await fetch('/wallet/add-funds', {
+        const response = await fetch('/user/wallet/add-funds', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

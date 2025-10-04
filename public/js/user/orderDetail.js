@@ -1,6 +1,6 @@
 
 
- function openModal(type,orderId,itemId) {
+ function openModal(type,orderId,itemId=null) {
     console.log("modal opened")
       const modal = document.getElementById(`${type}Modal`);
       console.log("modal:",modal);
@@ -8,11 +8,11 @@
             document.getElementById(`${type}Modal`).style.display = 'flex';
             const submitBtn=modal.querySelector('.modal-submit');
             // submitBtn.setAttribute('data-order-id',orderId);
-
+submitBtn.dataset.orderId=orderId;
             if(itemId){
-    submitBtn.setAttribute('data-item-id', itemId);
+submitBtn.dataset.itemId=itemId;
 } else {
-    submitBtn.removeAttribute('data-item-id'); 
+    delete submitBtn.dataset.itemId;
 }
             if(itemId){
                 submitBtn.setAttribute('data-item-id',itemId);

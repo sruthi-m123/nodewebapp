@@ -3,6 +3,7 @@ const RazorpayHelper=require('../../helper/razorpay');
 const crypto = require("crypto");
 const Order=require('../../models/orderSchema');
 const Coupon = require("../../models/couponSchema");
+const Product=require("../../models/productSchema");
 exports.createOrder = async (req, res) => {
   try {
     console.log("created order razorpay controller .")
@@ -38,26 +39,41 @@ exports.verifyPayment = async(req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature,  dborderId} = req.body;
 console.log("req.body inside the verify payment razor",req.body)
 console.log("re.session:",req.session);
+if (!dborderId) {
+      return res.status(400).json({ success: false, message: "Order ID required" });
+    }
     const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generatedSignature = hmac.digest("hex");
 
     if (generatedSignature === razorpay_signature) {
      const order= await Order.findOneAndUpdate(
-       {  dborderId:  dborderId },
+       {  orderId:  dborderId },
           {
           status: "paid",
           razorpayOrderId:razorpay_order_id,
           razorpayPaymentId: razorpay_payment_id,
           razorpaySignature: razorpay_signature,
-          appliedCoupon:req.session.appliedCoupon?.couponId||null
+          // appliedCoupon:req.session.appliedCoupon?.couponId||null
         },
         {new:true}
       );
 console.log("order inside the controller :",order);
+if (!order) { 
+        return res.status(404).json({ success: false, message: "Order not found" });
+      }
 if(order.appliedCoupon){
   await Coupon.findByIdAndUpdate(order.appliedCoupon,{$inc:{usedCount:1}});
 }
+//stock reduction
+await Product.bulkWrite(
+        order.items.map(item => ({
+          updateOne: {
+            filter: { _id: item.productId },
+            update: { $inc: { stock: -item.quantity } }
+          }
+        }))
+      );
 
       console.log("order successfull")
   return res.json({ success: true });
@@ -73,21 +89,23 @@ exports.markPaymentFailed=async(req,res)=>{
     console.log("entered mark payemnt failed")
     const {dborderId}=req.body;
     console.log("req.body",req.body);
-    const order=await Order.findById(dborderId);
-    console.log("order inside the markpaymente in raxorpay:",order);
+const order = await Order.findOne({ orderId: dborderId });
+    console.log("order inside the markpayment in raxorpay:",order);
     if(!order)return res.status(404).json({success:false,message:"Order not found"});
-order.status="payment_failed";
-if (order.appliedCoupon && order.appliedCoupon.couponId) {
-  await Coupon.findByIdAndUpdate(
-    order.appliedCoupon.couponId,
-    { $inc: { usedCount: -1 } }
-  );
-}
-order.status='payment_failed';
-console.log("order status",order.status);
+ if (order.status === "payment_pending" || order.status === "processing") {
+      order.status = "payment_failed";
+
+      if (order.appliedCoupon && order.appliedCoupon.couponId) {
+        await Coupon.findByIdAndUpdate(order.appliedCoupon.couponId, {
+          $inc: { usedCount: -1 }
+        });
+      }
+    }
+
 await order.save();
 res.json({success:true,message:"Order marked as payment failed"});
-  } catch (error) {
+   
+}catch (error) {
     console.error(error);
     res.status(500).json({success:false,message:"Something went wrong "});
   }

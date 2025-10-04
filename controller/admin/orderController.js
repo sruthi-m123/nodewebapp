@@ -77,7 +77,8 @@ const getOrderAdmin = async (req, res) => {
       status: order.status,
       statusClass: order.status.toLowerCase().replace(/\s+/g, '-'),
       returnRequest: order.returnRequested || false,
-      orderId:order.orderId
+      orderId:order.orderId,
+      returnItems:order.returnDetails?.items||[]
     }));
     console.log("formatted Order:",formattedOrders);
      const buildPaginationUrl = (pageNum) => {
@@ -159,29 +160,46 @@ if(!updatedOrder){
     res.status(500).json({ error: 'Failed to update status' });
         }
     }
-const getReturnDetails=async(req,res)=>{
+const getReturnDetails = async (req, res) => {
   try {
-   const orderId=req.params.orderId;
-   const order=await Order.findOne({orderId:orderId});
-   console.log("order imside the verify controller :",order);
-   if(!order){
-    return res.status(404).json({error:"order not found"});
-   }
-   
-   if(!order.returnRequested){
-    return res.status(400).json({error:"No return request for this order  "})
-   }
+    const { orderId } = req.params;
 
-res.json({
-  reason:order.returnDetails.reason,
-  notes:order.returnDetails.notes||"None"
-});
+    // Fetch the order with items populated (if needed)
+    const order = await Order.findOne({orderId}).populate('items.productId');
+    if (!order || !order.returnRequested) {
+      return res.status(404).json({ error: 'Return request not found' });
+    }
+
+    const { returnDetails } = order;
+
+    // Map each return item to the corresponding order item
+    const items = returnDetails.items?.map(returnItem => {
+   const matchedItem = order.items.find(
+    i => i.orderId === returnItem.orderId
+  );
+      return {
+        _id: returnItem.itemId,
+        name: matchedItem?.name || matchedItem?.productId?.name || 'Unknown Item',
+        quantity: matchedItem?.quantity || 0,
+        price: matchedItem?.totalPrice || matchedItem?.price || 'N/A',
+        reason: returnItem.reason || 'Not specified',
+        status: returnItem.status || 'Pending',
+      };
+    }) || [];
+
+    res.json({
+      reason: returnDetails.reason || 'Not specified', // global return reason
+      notes: returnDetails.notes || 'None',           // global notes
+      type: returnDetails.type || 'full',             // 'full' or 'partial'
+      totalItems: order.items.length,                 // total items in order
+      items,                                          // item-level return info
+    });
 
   } catch (error) {
-    console.error("error fetching return details :",error);
-    res.status(500).json({error:"server error"})
+    console.error('Error fetching return details:', error);
+    res.status(500).json({ error: 'Failed to fetch return details' });
   }
-}
+};
 
 
 
@@ -195,10 +213,10 @@ const verifyReturnedRequest = async (req, res) => {
   console.log("req.body:", req.body);
 
   const { orderId } = req.params;
+
   let wallet;
 
   try {
-    const { action, adminNotes } = req.body;
 
     if (!['approve', 'reject'].includes(action)) {
       return res.status(400).json({ 
@@ -225,6 +243,11 @@ const verifyReturnedRequest = async (req, res) => {
         code: 'NO_RETURN_REQUEST'
       });
     }
+
+const refundItems=ItemsIds?.length
+
+
+
 
     if (action === 'approve') {
       if (order.returnApproved) {
@@ -298,19 +321,7 @@ const transactionRef = `REFUND-${order.orderId}-${returnRequest._id}`;
         ...restockOps
       ]);
 
-      // try {
-      //   await sendNotification({
-      //     email: order.user.email,
-      //     type: 'refund_approved',
-      //     data: {
-      //       orderId: order.orderId,
-      //       amount: refundAmount,
-      //       newBalance: wallet.balance
-      //     }
-      //   });
-      // } catch (notificationError) {
-      //   console.error('Notification failed:', notificationError);
-      // }
+      
 
     } else {
       order.returnRequested = false;
@@ -320,18 +331,7 @@ const transactionRef = `REFUND-${order.orderId}-${returnRequest._id}`;
       
       await order.save();
 
-      // try {
-      //   await sendNotification({
-      //     email: order.user.email,
-      //     type: 'refund_rejected',
-      //     data: {
-      //       orderId: order.orderId,
-      //       reason: adminNotes
-      //     }
-      //   });
-      // } catch (notificationError) {
-      //   console.error('Notification failed:', notificationError);
-      // }
+     
     }
 
     return res.json({ 
@@ -369,7 +369,7 @@ const transactionRef = `REFUND-${order.orderId}-${returnRequest._id}`;
 const getOrderDetails=async(req,res)=>{
   try {
     const orderId=req.params.orderId;
-    const order=await Order.findById(orderId)
+    const order=await Order.findOne({orderId})
 .populate('items.productId')
 .exec();
 
@@ -379,7 +379,7 @@ if(!order){
 console.log("ORDEEERS",order.status)
 res.render('admin/orderDetailPage',{order,layout:false})
   } catch (error) {
-    console.error(err);
+    console.error(error);
     res.status(500).send("server error");
   }
 }

@@ -30,7 +30,7 @@
 
         <p><strong>Quantity: </strong> <%= item.quantity %></p>
         <p><strong>Item Total: </strong> ₹<%=(item.price * item.quantity).toLocaleString('en-IN')%></p>
-<!-- JSON.stringify({ "<%= order.status %>" }) -->
+JSON.stringify({ "<%= order.status %>" })
 
         <!-- Action buttons for each item -->
         <div class="item-actions">
@@ -60,6 +60,11 @@
           <% if (item.status === 'returned') { %>
             <span class="status-badge return-requested">Return Requested</span>
           <% } %>
+  
+ 
+
+
+
         </div>
       </div>
     </div>
@@ -185,24 +190,33 @@
   </ul>
 </div> -->
 
-
-
-
-    <% if (order.status.toUpperCase() === 'PENDING' || order.status.toUpperCase() === 'PROCESSING'||order.status.toUpperCase()==='PARTIALLY_CANCELLED') { %>
-        <div class="action-buttons">
-            <button class="action-btn cancel-btn"
-            data-order-id="<%= order._id %>"
+<% if (order.status.toUpperCase() === 'PENDING' || 
+       order.status.toUpperCase() === 'PROCESSING' || 
+       order.status.toUpperCase() === 'PARTIALLY_CANCELLED') { %>
+    <div class="action-buttons">
+        <button class="action-btn cancel-btn"
+                data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
-            onclick="openModal('cancel')">Cancel Order</button>
-        </div>
-    <% } else if (order.status.toUpperCase() === 'DELIVERED'||order.status.toUpperCase()==='PARTIALLY_RETURNED') { %>
-        <div class="action-buttons">
-            <button class="action-btn return-btn"
-            data-order-id="<%= order._id %>"
+                onclick="openModal('cancel')">Cancel Order</button>
+    </div>
+<% } else if (order.status.toUpperCase() === 'DELIVERED' || 
+               order.status.toUpperCase() === 'PARTIALLY_RETURNED'||
+               order.status.toUpperCase()==='PAID') { %>
+    <div class="action-buttons">
+        <button class="action-btn return-btn"
+                data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
-            onclick="openModal('return')">Return Item</button>
-        </div>
-    <% } %>
+                onclick="openModal('return')">Return Item</button>
+    </div>
+<% } else if (order.status.toUpperCase() === 'PAYMENT_FAILED') { %>
+    <div class="action-buttons">
+        <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">
+            Retry Payment
+        </a>
+    </div>
+<% } %>
+
+
 
     <p class="inquiries">Any inquiries? <a href="/user/contact">Contact us</a></p> 
 

@@ -16,6 +16,8 @@ const wishlistController=require('../controller/user/wishlistController');
 const walletController=require('../controller/user/walletController');
 const couponController=require('../controller/user/couponController');
 const razorpayController=require('../controller/user/razorpayController')
+const orderDetailController=require('../controller/user/orderDetailController');
+
 
 router.get("/home", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
@@ -75,6 +77,8 @@ router.post('/profile/update', upload.avatar, profileController.updateProfile);
 router.post('/request-email-change',profileController.requestEmailChangeOTP);
 router.post('/change-password',profileController.changePassword);
 router.post('/verify-email-change',profileController.verifyEmailChange);
+//order managment
+router.post('/orders/:orderId/return',  orderdetailController.returnOrder);  
 
 //shopall
 router.get("/shopAll",shopController.loadShopping);
@@ -96,6 +100,7 @@ router.post('/cart/update',cartController.updateCart);
 
 //checkout page
 router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
+router.get('/retry-checkout/:orderId',checkoutController.getRetryCheckoutPage);
 router.post('/buy-now',checkoutController.buyNow);
 router.post('/api/addresses',checkoutController.addAddress);
 // router.put('/api/addresses/:id',checkoutController.updateAddress);

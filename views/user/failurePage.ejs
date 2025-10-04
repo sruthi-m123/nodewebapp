@@ -168,7 +168,7 @@
             <h1 class="failure-title">Payment Failed</h1>
             <p class="failure-message">Your payment didn't go through as it was declined by the bank. Try another payment method or contact your bank.</p>
             <div class="failure-actions">
-                <a href="/user/checkout" class="btn btn-primary">Go to Checkout</a>
+                <a href="<%= retryPaymentUrl %>" class="btn btn-primary">Go to Checkout</a>
                 <a href="/user/home" class="btn btn-secondary">Go to Home</a>
             </div>
         </div>

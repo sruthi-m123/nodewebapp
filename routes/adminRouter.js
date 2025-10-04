@@ -51,7 +51,7 @@ router.delete('/products/:id', adminAuth, productController.deleteProduct);
 router.get('/products/:id/details', adminAuth, productController.getProductDetails);
 // order managment routes
 router.get('/orders', adminAuth, orderController.getOrderAdmin);
-router.get('order-details', orderController.getOrder);
+router.get('/order-details', orderController.getOrder);
 router.post('/orders/:orderId/status', orderController.updateOrderStatus)
 router.post('/orders/:orderId/verify-return', orderController.verifyReturnedRequest);
 router.get('/orders/:orderId/verify-return', orderController.getReturnDetails);

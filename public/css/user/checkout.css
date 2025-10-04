@@ -1072,7 +1072,8 @@ h1 {
     gap: 15px;
 }
 
-.action-btn {
+.action-btn,
+.retry-payment-btn {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
@@ -1080,18 +1081,17 @@ h1 {
     font-size: 16px;
     font-weight: 500;
     transition: all 0.2s ease;
+    text-decoration: none; /* For anchor tag */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Cancel button */
 .action-btn.cancel-btn {
     background-color: #ffebee;
     color: #d32f2f;
     border: 1px solid #ffcdd2;
-}
-
-.action-btn.return-btn {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    border: 1px solid #bbdefb;
 }
 
 .action-btn:hover.cancel-btn {
@@ -1099,12 +1099,33 @@ h1 {
     transform: translateY(-1px);
 }
 
+/* Return button */
+.action-btn.return-btn {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
 .action-btn:hover.return-btn {
     background-color: #bbdefb;
     transform: translateY(-1px);
 }
 
-.action-btn:active {
+/* Retry Payment button */
+.retry-payment-btn {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+}
+
+.retry-payment-btn:hover {
+    background-color: #ffe0b2;
+    transform: translateY(-1px);
+}
+
+/* Active state for all buttons */
+.action-btn:active,
+.retry-payment-btn:active {
     transform: translateY(1px);
 }
 
@@ -1117,7 +1138,7 @@ h1 {
     border-radius: 8px;
     margin-bottom: 10px;
     background-color: #fafafa;
-    border: 1px solid #d9c4b3; /* Consistent with your theme */
+    border: 1px solid #d9c4b3; 
 }
 
 .order-details-page .product-info {

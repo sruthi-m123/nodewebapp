@@ -676,7 +676,7 @@ console.log("appliedCoupon in place order",appliedCoupon);
     }
 
     if (paymentMethod === 'netbanking') {
-      payWithRazorpay(data.order, data.key);
+      payWithRazorpay(data.order, data.key,data.dborderID);
     } else {
       Swal.fire({
         icon: 'success',
@@ -732,7 +732,7 @@ function showToast(message, type = "success") {
 }
 
 
-function payWithRazorpay(order,key) {
+function payWithRazorpay(order,key,dborderId) {
    
   var options = {
     key: key, 
@@ -742,7 +742,6 @@ function payWithRazorpay(order,key) {
     description: "Order Payment",
     order_id: order.id,
     handler: function (response) {
-       
       fetch("/user/verifyPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -750,7 +749,7 @@ body: JSON.stringify({
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_order_id: response.razorpay_order_id,  
         razorpay_signature: response.razorpay_signature,
-        dborderId:response.dborderID
+        dborderId:dborderId
       })
         })
         .then(res => res.json())
@@ -788,10 +787,11 @@ body: JSON.stringify({
   var rzp = new Razorpay(options);
    rzp.on('payment.failed', function(response){
         console.log('Payment failed event:', response);
+       
         fetch("/user/mark-payment-failed",{
             method:"POST",
             headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({dborderId:order.dborderId})
+            body:JSON.stringify({dborderId:dborderId})
         })
         .then(res=>res.json())
         .then(data=>console.log(data));
