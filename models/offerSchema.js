@@ -17,7 +17,7 @@ const offerSchema = new Schema({
 
   type: {
     type: String,
-    enum: ['percentage', 'flat'],
+    enum: ['percentage', 'fixed'],
     required: true
   },
 

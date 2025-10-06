@@ -107,7 +107,7 @@ router.post('/api/addresses',checkoutController.addAddress);
 router.get('/api/addresses/:id',checkoutController.getAddress);
 //coupon
 router.post('/checkout/apply-coupon',couponController.applyCoupon);
-router.post('/checkout/applyCouponCode',couponController.applyCouponByCode)
+router.post('/checkout/apply-coupon-by-code',couponController.applyCouponByCode)
 router.post('/checkout/remove-coupon',couponController.removeCoupon);
 //offer checkout routes
 router.post('/api/offers/apply',checkoutController.applyOffer);

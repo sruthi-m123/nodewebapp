@@ -20,7 +20,7 @@ required:true
         },
         price:{
             type:Number,
-            required:true
+            required:false
         },
         totalPrice:{
             type:Number,

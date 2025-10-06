@@ -30,7 +30,8 @@ router.get('/api/stats', adminAuth, dashboardController.getDashboardStats);
 router.get('/api/top-products', adminAuth, dashboardController.getTopProducts);
 router.get('/api/sales-data', adminAuth, dashboardController.getSalesData);
 router.post('/api/generate-pdf-report', adminAuth, dashboardController.generatePDFReport);
-
+router.get('/api/sales-report', adminAuth, dashboardController.getSalesReport);
+router.get('/api/export-sales-report', adminAuth, dashboardController.exportSalesReport);
 //User or customer management
 router.get("/users", adminAuth, customerController.customerInfo);
 router.post("/toggle_block", adminAuth, customerController.toggleBlockStatus);

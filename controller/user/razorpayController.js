@@ -99,7 +99,9 @@ const order = await Order.findOne({ orderId: dborderId });
         await Coupon.findByIdAndUpdate(order.appliedCoupon.couponId, {
           $inc: { usedCount: -1 }
         });
+        order.appliedCoupon = null;
       }
+      
     }
 
 await order.save();

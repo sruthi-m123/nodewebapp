@@ -122,6 +122,36 @@
 >
   <i class="fas fa-edit"></i> Change
 </button>
+
+<!-- <select  -->
+  <!-- class="status-select" 
+  data-order-id="<%= order._id %>"
+  <% if (order.status === 'cancelled' || order.status === 'returned') { %>
+    disabled
+  <% } %>
+>
+  <% const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned']; %>
+  
+  <% statuses.forEach(status => { %>
+    <% 
+      let disableOption = false;
+      
+      // disable based on current status progression
+      if (order.status === 'processing' && ['pending'].includes(status)) disableOption = true;
+      if (order.status === 'shipped' && ['pending','processing'].includes(status)) disableOption = true;
+      if (order.status === 'delivered' && ['pending','processing','shipped'].includes(status)) disableOption = true;
+    %>
+    
+    <option 
+      value="<%= status %>" 
+      <%= order.status === status ? 'selected' : '' %>
+      <%= disableOption ? 'disabled' : '' %>
+    >
+      <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+    </option>
+  <% }) %>
+</select> -->
+
 </td>
               </tr>
             <% }); %>
@@ -404,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             // Hide global if partial (assume data.type from backend)
             const globalButtons = document.querySelectorAll('#returnRequestModal .modal-footer button');
-            const isPartial = data.type === 'partial';  // Or data.items.length < data.totalItems
+            const isPartial = data.type === 'partial'; 
             globalButtons.forEach(btn => btn.style.display = isPartial ? 'none' : 'inline-block');
           } else {
             if (itemContainer) itemContainer.innerHTML = '<li><em>Full order return requested</em></li>';
@@ -441,12 +471,13 @@ function closeReturnModal() {
   document.getElementById('returnRequestModal')?.classList.remove('active');
 }
 
-function processReturn(action, itemId = null) {  // Updated with param
+function processReturn(action, itemId = null) {  
   const modal = document.getElementById('returnRequestModal');
   if (!modal) return;
   const orderId = modal.dataset.orderId;
 
   const payload = { action, itemId };
+  console.log("payload:",payload)
 
   fetch(`/admin/orders/${orderId}/verify-return`, {
     method: 'POST',
@@ -463,7 +494,7 @@ function processReturn(action, itemId = null) {  // Updated with param
       return;
     }
 
-    const row = document.querySelector(`tr[data-order-id="${orderId}"]`);  // Now matches if you fix EJS
+    const row = document.querySelector(`tr[data-order-id="${orderId}"]`);  
     if (!row) return;
 
     if (!itemId) {  // Full

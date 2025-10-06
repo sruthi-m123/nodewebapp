@@ -16,14 +16,7 @@ const getWallet=async(req,res)=>{
        const limit=6;
        
        const wallet=await Wallet.findOne({user:userId})
-    //    .populate({
-    //     path:'transactions',
-    //     options:{
-    //         sort:{createdAt:-1},
-    //         skip:(page-1)*limit,
-    //         limit:limit
-    //     }
-    //    })
+    
 
 if(!wallet){
     return res.status(404).render('user/wallet',{
@@ -171,12 +164,41 @@ const getWalletTransactions=async(userId,page=1,limit=10)=>{
     .slice('wallet.transactions',[(page-1)*limit,limit]);
     return user.wallet.transactions;
 }
+const debitWallet=async(userId,amount,orderId,referenceType)=>{
+  console.log("inside the debit wallet controller ");
+  if(amount<=0) return false;
+  try {
+    const wallet=await findOrCreateWallet(userId);
+    if(wallet.balance<amount){
+      console.warn('Insufficent balance for debit:',{userId,amount,currentBalance:wallet.balance})
+    return false
+    }
+    wallet.balance-=amount;
+    console.log("walllet balance after deduction:",wallet.balance)
+addTransaction(
+  wallet,
+  amount,
+  'withdrawal',
+  referenceType,
+  `Debited for ${referenceType} ${orderId||''}`,
+  orderId
+)
 
+await wallet.save();
+console.log("wallet saved ");
+return true;
+  } catch (error) {
+    console.log("error inide the debit wallet");
+    console.error('error debiting wallet:',error);
+    return false;
+  }
+}
 
 module.exports={
     creditWallet,
     getWalletTransactions,
     getWallet,addFunds,
     findOrCreateWallet,
-    addTransaction
+    addTransaction,
+    debitWallet
 }

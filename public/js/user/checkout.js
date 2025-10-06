@@ -371,11 +371,12 @@ function applyCouponByCode() {
         showToast('Please enter a coupon code', 'error');
         return;
     }
-    
+   const isRetry = window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+  const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
     const applyButton = document.querySelector('.apply-coupon-input-btn');
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall('/user/checkout/applyCouponCode', 'POST', { couponCode }, 'Coupon applied successfully')
+    apiCall(url, 'POST', { couponCode }, 'Coupon applied successfully')
         .then(data => {
             console.log("data by apply coupon code ",data);
             if (data.success) {
@@ -393,6 +394,10 @@ function applyCouponByCode() {
                 showToast(data.message,'error')
             }
         })
+        .catch(err => {
+      console.log("Error in applyCouponByCode:", err);
+      showToast("Something went wrong", 'error');
+    })
         .finally(() => {
  if (!appliedCoupon) {
                 resetButtonState(applyButton, 'Apply');
@@ -402,17 +407,18 @@ function applyCouponByCode() {
 
 // Apply coupon from dropdown
 function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
+    const isRetry=window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+    const url=isRetry?'/user/checkout/apply-coupon?retry=true':'/user/checkout/apply-coupon';
     const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall('/user/checkout/apply-coupon', 'POST', { couponId }, 'Coupon applied successfully')
+    apiCall(url, 'POST', { couponId }, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
                 console.log("orderSummary",data.orderSummary)
                  appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
                  console.log("appliedCoupon",appliedCoupon);
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
-                // updateOrderSummary(data.updatedSummary);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
             }else{
@@ -427,16 +433,11 @@ function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
                 }
             }
         })
-        .catch(err=>{
-            console.log("hiiii inside cathc block",err);
+        .catch(error=>{
             showToast("something went wrong",'error');
             resetButtonState(applyButton,'Apply');
         })
-        // .finally(() => {
-        //     if (!appliedCoupon) {
-        //         resetButtonState(applyButton, 'Apply');
-        //     }
-        // });
+       
 }
 
 function removeCoupon() {
@@ -555,6 +556,8 @@ function resetButtonState(button, defaultText = null) {
 
 // API call with existing toast system
 function apiCall(url, method = 'GET', data = null, successMessage = null) {
+    console.log('apiCall request:', { url, method, data });  // NEW: Log outgoing request
+
     const options = {
         method: method,
         headers: {
@@ -570,11 +573,17 @@ function apiCall(url, method = 'GET', data = null, successMessage = null) {
 
     return fetch(url, options)
         .then(async (response) => {
+            const errorClone = response.clone();
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || errorData.error || 'An error occurred');
+                const errorData = await errorClone.json().catch(() => ({}));
+                console.error('HTTP Error in apiCall:', { status: response.status, errorData });  
+                throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
             }
-            return response.json();
+           
+            const data = await response.json();
+            console.log('API Response:', data);  
+            return data;
         })
         .then(data => {
             if (successMessage && data.success) {
@@ -588,22 +597,6 @@ function apiCall(url, method = 'GET', data = null, successMessage = null) {
             throw error;
         });
 }
-
-// // Update order summary
-// function updateOrderSummary(summary) {
-//     if (!summary) return;
-    
-//     const updateSummaryRow = (selector, value, isNegative = false) => {
-//         const element = document.querySelector(selector);
-//         if (element) {
-//             element.textContent = `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
-//         }
-//     };
-    
-//     if (summary.subtotal !== undefined) updateSummaryRow('.summary-row:nth-child(2) span:last-child', summary.subtotal);
-//     if (summary.discount !== undefined) updateSummaryRow('.summary-row:nth-child(5) span:last-child', summary.discount, true);
-//     if (summary.total !== undefined) updateSummaryRow('.summary-row.total span:last-child', summary.total);
-// }
 
 // Allow pressing Enter in coupon input
 document.getElementById('couponCodeInput')?.addEventListener('keypress', function(e) {
@@ -718,16 +711,52 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 function showToast(message, type = "success") {
+  if (!message) {
+    console.warn('showToast: No message provided');  // NEW: Warn if empty
+    return;
+  }
+
   const toast = document.createElement("div");
-   toast.style.zIndex = 9999; 
-  toast.className = `fixed top-5 right-5 px-4 py-2 rounded shadow text-white 
-    ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
   toast.textContent = message;
+  
+  // FIXED: Explicit inline styles for reliability (no Tailwind needed)
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;  /* top-5 equivalent */
+    right: 20px;  /* right-5 */
+    z-index: 9999;
+    padding: 12px 16px;  /* px-4 py-2 */
+    border-radius: 8px;  /* rounded */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* shadow */
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 250px;
+    max-width: 350px;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    background-color: ${type === "error" ? "#ef4444" : "#10b981"};  /* bg-red-500 or bg-green-500 */
+  `;
 
   document.body.appendChild(toast);
 
+  // Animate in
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(0)';
+  });
+
+  // Auto-remove after 3s with fade out
   setTimeout(() => {
-    toast.remove();
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
   }, 3000);
 }
 

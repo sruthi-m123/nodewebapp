@@ -1,26 +1,55 @@
 
+function openModal(type, orderId, itemId = null) {
+  console.log("Modal opened for order:", orderId, "item:", itemId);
 
- function openModal(type,orderId,itemId=null) {
-    console.log("modal opened")
-      const modal = document.getElementById(`${type}Modal`);
-      console.log("modal:",modal);
-    
-            document.getElementById(`${type}Modal`).style.display = 'flex';
-            const submitBtn=modal.querySelector('.modal-submit');
-            // submitBtn.setAttribute('data-order-id',orderId);
-submitBtn.dataset.orderId=orderId;
-            if(itemId){
-submitBtn.dataset.itemId=itemId;
-} else {
+  const modal = document.getElementById(`${type}Modal`);
+  if (!modal) {
+    console.error(`Modal element with ID '${type}Modal' not found`);
+    return;
+  }
+
+  modal.style.display = 'flex';
+
+  const submitBtn = modal.querySelector('.modal-submit');
+  if (!submitBtn) {
+    console.error("Submit button with class 'modal-submit' not found in modal");
+    return;
+  }
+
+  // ✅ Assign proper data attributes
+  submitBtn.dataset.orderId = orderId;
+  console.log("Order ID set on submit button:", submitBtn.dataset.orderId);
+
+  if (itemId) {
+    submitBtn.dataset.itemId = itemId;
+    console.log("Item ID set on submit button:", submitBtn.dataset.itemId);
+  } else {
     delete submitBtn.dataset.itemId;
+  }
 }
-            if(itemId){
-                submitBtn.setAttribute('data-item-id',itemId);
 
-            }else{
-                submitBtn.setAttribute('data-item-id');
-            }
-        }
+//  function openModal(type,orderId,itemId=null) {
+//     console.log("modal opened for order:",orderId,"item:",itemId);
+//       const modal = document.getElementById(`${type}Modal`);
+//       console.log("modal:",modal);
+    
+//             document.getElementById(`${type}Modal`).style.display = 'flex';
+//             const submitBtn=modal.querySelector('.modal-submit');
+//             submitBtn.setAttribute('data-order-id',orderId);
+
+//               submitBtn.dataset.orderId=orderId;
+//             if(itemId){
+// submitBtn.dataset.itemId=itemId;
+// } else {
+//     delete submitBtn.dataset.itemId;
+// }
+//             if(itemId){
+//                 submitBtn.setAttribute('data-item-id',itemId);
+
+//             }else{
+//                 submitBtn.setAttribute('data-item-id');
+//             }
+//         }
 
         function closeModal() {
             document.querySelectorAll('.modal').forEach(modal => {
@@ -117,76 +146,149 @@ submitBtn.dataset.itemId=itemId;
             closeModal();
         }
 
-        function submitReturn(event) {
-            const reason = document.getElementById('returnReason').value;
-            const orderId = event.target.getAttribute('data-order-id');
-              const itemId=event.target.getAttribute('data-item-id');          
-            console.log("orderId", orderId);
-            console.log("reason", reason);
-            if (!reason) {
-                alert('Please provide a reason for return');
-                return;
-            }
+        // function submitReturn(event) {
+        //     const reason = document.getElementById('returnReason').value;
+        //     const orderId = event.target.getAttribute('data-order-id');
+        //       const itemId=event.target.getAttribute('data-item-id');          
+        //     console.log("orderId", orderId);
+        //     console.log("reason", reason);
+        //     if (!reason) {
+        //         alert('Please provide a reason for return');
+        //         return;
+        //     }
             
-            const status = 'delivered';
-            console.log("status", status);
+        //     const status = 'delivered';
             
-            fetch(`/user/orders/${orderId}/return`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    reason,
-                    status: status.toLowerCase().trim(),
-                    itemId,
-                    returnRequest: true
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Return request submitted',
-                        timer: 2000,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: 'top-end'
-                    });
+        //     fetch(`/user/orders/${orderId}/return`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ 
+        //             reason,
+        //             status: status.toLowerCase().trim(),
+        //             ItemsIds: [itemId] ,
+        //             returnRequest: true
+        //         })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         console.log("data inside the return after submitting the modal:",data)
+        //         if (data.success) {
+        //             Swal.fire({
+        //                 icon: 'success',
+        //                 title: 'Return request submitted',
+        //                 timer: 2000,
+        //                 showConfirmButton: false,
+        //                 toast: true,
+        //                 position: 'top-end'
+        //             });
                     
-                    const returnButton = document.querySelector(`button[data-order-id="${orderId}"]`);
+        //             const returnButton = document.querySelector(`button[data-order-id="${orderId}"]`);
         
-                    if (returnButton) {
-                        returnButton.textContent = 'Requested';   
-                        returnButton.disabled = true;             
-                        returnButton.classList.add('disabled');   
-                    }
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: data.message || 'Return request failed',
-                        timer: 2500,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: 'top-end'
-                    });                
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Something went wrong',
-                    timer: 2500,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
-                });
-            });
+        //             if (returnButton) {
+        //                 returnButton.textContent = 'Requested';   
+        //                 returnButton.disabled = true;             
+        //                 returnButton.classList.add('disabled');   
+        //             }
+        //         } else {
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: data.message || 'Return request failed',
+        //                 timer: 2500,
+        //                 showConfirmButton: false,
+        //                 toast: true,
+        //                 position: 'top-end'
+        //             });                
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Something went wrong',
+        //             timer: 2500,
+        //             showConfirmButton: false,
+        //             toast: true,
+        //             position: 'top-end'
+        //         });
+        //     });
             
-            closeModal();
+        //     closeModal();
+        // }
+function submitReturn(event) {
+    const reason = document.getElementById('returnReason').value;
+    const target = event.currentTarget; // ✅ always the button
+
+    const orderId = target.dataset.orderId;
+    const itemId = target.dataset.itemId;
+
+    console.log("orderId", orderId);
+    console.log("itemId", itemId);
+    console.log("reason", reason);
+
+    if (!reason) {
+        alert('Please provide a reason for return');
+        return;
+    }
+
+    const status = 'delivered';
+
+    fetch(`/user/orders/${orderId}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            reason,
+            status: status.toLowerCase().trim(),
+            ItemsIds: [itemId],
+            returnRequest: true
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("data inside the return after submitting the modal:", data);
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Return request submitted',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+
+            const returnButton = document.querySelector(`button[data-order-id="${orderId}"]`);
+            if (returnButton) {
+                returnButton.textContent = 'Requested';   
+                returnButton.disabled = true;             
+                returnButton.classList.add('disabled');   
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.message || 'Return request failed',
+                timer: 2500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });                
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Something went wrong',
+            timer: 2500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    });
+
+    closeModal();
+}
 
         // Close modal when clicking outside
         window.onclick = function(event) {

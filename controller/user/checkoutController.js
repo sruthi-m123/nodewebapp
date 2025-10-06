@@ -10,10 +10,10 @@ const Coupon=require('../../models/couponSchema');
 const{calculateOrder}=require('../../helper/calculateTotal');
 const{validateAddress}=require('../../helper/validation')
       const Razorpay = require('razorpay');
-
+const { debitWallet } = require('../../controller/user/walletController');
 const razorpayController=require('../../controller/user/razorpayController');
 const addressController=require('../../controller/user/addressController');
-
+const couponController=require('../../controller/user/couponController');
 
 exports.getCheckoutPage = async (req, res) => {
     try {
@@ -207,13 +207,30 @@ const cartItems=order.items.map(item=>({
 
 
 }));
+
+const coupons=await Coupon.find({isActive:true}).lean();
+const usedOrders=await Order.find({
+  userId,
+  'appliedCoupon.couponId':{$in:coupons.map(c=>c._id)},
+  status:{$nin:['cancelled','returned','payment_failed']}
+}).lean();
+const usedCouponIds=usedOrders.map(o=>o.appliedCoupon.couponId.toString());
+const couponWithStatus=coupons.map(coupon=>({
+  ...coupon,
+  isUsed:usedCouponIds.includes(coupon._id.toString())
+}));
+
+const retryAppliedCoupon=null;
+
+
     const orderSummary = calculateOrder(cartItems, {
-      coupon: order.appliedCoupon,
+      coupon:retryAppliedCoupon,
       taxRate: 18
     });
    const paymentMethods = [
       { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
-      { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' }
+      { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
+      {id:'wallet',title:'Wallet',description:'Pay via Wallet'}
     ];
 
     res.render('user/checkout', {
@@ -232,9 +249,11 @@ const cartItems=order.items.map(item=>({
       selectedPaymentMethod: order.paymentMethod,
       appliedOffers: order.appliedOffers || [],
       user: order.userId,
-      coupons: [],
+      coupons: couponWithStatus,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
-      retryOrderId: order._id 
+      retryOrderId: order._id ,
+      isRetry:true,
+      retryCartItems:cartItems
     });
 } catch (error) {
  console.error("Retry checkout error:", error);
@@ -355,10 +374,9 @@ exports.applyOffer = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error applying offer' });
     }
 };
-
 exports.placeOrder = async (req, res) => {
   try {
-console.log("session inside place order",req.session);
+    console.log("session inside place order", req.session);
     const userId = req.session?.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Please log in' });
@@ -366,9 +384,9 @@ console.log("session inside place order",req.session);
 
     console.log("req body inside place order controller", req.body);
 
-    const { addressId, paymentMethod ,appliedOffers=[] } = req.body;
+    const { addressId, paymentMethod, appliedOffers = [] } = req.body;
     if (!addressId || !paymentMethod) {
-      return res.status(400).json ({
+      return res.status(400).json({
         success: false,
         message: 'Address and payment method are required'
       });
@@ -376,6 +394,7 @@ console.log("session inside place order",req.session);
 
     let items = [];
     let isBuyNow = false;
+    const isRetry = req.query.retry === 'true';
 
     if (req.session.buyNowItem) {
       const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
@@ -400,15 +419,39 @@ console.log("session inside place order",req.session);
       }];
 
       isBuyNow = true;
-    }
+    } else if (isRetry) {
+      // Retry from failed order
+      const failedOrder = await Order.findOne({
+        userId,
+        status: 'payment_failed'
+      }).populate('items.productId').sort({ createdAt: -1 });
 
-    else {
-     
+      if (!failedOrder || failedOrder.items.length === 0) {
+        return res.status(400).json({ success: false, message: 'No failed order found for retry' });
+      }
+
+      items = failedOrder.items.map(item => ({
+        productId: item.productId._id,
+        name: item.productId.productName,
+        variant: item.variant || 'Default',
+        quantity: item.quantity,
+        price: item.price,
+        discountedPrice: item.discountedPrice || null,
+        totalPrice: (item.discountedPrice || item.price) * item.quantity
+      }));
+
+      // Validate stock for retry items
+      for (const item of items) {
+        const product = await Product.findById(item.productId);
+        if (!product || !product.isActive || product.stock < item.quantity) {
+          return res.status(400).json({ success: false, message: `Product ${item.name} not available or insufficient stock for retry` });
+        }
+      }
+    } else {
       const cart = await Cart.findOne({ userId }).populate({
-  path: 'items.productId',
-  select: 'productName price discountedPrice stock isActive'
-});
-
+        path: 'items.productId',
+        select: 'productName price discountedPrice stock isActive'
+      });
 
       if (!cart || cart.items.length === 0) {
         return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -427,9 +470,17 @@ console.log("session inside place order",req.session);
           totalPrice: effectivePrice * item.quantity
         };
       });
+
+      // Validate stock for cart items
+      for (const item of items) {
+        const product = await Product.findById(item.productId);
+        if (product.stock < item.quantity) {
+          return res.status(400).json({ success: false, message: `Insufficient stock for ${item.name}` });
+        }
+      }
     }
 
-//address selection
+    // address selection
     const addresses = await Address.findOne(
       { userId, 'address._id': addressId },
       { address: { $elemMatch: { _id: addressId } } }
@@ -441,15 +492,14 @@ console.log("session inside place order",req.session);
 
     const selectedAddress = addresses.address[0];
 
-//coupon
-let appliedCouponData=null;
-let appliedCoupon=req.session.appliedCoupon||null;
-console.log("just cheching applied coupon:",appliedCoupon);
+    // coupon
+    let appliedCouponData = null;
+    let appliedCoupon = req.session.appliedCoupon || null;
+    console.log("just checking applied coupon:", appliedCoupon);
 
+    console.log("coupon inside the place order controller :", appliedCoupon);
 
-console.log("coupon inside the place order controller :",appliedCoupon);
-
-    //order summary
+    // order summary
     const cartItemsForCalculation = items.map(item => ({
       originalPrice: item.price,
       discountedPrice: item.discountedPrice || null,
@@ -460,7 +510,7 @@ console.log("coupon inside the place order controller :",appliedCoupon);
     const { subtotal, delivery, offerDiscount, couponDiscount, discount, tax, total } = orderSummary;
 
     // order creation 
-    const status = paymentMethod === 'cod' ? 'pending' : 'processing';
+    const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'processing');
     const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const order = new Order({
@@ -480,39 +530,52 @@ console.log("coupon inside the place order controller :",appliedCoupon);
     });
 
     await order.save();
-//reducing the stock quantity 
 
-if (paymentMethod === "cod") {
+    // order placing using wallet
+    let walletDeductionSuccess = true;
+    if (paymentMethod === 'wallet') {
+      // function for checking balance and calculate
+      const debitSuccess = await debitWallet(userId, total, order._id, 'order');
+
+      if (!debitSuccess) {
+        console.log("inside the debitsuccess")
+        await Order.findByIdAndDelete(order._id);
+        return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
+      }
+      walletDeductionSuccess = debitSuccess;
+      order.status = 'paid';
+      await order.save();
+    }
+
+    // reducing the stock quantity 
+    if (paymentMethod === "cod" || paymentMethod === 'wallet') {
       const stockUpdates = items.map(item => ({
         updateOne: {
-          filter: { _id: item.productId, stock: { $gte: item.quantity } },  // Atomic: Only if sufficient
+          filter: { _id: item.productId, stock: { $gte: item.quantity } },  
           update: { $inc: { stock: -item.quantity } }
         }
       }));
       const results = await Product.bulkWrite(stockUpdates);
       console.log('COD stock reduction results:', results);
 
-if(appliedCoupon){
-  await Coupon.findByIdAndUpdate(appliedCoupon.couponId,{
-    $inc:{usedCount:1}
-  });
-}
-
+      if (appliedCoupon) {
+        await Coupon.findByIdAndUpdate(appliedCoupon.couponId, {
+          $inc: { usedCount: 1 }
+        });
+      }
     }
 
-
-
-//clearing cart 
-    if (!isBuyNow) {
+    // clearing cart 
+    if (!isBuyNow && !isRetry) {
       await Cart.updateOne(
         { userId },
         { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } }
       );
-    } else {
+    } else if (isBuyNow) {
       delete req.session.buyNowItem;
     }
 
-//razorpay method 
+    // razorpay method 
     if (paymentMethod === 'netbanking') {
       const razorpay = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
@@ -526,7 +589,7 @@ if(appliedCoupon){
       });
 
       console.log("razorpayOrder", razorpayOrder);
-      console.log("order id created in the order placement :",order.orderId);
+      console.log("order id created in the order placement :", order.orderId);
       return res.json({
         dborderID: order.orderId,
         success: true,
@@ -542,10 +605,7 @@ if(appliedCoupon){
       order: { id: order._id, total, status: order.status, createdAt: order.createdAt }
     });
 
-  
-
-
-}catch (error) {
+  } catch (error) {
     console.error('Place order error:', error);
     res.status(500).json({
       success: false,
@@ -554,7 +614,6 @@ if(appliedCoupon){
     });
   }
 };
-
 exports.successPage=async(req,res)=>{
      try {
         console.log("enter success controller")

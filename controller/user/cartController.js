@@ -147,6 +147,7 @@ const addToCart = async (req, res) => {
 
     let cart = await Cart.findOne({ userId });
     const effectivePrice=product.discountedPrice||product.price;
+    
     if (!cart) {
       cart = new Cart({
         userId,
@@ -157,7 +158,10 @@ const addToCart = async (req, res) => {
           price: effectivePrice,
           totalPrice: product.price * quantity
         }]
+        
       });
+              console.log("cart:",cart.totalPrice);
+
     } else {
       const existingItem = cart.items.find(item => 
         item.productId.toString() === productId

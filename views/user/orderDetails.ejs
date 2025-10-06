@@ -30,7 +30,8 @@
 
         <p><strong>Quantity: </strong> <%= item.quantity %></p>
         <p><strong>Item Total: </strong> ₹<%=(item.price * item.quantity).toLocaleString('en-IN')%></p>
-JSON.stringify({ "<%= order.status %>" })
+<!-- /          JSON.stringify({ "<%= order %>" }) -->
+
 
         <!-- Action buttons for each item -->
         <div class="item-actions">
@@ -45,7 +46,7 @@ JSON.stringify({ "<%= order.status %>" })
 
           <% if (order.status === 'delivered' && item.status !== 'returned' && item.status !=='cancelled'&& order.items.length>1 && item.status!=='partially_cancelled') { %>
             <button class="return-item-btn" 
-                    data-order-id="<%= order._id %>" 
+                    data-order-id="<%= order._id%>" 
                     data-item-id="<%= item._id %>"
                     onclick="openModal('return', '<%= order._id %>', '<%= item._id %>')">
               Return Item
@@ -269,8 +270,12 @@ JSON.stringify({ "<%= order.status %>" })
         </div>
         <textarea id="returnReason" placeholder="Your reason..."></textarea>
         <div class="modal-actions">
-            <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
-            <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button>
+            <!-- <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button> -->
+
+<button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
+<button class="modal-btn modal-submit" type="button" onclick="submitReturn(event)">Submit Request</button>
+
         </div>
     </div>
 </div>

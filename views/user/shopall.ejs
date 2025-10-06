@@ -134,7 +134,7 @@
     if(product.bestOffer.type==='percentage'){
       finalPrice=Math.round(originalPrice-(originalPrice*discountValue/100));
       discountLabel=discountValue+'%OFF';
-    }else if(product.bestOffer.type==='flat'){
+    }else if(product.bestOffer.type==='fixed'){
       finalPrice=Math.max(0,originalPrice-discountValue);
       discountLabel='₹'+discountValue.toLocaleString()+'OFF';
     }

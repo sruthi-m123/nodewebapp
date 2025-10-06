@@ -22,7 +22,7 @@ console.log("orders",order);
     if (!order) {
       return res.status(404).render('error', { message: 'Order not found' });
     }
-
+console.log("order inside orderdetailsssssss:",order);
     const formatItems = order.items.map(item => ({
       ...item,
       name: item.productId?.ProductName || item.name,
@@ -356,6 +356,7 @@ console.log("refundAmount:",refundAmount);
 const returnOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
+    console.log("orderId",orderId);
     const { reason, itemId, customReason } = req.body;
     const returnReason = customReason || reason;
 console.log("return reason:",reason)

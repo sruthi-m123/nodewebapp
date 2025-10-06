@@ -32,7 +32,88 @@
       <h4><i class="fas fa-clock"></i> Pending Orders</h4>
       <p id="pending-orders">Loading...</p>
     </div>
-    <button class="pdf-btn" id="generate-pdf">PDF <i class="fas fa-file-pdf"></i></button>
+    <button class="pdf-btn" id="generate-report">Generate Report <i class="fas fa-chart-bar"></i></button>
+  </div>
+
+  <!-- Sales Report Section -->
+  <div class="sales-report-section">
+    <div class="section-header">
+      <h2>Sales Report</h2>
+      <div class="report-controls">
+        <div class="filter-group">
+          <label for="date-range">Date Range:</label>
+          <select id="date-range">
+            <option value="1d">Today</option>
+            <option value="1w">This Week</option>
+            <option value="1m">This Month</option>
+            <option value="1y">This Year</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+        
+        <div class="filter-group custom-date-range" id="custom-date-range" style="display: none;">
+          <label for="start-date">From:</label>
+          <input type="date" id="start-date">
+          <label for="end-date">To:</label>
+          <input type="date" id="end-date">
+        </div>
+        
+        <button class="apply-btn" id="apply-filters">Apply Filters</button>
+        <div class="export-buttons">
+          <button class="export-btn pdf" id="export-pdf">Export PDF <i class="fas fa-file-pdf"></i></button>
+          <button class="export-btn excel" id="export-excel">Export Excel <i class="fas fa-file-excel"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Report Summary Cards -->
+    <div class="report-summary">
+      <div class="summary-card">
+        <h4>Total Orders</h4>
+        <p id="report-orders-count">0</p>
+      </div>
+      <div class="summary-card">
+        <h4>Total Sales Amount</h4>
+        <p id="report-sales-amount">₹ 0</p>
+      </div>
+      <div class="summary-card">
+        <h4>Total Discount</h4>
+        <p id="report-discount-amount">₹ 0</p>
+      </div>
+      <div class="summary-card">
+        <h4>Net Revenue</h4>
+        <p id="report-net-revenue">₹ 0</p>
+      </div>
+    </div>
+    
+    <!-- Sales Report Table -->
+    <div class="report-table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Amount</th>
+            <th>Discount</th>
+            <th>Coupons</th>
+            <th>Net Amount</th>
+          </tr>
+        </thead>
+        <tbody id="sales-report-body">
+          <tr>
+            <td colspan="8" class="loading-text">Select date range to view sales report</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination" id="report-pagination">
+        <span class="page-prev"><</span>
+        <span class="page-number active">1</span>
+        <span class="page-next">></span>
+      </div>
+    </div>
   </div>
 
   <!-- Top Sold Products Table -->
@@ -77,12 +158,23 @@
   document.addEventListener('DOMContentLoaded', function() {
     initDashboard();
     
-    document.getElementById('generate-pdf').addEventListener('click', generatePDFReport);
+    // Set up event listeners for sales report
+    document.getElementById('date-range').addEventListener('change', toggleCustomDateRange);
+    document.getElementById('apply-filters').addEventListener('click', applyReportFilters);
+    document.getElementById('export-pdf').addEventListener('click', exportPDFReport);
+    document.getElementById('export-excel').addEventListener('click', exportExcelReport);
   });
 
   let currentPage = 1;
   let totalPages = 1;
   let salesChart = null;
+  let reportCurrentPage = 1;
+  let reportTotalPages = 1;
+  let currentFilters = {
+    dateRange: '1d',
+    startDate: null,
+    endDate: null
+  };
 
   async function initDashboard() {
     try {
@@ -144,11 +236,11 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>#${product.id.toString().slice(-4)}</td>
-<td>
-  <img src="/${product.image}" 
-       alt="${product.name || 'Product'}" 
-       onerror="this.src='/images/placeholder.jpg'">
-</td>
+            <td>
+              <img src="/${product.image}" 
+                   alt="${product.name || 'Product'}" 
+                   onerror="this.src='/images/placeholder.jpg'">
+            </td>
             <td>${product.name || 'Unnamed Product'}</td>
             <td>₹${(product.price || 0).toLocaleString()}</td>
             <td>₹${(product.revenue || 0).toLocaleString()}</td>
@@ -182,8 +274,7 @@
     prevButton.addEventListener('click', () => changePage('prev'));
     pagination.appendChild(prevButton);
     
-// blob:http://localhost:3000/0057e747-692a-4d88-b763-1fe654ba9559   
- const pageNumbersContainer = document.createElement('div');
+    const pageNumbersContainer = document.createElement('div');
     pageNumbersContainer.className = 'page-numbers';
     
     for (let i = 1; i <= totalPages; i++) {
@@ -289,21 +380,190 @@
     }
   }
 
-  // Generate PDF report
-  async function generatePDFReport() {
+  // Sales Report Functions
+  function toggleCustomDateRange() {
+    const dateRange = document.getElementById('date-range').value;
+    const customDateRange = document.getElementById('custom-date-range');
+    
+    if (dateRange === 'custom') {
+      customDateRange.style.display = 'flex';
+    } else {
+      customDateRange.style.display = 'none';
+    }
+  }
+
+  async function applyReportFilters() {
+    const dateRange = document.getElementById('date-range').value;
+    let startDate = null;
+    let endDate = null;
+    
+    if (dateRange === 'custom') {
+      startDate = document.getElementById('start-date').value;
+      endDate = document.getElementById('end-date').value;
+      
+      if (!startDate || !endDate) {
+        showNotification('Please select both start and end dates', 'error');
+        return;
+      }
+      
+      if (new Date(startDate) > new Date(endDate)) {
+        showNotification('Start date cannot be after end date', 'error');
+        return;
+      }
+    }
+    
+    currentFilters = {
+      dateRange,
+      startDate,
+      endDate
+    };
+    
+    await loadSalesReport(1);
+  }
+
+  async function loadSalesReport(page = 1) {
+    try {
+      const tbody = document.getElementById('sales-report-body');
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Loading sales data...</td></tr>';
+      
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page,
+        limit: 10,
+        dateRange: currentFilters.dateRange
+      });
+      
+      if (currentFilters.startDate) {
+        params.append('startDate', currentFilters.startDate);
+      }
+      
+      if (currentFilters.endDate) {
+        params.append('endDate', currentFilters.endDate);
+      }
+      
+      const response = await fetch(`/admin/api/sales-report?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      tbody.innerHTML = '';
+      
+      if (data.orders && data.orders.length > 0) {
+        data.orders.forEach(order => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${new Date(order.date).toLocaleDateString()}</td>
+            <td>#${order.orderId}</td>
+            <td>${order.customerName}</td>
+            <td>${order.itemsCount}</td>
+            <td>₹${(order.amount || 0).toLocaleString()}</td>
+            <td>₹${(order.discount || 0).toLocaleString()}</td>
+            <td>${order.coupons || 'None'}</td>
+            <td>₹${(order.netAmount || 0).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        // Update summary cards
+        document.getElementById('report-orders-count').textContent = data.summary.totalOrders || 0;
+        document.getElementById('report-sales-amount').textContent = `₹ ${(data.summary.totalSales || 0).toLocaleString()}`;
+        document.getElementById('report-discount-amount').textContent = `₹ ${(data.summary.totalDiscount || 0).toLocaleString()}`;
+        document.getElementById('report-net-revenue').textContent = `₹ ${(data.summary.netRevenue || 0).toLocaleString()}`;
+      } else {
+        tbody.innerHTML = '<tr><td colspan="8" class="loading-text">No sales data found for the selected period</td></tr>';
+        
+        // Reset summary cards
+        document.getElementById('report-orders-count').textContent = '0';
+        document.getElementById('report-sales-amount').textContent = '₹ 0';
+        document.getElementById('report-discount-amount').textContent = '₹ 0';
+        document.getElementById('report-net-revenue').textContent = '₹ 0';
+      }
+      
+      reportTotalPages = data.totalPages || 1;
+      updateReportPagination(page);
+    } catch (error) {
+      console.error('Error loading sales report:', error);
+      document.getElementById('sales-report-body').innerHTML = 
+        '<tr><td colspan="8" class="error-text">Failed to load sales data</td></tr>';
+      showNotification('Failed to load sales report', 'error');
+    }
+  }
+
+  function updateReportPagination(currentPage) {
+    const pagination = document.getElementById('report-pagination');
+    
+    pagination.innerHTML = '';
+    
+    const prevButton = document.createElement('span');
+    prevButton.className = 'page-prev';
+    prevButton.innerHTML = '<';
+    prevButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
+    prevButton.addEventListener('click', () => changeReportPage('prev'));
+    pagination.appendChild(prevButton);
+    
+    const pageNumbersContainer = document.createElement('div');
+    pageNumbersContainer.className = 'page-numbers';
+    
+    for (let i = 1; i <= reportTotalPages; i++) {
+      const pageSpan = document.createElement('span');
+      pageSpan.className = `page-number ${i === currentPage ? 'active' : ''}`;
+      pageSpan.textContent = i;
+      pageSpan.addEventListener('click', () => changeReportPage(i));
+      pageNumbersContainer.appendChild(pageSpan);
+    }
+    
+    pagination.appendChild(pageNumbersContainer);
+    
+    // Add next button
+    const nextButton = document.createElement('span');
+    nextButton.className = 'page-next';
+    nextButton.innerHTML = '>';
+    nextButton.style.visibility = currentPage === reportTotalPages ? 'hidden' : 'visible';
+    nextButton.addEventListener('click', () => changeReportPage('next'));
+    pagination.appendChild(nextButton);
+  }
+
+  function changeReportPage(page) {
+    if (page === 'prev') {
+      if (reportCurrentPage > 1) {
+        reportCurrentPage--;
+      }
+    } else if (page === 'next') {
+      if (reportCurrentPage < reportTotalPages) {
+        reportCurrentPage++;
+      }
+    } else {
+      reportCurrentPage = page;
+    }
+    
+    loadSalesReport(reportCurrentPage);
+  }
+
+  async function exportPDFReport() {
     // Show loading state
-    const pdfButton = document.getElementById('generate-pdf');
+    const pdfButton = document.getElementById('export-pdf');
     const originalText = pdfButton.innerHTML;
     pdfButton.innerHTML = 'Generating... <i class="fas fa-spinner fa-spin"></i>';
     pdfButton.disabled = true;
     
     try {
-      const response = await fetch('/admin/api/generate-pdf-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      // Build query parameters
+      const params = new URLSearchParams({
+        dateRange: currentFilters.dateRange,
+        exportType: 'pdf'
       });
+      
+      if (currentFilters.startDate) {
+        params.append('startDate', currentFilters.startDate);
+      }
+      
+      if (currentFilters.endDate) {
+        params.append('endDate', currentFilters.endDate);
+      }
+      
+      const response = await fetch(`/admin/api/export-sales-report?${params}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -314,7 +574,16 @@
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = 'sales-report.pdf';
+      
+      // Generate filename with date range
+      let filename = 'sales-report';
+      if (currentFilters.dateRange === 'custom' && currentFilters.startDate && currentFilters.endDate) {
+        filename = `sales-report-${currentFilters.startDate}-to-${currentFilters.endDate}`;
+      } else {
+        filename = `sales-report-${currentFilters.dateRange}`;
+      }
+      a.download = `${filename}.pdf`;
+      
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -326,6 +595,63 @@
     } finally {
       pdfButton.innerHTML = originalText;
       pdfButton.disabled = false;
+    }
+  }
+
+  async function exportExcelReport() {
+    // Show loading state
+    const excelButton = document.getElementById('export-excel');
+    const originalText = excelButton.innerHTML;
+    excelButton.innerHTML = 'Generating... <i class="fas fa-spinner fa-spin"></i>';
+    excelButton.disabled = true;
+    
+    try {
+      // Build query parameters
+      const params = new URLSearchParams({
+        dateRange: currentFilters.dateRange,
+        exportType: 'excel'
+      });
+      
+      if (currentFilters.startDate) {
+        params.append('startDate', currentFilters.startDate);
+      }
+      
+      if (currentFilters.endDate) {
+        params.append('endDate', currentFilters.endDate);
+      }
+      
+      const response = await fetch(`/admin/api/export-sales-report?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      // Generate filename with date range
+      let filename = 'sales-report';
+      if (currentFilters.dateRange === 'custom' && currentFilters.startDate && currentFilters.endDate) {
+        filename = `sales-report-${currentFilters.startDate}-to-${currentFilters.endDate}`;
+      } else {
+        filename = `sales-report-${currentFilters.dateRange}`;
+      }
+      a.download = `${filename}.xlsx`;
+      
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      showNotification('Excel report generated successfully!', 'success');
+    } catch (error) {
+      console.error('Error generating Excel:', error);
+      showNotification('Failed to generate Excel report', 'error');
+    } finally {
+      excelButton.innerHTML = originalText;
+      excelButton.disabled = false;
     }
   }
 
@@ -387,7 +713,6 @@
   }
 </script>
 
-
 <style>
   .loading-text {
     text-align: center;
@@ -407,6 +732,7 @@
     justify-content: center;
     margin-top: 20px;
     gap: 10px;
+    align-items: center;
   }
   
   .pagination span {
@@ -429,6 +755,196 @@
   .page-numbers {
     display: flex;
     gap: 5px;
+  }
+  
+  /* Sales Report Styles */
+  .sales-report-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    color: #333;
+  }
+  
+  .report-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .filter-group label {
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+  }
+  
+  .filter-group select,
+  .filter-group input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .custom-date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .apply-btn {
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+  
+  .apply-btn:hover {
+    background: #3a5bd9;
+  }
+  
+  .export-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .export-btn.pdf {
+    background: #f44336;
+    color: white;
+  }
+  
+  .export-btn.pdf:hover {
+    background: #d32f2f;
+  }
+  
+  .export-btn.excel {
+    background: #4CAF50;
+    color: white;
+  }
+  
+  .export-btn.excel:hover {
+    background: #388E3C;
+  }
+  
+  .report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .summary-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border-left: 4px solid #4a6cf7;
+  }
+  
+  .summary-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .summary-card p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .report-table-container {
+    overflow-x: auto;
+  }
+  
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .report-table th {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e9ecef;
+  }
+  
+  .report-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .report-table tr:hover {
+    background: #f8f9fa;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .report-controls {
+      width: 100%;
+    }
+    
+    .custom-date-range {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .export-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .export-btn {
+      flex: 1;
+      justify-content: center;
+    }
   }
 </style>
 <%- include('../partials/admin/admin-footer') %>

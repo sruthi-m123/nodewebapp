@@ -236,7 +236,7 @@
 
 <div class="summary-row">
   <span>Total</span>
-  <span id="summary-subtotal">₹<%= itemDiscount || subtotal %></span>
+  <span id="summary-subtotal">₹<%= netAmount %></span>
 </div>
 
 
@@ -352,4 +352,11 @@
          data-cart='<%- JSON.stringify(cartItems || []) %>'
          data-payment="<%= selectedPayment || '' %>">
     </div>
+   <% if (typeof isRetry !== 'undefined' && isRetry) { %>
+  <script>
+    window.isRetry = true;
+    console.log('Retry mode detected in EJS: window.isRetry = true');  <!-- NEW: Log to confirm execution -->
+    document.body.dataset.isRetry = 'true'; 
+    </script>
+<% } %> 
 </div>

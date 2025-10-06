@@ -937,3 +937,7 @@ th {
     align-self: center;
   }
 }
+.status-select option:disabled {
+  color: #999;
+  background-color: #f2f2f2;
+}

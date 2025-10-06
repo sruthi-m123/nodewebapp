@@ -188,11 +188,11 @@ const getReturnDetails = async (req, res) => {
     }) || [];
 
     res.json({
-      reason: returnDetails.reason || 'Not specified', // global return reason
-      notes: returnDetails.notes || 'None',           // global notes
-      type: returnDetails.type || 'full',             // 'full' or 'partial'
-      totalItems: order.items.length,                 // total items in order
-      items,                                          // item-level return info
+      reason: returnDetails.reason || 'Not specified', 
+      notes: returnDetails.notes || 'None',           
+      type: returnDetails.type || 'full',             
+      totalItems: order.items.length,                
+      items,                                          
     });
 
   } catch (error) {
@@ -213,10 +213,14 @@ const verifyReturnedRequest = async (req, res) => {
   console.log("req.body:", req.body);
 
   const { orderId } = req.params;
+  console.log("orderId",orderId);
 
   let wallet;
 
   try {
+
+    const{action,adminNotes,ItemsIds}=req.body;
+    
 
     if (!['approve', 'reject'].includes(action)) {
       return res.status(400).json({ 
@@ -245,127 +249,84 @@ const verifyReturnedRequest = async (req, res) => {
     }
 
 const refundItems=ItemsIds?.length
+? order.items.filter(i=>ItemsIds.includes(i._id.toString()))
+:order.items;
 
+//refund calculation
+const couponDiscount=order.appliedCoupon?.value||0;
+console.log("couponDiscount",couponDiscount);
+const deliveryCharge=order.deliveryCharge||0;
+
+const totalPaid=order.total;
+let refundAmount=0;
+refundItems.forEach(item=>{
+  const itemPrice=item.discountedPrice??item.price;
+  const itemTotal=itemPrice*item.quantity;
+
+
+const itemCouponshare=(itemTotal/totalPaid)*couponDiscount;
+const itemDeliveryShare=(itemTotal/totalPaid)*deliveryCharge;
+
+refundAmount+=itemTotal-itemCouponshare+itemDeliveryShare;
+
+});
+const wallet=await Wallet.findOne({user:order.userId})||new Wallet({user:order.userId,balance:0})
 
 
 
     if (action === 'approve') {
-      if (order.returnApproved) {
-        return res.status(400).json({ 
-          error: 'Return already approved',
-          code: 'ALREADY_APPROVED'
-        });
-      }
 
-      if (order.total <= 0) {
-        return res.status(400).json({
-          error: 'Invalid refund amount',
-          code: 'INVALID_REFUND_AMOUNT'
-        });
-      }
+
+      refundAmount=Math.max(refundAmount,0)
+
+      //Update Wallet
+await wallet.addFunds(refundAmount,{
+  order:order._id,
+  description:`Refund for order #${order.orderId}`,
+  reference:`REFUND=${order.orderId}-${Date.now()}`,
+  status:'completed'
+})
+
+refundItems.forEach(item=>{
+  item.status='returned';
+});
+
+      
 
       order.returnRequested = false;
-      order.returnDetails.status = 'approved';
-      order.status = 'returned';
+      order.status =refundItems.length===order.items.length?'returned':'partially_returned';
       order.returnProcessedAt = new Date();
       order.adminNotes = adminNotes || 'Return approved by administrator';
 
-      const refundAmount = order.total;
-
-      wallet = await Wallet.findOne({ user: order.userId });
       
-      if (!wallet) {
-        wallet = new Wallet({
-          user: order.userId,
-          balance: 0
-        });
-        await wallet.save();
+      }else{
+        //reject
+refundItems.forEach(item=>{
+  item.status='return_rejected';
+});
+
+order.returnRequested=false;
+order.returnRejectedAt=new Date();
+order.adminNotes=adminNotes||'rejected by admin'
       }
+const restockOps=refundItems.map(item=>
+  Product.findByIdAndUpdate(item.productId._id,{$inc:{stock:item.quantity}},{new:true})
+)
+await Promise.all([order.save(),wallet.save(),...restockOps]);
 
- const returnRequest = generateRefundId(orderId)
-
-    if (!returnRequest) {
-      return res.status(404).json({ error: "Return request not found" });
-    }
-
-const transactionRef = `REFUND-${order.orderId}-${returnRequest._id}`;
-      
-      await wallet.addFunds(refundAmount, {
-        order: order._id,
-        description: `Refund for order #${order.orderId}`,
-        reference: transactionRef,
-        status: 'completed'
-      });
-
-      // const refund = new Refund({
-      //   order: order._id,
-      //   user: order.userId._id,
-      //   amount: refundAmount,
-      //   status: 'completed',
-      //   processedBy: req.user._id,
-      //   notes: adminNotes,
-      //   walletTransaction: wallet.transactions[wallet.transactions.length - 1]._id
-      // });
-
-      const restockOps = order.items.map(item => 
-        Product.findByIdAndUpdate(
-          item.productId._id,
-          { $inc: { stock: item.quantity } },
-          { new: true }
-        )
-      );
-
-      await Promise.all([
-        order.save(),
-        // refund.save(),
-        ...restockOps
-      ]);
-
-      
-
-    } else {
-      order.returnRequested = false;
-      order.returnDetails.status = 'rejected';
-      order.returnRejectedAt = new Date();
-      order.adminNotes = adminNotes || 'Return rejected by administrator';
-      
-      await order.save();
-
-     
-    }
-
-    return res.json({ 
+ return res.json({
       success: true,
       message: `Return request ${action}d successfully`,
       orderId: order.orderId,
       status: order.status,
-      ...(action === 'approve' && { 
-        refundAmount: order.totalAmount,
-        newBalance: wallet.balance 
-      })
+      ...(action === 'approve' && { refundAmount, walletBalance: wallet.balance })
     });
-
-  } catch (error) {
-    console.error('Return processing error:', {
-      error: error.message,
-      stack: error.stack,
-      orderId,
-      action: req.body.action
-    });
-
-    const response = {
-      error: 'Failed to process return request',
-      code: 'PROCESSING_ERROR'
-    };
-
-    if (process.env.NODE_ENV === 'development') {
-      response.details = error.message;
-      response.stack = error.stack;
+    }catch(error){
+      console.error('return processing error:',error);
+      return res.status(500).json({error:'failed to process return request',code:'PROCESSING_ERROR',details:error.message})
     }
-
-    return res.status(500).json(response);
   }
-};
+
 const getOrderDetails=async(req,res)=>{
   try {
     const orderId=req.params.orderId;
