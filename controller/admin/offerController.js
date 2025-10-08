@@ -57,6 +57,7 @@ const getApplicableItems = async (req, res) => {
   }
 }
 
+
 const createOffer = async (req, res) => {
   try {
     const {

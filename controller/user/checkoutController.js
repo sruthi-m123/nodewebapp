@@ -176,7 +176,7 @@ try {
  
   const userId=req.session.user.id;
   if (!userId) {
-  return res.redirect('/user/login');
+      return res.status(401).json({success:false,message:"Please login to continue"});
 }
   const orderId=req.params.orderId;
 
@@ -207,6 +207,9 @@ const cartItems=order.items.map(item=>({
 
 
 }));
+
+console.log("cartItems:",cartItems);
+
 
 const coupons=await Coupon.find({isActive:true}).lean();
 const usedOrders=await Order.find({

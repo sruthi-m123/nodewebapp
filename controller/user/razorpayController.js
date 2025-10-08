@@ -54,7 +54,6 @@ if (!dborderId) {
           razorpayOrderId:razorpay_order_id,
           razorpayPaymentId: razorpay_payment_id,
           razorpaySignature: razorpay_signature,
-          // appliedCoupon:req.session.appliedCoupon?.couponId||null
         },
         {new:true}
       );

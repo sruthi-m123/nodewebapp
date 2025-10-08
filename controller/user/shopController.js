@@ -129,10 +129,14 @@ const loadShopping = async (req, res) => {
           console.log(`Fallback to static bestOffer for ${product.productName}: ${staticDiscount}`);
         }
       }
+    
       
       if (bestOffer.discount > 0) {
         console.log(`Final bestOffer for ${product.productName}:`, bestOffer);
       } else {
+product.bestOffer=null;
+product.discountedPrice=null;
+       
         console.log(`No valid discount for ${product.productName} (stays {discount:0})`);
       }
       

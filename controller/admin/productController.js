@@ -17,7 +17,7 @@ const renderProducts = async (req, res) => {
                      
         
     
-    const filter = { isDeleted: false, ...searchFilter };
+    const filter = {  ...searchFilter };
     const products = await Product.find(filter)
       .populate("category")
       .sort({createdAt:-1})
@@ -38,7 +38,7 @@ const renderProducts = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server Error");
+    res.status(500).json({success:false,message:"Something went wrong"});
   }
 };
 
@@ -90,7 +90,7 @@ if (!sku) {
     const newProduct = new Product(productData);
     const savedProduct = await newProduct.save();
 
-    res.json({ success: true, product: savedProduct });
+    res.json({ success: true, product: savedProduct,message:"product added successfully" });
   } catch (error) {
     console.error('Error saving product:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -173,7 +173,7 @@ updateData.images = updatedImages;
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-await Product.findByIdAndUpdate(id, { isDeleted: true });
+await Product.findByIdAndDelete(id);
 
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
       res.json({ success: true, message: "Product deleted successfully" });

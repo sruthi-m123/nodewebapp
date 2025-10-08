@@ -46,10 +46,7 @@ app.use(passport.initialize());
 app.use(methodOverride('_method'));
 app.use(flash())
 app.use(expressLayouts);
-// app.use((req, res, next) => {
-//   res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' http://localhost:3000");
-//   next();
-// });
+
 
 
 app.set("view engine", "ejs");
@@ -61,9 +58,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
-
-
-
 
 app.get("/error", (req, res) => {
   res.status(500).render("user/error", { message: "something went wrong!" });

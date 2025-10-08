@@ -100,7 +100,7 @@ router.post('/cart/update',cartController.updateCart);
 
 //checkout page
 router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
-router.get('/retry-checkout/:orderId',checkoutController.getRetryCheckoutPage);
+router.get('/retry-checkout/:orderId',isLoggedIn,checkoutController.getRetryCheckoutPage);
 router.post('/buy-now',checkoutController.buyNow);
 router.post('/api/addresses',checkoutController.addAddress);
 // router.put('/api/addresses/:id',checkoutController.updateAddress);

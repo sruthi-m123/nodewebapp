@@ -218,8 +218,7 @@ function openModal(type, orderId, itemId = null) {
         // }
 function submitReturn(event) {
     const reason = document.getElementById('returnReason').value;
-    const target = event.currentTarget; // ✅ always the button
-
+    const target = event.currentTarget; 
     const orderId = target.dataset.orderId;
     const itemId = target.dataset.itemId;
 

@@ -274,7 +274,7 @@
             <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button> -->
 
 <button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
-<button class="modal-btn modal-submit" type="button" onclick="submitReturn(event)">Submit Request</button>
+<button class="modal-btn modal-submit" type="button"data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button>
 
         </div>
     </div>

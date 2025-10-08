@@ -275,8 +275,7 @@ const getSalesReport = async (req, res) => {
       .limit(parseInt(limit))
       .populate('userId', 'name email')
       .populate('items.productId', 'productName');
-    
-    // Calculate summary statistics
+    // Calculate summary 
     const totalOrders = await Order.countDocuments(dateFilter);
     
     const summaryData = await Order.aggregate([
@@ -307,10 +306,11 @@ const getSalesReport = async (req, res) => {
       itemsCount: order.items.reduce((total, item) => total + item.quantity, 0),
       amount: order.subtotal,
       discount: order.discount || 0,
-      coupons: order.appliedCoupon?.title || 'None',
-      netAmount: order.subtotal - (order.discount || 0)
+      coupons: order.appliedCoupon.code || 'None',
+      netAmount: order.subtotal - (order.discount || 0)-(order.appliedCoupon?.value||0)
     }));
     
+
     res.json({
       orders: formattedOrders,
       summary: {
@@ -513,7 +513,9 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
       `₹${(order.subtotal || 0).toLocaleString()}`,
       `₹${(order.discount || 0).toLocaleString()}`,
       order.appliedCoupon?.title || 'None',
-      `₹${preTaxNet.toLocaleString()}`
+        order.paymentMethod||'N/A'
+      `₹${preTaxNet.toLocaleString()}`,
+    
     ];
     
     rowData.forEach((data, i) => {
@@ -543,6 +545,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
     { header: 'Amount (₹)', key: 'amount', width: 15 },
     { header: 'Discount (₹)', key: 'discount', width: 15 },
     { header: 'Coupons', key: 'coupons', width: 15 },
+    {header:'Payment Method',key:'paymentMethod',width:15},
     { header: 'Net Amount (₹)', key: 'netAmount', width: 15 }
   ];
 
@@ -607,7 +610,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
   worksheet.getCell('A10').font = { bold: true, size: 14 };
 
   // Add column headers for orders
-  worksheet.insertRow(11, ['Date', 'Order ID', 'Customer', 'Items', 'Amount (₹)', 'Discount (₹)', 'Coupons', 'Net Amount (₹)']);
+  worksheet.insertRow(11, ['Date', 'Order ID', 'Customer', 'Items', 'Amount (₹)', 'Discount (₹)', 'Coupons','Payment Method', 'Net Amount (₹)']);
   
   // Style the header row
   const headerRow = worksheet.getRow(11);
@@ -621,7 +624,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
   // Add order data starting from row 12
   let currentRow = 12;
   orders.forEach(order => {
-    const preTaxNet = (order.subtotal || 0) - (order.discount || 0);
+    const preTaxNet = (order.subtotal || 0) - (order.discount || 0)-(order.appliedCoupon?.value||0);
     worksheet.addRow({
       date: new Date(order.createdAt).toLocaleDateString(),
       orderId: order._id.toString().slice(-8).toUpperCase(),
@@ -629,7 +632,8 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
       items: order.items.reduce((total, item) => total + item.quantity, 0),
       amount: order.subtotal || 0,
       discount: order.discount || 0,
-      coupons: order.appliedCoupon?.title || 'None',
+      coupons: order.appliedCoupon.code|| 'None',
+      paymentMethod:order.paymentMethod||'N/A',
       netAmount: preTaxNet
     });
     

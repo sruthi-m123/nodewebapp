@@ -224,442 +224,466 @@
       </div>
     </div>
   </div>
+<script>
+  let currentProductId = null;
+  let deleteProductId = null;
+  let filesQueue = [];
+  let currentFileIndex = 0;
+  let cropper;
+  let croppedImages = [];
+  let removedImages = [];
 
-  <script>
-    let currentProductId = null;
-    let deleteProductId = null;
-    let filesQueue = [];
-    let currentFileIndex = 0;
-    let cropper;
-    let croppedImages = [];
-    let removedImages = [];
+  // Toast Notification Function
+  function showToast(message, type = 'success') {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
 
-    // Modal Functions
-    function openModal() {
-      document.getElementById('productModal').style.display = 'flex';
-      document.querySelector('.modal-title').textContent = 'Add Product';
-      document.getElementById('productForm').reset();
-      document.getElementById('croppedImageList').innerHTML = '';
-      document.getElementById('previewArea').innerHTML = '';
-      removedImages = [];
-      currentProductId = null;
-    }
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: ${type === 'error' ? '#dc3545' : '#28a745'};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 10000;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    `;
 
-    function closeModal() {
-      document.getElementById('productModal').style.display = 'none';
-    }
+    document.body.appendChild(toast);
 
-    function closeViewModal() {
-      document.getElementById('viewProductModal').style.display = 'none';
-    }
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(0)';
+    }, 100);
 
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').style.display = 'none';
-      deleteProductId = null;
-    }
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
 
-    // Product CRUD Operations
-    function editProduct(productId) {
-      currentProductId = productId;
-      document.getElementById('productForm').reset();
-      document.getElementById('croppedImageList').innerHTML = '';
-      document.getElementById('previewArea').innerHTML = '';
-      removedImages = [];
+  // Modal Functions
+  function openModal() {
+    document.getElementById('productModal').style.display = 'flex';
+    document.querySelector('.modal-title').textContent = 'Add Product';
+    document.getElementById('productForm').reset();
+    document.getElementById('croppedImageList').innerHTML = '';
+    document.getElementById('previewArea').innerHTML = '';
+    removedImages = [];
+    currentProductId = null;
+  }
 
-      fetch(`/admin/products/${productId}/details`)
-        .then(response => response.json())
-        .then(product => {
-          // Fill form fields
-          document.getElementById('productName').value = product.productName || '';
-           document.getElementById('sku').value = product.sku || '';
-          document.getElementById('category').value = product.category._id || '';
-          document.getElementById('price').value = product.price || '';
-          document.getElementById('stock').value = product.stock || '';
-          document.getElementById('color').value = product.color || '';
-          document.getElementById('description').value = product.description || '';
-          document.getElementById('isNewArrival').checked = product.isNewArrival || false;
-          document.getElementById('isActive').checked = product.isActive !== false;
+  function closeModal() {
+    document.getElementById('productModal').style.display = 'none';
+  }
 
-          // Show existing images
-          if (product.images && product.images.length > 0) {
-            product.images.forEach((imgPath, index) => {
-              const wrapper = document.createElement("div");
-              wrapper.classList.add("existing-image");
-              wrapper.style.position = "relative";
+  function closeViewModal() {
+    document.getElementById('viewProductModal').style.display = 'none';
+  }
 
-              const img = document.createElement("img");
-              img.src = `/${imgPath}`;
-              img.style.width = "60px";
-              img.style.height = "60px";
-              img.style.objectFit = "cover";
-              img.style.borderRadius = "4px";
-              img.style.marginRight = "10px";
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    deleteProductId = null;
+  }
 
-              const removeBtn = document.createElement("button");
-              removeBtn.innerHTML = "&times;";
-              removeBtn.classList.add("remove-existing-btn");
-              removeBtn.style.position = "absolute";
-              removeBtn.style.top = "-6px";
-              removeBtn.style.right = "-6px";
+  // Product 
+  function editProduct(productId) {
+    currentProductId = productId;
+    document.getElementById('productForm').reset();
+    document.getElementById('croppedImageList').innerHTML = '';
+    document.getElementById('previewArea').innerHTML = '';
+    removedImages = [];
 
-              removeBtn.addEventListener("click", () => {
-                wrapper.remove();
-                removedImages.push(imgPath);
-              });
-              
-              wrapper.appendChild(img);
-              wrapper.appendChild(removeBtn);
-              document.getElementById('previewArea').appendChild(wrapper);
-            });
-          }
-
-          document.querySelector('.modal-title').textContent = 'Edit Product';
-          document.getElementById('productModal').style.display = 'flex';
-        })
-        .catch(error => {
-          console.error('Error fetching product:', error);
-          alert('Error loading product data');
-        });
-    }
-
-    function viewProduct(productId) {
-      fetch(`/admin/products/${productId}/details`)
-        .then(response => response.json())
-        .then(product => {
-          const content = `
-            <div class="product-view">
-              <div class="product-images">
-                ${product.images && product.images.length > 0
-                  ? product.images.map(
-                      img => `<img src="/${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
-                    ).join('')
-                  : '<div style="width: 100px; height: 100px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">📷</div>'
-                }
-              </div>
-              <div class="product-info">
-                <h4>${product.productName}</h4>
-                  <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
-                <p><strong>Category:</strong> ${product.category?.name || 'N/A'}</p>
-                <p><strong>Price:</strong> ₹${product.price}</p>
-                <p><strong>Stock:</strong> ${product.stock}</p>
-                <p><strong>Color:</strong> ${product.color || 'N/A'}</p>
-                <p><strong>New Arrival:</strong> ${product.isNewArrival ? 'Yes' : 'No'}</p>
-                <p><strong>Status:</strong> ${product.isActive !== false ? 'Active' : 'Inactive'}</p>
-                ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
-                <p><strong>Created:</strong> ${new Date(product.createdAt).toLocaleDateString()}</p>
-                <p><strong>Last Updated:</strong> ${new Date(product.updatedAt || product.createdAt).toLocaleDateString()}</p>
-              </div>
-            </div>
-          `;
-
-          document.getElementById('viewProductContent').innerHTML = content;
-          document.getElementById('viewProductModal').style.display = 'flex';
-        })
-        .catch(error => {
-          console.error('Error fetching product:', error);
-          alert('Error loading product details');
-        });
-    }
-
-    function deleteProduct(productId) {
-      deleteProductId = productId;
-      document.getElementById('deleteModal').style.display = 'flex';
-    }
-
-    function confirmDelete() {
-      if (!deleteProductId) return;
-      
-      fetch(`/admin/products/${deleteProductId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
+    fetch(`/admin/products/${productId}/details`)
       .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert(data.message || 'Error deleting product');
+      .then(product => {
+        document.getElementById('productName').value = product.productName || '';
+        document.getElementById('sku').value = product.sku || '';
+        document.getElementById('category').value = product.category._id || '';
+        document.getElementById('price').value = product.price || '';
+        document.getElementById('stock').value = product.stock || '';
+        document.getElementById('color').value = product.color || '';
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('isNewArrival').checked = product.isNewArrival || false;
+        document.getElementById('isActive').checked = product.isActive !== false;
+
+        // Show existing images
+        if (product.images && product.images.length > 0) {
+          product.images.forEach((imgPath, index) => {
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("existing-image");
+            wrapper.style.position = "relative";
+
+            const img = document.createElement("img");
+            img.src = `/${imgPath}`;
+            img.style.width = "60px";
+            img.style.height = "60px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "4px";
+            img.style.marginRight = "10px";
+
+            const removeBtn = document.createElement("button");
+            removeBtn.innerHTML = "&times;";
+            removeBtn.classList.add("remove-existing-btn");
+            removeBtn.style.position = "absolute";
+            removeBtn.style.top = "-6px";
+            removeBtn.style.right = "-6px";
+
+            removeBtn.addEventListener("click", () => {
+              wrapper.remove();
+              removedImages.push(imgPath);
+            });
+            
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            document.getElementById('previewArea').appendChild(wrapper);
+          });
         }
+
+        document.querySelector('.modal-title').textContent = 'Edit Product';
+        document.getElementById('productModal').style.display = 'flex';
       })
       .catch(error => {
-        console.error('Error deleting product:', error);
-        alert('Error deleting product');
-      })
-      .finally(() => {
-        closeDeleteModal();
+        console.error('Error fetching product:', error);
+        showToast('Error loading product data', 'error');
       });
+  }
+
+  function viewProduct(productId) {
+    fetch(`/admin/products/${productId}/details`)
+      .then(response => response.json())
+      .then(product => {
+        const content = `
+          <div class="product-view">
+            <div class="product-images">
+              ${product.images && product.images.length > 0
+                ? product.images.map(
+                    img => `<img src="/${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
+                  ).join('')
+                : '<div style="width: 100px; height: 100px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">📷</div>'
+              }
+            </div>
+            <div class="product-info">
+              <h4>${product.productName}</h4>
+                <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
+              <p><strong>Category:</strong> ${product.category?.name || 'N/A'}</p>
+              <p><strong>Price:</strong> ₹${product.price}</p>
+              <p><strong>Stock:</strong> ${product.stock}</p>
+              <p><strong>Color:</strong> ${product.color || 'N/A'}</p>
+              <p><strong>New Arrival:</strong> ${product.isNewArrival ? 'Yes' : 'No'}</p>
+              <p><strong>Status:</strong> ${product.isActive !== false ? 'Active' : 'Inactive'}</p>
+              ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
+              <p><strong>Created:</strong> ${new Date(product.createdAt).toLocaleDateString()}</p>
+              <p><strong>Last Updated:</strong> ${new Date(product.updatedAt || product.createdAt).toLocaleDateString()}</p>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('viewProductContent').innerHTML = content;
+        document.getElementById('viewProductModal').style.display = 'flex';
+      })
+      .catch(error => {
+        console.error('Error fetching product:', error);
+        showToast('Error loading product details', 'error');
+      });
+  }
+
+  function deleteProduct(productId) {
+    deleteProductId = productId;
+    document.getElementById('deleteModal').style.display = 'flex';
+  }
+
+  function confirmDelete() {
+    if (!deleteProductId) return;
+    
+    fetch(`/admin/products/${deleteProductId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showToast('Product deleted successfully');
+        location.reload();
+      } else {
+        showToast(data.message || 'Error deleting product', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting product:', error);
+      showToast('Error deleting product', 'error');
+    })
+    .finally(() => {
+      closeDeleteModal();
+    });
+  }
+
+  // Form Submission
+  document.getElementById('productForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('productName', document.getElementById('productName').value);
+    formData.append('sku', document.getElementById('sku').value);
+    formData.append('category', document.getElementById('category').value);
+    formData.append('price', document.getElementById('price').value);
+    formData.append('stock', document.getElementById('stock').value);
+    formData.append('color', document.getElementById('color').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
+    formData.append('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
+
+    if (currentProductId) {
+      formData.append('id', currentProductId);
+      formData.append('removedImages', JSON.stringify(removedImages));
+    }
+    
+    croppedImages.forEach((blob, index) => {
+      formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
+    });
+    
+    if (!currentProductId && croppedImages.length === 0) {
+      showToast('Please upload at least one product image', 'error');
+      return;
     }
 
-    // Form Submission
-    document.getElementById('productForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+    const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
+    const method = currentProductId ? 'PUT' : 'POST';
 
-      
-      
-      const formData = new FormData();
-      formData.append('productName', document.getElementById('productName').value);
-  formData.append('sku', document.getElementById('sku').value);
-  formData.append('category', document.getElementById('category').value);
-  formData.append('price', document.getElementById('price').value);
-  formData.append('stock', document.getElementById('stock').value);
-  formData.append('color', document.getElementById('color').value);
-  formData.append('description', document.getElementById('description').value);
-  formData.append('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
-  formData.append('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
-      
-      // // Explicitly handle checkboxes
-      // formData.set('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
-      // formData.set('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
-
-      if (currentProductId) {
-        formData.append('id', currentProductId);
-        formData.append('removedImages', JSON.stringify(removedImages));
-      }
-      
-      
-croppedImages.forEach((blob, index) => {
-  formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
-});
-      
-if (!currentProductId && croppedImages.length === 0) {
-  alert('Please upload at least one product image');
-  return;
-}
-
-      const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
-      const method = currentProductId ? 'PUT' : 'POST';
-
-      fetch(url, {
-        method,
-        body: formData
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        if (data.success) {
-          croppedImages=[];
-          filesQueue=[];
-          currentFileIndex=0;
-
-          location.reload();
-        } else {
-          alert(data.message || 'Error saving product');
-        }
-      })
-      .catch(error => {
-        console.error('Error saving product:', error);
-
-         croppedImages = [];
-  filesQueue = [];
-  currentFileIndex = 0;
-
-        alert('Error saving product');
-      });
-    });
-
-    // Image Cropping Functionality
-    document.getElementById('cropImageInput').addEventListener('change', function(e) {
-      filesQueue = Array.from(e.target.files);
-      currentFileIndex = 0;
-      if (filesQueue.length > 0) {
+    fetch(url, {
+      method,
+      body: formData
+    })
+    .then(res=>res.json())
+    .then(data => {
+      if (data.success) {
         croppedImages = [];
+        filesQueue = [];
+        currentFileIndex = 0;
+        showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully');
+        location.reload();
+      } else {
+        showToast(data.message || 'Error saving product', 'error');
       }
-      
-      document.getElementById('previewArea').innerHTML = '';
-      filesQueue.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const wrapper = document.createElement("div");
-          wrapper.style.position = "relative";
-          wrapper.style.display = "inline-block";
-
-          const img = document.createElement("img");
-          img.src = event.target.result;
-          img.style.width = "60px";
-          img.style.height = "60px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "4px";
-          img.style.marginRight = "10px";
-
-          const removeBtn = document.createElement("button");
-          removeBtn.innerHTML = "&times;";
-          removeBtn.style.position = "absolute";
-          removeBtn.style.top = "-6px";
-          removeBtn.style.right = "-6px";
-          removeBtn.style.background = "transparent";
-          removeBtn.style.color = "#000";
-          removeBtn.style.border = "1px solid #fff";
-          removeBtn.style.borderRadius = "50%";
-          removeBtn.style.cursor = "pointer";
-          removeBtn.style.width = "20px";
-          removeBtn.style.height = "20px";
-          removeBtn.style.fontSize = "14px";
-          removeBtn.style.lineHeight = "16px";
-          removeBtn.style.padding = "0";
-
-          removeBtn.addEventListener("click", () => {
-            filesQueue.splice(index, 1); 
-            wrapper.remove(); 
-          });
-
-          wrapper.appendChild(img);
-          wrapper.appendChild(removeBtn);
-          document.getElementById('previewArea').appendChild(wrapper);
-        };
-        reader.readAsDataURL(file);
-      });
-
-      loadNextImage();
+    })
+    .catch(error => {
+      console.error('Error saving product:', error);
+      croppedImages = [];
+      filesQueue = [];
+      currentFileIndex = 0;
+      showToast('Error saving product', 'error');
     });
+  });
 
-    function loadNextImage() {
-      if (currentFileIndex >= filesQueue.length) {
-        document.getElementById('cropButton').style.display = "none";
-        document.getElementById('cropPreview').style.display = "none";
-        return;
-      }
-      
-      const file = filesQueue[currentFileIndex];
+  // Image Cropping Functionality
+  document.getElementById('cropImageInput').addEventListener('change', function(e) {
+    filesQueue = Array.from(e.target.files);
+    currentFileIndex = 0;
+    if (filesQueue.length > 0) {
+      croppedImages = [];
+    }
+    
+    document.getElementById('previewArea').innerHTML = '';
+    filesQueue.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = function(event) {
-        document.getElementById('cropPreview').src = event.target.result;
-        document.getElementById('cropPreview').style.display = "block";
-        document.getElementById('cropButton').style.display = "inline-block";
-        
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(document.getElementById('cropPreview'), {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          responsive: true,
-          scalable: true,
-          zoomable: true
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-
-    document.getElementById('cropButton').addEventListener('click', function() {
-      const canvas = cropper.getCroppedCanvas();
-      canvas.toBlob(function(blob) {
-        const imageUrl = URL.createObjectURL(blob);
-        
-        const container = document.createElement("div");
-        container.style.border = "1px solid #ccc";
-        container.style.borderRadius = "8px";
-        container.style.padding = "8px";
-        container.style.background = "#f9f9f9";
-        container.style.width = "120px";
-        container.style.textAlign = "center";
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "inline-block";
 
         const img = document.createElement("img");
-        img.src = imageUrl;
-        img.style.width = "100%";
-        img.style.height = "100px";
+        img.src = event.target.result;
+        img.style.width = "60px";
+        img.style.height = "60px";
         img.style.objectFit = "cover";
         img.style.borderRadius = "4px";
+        img.style.marginRight = "10px";
 
-        const indexLabel = document.createElement("div");
-        indexLabel.textContent = `Image ${croppedImages.length + 1}`;
-        indexLabel.style.marginTop = "5px";
-        indexLabel.style.fontSize = "12px";
-        indexLabel.style.color = "#333";
+        const removeBtn = document.createElement("button");
+        removeBtn.innerHTML = "&times;";
+        removeBtn.style.position = "absolute";
+        removeBtn.style.top = "-6px";
+        removeBtn.style.right = "-6px";
+        removeBtn.style.background = "transparent";
+        removeBtn.style.color = "#000";
+        removeBtn.style.border = "1px solid #fff";
+        removeBtn.style.borderRadius = "50%";
+        removeBtn.style.cursor = "pointer";
+        removeBtn.style.width = "20px";
+        removeBtn.style.height = "20px";
+        removeBtn.style.fontSize = "14px";
+        removeBtn.style.lineHeight = "16px";
+        removeBtn.style.padding = "0";
 
-        container.appendChild(img);
-        container.appendChild(indexLabel);
-        document.getElementById('croppedImageList').appendChild(container);
+        removeBtn.addEventListener("click", () => {
+          filesQueue.splice(index, 1); 
+          wrapper.remove(); 
+        });
 
-        croppedImages.push(blob);
-        
-        cropper.destroy();
-        document.getElementById('cropPreview').style.display = "none";
-        document.getElementById('cropButton').style.display = "none";
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        document.getElementById('previewArea').appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
+    });
 
-        currentFileIndex++;
-        loadNextImage();
+    loadNextImage();
+  });
+
+  function loadNextImage() {
+    if (currentFileIndex >= filesQueue.length) {
+      document.getElementById('cropButton').style.display = "none";
+      document.getElementById('cropPreview').style.display = "none";
+      return;
+    }
+    
+    const file = filesQueue[currentFileIndex];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('cropPreview').src = event.target.result;
+      document.getElementById('cropPreview').style.display = "block";
+      document.getElementById('cropButton').style.display = "inline-block";
+      
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(document.getElementById('cropPreview'), {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        responsive: true,
+        scalable: true,
+        zoomable: true
       });
-    });
+    };
+    reader.readAsDataURL(file);
+  }
 
-    // Pagination
-    function goToPage(page) {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('page', page);
-      window.location.href = `/admin/products?${urlParams.toString()}`;
+  document.getElementById('cropButton').addEventListener('click', function() {
+    const canvas = cropper.getCroppedCanvas();
+    canvas.toBlob(function(blob) {
+      const imageUrl = URL.createObjectURL(blob);
+      
+      const container = document.createElement("div");
+      container.style.border = "1px solid #ccc";
+      container.style.borderRadius = "8px";
+      container.style.padding = "8px";
+      container.style.background = "#f9f9f9";
+      container.style.width = "120px";
+      container.style.textAlign = "center";
+
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      img.style.width = "100%";
+      img.style.height = "100px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "4px";
+
+      const indexLabel = document.createElement("div");
+      indexLabel.textContent = `Image ${croppedImages.length + 1}`;
+      indexLabel.style.marginTop = "5px";
+      indexLabel.style.fontSize = "12px";
+      indexLabel.style.color = "#333";
+
+      container.appendChild(img);
+      container.appendChild(indexLabel);
+      document.getElementById('croppedImageList').appendChild(container);
+
+      croppedImages.push(blob);
+      
+      cropper.destroy();
+      document.getElementById('cropPreview').style.display = "none";
+      document.getElementById('cropButton').style.display = "none";
+
+      currentFileIndex++;
+      loadNextImage();
+    });
+  });
+
+  // Pagination
+  function goToPage(page) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', page);
+    window.location.href = `/admin/products?${urlParams.toString()}`;
+  }
+
+  function goToPrevPage() {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
     }
+  }
 
-    function goToPrevPage() {
-      if (currentPage > 1) {
-        goToPage(currentPage - 1);
-      }
+  function goToNextPage() {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
     }
+  }
 
-    function goToNextPage() {
-      if (currentPage < totalPages) {
-        goToPage(currentPage + 1);
+  // Toggle Product Status
+  function toggleProductStatus(productId, newStatus) {
+    fetch(`/admin/products/status/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ isActive: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showToast('Product status updated successfully');
+        location.reload();
+      } else {
+        showToast('Failed to update status', 'error');
       }
+    })
+    .catch(err => {
+      console.error('Error updating product status:', err);
+      showToast('Error occurred while updating the status', 'error');
+    });
+  }
+
+  // Search Functionality
+  document.getElementById('searchBtn').addEventListener('click', function() {
+    const searchTerm = document.getElementById('searchBox').value;
+    if (searchTerm.trim()) {
+      window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
     }
+  });
 
-    // Toggle Product Status
-    function toggleProductStatus(productId, newStatus) {
-      fetch(`/admin/products/status/${productId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ isActive: newStatus })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert('Failed to update status');
-        }
-      })
-      .catch(err => {
-        console.error('Error updating product status:', err);
-        alert('Error occurred while updating the status');
-      });
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    document.getElementById('searchBox').value = '';
+    window.location.href = '/admin/products';
+  });
+
+  document.getElementById('searchBox').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('searchBtn').click();
     }
+  });
 
-    // Search Functionality
-    document.getElementById('searchBtn').addEventListener('click', function() {
-      const searchTerm = document.getElementById('searchBox').value;
-      if (searchTerm.trim()) {
-        window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
-      }
-    });
+  // Close modals when clicking outside
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+      if (e.target.id === 'productModal') closeModal();
+      if (e.target.id === 'viewProductModal') closeViewModal();
+      if (e.target.id === 'deleteModal') closeDeleteModal();
+    }
+  });
 
-    document.getElementById('resetBtn').addEventListener('click', function() {
-      document.getElementById('searchBox').value = '';
-      window.location.href = '/admin/products';
-    });
+  // Initialize pagination variables
+  var currentPage = parseInt('<%= currentPage || 1 %>');
+  var totalPages = parseInt('<%= totalPages || 1 %>');
 
-    document.getElementById('searchBox').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('searchBtn').click();
-      }
-    });
-
-    // Close modals when clicking outside
-    window.addEventListener('click', function(e) {
-      if (e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'productModal') closeModal();
-        if (e.target.id === 'viewProductModal') closeViewModal();
-        if (e.target.id === 'deleteModal') closeDeleteModal();
-      }
-    });
-
-    // Initialize pagination variables
-    var currentPage = parseInt('<%= currentPage || 1 %>');
-    var totalPages = parseInt('<%= totalPages || 1 %>');
-
-   
   document.addEventListener('DOMContentLoaded', function () {
     const productNameInput = document.getElementById('productName');
     const skuInput = document.getElementById('sku');
@@ -672,18 +696,13 @@ if (!currentProductId && croppedImages.length === 0) {
         return;
       }
 
-      // Convert to SKU format: "Maheshwari Bottle Green" → "MAHESHWARI-BOTTLE-GREEN"
       const formatted = name.replace(/\s+/g, '-').replace(/[^A-Z0-9\-]/g, '');
 
-      // Add a short prefix or ID — you can customize this part
-      const skuPrefix = 'SKU-'; // or derive based on category
+      const skuPrefix = 'SKU-'; 
       const sku = `${skuPrefix}${formatted}`;
 
       skuInput.value = sku;
     });
   });
-
-
-  </script>
-
+</script>
   <%- include('../partials/admin/admin-footer') %>
