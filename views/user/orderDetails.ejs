@@ -193,21 +193,22 @@
 
 <% if (order.status.toUpperCase() === 'PENDING' || 
        order.status.toUpperCase() === 'PROCESSING' || 
+       order.status.toUpperCase()==='PAID'||
        order.status.toUpperCase() === 'PARTIALLY_CANCELLED') { %>
     <div class="action-buttons">
         <button class="action-btn cancel-btn"
                 data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
-                onclick="openModal('cancel')">Cancel Order</button>
+                onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
     </div>
 <% } else if (order.status.toUpperCase() === 'DELIVERED' || 
-               order.status.toUpperCase() === 'PARTIALLY_RETURNED'||
-               order.status.toUpperCase()==='PAID') { %>
+               order.status.toUpperCase() === 'PARTIALLY_RETURNED'
+              ) { %>
     <div class="action-buttons">
         <button class="action-btn return-btn"
                 data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
-                onclick="openModal('return')">Return Item</button>
+                onclick="openModal('return', '<%= order._id %>', '<%= order.items.length === 1 ? order.items[0]._id : null %>')">Return Item</button>
     </div>
 <% } else if (order.status.toUpperCase() === 'PAYMENT_FAILED') { %>
     <div class="action-buttons">
@@ -251,8 +252,8 @@
         </div>
         <textarea id="cancelReason" placeholder="Your reason..."></textarea>
         <div class="modal-actions">
-            <button class="modal-btn modal-cancel"  data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
-            <button class="modal-btn modal-submit" data-order-id="<%= order._id %>" onclick="submitCancel(event)">Submit Request</button>
+            <button class="modal-btn modal-cancel" type="button"  onclick="closeModal()">Cancel</button>
+            <button class="modal-btn modal-submit" type="button" onclick="submitCancel(event)">Submit Request</button>
         </div>
     </div>
 </div>
@@ -274,7 +275,7 @@
             <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button> -->
 
 <button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
-<button class="modal-btn modal-submit" type="button"data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button>
+<button class="modal-btn modal-submit" type="button" onclick="submitReturn(event)">Submit Request</button>
 
         </div>
     </div>

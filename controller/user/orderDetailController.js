@@ -216,141 +216,323 @@ res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order
         res.status(500).json({ error: 'Failed to generate invoice' });
     }
 };
-const cancelOrder = async (req, res) => {
+// const cancelOrder = async (req, res) => {
+//   try {
+//     console.log("Cancel controller called");
+
+//     const { orderId } = req.params;
+//     const { reason, itemId, customReason } = req.body;
+
+//     console.log("orderId",req.params.orderId);
+
+//     console.log("req.body inside cancel", req.body);
+
+//     if (!orderId) {
+//       return res.status(400).json({ success: false, message: 'Order ID is required' });
+//     }
+
+//     const order = await Order.findById(orderId);
+//     if (!order) {
+//       return res.status(404).json({ success: false, message: 'Order not found' });
+//     }
+
+//     const cancellationReason = customReason || reason;
+//     if (!cancellationReason) {
+//       return res.status(400).json({ success: false, message: 'Cancellation reason is required' });
+//     }
+
+//     // Only allow cancel if order is not delivered/shipped/returned
+//     if (!['pending', 'processing','paid','partially_cancelled'].includes(order.status.toLowerCase())) {
+//       return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
+//     }
+
+//     let cancelledItems = order.cancellation?.cancelledItems || [];
+//     const deliveryCharge = order.delivery || 0;
+//     const totalPaid = order.total;
+//     let refundAmount = 0;
+
+//     if (!itemId) {
+//       //  Full order cancellation
+//       order.items.forEach(item => {
+//         if (item.status !== 'cancelled') {
+//           item.status = 'cancelled';
+//           cancelledItems.push({
+//             product: item.productId,
+//             name: item.name,
+//             quantity: item.quantity,
+//             reason: cancellationReason
+//           });
+//         }
+//       });
+
+//       order.status = 'cancelled';
+//       order.cancelledAt = new Date();
+//       refundAmount = totalPaid - deliveryCharge;
+
+//       order.cancellation = {
+//         reason: cancellationReason,
+//         date: new Date(),
+//         initiatedBy: 'customer',
+//         type: 'full',
+//         cancelledItems
+//       };
+
+//       // Restore stock for all items
+//       await Promise.all(order.items.map(item =>
+//         Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+//       ));
+
+//     } else {
+//       const item = order.items.id(itemId);
+
+//       if (!item) {
+//         return res.status(404).json({ success: false, message: 'Item not found in order' });
+//       }
+
+//       if (item.status === 'cancelled') {
+//         return res.status(400).json({ success: false, message: 'Item already cancelled' });
+//       }
+
+//       // Restore stock
+//       await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+
+//       // Mark item as cancelled
+//       item.status = 'cancelled';
+//       cancelledItems.push({
+//         product: item.productId,
+//         name: item.name,
+//         quantity: item.quantity,
+//         reason: cancellationReason
+//       });
+
+//       const allCancelled = order.items.every(i => i.status === 'cancelled');
+//       order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
+
+//       const activeItemsCount = order.items.length;
+//       const perItemRefund = (totalPaid - deliveryCharge) / activeItemsCount;
+//       const perItemDelivery = deliveryCharge / activeItemsCount;
+//       refundAmount = perItemRefund - perItemDelivery;
+// console.log("refundAmount:",refundAmount);
+//       order.cancellation = {
+//         reason: cancellationReason,
+//         date: new Date(),
+//         initiatedBy: 'customer',
+//         type: allCancelled ? 'full' : 'partial',
+//         cancelledItems
+//       };
+//     }
+
+//     // Save order
+//     await order.save();
+
+//     // Wallet refund
+//     if (refundAmount > 0 && order.paymentMethod) {
+//       const paymentMethod=order.paymentMethod.toLowerCase();
+//       if(paymentMethod==='cod'){
+//         console.log("cod order:no refund needed for cancellation")
+//       }else if (paymentMethod==='wallet'||paymentMethod==='netbanking'){
+//       const wallet = await Wallet.findOne({ user: order.userId });
+//       if (wallet) {
+//         wallet.balance += refundAmount;
+//         wallet.transactions.push({
+//           amount: refundAmount,
+//           type: 'refund',
+//           order: order._id,
+//           description: `Refund for order cancellation (${order.orderId})`,
+//           status: 'completed'
+//         });
+//         await wallet.save();
+//       }
+//     }
+
+//     return res.json({
+//       success: true,
+//       message: 'Cancellation processed successfully',
+//       order
+//     });
+
+//   }
+//  } catch (error) {
+//     console.error('Error cancelling order:', error);
+//     res.status(500).json({ success: false, message: 'Failed to cancel order', error: error.message });
+//   }
+// }
+
+const cancelOrder=async(req,res)=>{
   try {
-    console.log("Cancel controller called");
+    console.log("cancel controler called");
+    const {orderId}=req.params;
+    const{reason,itemId,customReason}=req.body;
+    console.log("orderId",req.params.orderId);
+    console.log("req.body inside the cancel",req.body);
+    if(!orderId){
+      return res.status(400).json({success:false,message:"Order Id is required"});
 
-    const { orderId } = req.params;
-    const { reason, itemId, customReason } = req.body;
-
-    console.log("req.body inside cancel", req.body);
-
-    if (!orderId) {
-      return res.status(400).json({ success: false, message: 'Order ID is required' });
     }
+    const order=await Order.findById(orderId);
+if(!order){
+  return res.status(404).json({success:false,message:'order not found'})
+}
 
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
+const cancellationReason=customReason||reason;
+if(!cancellationReason){
+  return res.status(400).json({success:false,message:'Cancellation reason is required'})
+}
 
-    const cancellationReason = customReason || reason;
-    if (!cancellationReason) {
-      return res.status(400).json({ success: false, message: 'Cancellation reason is required' });
-    }
+if(!['pending','processing','paid','partially_cancelled'].includes(order.status.toLowerCase())){
+  return res.json({success:false,message:"order cannot be cancelled at this stage"});
+}
 
-    // Only allow cancel if order is not delivered/shipped/returned
-    if (!['pending', 'processing','paid'].includes(order.status.toLowerCase())) {
-      return res.status(400).json({ success: false, message: 'Order cannot be cancelled at this stage' });
-    }
+let cancelledItems=order.cancellation?.cancelledItems||[];
+const deliveryCharge=order.delivery||0;
+const couponAmount=order.appliedCoupon?.value||0;
+const tax=order.tax||0;
+let refundAmount=0;
 
-    let cancelledItems = order.cancellation?.cancelledItems || [];
-    const deliveryCharge = order.delivery || 0;
-    const totalPaid = order.total;
-    let refundAmount = 0;
+const getActiveSubtotal=()=>{
+  return order.items.reduce((sum,item)=>{
+    return item.status!=='cancelled'?sum+item.totalPrice:sum;
+  },0);
+}
 
-    if (!itemId) {
-      //  Full order cancellation
-      order.items.forEach(item => {
-        if (item.status !== 'cancelled') {
-          item.status = 'cancelled';
-          cancelledItems.push({
-            product: item.productId,
-            name: item.name,
-            quantity: item.quantity,
-            reason: cancellationReason
-          });
-        }
-      });
+const activeSubtotal=getActiveSubtotal();
+const activeItems =order.items.filter(item=>item.status!=='cancelled');
+const activeItemsCount=activeItems.length;
+console.log("Active subtotal before cancel:",activeSubtotal,"Active items:",activeItems);
 
-      order.status = 'cancelled';
-      order.cancelledAt = new Date();
-      refundAmount = totalPaid - deliveryCharge;
+if(!itemId){
+  //full order cancellation
 
-      order.cancellation = {
-        reason: cancellationReason,
-        date: new Date(),
-        initiatedBy: 'customer',
-        type: 'full',
-        cancelledItems
-      };
+  if(activeItemsCount===0){
+    console.log("all the itens already canceled;no additional refund is needed");
+    refundAmount=0;
+  
+  }else{
+  activeItems.forEach(item=>{
+    item.status='cancelled';
+    cancelledItems.push({
+      product:item.productId,
+      name:item.name,
+      quantity:item.quantity,
+      reason:cancellationReason
+    })
+  })
 
-      // Restore stock for all items
-      await Promise.all(order.items.map(item =>
-        Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
-      ));
+//refund
+const netRefundable=activeSubtotal-couponAmount+tax;
+refundAmount=netRefundable-deliveryCharge;
+refundAmount=Math.max(0,refundAmount);
+console.log("full refund calc:activeSubtotal",activeSubtotal,"-coupon",couponAmount,"+tax",tax,"-delivery",deliveryCharge,"=",refundAmount);
+  }
+order.status='cancelled';
+order.cancelledAt=new Date();
 
-    } else {
-      //  Partial (single item) cancellation
-      const item = order.items.id(itemId);
+order.cancellation={
+  reason:cancellationReason,
+  date:new Date(),
+  intitatedBy:'customer',
+  type:'full',
+  cancelledItems
+}
+await Promise.all(activeItems.map(item=>
+  Product.findByIdAndUpdate(item.productId,{$inc:{stock:item.quantity}})
+))
+}else{
+ //partial cancellation
+const item=order.items.id(itemId);
+if(!item){
+  return res.status(404).json({success:false,message:"Item not found in order"});
+}
 
-      if (!item) {
-        return res.status(404).json({ success: false, message: 'Item not found in order' });
-      }
+if(item.status==='cancelled'){
+  return res.status(400).json({success:false,message:'Items already cancelled'});
+}
+//restocking the item
+await Product.findByIdAndUpdate(item.productId,{$inc:{stock:item.quantity}});
 
-      if (item.status === 'cancelled') {
-        return res.status(400).json({ success: false, message: 'Item already cancelled' });
-      }
+item.status='cancelled';
+cancelledItems.push({
+  product:item.productId,
+  name:item.name,
+  quantity:item.quantity,
+  reason:cancellationReason
+})
 
-      // Restore stock
-      await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+const allCancelled=order.items.every(i=>i.status==='cancelled');
+order.status=allCancelled?'cancelled':'partially_cancelled';
 
-      // Mark item as cancelled
-      item.status = 'cancelled';
-      cancelledItems.push({
-        product: item.productId,
-        name: item.name,
-        quantity: item.quantity,
-        reason: cancellationReason
-      });
+const itemTotalPrice=item.totalPrice;
+if(activeSubtotal>0){
+  const itemShare=itemTotalPrice/activeSubtotal;
+  const netRefundable=activeSubtotal-couponAmount+tax;
+  refundAmount=itemShare*netRefundable;
+  refundAmount=Math.max(0,refundAmount);
+  console.log("partial refund calc:itemTotalPrice")
+}else{
+  refundAmount=0;
+}
 
-      const allCancelled = order.items.every(i => i.status === 'cancelled');
-      order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
-
-      const activeItemsCount = order.items.length;
-      const perItemRefund = (totalPaid - deliveryCharge) / activeItemsCount;
-      const perItemDelivery = deliveryCharge / activeItemsCount;
-      refundAmount = perItemRefund - perItemDelivery;
-console.log("refundAmount:",refundAmount);
-      order.cancellation = {
-        reason: cancellationReason,
-        date: new Date(),
+order.cancellation={
+  reason:cancellationReason,
+  date: new Date(),
         initiatedBy: 'customer',
         type: allCancelled ? 'full' : 'partial',
         cancelledItems
-      };
-    }
+}
+}
+await order.save();
+if(refundAmount>0){
+  order.refund={
+    amount:refundAmount,
+    mathod:"wallet",
+    status:"completed"
+  }
+  await order.save();
+}
+//wallet refund
 
-    // Save order
-    await order.save();
+if(refundAmount>0 && order.paymentMethod){
+  const paymentMethod=order.paymentMethod.toLowerCase();
+  if(paymentMethod==='cod'){
+    console.log("cod order :no refund needed for cancellation")
+  }else if(paymentMethod==='wallet'){
+const wallet=await Wallet.findOne({user:order.userId});
+if(wallet){
+  wallet.balance+=refundAmount;
+  wallet.transactions.push({
+    amount:refundAmount,
+    type:'refund',
+    order:order._id,
+    description:` Refund for order cancellation (${order.orderId})`,
+    status:'completed'
+  });
+  await wallet.save();
+  console.log("wallet refunded:",refundAmount);
+}else{
+  console.warn("unsupported payment method for refund:",paymentMethod);
+}
+  }else if(refundAmount=0){
+    console.log("no refund calculated")
+  }
+}
 
-    // Wallet refund
-    if (refundAmount > 0) {
-      const wallet = await Wallet.findOne({ user: order.userId });
-      if (wallet) {
-        wallet.balance += refundAmount;
-        wallet.transactions.push({
-          amount: refundAmount,
-          type: 'refund',
-          order: order._id,
-          description: `Refund for order cancellation (${order.orderId})`,
-          status: 'completed'
-        });
-        await wallet.save();
-      }
-    }
 
-    return res.json({
+return res.json({
       success: true,
       message: 'Cancellation processed successfully',
       order
     });
 
+
+
   } catch (error) {
     console.error('Error cancelling order:', error);
     res.status(500).json({ success: false, message: 'Failed to cancel order', error: error.message });
   }
-};
+}
+
+
+
 
 
 const returnOrder = async (req, res) => {

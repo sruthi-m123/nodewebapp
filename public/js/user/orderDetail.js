@@ -16,7 +16,7 @@ function openModal(type, orderId, itemId = null) {
     return;
   }
 
-  // ✅ Assign proper data attributes
+
   submitBtn.dataset.orderId = orderId;
   console.log("Order ID set on submit button:", submitBtn.dataset.orderId);
 
@@ -89,10 +89,14 @@ function openModal(type, orderId, itemId = null) {
         }
 
         function submitCancel(event) {
+            
             const reason = document.getElementById('cancelReason').value;
-            const orderId = event.target.getAttribute('data-order-id');
-            const itemId=event.target.getAttribute('data-item-id');
+            const target=event.currentTarget;
+            console.log("target:",target);
+            const orderId = target.dataset.orderId;
+            const itemId=target.dataset.itemId;
             console.log("itemID:",itemId);
+            console.log("orderId",orderId);
           
             if (!reason) {
                 alert('Please provide a reason for cancellation');
@@ -340,44 +344,44 @@ function submitReturn(event) {
         }
 
 
-        function downloadInvoice(orderId){
-            const button=document.querySelector('.download-invoice');
-            const originalText=button.innerHTML;
-            button.innerHTML='<span>Generating Invoice...</span>';
-            button.disabled=true;
+//         function downloadInvoice(orderId){
+//             const button=document.querySelector('.download-invoice');
+//             const originalText=button.innerHTML;
+//             button.innerHTML='<span>Generating Invoice...</span>';
+//             button.disabled=true;
 
-            fetch(`/user/orders/${orderId}/invoice`,{
-                method:'GET',
-                headers:{
-                    'Content-Type':'application/json',
-                }
-            })
-            .then(response=>{
-                if(!response.ok){
-throw new Error('failed to generate invoice');
-                }
-                return response.blob();
-            })
-.then(blob=>{
-    const url=window.URL.createObjectURL(blob);
-    const a =document.createElement('a');
-    a.href=url;
-    a.download='Invoice_${orderId}.pdf';
-     document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-})
- .catch(error => {
-            console.error('Error:', error);
-Swal.fire({
-  icon: 'error',
-  title: 'Download Failed',
-  text: 'Failed to download invoice. Please try again.',
-  confirmButtonText: 'OK'
-});        })
-        .finally(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        });
-        }
+//             fetch(`/user/orders/${orderId}/invoice`,{
+//                 method:'GET',
+//                 headers:{
+//                     'Content-Type':'application/json',
+//                 }
+//             })
+//             .then(response=>{
+//                 if(!response.ok){
+// throw new Error('failed to generate invoice');
+//                 }
+//                 return response.blob();
+//             })
+// .then(blob=>{
+//     const url=window.URL.createObjectURL(blob);
+//     const a =document.createElement('a');
+//     a.href=url;
+//     a.download='Invoice_${orderId}.pdf';
+//      document.body.appendChild(a);
+//             a.click();
+//             window.URL.revokeObjectURL(url);
+//             a.remove();
+// })
+//  .catch(error => {
+//             console.error('Error:', error);
+// Swal.fire({
+//   icon: 'error',
+//   title: 'Download Failed',
+//   text: 'Failed to download invoice. Please try again.',
+//   confirmButtonText: 'OK'
+// });        })
+//         .finally(() => {
+//             button.innerHTML = originalText;
+//             button.disabled = false;
+//         });
+//         }
