@@ -99,7 +99,7 @@
         }),
        }) ;
 if(response.ok){
-    window.location.reload();//referesh to updating ui
+    window.location.reload();
 }else{
     const data = await response.json();
     alert(data.message||'failed to update user status');

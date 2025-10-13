@@ -22,20 +22,30 @@
 
       <div>
         <p><strong><%= item.name %></strong></p>
-        <p><strong>₹<%= item.price.toLocaleString('en-IN') %></strong></p>
+        <p><strong>₹<%= item.totalPrice.toLocaleString('en-IN') %></strong></p>
 
         <% if (item.color) { %>
           <p><strong>Color: </strong> <%= item.color %></p>
         <% } %>
 
         <p><strong>Quantity: </strong> <%= item.quantity %></p>
-        <p><strong>Item Total: </strong> ₹<%=(item.price * item.quantity).toLocaleString('en-IN')%></p>
+        <p><strong>Item Total: </strong> ₹<%=(item.totalPrice * item.quantity).toLocaleString('en-IN')%></p>
 <!-- /          JSON.stringify({ "<%= order %>" }) -->
 
 
         <!-- Action buttons for each item -->
         <div class="item-actions">
-          <% if (order.status !== 'cancelled' && order.status !== 'delivered' && item.status !== 'cancelled'&& item.status!=='returned'&& order.items.length>1&& item.status!=='partially_returned'&&item.status!=='return_requested') { %>
+          <% const activeItems = order.items.filter(i => i.status !== 'cancelled'&&i.status!=='returned'&& i.status!=='return_requested'); %>
+          <% const activeCount = activeItems.length; %>
+          <% if (activeCount>1 &&
+                 order.status !== 'cancelled' &&
+                 order.status !== 'delivered' &&
+                 order.status!=='return_requested'&&
+                 order.status!=='partially_returned'&&
+                 item.status !== 'cancelled'&&
+                 item.status!=='returned'&& 
+                 item.status!=='partially_returned'&&
+                item.status!=='return_requested') { %>
             <button class="cancel-item-btn" 
                     data-order-id="<%= order._id %>" 
                     data-item-id="<%= item._id %>"
@@ -44,7 +54,12 @@
             </button>
           <% } %>
 
-          <% if (order.status === 'delivered' && item.status !== 'returned' && item.status !=='cancelled'&& order.items.length>1 && item.status!=='partially_cancelled') { %>
+          <% if (activeCount > 1 &&
+            (order.status === 'delivered' || order.status === 'partially_returned') &&
+           item.status !== 'returned' &&
+           item.status!=='return_requested'&&
+            item.status !=='cancelled'&&
+                        item.status!=='partially_cancelled') { %>
             <button class="return-item-btn" 
                     data-order-id="<%= order._id%>" 
                     data-item-id="<%= item._id %>"
@@ -201,14 +216,14 @@
                 data-status="<%= order.status %>"
                 onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
     </div>
-<% } else if (order.status.toUpperCase() === 'DELIVERED' || 
-               order.status.toUpperCase() === 'PARTIALLY_RETURNED'
-              ) { %>
+<% } else if ((order.status.toUpperCase() === 'DELIVERED' || 
+               order.status.toUpperCase() === 'PARTIALLY_RETURNED') && 
+               order.items.length === 1) { %>
     <div class="action-buttons">
         <button class="action-btn return-btn"
                 data-order-id="<%= order._id %>"
                 data-status="<%= order.status %>"
-                onclick="openModal('return', '<%= order._id %>', '<%= order.items.length === 1 ? order.items[0]._id : null %>')">Return Item</button>
+                onclick="openModal('return', '<%= order._id %>', '<%= order.items[0]._id %>')">Return Item</button>
     </div>
 <% } else if (order.status.toUpperCase() === 'PAYMENT_FAILED') { %>
     <div class="action-buttons">

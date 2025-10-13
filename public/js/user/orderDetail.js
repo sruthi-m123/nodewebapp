@@ -235,6 +235,19 @@ function submitReturn(event) {
         return;
     }
 
+if(!itemId){
+    console.error("No item found-cannot submit return");
+    Swal.fir({
+        icon:'error',
+        title:'Invalid item selection',
+        timer:2500,
+        showConfirmButton:false,
+        toast:true,
+        position:'top-end'
+    });
+    return;
+}
+
     const status = 'delivered';
 
     fetch(`/user/orders/${orderId}/return`, {
@@ -243,7 +256,7 @@ function submitReturn(event) {
         body: JSON.stringify({ 
             reason,
             status: status.toLowerCase().trim(),
-            ItemsIds: [itemId],
+            itemId,
             returnRequest: true
         })
     })

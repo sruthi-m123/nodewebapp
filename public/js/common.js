@@ -42,7 +42,7 @@ window.addEventListener("click",(e)=>{
     })
       .then(res => {
         if (res.ok) {
-          window.location.href = '/home'; 
+          window.location.href = '/user/home'; 
         }
       })
       .catch(err => console.error('Logout failed:', err));

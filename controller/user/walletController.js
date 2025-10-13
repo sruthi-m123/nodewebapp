@@ -128,12 +128,19 @@ const addTransaction=(wallet,amount,type,reference,description,orderId=null)=>{
 
 
 const creditWallet = async (userId, amount, orderId, referenceType) => {
+  console.log("inside the controller")
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const wallet = await findOrCreateWallet(userId, session); 
-
+const alreadyCredited = wallet.transactions.some(
+      (t) => t.order?.toString() === orderId.toString() && t.type === 'credit'
+    );
+    if (alreadyCredited) {
+      console.log("refund already credited for this order");
+      return true;
+    }
     wallet.balance += amount;
 
     addTransaction(

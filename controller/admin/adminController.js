@@ -69,20 +69,35 @@ const loadDashboard = async (req, res) => {
   }
 };
 
-const logout = async (req, res) => {
+// const logout = async (req, res) => {
+//   try {
+//     req.session.admin.destroy((err) => {
+//       if (err) {
+//         console.log("error destroying session", err);
+//         return res.redirect("/admin/page_error");
+//       }
+//       res.redirect("/admin/login");
+//     });
+//   } catch (error) {
+//     console.log("unexpected error during logout", error);
+//     res.redirect("/admin/page_error");
+//   }
+// };
+
+const logout=async(req,res)=>{
   try {
-    req.session.admin.destroy((err) => {
-      if (err) {
-        console.log("error destroying session", err);
-        return res.redirect("/admin/page_error");
-      }
-      res.redirect("/admin/login");
-    });
+    if(req.session.admin){
+      delete req.session.admin;
+      console.log("admin session cleared successfully");
+    }else{
+      console.log("no admin session found");
+    }
+    res.redirect("/admin/login");
   } catch (error) {
-    console.log("unexpected error during logout", error);
-    res.redirect("/admin/page_error");
+   console.log("unexpected error during admin logout:",error);
+   res.redirect("/admin/page_error"); 
   }
-};
+}
 
 
 module.exports = {

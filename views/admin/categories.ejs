@@ -166,47 +166,90 @@
       </div>
     </div>
   </div>
+<script>
+  let currentCategoryId = null;
+  let deleteCategoryId = null;
+  let cropper;
+  let croppedImage = null;
 
-  <script>
-    let currentCategoryId = null;
-    let deleteCategoryId = null;
-    let cropper;
-    let croppedImage = null;
+  // Toast Notification Function
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+      color: white;
+      padding: 16px;
+      border-radius: 4px;
+      z-index: 10000;
+      min-width: 300px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease-out;
+    `;
+    document.body.appendChild(toast);
 
-    // Modal Functions
-    function openModal() {
-      document.getElementById('categoryModal').style.display = 'flex';
-      document.querySelector('.modal-title').textContent = 'Add Category';
-      document.getElementById('categoryForm').reset();
-      document.getElementById('croppedImageList').innerHTML = '';
-      document.getElementById('previewArea').innerHTML = '';
-      currentCategoryId = null;
-      croppedImage = null;
-    }
+    // Simple slide-in animation via CSS (add this to your stylesheet if needed)
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .toast {
+        animation: slideIn 0.3s ease-out;
+      }
+    `;
+    document.head.appendChild(style);
 
-    function closeModal() {
-      document.getElementById('categoryModal').style.display = 'none';
-    }
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+        document.head.removeChild(style);
+      }, 300);
+    }, 4000);
+  }
 
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').style.display = 'none';
-      deleteCategoryId = null;
-    }
+  // Modal Functions
+  function openModal() {
+    document.getElementById('categoryModal').style.display = 'flex';
+    document.querySelector('.modal-title').textContent = 'Add Category';
+    document.getElementById('categoryForm').reset();
+    document.getElementById('croppedImageList').innerHTML = '';
+    document.getElementById('previewArea').innerHTML = '';
+    currentCategoryId = null;
+    croppedImage = null;
+  }
 
-    // Category CRUD Operations
-    function editCategory(categoryId) {
-      currentCategoryId = categoryId;
-      document.getElementById('categoryForm').reset();
-      document.getElementById('croppedImageList').innerHTML = '';
-      document.getElementById('previewArea').innerHTML = '';
-      croppedImage = null;
+  function closeModal() {
+    document.getElementById('categoryModal').style.display = 'none';
+  }
 
-      fetch(`/admin/categories/${categoryId}/details`)
-        .then(response => response.json())
-        .then(data => {
-           if (data.success && data.category) {
-    const category = data.category;
-           
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    deleteCategoryId = null;
+  }
+
+  // Category CRUD Operations
+  function editCategory(categoryId) {
+    currentCategoryId = categoryId;
+    document.getElementById('categoryForm').reset();
+    document.getElementById('croppedImageList').innerHTML = '';
+    document.getElementById('previewArea').innerHTML = '';
+    croppedImage = null;
+
+    fetch(`/admin/categories/${categoryId}/details`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.category) {
+          const category = data.category;
+          
           // Fill form fields
           document.getElementById('categoryName').value = category.name || '';
           document.getElementById('description').value = category.description || '';
@@ -245,231 +288,231 @@
 
           document.querySelector('.modal-title').textContent = 'Edit Category';
           document.getElementById('categoryModal').style.display = 'flex';
-           }
-        })
-        .catch(error => {
-          console.error('Error fetching category:', error);
-          alert('Error loading category data');
-        });
-    }
-
-    function deleteCategory(categoryId) {
-      deleteCategoryId = categoryId;
-      document.getElementById('deleteModal').style.display = 'flex';
-    }
-
-    function confirmDelete() {
-      if (!deleteCategoryId) return;
-      
-      fetch(`/admin/categories/${deleteCategoryId}/delete`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
-.then(async (response) => {
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Server Error: ${response.status}\n${text}`);
-  }
-  return response.json();
-})
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert(data.message || 'Error deleting category');
         }
       })
       .catch(error => {
-        console.error('Error deleting category:', error);
-        alert('Error deleting category');
-      })
-      .finally(() => {
-        closeDeleteModal();
+        console.error('Error fetching category:', error);
+        showToast('Error loading category data', 'error');
       });
-    }
-
-    // Form Submission
-    document.getElementById('categoryForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  const formData = new FormData(this);
-  console.log('🔍 croppedImage:', croppedImage);
-console.log('croppedImage Type:', croppedImage?.constructor?.name); // Should be Blob or File
-
-  // Simplified checkbox handling
-  formData.append('isActive', document.getElementById('isActive').checked);
-
-  if (currentCategoryId) {
-    formData.append('id', currentCategoryId);
-  }
-  
-  // 
-  
-  if(croppedImage){
-    const file=new File([croppedImage],`category=${Date.now()}.jpg`,{type:'image/jpeg'});
-    formData.append('categoryImage',file);
   }
 
-  const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
-  const method = currentCategoryId ? 'PUT' : 'POST';
+  function deleteCategory(categoryId) {
+    deleteCategoryId = categoryId;
+    document.getElementById('deleteModal').style.display = 'flex';
+  }
 
-  fetch(url, {
-    method,
-    body: formData // No headers needed for FormData
-  })
-  .then(res => {
-    if (!res.ok) {
-      return res.json().then(err => { throw err; });
+  function confirmDelete() {
+    if (!deleteCategoryId) return;
+    
+    fetch(`/admin/categories/${deleteCategoryId}/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+    .then(async (response) => {
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Server Error: ${response.status}\n${text}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        showToast('Category deleted successfully!', 'success');
+        location.reload();
+      } else {
+        showToast(data.message || 'Error deleting category', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting category:', error);
+      showToast('Error deleting category', 'error');
+    })
+    .finally(() => {
+      closeDeleteModal();
+    });
+  }
+
+  // Form Submission
+  document.getElementById('categoryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    console.log('🔍 croppedImage:', croppedImage);
+    console.log('croppedImage Type:', croppedImage?.constructor?.name); // Should be Blob or File
+
+    // Simplified checkbox handling
+    formData.append('isActive', document.getElementById('isActive').checked);
+
+    if (currentCategoryId) {
+      formData.append('id', currentCategoryId);
     }
-    return res.json();
-  })
-  .then(data => {
-    if (data.success) {
-      location.reload();
-    } else {
-      alert(data.message || 'Error saving category');
+    
+    // 
+    
+    if(croppedImage){
+      const file=new File([croppedImage],`category=${Date.now()}.jpg`,{type:'image/jpeg'});
+      formData.append('categoryImage',file);
     }
-  })
-  .catch(error => {
-    console.error('Error saving category:', error);
-    alert(error.message || 'Error saving category');
+
+    const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
+    const method = currentCategoryId ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method,
+      body: formData // No headers needed for FormData
+    })
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(err => { throw err; });
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (data.success) {
+        const action = currentCategoryId ? 'updated' : 'added';
+        showToast(`Category ${action} successfully!`, 'success');
+        location.reload();
+      } else {
+        showToast(data.message || 'Error saving category', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error saving category:', error);
+      showToast(error.message || 'Error saving category', 'error');
+    });
   });
-});
-    // Image Cropping Functionality
-    document.getElementById('cropImageInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+
+  // Image Cropping Functionality
+  document.getElementById('cropImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('previewArea').innerHTML = '';
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('cropPreview').src = event.target.result;
+      document.getElementById('cropPreview').style.display = "block";
+      document.getElementById('cropButton').style.display = "inline-block";
       
-      document.getElementById('previewArea').innerHTML = '';
-      
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        document.getElementById('cropPreview').src = event.target.result;
-        document.getElementById('cropPreview').style.display = "block";
-        document.getElementById('cropButton').style.display = "inline-block";
-        
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(document.getElementById('cropPreview'), {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          responsive: true,
-          scalable: true,
-          zoomable: true
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('cropButton').addEventListener('click', function() {
-      const canvas = cropper.getCroppedCanvas();
-      canvas.toBlob(function(blob) {
-        const imageUrl = URL.createObjectURL(blob);
-        
-        const container = document.createElement("div");
-        container.style.border = "1px solid #ccc";
-        container.style.borderRadius = "8px";
-        container.style.padding = "8px";
-        container.style.background = "#f9f9f9";
-        container.style.width = "120px";
-        container.style.textAlign = "center";
-
-        const img = document.createElement("img");
-        img.src = imageUrl;
-        img.style.width = "100%";
-        img.style.height = "100px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "4px";
-
-        const indexLabel = document.createElement("div");
-        indexLabel.textContent = `Image`;
-        indexLabel.style.marginTop = "5px";
-        indexLabel.style.fontSize = "12px";
-        indexLabel.style.color = "#333";
-
-        container.appendChild(img);
-        container.appendChild(indexLabel);
-        document.getElementById('croppedImageList').innerHTML = '';
-        document.getElementById('croppedImageList').appendChild(container);
-
-        croppedImage = blob;
-        
-        cropper.destroy();
-        document.getElementById('cropPreview').style.display = "none";
-        document.getElementById('cropButton').style.display = "none";
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(document.getElementById('cropPreview'), {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        responsive: true,
+        scalable: true,
+        zoomable: true
       });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('cropButton').addEventListener('click', function() {
+    const canvas = cropper.getCroppedCanvas();
+    canvas.toBlob(function(blob) {
+      const imageUrl = URL.createObjectURL(blob);
+      
+      const container = document.createElement("div");
+      container.style.border = "1px solid #ccc";
+      container.style.borderRadius = "8px";
+      container.style.padding = "8px";
+      container.style.background = "#f9f9f9";
+      container.style.width = "120px";
+      container.style.textAlign = "center";
+
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      img.style.width = "100%";
+      img.style.height = "100px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "4px";
+
+      const indexLabel = document.createElement("div");
+      indexLabel.textContent = `Image`;
+      indexLabel.style.marginTop = "5px";
+      indexLabel.style.fontSize = "12px";
+      indexLabel.style.color = "#333";
+
+      container.appendChild(img);
+      container.appendChild(indexLabel);
+      document.getElementById('croppedImageList').innerHTML = '';
+      document.getElementById('croppedImageList').appendChild(container);
+
+      croppedImage = blob;
+      
+      cropper.destroy();
+      document.getElementById('cropPreview').style.display = "none";
+      document.getElementById('cropButton').style.display = "none";
     });
+  });
 
-    // Toggle Category Status
-    function toggleCategoryStatus(categoryId, newStatus) {
-      const status = isActive ? 'active' : 'inactive';  
-      fetch(`/admin/categories/status/${categoryId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-const button = document.getElementById(`status-btn-${categoryId}`);
-      const updatedStatus = data.category.status;
+  // Toggle Category Status
+  function toggleCategoryStatus(categoryId, newStatus) {
+    const status = newStatus ? newStatus : 'active';  
+    fetch(`/admin/categories/status/${categoryId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const button = document.getElementById(`status-btn-${categoryId}`);
+        const updatedStatus = data.category.status;
 
-      // Update button text and onclick
-      if (button) {
-        button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
-        button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
-      
-      }
-    }else{
-          alert('Failed to update status');
+        // Update button text and onclick
+        if (button) {
+          button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
+          button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
         }
-      
-      })
-      .catch(err => {
-        console.error('Error updating category status:', err);
-        alert('Error occurred while updating the status');
+        showToast(`Category status updated to ${updatedStatus}!`, 'success');
+      } else {
+        showToast('Failed to update status', 'error');
+      }
+    })
+    .catch(err => {
+      console.error('Error updating category status:', err);
+      showToast('Error occurred while updating the status', 'error');
+    });
+  }
+
+  // Search Functionality
+  document.getElementById('searchBtn').addEventListener('click', function() {
+    const searchTerm = document.getElementById('searchBox').value;
+    if (searchTerm.trim()) {
+      window.location.href = `/admin/categories?search=${encodeURIComponent(searchTerm)}`;
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const resetBtn=document.getElementById('resetBtn');
+    if(resetBtn){
+      resetBtn.addEventListener('click',function(){
+        document.getElementById('searchBox').value = '';
+        window.location.href = '/admin/categories';
       });
     }
+  });
 
-    // Search Functionality
-    document.getElementById('searchBtn').addEventListener('click', function() {
-      const searchTerm = document.getElementById('searchBox').value;
-      if (searchTerm.trim()) {
-        window.location.href = `/admin/categories?search=${encodeURIComponent(searchTerm)}`;
-      }
-    });
+  document.getElementById('searchBox').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('searchBtn').click();
+    }
+  });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const resetBtn=document.getElementById('resetBtn');
-      if(resetBtn){
-        resetBtn.addEventListener('click',function(){
-document.getElementById('searchBox').value = '';
-      window.location.href = '/admin/categories';
-        });
-            }
-    });
+  // Pagination
 
-    document.getElementById('searchBox').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('searchBtn').click();
-      }
-    });
-
-    // Pagination
-   
- 
-  
- 
   //Initialize pagination variables
  
   var currentPage = <%= currentPage %>;
   var totalPages = <%= totalPages %>;
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.pagination-btn');
 
     buttons.forEach(button => {
@@ -499,22 +542,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Close modals when clicking outside
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+      if (e.target.id === 'categoryModal') closeModal();
+      if (e.target.id === 'deleteModal') closeDeleteModal();
+    }
+  });
 
-
-
-
-    // Close modals when clicking outside
-    window.addEventListener('click', function(e) {
-      if (e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'categoryModal') closeModal();
-        if (e.target.id === 'deleteModal') closeDeleteModal();
-      }
-    });
-
-    
-
-
-  
-  </script>
+</script>
 
   <%- include('../partials/admin/admin-footer') %>

@@ -157,7 +157,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // API Configuration
+
   const API_BASE_URL = '/admin/coupons';
   const API_HEADERS = {
     'Content-Type': 'application/json',
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const now = new Date();
     const validFrom = new Date(now);
     const validTill = new Date(now);
-    validTill.setDate(validTill.getDate() + 30); // 30 days from now
+    validTill.setDate(validTill.getDate() + 30); 
 
     document.getElementById('validFrom').value = formatDateForInput(validFrom);
     document.getElementById('validTill').value = formatDateForInput(validTill);
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function formatDateForInput(date) {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -359,14 +359,15 @@ document.addEventListener('DOMContentLoaded', function() {
       // }
 
       // return await response.json();
+      console.log(Object.fromEntries(formData));
 const data = await response.json();
 
-if (!data.success) {
+if (!data.success||!response.ok) {
   showAlert('error', data.message || 'Something went wrong');
   return; 
 }
-showAlert('success', data.message || 'Coupon saved successfully!');
-    closeModal();
+// showAlert('success', data.message || 'Coupon saved successfully!');
+    // closeModal();
     setTimeout(() => window.location.reload(), 1000);
 
     return data;
@@ -453,18 +454,18 @@ showAlert('success', data.message || 'Coupon saved successfully!');
       submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
       
       const formData = new FormData(couponForm);
-      await saveCoupon(formData);
-      
-      showAlert('success', 'Coupon saved successfully!');
-      closeModal();
-      
-      // Reload page to reflect changes
-      setTimeout(() => {
+      const data=await saveCoupon(formData);
+      if(data &&data.success){
+closeModal();
+setTimeout(() => {
         window.location.reload();
       }, 1000);
+      }
+      
+      
+      
     } catch (error) {
-      console.error('Save failed:', error);
-    } finally {
+  showAlert('error', error.message || 'Something went wrong');    } finally {
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.textContent = 'Save Coupon';

@@ -267,7 +267,7 @@
       toast.style.opacity = '0';
       toast.style.transform = 'translateX(100%)';
       setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 4000);
   }
 
   // Modal Functions
@@ -414,8 +414,8 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        showToast('Product deleted successfully');
-        location.reload();
+        showToast('Product deleted successfully', 'success');
+        setTimeout(() => location.reload(), 2000);
       } else {
         showToast(data.message || 'Error deleting product', 'error');
       }
@@ -471,8 +471,8 @@
         croppedImages = [];
         filesQueue = [];
         currentFileIndex = 0;
-        showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully');
-        location.reload();
+        showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully', 'success');
+        setTimeout(() => location.reload(), 2000);
       } else {
         showToast(data.message || 'Error saving product', 'error');
       }
@@ -640,8 +640,8 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        showToast('Product status updated successfully');
-        location.reload();
+        showToast('Product status updated successfully', 'success');
+        setTimeout(() => location.reload(), 2000);
       } else {
         showToast('Failed to update status', 'error');
       }

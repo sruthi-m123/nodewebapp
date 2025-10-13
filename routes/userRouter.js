@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require("../controller/user/userController");
 const passport =require("passport");
 const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require("../middlewares/auth");
+const{checkBlocked}=require('../middlewares/checkBlocked');
 const {singleUpload, multiUpload,upload}=require('../config/multer');
 const profileController = require("../controller/user/profileController");
 const shopController=require("../controller/user/shopController");
@@ -71,12 +72,13 @@ req.session.user = {
 router.post('/logout',userController.logout);
 
 //profile page
-router.get('/profile',isLoggedIn,upload.avatar,profileController.getProfile)
-router.get('/profile/edit',upload.avatar,profileController.getEditProfile);
-router.post('/profile/update', upload.avatar, profileController.updateProfile);
-router.post('/request-email-change',profileController.requestEmailChangeOTP);
-router.post('/change-password',profileController.changePassword);
-router.post('/verify-email-change',profileController.verifyEmailChange);
+
+router.get('/profile',isLoggedIn,checkBlocked,profileController.getProfile)
+router.get('/profile/edit',checkBlocked,profileController.getEditProfile);
+router.post('/profile/update',checkBlocked, upload.avatar, profileController.updateProfile);
+router.post('/request-email-change',checkBlocked,profileController.requestEmailChangeOTP);
+router.post('/change-password',checkBlocked,profileController.changePassword);
+router.post('/verify-email-change',checkBlocked,profileController.verifyEmailChange);
 //order managment
 router.post('/orders/:orderId/return',  orderdetailController.returnOrder);  
 
@@ -93,48 +95,48 @@ router.put('/addresses/edit/:id',addressController.updateAddress);
 router.delete('/addresses/delete/:id',addressController.deleteAddress);
 router.post('/set-default-address/:id',addressController.setDefaultAddress)
 //cart page
-router.get('/cart',isLoggedIn,cartController.getCart);
+router.get('/cart',isLoggedIn,checkBlocked,cartController.getCart);
 router.post('/cart/add/:productId',cartController.addToCart);
-router.delete('/cart/remove/:itemId',cartController.removeCartItem);
-router.post('/cart/update',cartController.updateCart);
+router.delete('/cart/remove/:itemId',checkBlocked,cartController.removeCartItem);
+router.post('/cart/update',checkBlocked,cartController.updateCart);
 
 //checkout page
-router.get('/checkout',isLoggedIn, checkoutController.getCheckoutPage);
-router.get('/retry-checkout/:orderId',isLoggedIn,checkoutController.getRetryCheckoutPage);
-router.post('/buy-now',checkoutController.buyNow);
+router.get('/checkout',isLoggedIn,checkBlocked, checkoutController.getCheckoutPage);
+router.get('/retry-checkout/:orderId',isLoggedIn,checkBlocked,checkoutController.getRetryCheckoutPage);
+router.post('/buy-now',checkBlocked,checkoutController.buyNow);
 router.post('/api/addresses',checkoutController.addAddress);
 // router.put('/api/addresses/:id',checkoutController.updateAddress);
 router.get('/api/addresses/:id',checkoutController.getAddress);
 //coupon
-router.post('/checkout/apply-coupon',couponController.applyCoupon);
-router.post('/checkout/apply-coupon-by-code',couponController.applyCouponByCode)
-router.post('/checkout/remove-coupon',couponController.removeCoupon);
+router.post('/checkout/apply-coupon',checkBlocked,couponController.applyCoupon);
+router.post('/checkout/apply-coupon-by-code',checkBlocked,couponController.applyCouponByCode)
+router.post('/checkout/remove-coupon',checkBlocked,couponController.removeCoupon);
 //offer checkout routes
-router.post('/api/offers/apply',checkoutController.applyOffer);
+router.post('/api/offers/apply',checkBlocked,checkoutController.applyOffer);
 //order chekout routes
-router.post('/orders-placed',checkoutController.placeOrder);
+router.post('/orders-placed',checkBlocked,checkoutController.placeOrder);
 //razor paymentmethod
 // router.post("/createOrder", razorpayController.createOrder);
-router.post("/verifyPayment", razorpayController.verifyPayment);//success
-router.post('/mark-payment-failed',razorpayController.markPaymentFailed);//failure
+router.post("/verifyPayment",checkBlocked, razorpayController.verifyPayment);//success
+router.post('/mark-payment-failed',checkBlocked,razorpayController.markPaymentFailed);//failure
 
 
 
 
 
 //success page and failure page
-router.get('/order-success/:orderId',checkoutController.successPage);
+router.get('/order-success/:orderId',checkBlocked,checkoutController.successPage);
 router.get('/order-failure/:orderId',checkoutController.failurePage);
 //order history page
-router.get('/orders',isLoggedIn,orderController.getOrderHistory);
+router.get('/orders',isLoggedIn,checkBlocked,orderController.getOrderHistory);
 //order detail page
-router.get('/orders-details/:orderId',isLoggedIn,orderdetailController.getOrderDetails);
+router.get('/orders-details/:orderId',isLoggedIn,checkBlocked,orderdetailController.getOrderDetails);
 router.post('/orders/:orderId/return',orderdetailController.returnOrder);
 router.get('/orders/:orderId/invoice',orderdetailController.invoice);
 router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
 router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
 //wishlist page
-router.get('/wishlist',isLoggedIn,wishlistController.getWishlistPage);
+router.get('/wishlist',isLoggedIn,checkBlocked,wishlistController.getWishlistPage);
 router.post('/wishlist/add/:productId',isLoggedIn,wishlistController.addToWishlist);
 router.post('/wishlist/add-to-cart/:itemId',isLoggedIn,wishlistController.addToCartFromWishlist);
 router.delete('/wishlist/remove/:itemId',isLoggedIn,wishlistController.removeFromWishlist);
@@ -142,7 +144,7 @@ router.delete('/wishlist/remove/:itemId',isLoggedIn,wishlistController.removeFro
 router.get('/cart/count',cartController.cartCount);
 
 //wallet routes
-router.get('/wallet',walletController.getWallet);
-router.post('/add-funds',walletController.addFunds);
+router.get('/wallet',checkBlocked,walletController.getWallet);
+router.post('/add-funds',checkBlocked,walletController.addFunds);
 
 module.exports = router;

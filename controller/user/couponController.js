@@ -103,45 +103,117 @@ function checkMinCartValue(cartItems, coupon) {
   return { valid: true };
 }
 
-async function applyCouponLogic({ userId, coupon, retryCartItems = null }) {
-  let cartItems;  // Declare the variable
+// async function applyCouponLogic({ userId, coupon, retryCartItems = null }) {
+//   let cartItems;  // Declare the variable
 
-  if (retryCartItems) {
-    console.log('applyCouponLogic: Using retry cart items (count:', retryCartItems.length, ')');
-    cartItems = retryCartItems;
-  } else {
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    if (!cart || cart.items.length == 0) {
-      return { success: false, message: 'cart is empty' };
+//   if (retryCartItems) {
+//     console.log('applyCouponLogic: Using retry cart items (count:', retryCartItems.length, ')');
+//     cartItems = retryCartItems;
+//   } else {
+//     const cart = await Cart.findOne({ userId }).populate('items.productId');
+//     if (!cart || cart.items.length == 0) {
+//       return { success: false, message: 'cart is empty' };
+//     }
+//     cartItems = prepareCartItems(cart);
+//   }
+
+//   const cartCheck = checkMinCartValue(cartItems, coupon);
+//   if (!cartCheck.valid) return { success: false, message: cartCheck.message };
+
+//   const usageCheck = await checkCouponUsage(userId, coupon);
+//   if (!usageCheck.valid) return { success: false, message: usageCheck.message };
+
+//   const orderSummary = calculateOrder(cartItems, {
+//     coupon: {
+//       type: coupon.discountType === 'percentage' ? 'percentage' : 'fixed',
+//       value: coupon.discountValue
+//     }
+//   });
+
+//   return {
+//     success: true,
+//     orderSummary,
+//     discountText: getDiscountText(coupon),
+//     appliedCoupon: {
+//       couponId: coupon._id,
+//       code: coupon.code,
+//       type: coupon.discountType,
+//       value: coupon.discountValue
+//     }
+//   };
+// }
+
+async function applyCouponLogic({userId,coupon,retryCartItems=null}){
+try {
+  let cartItems=retryCartItems;
+  if(!cartItems){
+    const userCart=await Cart.findOne({userId}).populate('items.productId');
+    if(!userCart||userCart.items.length===0){
+      return {success:false,message:'cart is empty'};
     }
-    cartItems = prepareCartItems(cart);
+
+cartItems=userCart.items.map(item=>({
+  id:item.productId._id,
+  name:item.productId.productName,
+  price:item.discountedPrice||item.price,
+  originalPrice:item.price,
+  discountedPrice:item.discountedPrice||null,
+  quantity:item.quantity
+}))
+
+let orderTotal=0;
+cartItems.forEach(item=>{
+  orderTotal+=(item.discountedPrice||item.price)*item.quantity;
+})
+
+if(coupon.minCartValue&&orderTotal<coupon.minCartValue){
+  return {success:false,message:`coupon requires a minimum cart value of ₹${coupon.minCartValue}`};
+}
+let discountToApply=0;
+if(coupon.discountType==='fixed'){
+  discountToApply=coupon.discountValue;
+}else if(coupon.discountType==='perentage'){
+  discountToApply=(coupon.discountValue/100)*orderTotal;
+  if(coupon.maxDiscount&&discountToApply>coupon.maxDiscount){
+ discountToApply = coupon.maxDiscount;
   }
 
-  const cartCheck = checkMinCartValue(cartItems, coupon);
-  if (!cartCheck.valid) return { success: false, message: cartCheck.message };
-
-  const usageCheck = await checkCouponUsage(userId, coupon);
-  if (!usageCheck.valid) return { success: false, message: usageCheck.message };
-
-  const orderSummary = calculateOrder(cartItems, {
-    coupon: {
-      type: coupon.discountType === 'percentage' ? 'percentage' : 'fixed',
-      value: coupon.discountValue
-    }
-  });
-
-  return {
-    success: true,
-    orderSummary,
-    discountText: getDiscountText(coupon),
-    appliedCoupon: {
-      couponId: coupon._id,
-      code: coupon.code,
-      type: coupon.discountType,
-      value: coupon.discountValue
-    }
-  };
 }
+ if (discountToApply > orderTotal) discountToApply = orderTotal;
+
+    const finalPrice = orderTotal - discountToApply;
+  const appliedCoupon = {
+      id: coupon._id,
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      maxDiscount: coupon.maxDiscount,
+      discountApplied: discountToApply,
+    };
+  const discountText = coupon.discountType === 'percentage'
+      ? `${coupon.discountValue}% off (₹${discountToApply})`
+      : `₹${discountToApply} off`;
+
+
+         const orderSummary = {
+      items: cartItems,
+      orderTotal,
+      discountApplied: discountToApply,
+      finalPrice
+    };
+  }
+    return { success: true, appliedCoupon, discountText, orderSummary };
+} catch (error) {
+   console.error('Error in applyCouponLogic:', error);
+    return { success: false, message: 'Error calculating coupon' };
+  }
+}
+
+
+
+
+
+
 
 exports.applyCouponByCode = async (req, res) => {
   try {
@@ -235,7 +307,7 @@ exports.applyCoupon = async (req, res) => {
         }));
         console.log('retry items fetched:', retryCartItems ? retryCartItems.length : 0);
         console.log('applyCoupon:Retry mode,using failed order items ');
-      } else {
+      } else { 
         return res.json({ success: false, message: 'No failed order for retry' })
       }
     }

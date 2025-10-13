@@ -2,6 +2,7 @@ const Order=require('../../models/orderSchema');
 const Product=require('../../models/productSchema');
 const User=require('../../models/userSchema');
 const Wallet=require('../../models/walletSchema');
+const walletcontroller=require('../../controller/user/walletController')
 const PDFDocument=require('pdfkit');
 const fs=require('fs');
 const { log } = require('console');
@@ -484,36 +485,47 @@ await order.save();
 if(refundAmount>0){
   order.refund={
     amount:refundAmount,
-    mathod:"wallet",
+    method:"wallet",
     status:"completed"
   }
   await order.save();
 }
 //wallet refund
+if(refundAmount>0&&refundAmount!==0){
+  console.log("no refund calculated");
 
-if(refundAmount>0 && order.paymentMethod){
-  const paymentMethod=order.paymentMethod.toLowerCase();
+ if(order.paymentMethod){
+  const paymentMethod= order.paymentMethod.toLowerCase();
   if(paymentMethod==='cod'){
-    console.log("cod order :no refund needed for cancellation")
-  }else if(paymentMethod==='wallet'){
-const wallet=await Wallet.findOne({user:order.userId});
-if(wallet){
-  wallet.balance+=refundAmount;
-  wallet.transactions.push({
-    amount:refundAmount,
-    type:'refund',
-    order:order._id,
-    description:` Refund for order cancellation (${order.orderId})`,
-    status:'completed'
-  });
-  await wallet.save();
-  console.log("wallet refunded:",refundAmount);
-}else{
-  console.warn("unsupported payment method for refund:",paymentMethod);
-}
-  }else if(refundAmount=0){
-    console.log("no refund calculated")
+    console.log("cod order:no refund needed for calculation");
+  }else if(paymentMethod==='wallet'||paymentMethod==='netbanking'){
+    
+
+    const wallet =await Wallet.findOne({user:order.userId});
+    if(wallet){
+      wallet.balance+=refundAmount;
+
+      wallet.transactions.push({
+        amount:refundAmount,
+        type:'refund',
+        order:order._id,
+        description:`Refund for order ${order.orderId}`,
+        status:'completed'
+      })
+
+      await wallet.save();
+      console.log(`wallet refunded:{refundAmount}`)
+      order.refund.status='completed'
+    }
+
+    }else{
+      console.error('wallet refund failed');
+      order.refund.status='failed';
+    }
+    await order.save();
   }
+}else{
+  console.log("no refund to process");
 }
 
 
@@ -525,7 +537,8 @@ return res.json({
 
 
 
-  } catch (error) {
+  } 
+catch (error) {
     console.error('Error cancelling order:', error);
     res.status(500).json({ success: false, message: 'Failed to cancel order', error: error.message });
   }
@@ -542,6 +555,7 @@ const returnOrder = async (req, res) => {
     const { reason, itemId, customReason } = req.body;
     const returnReason = customReason || reason;
 console.log("return reason:",reason)
+console.log("itemId",itemId);
     if (!returnReason) {
       return res.status(400).json({ success: false, message: "Return reason is required" });
     }

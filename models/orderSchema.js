@@ -150,7 +150,7 @@ const orderSchema = new mongoose.Schema({
 refund:{
   amount:{type:Number,default:0},
   method:{type:String,enum:['cod','netbanking','wallet'],default:'wallet'},
-status: { type: String, enum: ['pending', 'processed', 'failed'], default: 'pending' },
+status: { type: String, enum: ['pending', 'processed', 'failed','completed'], default: 'pending' },
     processedAt: Date
   }
 

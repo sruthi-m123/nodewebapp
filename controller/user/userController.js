@@ -324,7 +324,8 @@ const resendOtp = async (req, res) => {
 
 const loadLogin = async (req, res) => {
   try {
-    res.render("user/login",{ layout:false, pageTitle:"Chettinad-Premium sarees",message:null});
+    const message=req.query.message||null;
+    res.render("user/login",{ layout:false, pageTitle:"Chettinad-Premium sarees",message});
   } catch (error) {
     console.error("Error rendering login page:", error);
     res.redirect("/pageNotFound");
@@ -628,15 +629,20 @@ const resetforgotPassword = async (req, res) => {
 
 
 const logout=async (req,res)=>{
-  
+  try{
+    console.log("giiiiiii")
   req.session.destroy((err)=>{
     if(err){
       console.log('session destroyed error:',err);
       return res.status(500).send('logout failed');
     }
     res.clearCookie('connect.sid');
-   res.redirect('/user/home');
+   res.redirect('/user/login');
   })
+}catch(error){
+  console.log("unexpected error during the user logout:",error);
+  res.redirect("/user/error");
+}
 }
 
 
