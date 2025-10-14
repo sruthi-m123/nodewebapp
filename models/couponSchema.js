@@ -29,16 +29,16 @@ const couponSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  maxDiscount: {
-    type: Number,
-    required: function() {
-      return this.discountType === 'percentage';
-    }
-  },
-  minDiscount: {
-    type: Number,
-    default: 0
-  },
+  // maxDiscount: {
+  //   type: Number,
+  //   required: function() {
+  //     return this.discountType === 'percentage';
+  //   }
+  // },
+  // minDiscount: {
+  //   type: Number,
+  //   default: 0
+  // },
   redeemAmount: {
     type: Number,
     required: true,

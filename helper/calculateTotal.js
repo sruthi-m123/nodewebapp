@@ -1,5 +1,6 @@
 
 function calculateOrder(cartItems, options = {}) {
+ 
     const { coupon = null, taxRate = 18 } = options;
 console.log("coupon passed to calaculateorder",coupon);
 console.log("cartitems passed to cal:",cartItems);
@@ -22,20 +23,23 @@ console.log("cartitems passed to cal:",cartItems);
 
     let couponDiscount = 0;
     if (coupon) {
-        console.log("Coupon type:", coupon.type);
-        if (coupon.type === "percentage") {
-            couponDiscount = ((subtotal - offerDiscount) * coupon.value) / 100;
-        } else if (coupon.type === "fixed"||coupon.type==="flat") {
-            couponDiscount = coupon.value;
+        console.log("Coupon type:", coupon.discountType);
+        if (coupon.discountType === "percentage") {
+            couponDiscount = ((subtotal - offerDiscount) * coupon.discountValue) / 100;
+        } else if (coupon.discountType === "fixed"||coupon.discountType==="flat") {
+            couponDiscount = coupon.discountValue;
+            console.log("discount value inside calculateOrder:",couponDiscount)
         }
     }
-console.log("Calculated couponDiscount:", couponDiscount);console.log("hiiiiiii");
+console.log("Calculated couponDiscount:", couponDiscount);
     const discount = offerDiscount + couponDiscount;
    
 
     const netAmount = subtotal + delivery - discount;
+    console.log("what comes in place of 3900",netAmount);
 
     const tax = netAmount * (taxRate / 100);
+    console.log("tax inside the calulation:",tax)
 
     const total = netAmount + tax;
     return {

@@ -13,92 +13,6 @@ const getCouponPage = async (req, res) => {
     }
 };
 
-// const createCoupon = async (req, res) => {
-//     console.log("Hit the coupon controller");
-//     console.log("req.body:", req.body);
-//     try {
-
-// const trimmedBody={
-//     ...req.body,
-//     description:req.body.description?.trim()||'',
-//     code:req.body.code?.trim()||'',
-//     discountType:req.body.discountType?.trim()||'',
-//     discountValue:req.body.discountValue?.trim()||'',
-//     redeemAmount:req.body.redeemAmount?.trim()||'',
-//     minCartValue:req.body.minCartValue?.trim()||'',
-//     minDiscount:req.body.minDiscount?.trim()||'',
-//     maxDiscount:req.body.maxDiscount?.trim()||'',
-//     usageLimit:req.body.usageLimit?.trim()||'',
-//     }
-
-
-
-
-//         const { 
-//             description, 
-//             code, 
-//             discountType,
-//             discountValue,
-//             redeemAmount,
-//             minCartValue, 
-//             minDiscount,
-//             maxDiscount,
-//             validFrom,
-//             validTill, 
-//             usageLimit,
-//             isActive 
-//         } = req.body;
-
-//         if (!description || !code || !discountType || !validTill || !validFrom) {
-//             return res.status(400).json({ success:false,message: "Required fields are missing" });
-//         }
-
-// if(usageLimit<1){
-//     return res.status(400).json({success:false,message:"usage limit should be one or more"});
-// }
-
-//         const parsedValidFrom = new Date(validFrom);
-//         const parsedValidTill = new Date(validTill);
-        
-//         if (isNaN(parsedValidFrom.getTime()) || isNaN(parsedValidTill.getTime())) {
-//             return res.status(400).json({success:false, message: "Valid dates are required" });
-//         }
-
-//         if (parsedValidFrom >= parsedValidTill) {
-//             return res.status(400).json({success:false, message: "Valid Till date must be after Valid From date" });
-//         }
-
-//         const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
-//         if (existingCoupon) {
-//             return res.status(400).json({success:false, message: "Coupon code already exists" });
-//         }
-
-//         const formatData = {
-//             description,
-//             code: code.toUpperCase(),
-//             discountType: discountType || 'fixed',
-//             discountValue: discountValue ? parseFloat(discountValue) : 0,
-//             redeemAmount: redeemAmount ? parseFloat(redeemAmount) : 0,
-//             minCartValue: minCartValue ? parseFloat(minCartValue) : 0,
-//             minDiscount: minDiscount ? parseFloat(minDiscount) : 0,
-//             maxDiscount: maxDiscount ? parseFloat(maxDiscount) : null,
-//             validFrom: parsedValidFrom,
-//             validTill: parsedValidTill,
-//             usageLimit: usageLimit ? parseInt(usageLimit) : null,
-//             isActive: isActive === 'on' || isActive === true || isActive === 'true'
-//         };
-
-//         const coupon = new Coupon(formatData);
-//         await coupon.save();
-//         console.log("Created coupon:", coupon);
-        
-//         res.status(200).json({success:true, message: "Coupon added successfully" });
-//     } catch (error) {
-//         console.error("Server error:", error);
-//         res.status(500).json({ success:false,error: error.message });
-//     }
-// };
-
 const createCoupon=async(req,res)=>{
     console.log("the create coupon controller");
     try {
@@ -112,8 +26,6 @@ const {
     discountValue,
     redeemAmount,
     minCartValue,
-    minDiscount,
-    maxDiscount,
     validFrom,
     validTill,
     usageLimit,
@@ -138,9 +50,6 @@ if(!code){
                             if(discountType==="fixed"&& !discountValue){
                                 return res.status(400).json({success:false,message:"Discount type and discount value is needed to add"});
                                                             }
-                                                            if (discountType === "percentage" && !maxDiscount) {
-      return res.status(400).json({ success: false, message: "Max discount is required for percentage type" });
-    }
 
     if (usageLimit && Number(usageLimit) < 1) {
       return res.status(400).json({ success: false, message: "Usage limit must be at least 1" });
@@ -177,8 +86,6 @@ const couponData={
     discountValue:discountValue? parseFloat(discountValue):0,
     redeemAmount: redeemAmount ? parseFloat(redeemAmount) : 0,
       minCartValue: minCartValue ? parseFloat(minCartValue) : 0,
-      minDiscount: minDiscount ? parseFloat(minDiscount) : 0,
-      maxDiscount: maxDiscount ? parseFloat(maxDiscount) : null,
       validFrom: parsedValidFrom,
       validTill: parsedValidTill,
       usageLimit: usageLimit ? parseInt(usageLimit) : null,
@@ -223,8 +130,6 @@ const updateCoupon = async (req, res) => {
             discountValue,
             redeemAmount,
             minCartValue, 
-            minDiscount,
-            maxDiscount,
             validFrom,
             validTill, 
             usageLimit,
@@ -261,8 +166,6 @@ const updateCoupon = async (req, res) => {
             discountValue: discountValue ? parseFloat(discountValue) : undefined,
             redeemAmount: redeemAmount ? parseFloat(redeemAmount) : undefined,
             minCartValue: minCartValue ? parseFloat(minCartValue) : undefined,
-            minDiscount: minDiscount ? parseFloat(minDiscount) : undefined,
-            maxDiscount: maxDiscount ? parseFloat(maxDiscount) : undefined,
             validFrom: validFrom ? new Date(validFrom) : undefined,
             validTill: validTill ? new Date(validTill) : undefined,
             usageLimit: usageLimit ? parseInt(usageLimit) : undefined,

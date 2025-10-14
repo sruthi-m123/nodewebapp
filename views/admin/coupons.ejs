@@ -21,8 +21,6 @@
           <th>Coupon</th>
           <th>Discount</th>
           <th>Min Cart Value</th>
-          <th>Min Discount</th>
-          <th>Max Discount</th>
           <th>Coupon Code</th>
           <th>Valid Till</th>
           <th>Status</th>
@@ -42,8 +40,6 @@
               <% } %>
             </td>
             <td>Rs.<%= coupon.minCartValue || 0 %></td>
-            <td>Rs.<%= coupon.minDiscount || 0 %></td>
-            <td><%= coupon.maxDiscount ? 'Rs.' + coupon.maxDiscount : 'N/A' %></td>
             <td>#<%= coupon.code %></td>
             <td><%= new Date(coupon.validTill).toLocaleDateString('en-GB') %></td>
             <td>
@@ -103,16 +99,6 @@
       <div class="form-group">
         <label for="minCartValue">Minimum Cart Value (Rs.)*</label>
         <input type="number" id="minCartValue" name="minCartValue" min="0" step="0.01" placeholder="0">
-      </div>
-
-      <div class="form-group">
-        <label for="minDiscount">Minimum Discount (Rs.)*</label>
-        <input type="number" id="minDiscount" name="minDiscount"  min="0" step="0.01" placeholder="0">
-      </div>
-
-      <div class="form-group" id="maxDiscountGroup" style="display:none;">
-        <label for="maxDiscount">Maximum Discount (Rs.)*</label>
-        <input type="number" id="maxDiscount" name="maxDiscount" min="0" step="0.01" placeholder="Maximum discount limit">
       </div>
 
       <div class="form-row">
@@ -193,16 +179,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('discountType').value = this.dataset.value;
         
         const discountValueLabel = document.getElementById('discountValueLabel');
-        const maxDiscountGroup = document.getElementById('maxDiscountGroup');
         
         if (this.dataset.value === 'percentage') {
           discountValueLabel.textContent = 'Discount Percentage (%)*';
-          maxDiscountGroup.style.display = 'block';
-          document.getElementById('maxDiscount').required = true;
         } else {
           discountValueLabel.textContent = 'Discount Value (Rs.)*';
-          maxDiscountGroup.style.display = 'none';
-          document.getElementById('maxDiscount').required = false;
         }
       });
     });
@@ -259,7 +240,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('.toggle-btn[data-value="fixed"]').classList.add('active');
     document.getElementById('discountType').value = 'fixed';
-    document.getElementById('maxDiscountGroup').style.display = 'none';
     document.getElementById('discountValueLabel').textContent = 'Discount Value (Rs.)*';
     
     setDefaultDates();
@@ -275,8 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('discountValue').value = coupon.discountValue || coupon.redeemAmount || 0;
     document.getElementById('minCartValue').value = coupon.minCartValue || 0;
     document.getElementById('discountValue').value = coupon.discountValue || coupon.redeemAmount || 0;
-    document.getElementById('maxDiscount').value = coupon.maxDiscount || '';
-    document.getElementById('minDiscount').value=coupon.minDiscount || '';
     document.getElementById('validFrom').value = coupon.validFrom ? formatDateForInput(new Date(coupon.validFrom)) : '';
     document.getElementById('validTill').value = coupon.validTill? formatDateForInput(new Date(coupon.validTill)):'';
     document.getElementById('usageLimit').value = coupon.usageLimit || '';
@@ -291,12 +269,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const discountValueLabel = document.getElementById('discountValueLabel');
     if (discountType === 'percentage') {
       discountValueLabel.textContent = 'Discount Percentage (%)*';
-      document.getElementById('maxDiscountGroup').style.display = 'block';
-      document.getElementById('maxDiscount').required = true;
     } else {
       discountValueLabel.textContent = 'Discount Value (Rs.)*';
-      document.getElementById('maxDiscountGroup').style.display = 'none';
-      document.getElementById('maxDiscount').required = false;
     }
 
     modal.style.display = 'block';

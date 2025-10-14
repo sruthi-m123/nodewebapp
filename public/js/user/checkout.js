@@ -434,6 +434,7 @@ function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
             }
         })
         .catch(error=>{
+            console.log("error:",error)
             showToast("something went wrong",'error');
             resetButtonState(applyButton,'Apply');
         })

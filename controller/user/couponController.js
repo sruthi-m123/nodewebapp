@@ -103,117 +103,69 @@ function checkMinCartValue(cartItems, coupon) {
   return { valid: true };
 }
 
-// async function applyCouponLogic({ userId, coupon, retryCartItems = null }) {
-//   let cartItems;  // Declare the variable
-
-//   if (retryCartItems) {
-//     console.log('applyCouponLogic: Using retry cart items (count:', retryCartItems.length, ')');
-//     cartItems = retryCartItems;
-//   } else {
-//     const cart = await Cart.findOne({ userId }).populate('items.productId');
-//     if (!cart || cart.items.length == 0) {
-//       return { success: false, message: 'cart is empty' };
-//     }
-//     cartItems = prepareCartItems(cart);
-//   }
-
-//   const cartCheck = checkMinCartValue(cartItems, coupon);
-//   if (!cartCheck.valid) return { success: false, message: cartCheck.message };
-
-//   const usageCheck = await checkCouponUsage(userId, coupon);
-//   if (!usageCheck.valid) return { success: false, message: usageCheck.message };
-
-//   const orderSummary = calculateOrder(cartItems, {
-//     coupon: {
-//       type: coupon.discountType === 'percentage' ? 'percentage' : 'fixed',
-//       value: coupon.discountValue
-//     }
-//   });
-
-//   return {
-//     success: true,
-//     orderSummary,
-//     discountText: getDiscountText(coupon),
-//     appliedCoupon: {
-//       couponId: coupon._id,
-//       code: coupon.code,
-//       type: coupon.discountType,
-//       value: coupon.discountValue
-//     }
-//   };
-// }
-
 async function applyCouponLogic({userId,coupon,retryCartItems=null}){
-try {
-  let cartItems=retryCartItems;
-  if(!cartItems){
-    const userCart=await Cart.findOne({userId}).populate('items.productId');
-    if(!userCart||userCart.items.length===0){
-      return {success:false,message:'cart is empty'};
+  try {
+    let cartItems=retryCartItems;
+    if(!cartItems){
+      const userCart=await Cart.findOne({userId}).populate('items.productId');
+      if(!userCart||userCart.items.length===0){
+        return{success:false,message:'Cart is empty'};
+      }
+      cartItems=userCart.items.map(item=>({
+        id:item.productId._id,
+        name:item.productId.productName,
+        originalPrice:item.price,
+        discountedPrice:item.discountedPrice||null,
+        quantity:item.quantity
+      }))
     }
+const baseOrderSummary=calculateOrder(cartItems,{coupon});
+const subtotal=baseOrderSummary.subtotal||0;
+const delivery=baseOrderSummary.delivery||0;
+const tax=baseOrderSummary.tax||0;
+console.log("tax inside baseSummary:",baseOrderSummary.tax)
+const totalBeforDiscount=baseOrderSummary.total||0;
 
-cartItems=userCart.items.map(item=>({
-  id:item.productId._id,
-  name:item.productId.productName,
-  price:item.discountedPrice||item.price,
-  originalPrice:item.price,
-  discountedPrice:item.discountedPrice||null,
-  quantity:item.quantity
-}))
 
-let orderTotal=0;
-cartItems.forEach(item=>{
-  orderTotal+=(item.discountedPrice||item.price)*item.quantity;
-})
 
-if(coupon.minCartValue&&orderTotal<coupon.minCartValue){
-  return {success:false,message:`coupon requires a minimum cart value of ₹${coupon.minCartValue}`};
+if(coupon.minCartValue&&subtotal<coupon.minCartValue){
+  return {success:false,message:`Coupon requires a minimum cart value of ₹${coupon.minCartValue}`}
 }
 let discountToApply=0;
+
 if(coupon.discountType==='fixed'){
   discountToApply=coupon.discountValue;
-}else if(coupon.discountType==='perentage'){
-  discountToApply=(coupon.discountValue/100)*orderTotal;
-  if(coupon.maxDiscount&&discountToApply>coupon.maxDiscount){
- discountToApply = coupon.maxDiscount;
-  }
-
+}else if(coupon.discountType==='percentage'){
+  discountToApply=(coupon.discountValue/100)*subtotal;
 }
- if (discountToApply > orderTotal) discountToApply = orderTotal;
+//check here 
+if(discountToApply>subtotal){
+return{success:false,message:"this coupon cannot be applied becuase the coupon value exceedes the subtotal"}
+} 
+const finalPrice=subtotal-discountToApply+delivery+tax;
+const appliedCoupon={
+  id:coupon._id,
+  code:coupon.code,
+  discountType:coupon.discountType,
+  discountValue:coupon.discountValue,
+  discountApplied:discountToApply
+}
+const discountText=getDiscountText(coupon)
+const orderSummary={
+  items:cartItems,
+  subtotal,
+  delivery,
+  tax,
+  couponDiscount:discountToApply,
+  total:finalPrice
+}
 
-    const finalPrice = orderTotal - discountToApply;
-  const appliedCoupon = {
-      id: coupon._id,
-      code: coupon.code,
-      discountType: coupon.discountType,
-      discountValue: coupon.discountValue,
-      maxDiscount: coupon.maxDiscount,
-      discountApplied: discountToApply,
-    };
-  const discountText = coupon.discountType === 'percentage'
-      ? `${coupon.discountValue}% off (₹${discountToApply})`
-      : `₹${discountToApply} off`;
-
-
-         const orderSummary = {
-      items: cartItems,
-      orderTotal,
-      discountApplied: discountToApply,
-      finalPrice
-    };
-  }
-    return { success: true, appliedCoupon, discountText, orderSummary };
-} catch (error) {
-   console.error('Error in applyCouponLogic:', error);
+return {success:true,appliedCoupon,discountText,orderSummary}
+  } catch (error) {
+     console.error('Error in applyCouponLogic:', error);
     return { success: false, message: 'Error calculating coupon' };
   }
 }
-
-
-
-
-
-
 
 exports.applyCouponByCode = async (req, res) => {
   try {

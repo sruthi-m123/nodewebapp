@@ -355,7 +355,7 @@
    <% if (typeof isRetry !== 'undefined' && isRetry) { %>
   <script>
     window.isRetry = true;
-    console.log('Retry mode detected in EJS: window.isRetry = true');  <!-- NEW: Log to confirm execution -->
+    console.log('Retry mode detected in EJS: window.isRetry = true'); 
     document.body.dataset.isRetry = 'true'; 
     </script>
 <% } %> 
