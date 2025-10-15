@@ -183,7 +183,7 @@ try {
   const order=await Order.findOne({orderId:orderId})
   .populate('items.productId')
   .populate('userId');
-  
+  console.log("order inside retrycheckout page:",order);
 if(!order||order.userId._id.toString()!==userId){
   return res.status(404).send("order not found or not authorized")
 }
@@ -194,19 +194,20 @@ if(order.status!=='payment_failed'){
  const addressesDoc = await Address.findOne({ userId }).lean();
     const addresses = addressesDoc ? addressesDoc.address.filter(addr => !addr.isDeleted) : [];
 
+
+
 const cartItems=order.items.map(item=>({
         id: item.productId._id,
       name: item.productId.productName,
       image: item.productId.images[0],
       variant: item.variant,
-      price: item.discountedPrice || item.price,
-      originalPrice: item.price,
-      discountedPrice: item.discountedPrice || null,
+      price: item.productId.discountedPrice || item.productId.price,
+originalPrice:item.price,
+           discountedPrice: item.productId.discountedPrice || null,
       quantity: item.quantity,
       isBuyNow: false
-
-
 }));
+
 
 console.log("cartItems:",cartItems);
 
@@ -387,7 +388,8 @@ exports.placeOrder = async (req, res) => {
 
     console.log("req body inside place order controller", req.body);
 
-    const { addressId, paymentMethod, appliedOffers = [] } = req.body;
+    const { addressId, paymentMethod, appliedOffers = [],isRetry=false } = req.body.payload||{};
+    console.log("destructed value:",{addressId,paymentMethod,isRetry});
     if (!addressId || !paymentMethod) {
       return res.status(400).json({
         success: false,
@@ -397,7 +399,8 @@ exports.placeOrder = async (req, res) => {
 
     let items = [];
     let isBuyNow = false;
-    const isRetry = req.query.retry === 'true';
+    let orderId;
+let order;
 
     if (req.session.buyNowItem) {
       const { productId, quantity = 1, variant = 'Default', price } = req.session.buyNowItem;
@@ -450,6 +453,8 @@ exports.placeOrder = async (req, res) => {
           return res.status(400).json({ success: false, message: `Product ${item.name} not available or insufficient stock for retry` });
         }
       }
+      orderId=failedOrder.orderId;
+      order=failedOrder;
     } else {
       const cart = await Cart.findOne({ userId }).populate({
         path: 'items.productId',
@@ -473,6 +478,7 @@ exports.placeOrder = async (req, res) => {
           totalPrice: effectivePrice * item.quantity
         };
       });
+      console.log("items iniside the place order:",items)
 
       // Validate stock for cart items
       for (const item of items) {
@@ -514,9 +520,11 @@ exports.placeOrder = async (req, res) => {
 
     // order creation 
     const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'processing');
-    const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    const order = new Order({
+    if(!isRetry){
+  orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+     order = new Order({
       orderId,
       userId,
       items,
@@ -533,7 +541,7 @@ exports.placeOrder = async (req, res) => {
     });
 
     await order.save();
-
+  }
     // order placing using wallet
     let walletDeductionSuccess = true;
     if (paymentMethod === 'wallet') {

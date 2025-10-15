@@ -408,6 +408,7 @@ function applyCouponByCode() {
 // Apply coupon from dropdown
 function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
     const isRetry=window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+    console.log("isRetry:",isRetry);
     const url=isRetry?'/user/checkout/apply-coupon?retry=true':'/user/checkout/apply-coupon';
     const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     setButtonLoadingState(applyButton, 'Applying...');
@@ -655,11 +656,25 @@ function placeOrder() {
     btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
 console.log("appliedCoupon in place order",appliedCoupon);
+
+const isRetry=window.isRetry||window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+
+const payload={
+    addressId:selectedAddress,
+    paymentMethod,
+    appliedOffers
+};
+if(isRetry){
+    payload.isRetry=true;
+    console.log('Adding isRetry:true to payload');
+
+}
+console.log("submiting payload:",payload);
   // single fetch call
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ addressId: selectedAddress, paymentMethod, appliedOffers})
+    body: JSON.stringify({ payload})
   })
   .then(res => res.json())
   .then(data => {
@@ -713,14 +728,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 function showToast(message, type = "success") {
   if (!message) {
-    console.warn('showToast: No message provided');  // NEW: Warn if empty
+    console.warn('showToast: No message provided');  
     return;
   }
 
   const toast = document.createElement("div");
   toast.textContent = message;
   
-  // FIXED: Explicit inline styles for reliability (no Tailwind needed)
   toast.style.cssText = `
     position: fixed;
     top: 20px;  /* top-5 equivalent */

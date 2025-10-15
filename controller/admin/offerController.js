@@ -153,6 +153,10 @@ const createOffer = async (req, res) => {
       }
     }
 
+    const existingOffer= Offer.findOne({title:title.trim()});
+    if(existingOffer){
+      res.status(400).json({success:false,message:"the offer with this title already exists "});
+    }
     const isOfferActive = isActive === true || String(isActive).toLowerCase() === 'true';
 
    

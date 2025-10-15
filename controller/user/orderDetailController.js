@@ -45,6 +45,8 @@ console.log("order inside orderdetailsssssss:",order);
       });
     }
 
+ 
+
     if (order.status === 'shipped' && order.shippedAt) {
       statusHistory.push({
         date: order.shippedAt,
@@ -74,11 +76,19 @@ console.log("order inside orderdetailsssssss:",order);
         message: 'Your order has been returned.'
       });
     }
+    // if(order.status==='payment_failed'){
+    //   statusHistory.push({
+    //     date:order.createdAt,
+    //     message:"the order payment has been failed "
+    //   })
+    // }
+    
 
     // Status message map
     const getStatusMessage = (status) => {
       const messages = {
         processing: 'Seller is preparing your item for shipment.',
+        payment_failed:'Your order payment is pending.',
         shipped: 'Your item has been shipped and is on its way.',
         delivered: 'Your item has been delivered.',
         cancelled: 'Your order has been cancelled.',

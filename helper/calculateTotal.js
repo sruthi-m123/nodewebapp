@@ -36,10 +36,8 @@ console.log("Calculated couponDiscount:", couponDiscount);
    
 
     const netAmount = subtotal + delivery - discount;
-    console.log("what comes in place of 3900",netAmount);
 
     const tax = netAmount * (taxRate / 100);
-    console.log("tax inside the calulation:",tax)
 
     const total = netAmount + tax;
     return {
