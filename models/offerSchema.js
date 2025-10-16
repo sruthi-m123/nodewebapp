@@ -31,10 +31,10 @@ const offerSchema = new Schema({
     default: 0
   },
 
-  maxDiscount: {
-    type: Number, 
-    default: null
-  },
+  // maxDiscount: {
+  //   type: Number, 
+  //   default: null
+  // },
 
   startDate: Date,
   endDate: Date,

@@ -75,11 +75,17 @@
         <strong>Rs. <span id="grand-total"><%= total %></span></strong>
       </div>
 
-      <div class="checkout-btn-container">
+      <!-- <div class="checkout-btn-container">
 <a href="/user/checkout" class="checkout-btn">
           <i class="fas fa-lock"></i> Proceed to Checkout
         </a>
-      </div>
+      </div> -->
+      <div class="checkout-btn-container">
+  <button type="button" class="checkout-btn" onclick="checkout()">
+    <i class="fas fa-lock"></i> Proceed to Checkout
+  </button>
+</div>
+
     <% } else { %>
       <div class="empty-cart">
         <i class="fas fa-shopping-cart fa-3x"></i>

@@ -312,10 +312,126 @@ function showAlert(title, text, icon) {
     showConfirmButton: false
   });
 }
+// Proceed to checkout (now with optional flag to avoid re-prompt after removal)
+async function checkout(justRemoved = false) {
+  try {
+    const response = await fetch('/user/cart/validate-cart', { method: 'GET' });
+    const data = await response.json();
+    console.log("Validation result:", { success: data.success, invalidIds: data.invalidProductIds?.length, message: data.message });
 
-// Proceed to checkout
-function checkout() {
-  window.location.href = '/user/checkout';
+    if (data.success) {
+      Swal.fire({
+        title: 'All Good!',
+        text: 'Your cart has been validated successfully.',
+        icon: 'success',
+        confirmButtonText: 'Proceed to Checkout',
+        confirmButtonColor: '#3085d6',
+      }).then(() => {
+        window.location.href = '/user/checkout';
+      });
+      return;  // Exit early
+    }
+
+    // If cart empty
+    if (data.message === 'Your cart is empty.') {
+      Swal.fire({
+        title: 'Empty Cart!',
+        text: 'Your cart is empty. Add items to proceed.',
+        icon: 'info',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
+
+    // Check if partial invalid
+    if (data.invalidProductIds && data.invalidProductIds.length > 0) {
+      // If just removed, don't re-offer removal—assume user wants to proceed or manual fix
+      if (justRemoved) {
+        Swal.fire({
+          title: 'Still Issues!',
+          text: `${data.message} Please review your cart manually.`,
+          icon: 'warning',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#d33',
+        });
+        return;
+      }
+
+      // Normal partial invalid prompt
+      Swal.fire({
+        title: 'Hold on!',
+        text: `${data.message} Would you like to remove them and proceed?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Keep Cart As Is',
+        cancelButtonText: 'Remove Invalid Items',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          return;  // Close, no action
+        }
+        // Remove and re-call with flag
+        try {
+          const removeResponse = await fetch('/user/cart/remove-invalid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ invalidProductIds: data.invalidProductIds }),
+          });
+          const removeData = await removeResponse.json();
+          console.log('Removal result:', removeData);  // Debug
+          if (removeData.success) {
+            // Optional UI update
+            // document.getElementById('cartTotal').textContent = `$${removeData.newCartTotal.toFixed(2)}`;
+            
+            Swal.fire({
+              title: 'Updated!',
+              text: `${removeData.message} (${removeData.removedCount} item(s) removed). Proceeding to checkout...`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(() => {
+              // Re-run with flag to avoid re-prompt
+              checkout(true);
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: removeData.message || 'Failed to remove items.',
+              icon: 'error',
+              confirmButtonText: 'OK',
+            });
+          }
+        } catch (removeError) {
+          console.error('Error removing invalid items:', removeError);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong while removing items.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      });
+    } else {
+      // Full invalid or other error - no removal
+      Swal.fire({
+        title: 'Hold on!',
+        text: data.message || 'Some products are unavailable or inactive.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#d33',
+      });
+    }
+  } catch (error) {
+    console.error('Error in validating the cart:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'Something went wrong. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'OK',
+    });
+  }
 }
 
 // Make functions available globally if needed

@@ -99,6 +99,8 @@ router.get('/cart',isLoggedIn,checkBlocked,cartController.getCart);
 router.post('/cart/add/:productId',cartController.addToCart);
 router.delete('/cart/remove/:itemId',checkBlocked,cartController.removeCartItem);
 router.post('/cart/update',checkBlocked,cartController.updateCart);
+router.get('/cart/validate-cart',cartController.validateCart);
+router.post('/cart/remove-invalid',cartController.removeInvalidCartItems);
 
 //checkout page
 router.get('/checkout',isLoggedIn,checkBlocked, checkoutController.getCheckoutPage);

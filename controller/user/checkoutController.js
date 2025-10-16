@@ -69,9 +69,17 @@ if(product.stock<requestedQty){
             }
         } 
         else {
-            const cart = await Cart.findOne({ userId }).populate('items.productId');
-            console.log("cart inisde the checkout controller:",cart);
-            const coupons=await Coupon.find({});
+            const cart = await Cart.findOne({ userId:userId }).populate('items.productId');
+//           const cart = await Cart.findOne({
+//   userId,
+//   'items.status': 'active'
+// }).populate('items.productId');
+
+//             console.log("cart inisde the checkout controller:",cart);
+//             const coupons=await Coupon.find({});
+//             if(!cart){
+//               return res.status(400).json({success:false,message:" Either the cart is empty or the cart contains only inactive products"})
+//             }
             if (cart) {
 for (const item of cart.items){
     if(item.productId&&item.productId.isActive){

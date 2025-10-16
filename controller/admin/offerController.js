@@ -153,9 +153,10 @@ const createOffer = async (req, res) => {
       }
     }
 
-    const existingOffer= Offer.findOne({title:title.trim()});
-    if(existingOffer){
-      res.status(400).json({success:false,message:"the offer with this title already exists "});
+    // Fixed: Await the query
+    const existingOffer = await Offer.findOne({ title: title.trim() });
+    if (existingOffer) {
+      return res.status(400).json({ success: false, message: "The offer with this title already exists" });
     }
     const isOfferActive = isActive === true || String(isActive).toLowerCase() === 'true';
 
@@ -200,11 +201,11 @@ const createOffer = async (req, res) => {
       });
     }
 
-    if (error.code === 11000) {
-      return res.status(400).json({
-        message: 'Offer code already exists'
-      });
-    }
+    // if (error.code === 11000) {
+    //   return res.status(400).json({
+    //     message: 'Offer code already exists'
+    //   });
+    // }
 
     res.status(500).json({
       message: 'Failed to create offer',
@@ -284,55 +285,119 @@ const getEditOffer = async (req, res) => {
     });
   }
 }
+
 const updateOffer = async (req, res) => {
   try {
-
     const offerId = req.params.id;
-    const { title, type } = req.body;  
+    const {
+      title,
+      type,
+      discountValue,
+      applicableTo,
+      applicableItems,
+      startDate,
+      endDate
+    } = req.body;
 
-    
+    const trimmedTitle = title?.trim();
+    if (!trimmedTitle) {
+      return res.status(400).json({ message: 'Offer title is required' });
+    }
+    const discount = Number(discountValue);
+    if (isNaN(discount) || discount <= 0) {
+      return res.status(400).json({ message: 'Discount value must be a positive number' });
+    }
     const normalizedType = type === 'flat' ? 'fixed' : type;
+    if (normalizedType === 'percentage' && discount >= 100) {
+      return res.status(400).json({ message: 'Percentage discount cannot be 100% or more' });
+    }
+
+    // Date validation
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) {
+      return res.status(400).json({ message: 'End date must be after start date' });
+    }
+
+    // Fixed discount validation: Cannot exceed the price of applicable items
+    if (normalizedType === 'fixed' && applicableTo !== 'all') {
+      if (!applicableItems || !Array.isArray(applicableItems) || applicableItems.length === 0) {
+        return res.status(400).json({ message: `Please select at least one ${applicableTo === 'category' ? 'category' : 'product'}` });
+      }
+
+      let relevantProductIds = [];
+      if (applicableTo === 'product') {
+        relevantProductIds = applicableItems;
+      } else if (applicableTo === 'category') {
+        // Fetch all products in the selected categories (assuming Category schema has a 'products' array ref)
+        const categories = await Category.find({ _id: { $in: applicableItems } }).populate('products');
+        relevantProductIds = categories.flatMap(cat => cat.products.map(p => p._id));
+      }
+
+      if (relevantProductIds.length === 0) {
+        return res.status(400).json({ message: 'No valid products found for the selected items' });
+      }
+
+      // Fetch prices of relevant products
+      const products = await Product.find({ _id: { $in: relevantProductIds } }, 'price');
+      const minPrice = Math.min(...products.map(p => p.price));
+
+      if (discount > minPrice) {
+        return res.status(400).json({ 
+          message: `Fixed discount (${discount}) cannot exceed the lowest item price (${minPrice})` 
+        });
+      }
+    }
 
     const updateData = {
       ...req.body,
-      type: normalizedType,  
-      startDate: new Date(req.body.startDate),
-      endDate: new Date(req.body.endDate),
-      applicableItems: req.body.applicableItems || []
-    }
-    console.log("offernamejnnm,:", req.body)
+      title: trimmedTitle,
+      type: normalizedType,
+      startDate: start,
+      endDate: end,
+      applicableItems: applicableItems || []
+    };
+
+    // Title uniqueness check (case-insensitive)
     const existingOffer = await Offer.findOne({
-      title: req.body.title,  
+      title: { $regex: new RegExp(`^${trimmedTitle}$`, 'i') },
       _id: { $ne: offerId }
     });
     if (existingOffer) {
       return res.status(400).json({
         success: false,
-        message: 'Offer already in use'
+        message: 'An offer with this title already exists'
       });
     }
 
-    const updateOffer = await Offer.findByIdAndUpdate(
+    const updatedOffer = await Offer.findByIdAndUpdate(
       offerId,
       updateData,
       { new: true, runValidators: true }
     );
 
-    if (!updateOffer) {
+    if (!updatedOffer) {
       return res.status(404).json({
         success: false,
         message: 'Offer not found'
       });
     }
 
+    await updateProductsOffer(updatedOffer);
     res.status(200).json({
       success: true,
       message: 'Offer updated successfully',
-      offer: updateOffer
+      offer: updatedOffer
     });
-
   } catch (error) {
-    console.error('Error updating offer:', error);
+    console.error('error updating offer:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: 'Validation error: ' + messages.join(', ') });
+    }
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'An offer with this title already exists' });
+    }
     res.status(500).json({
       success: false,
       message: 'Server error while updating offer'

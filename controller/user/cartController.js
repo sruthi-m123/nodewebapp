@@ -120,7 +120,7 @@ const addToCart = async (req, res) => {
         stock: { $gte: quantity } ,
         isActive:true
         }).populate('bestOffer');
-    console.log("hiiiii");
+       
     console.log("product details befor cal offer:",product);
 
     if (!product) {
@@ -147,6 +147,9 @@ const addToCart = async (req, res) => {
 
     let cart = await Cart.findOne({ userId });
     const effectivePrice=product.discountedPrice||product.price;
+    console.log("discounted price for checking:",product.discountedPrice);
+    console.log("effective price:",effectivePrice);
+
     
     if (!cart) {
       cart = new Cart({
@@ -183,6 +186,7 @@ const addToCart = async (req, res) => {
     }
 
     await cart.save();
+    
     console.log("cart inside the add to cart :",cart)
     res.json({ 
       success: true,
@@ -293,27 +297,6 @@ item.quantity=update.quantity;
 item.totalPrice=item.quantity*item.price;
 }
 
-// const oldQty=item.quantity;
-// const newQty=update.quantity;
-// const diff=newQty-oldQty;
-
-// if(diff>0){
-//   if(product.stock<diff){
-//     return res.status(400).json({
-//       message:`only ${product.stock} units left for ${product.productName}`,
-//       productId:item.productId
-//     })
-//   }
-//   product.stock-=diff;
-// }
-// if(diff<0){
-//   product.stock+=Math.abs(diff);
-// }
-// await product.save();
-
-// item.quantity=newQty;
-// item.totalPrice=item.quantity*item.price;
-
 
 
 }
@@ -344,7 +327,112 @@ const cartCount=async(req,res)=>{
   }
 }
 
+const validateCart = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const cart = await Cart.findOne({ userId:userId }).populate('items.productId');
+console.log("cart :",cart)
+    if (!cart || cart.items.length === 0) {
+      return res.json({ success: false, message: 'Your cart is empty.' });
+    }
 
+    let invalidItems = [];
+    let invalidProductIds = [];
+    let validItems = [];
+
+    for (const item of cart.items) {
+      const product = item.productId;
+
+      if (!product || 
+          !product.isActive || 
+          product.isBlocked || 
+          product.isDeleted || 
+          product.stock < item.quantity) {
+        invalidItems.push(product ? product.productName : 'Unknown Product');
+        if (product && product._id) {
+          invalidProductIds.push(product._id.toString());
+        }
+      } else {
+        validItems.push(item);
+      }
+    }
+
+    // If all invalid
+    if (invalidItems.length === cart.items.length) {
+      return res.json({
+        success: false,
+        message: `All selected products are currently unavailable: ${invalidItems.join(', ')}`,
+      });
+    }
+
+    // If some invalid but some valid
+    if (invalidItems.length > 0) {
+      return res.json({
+        success: false,
+        message: `Some products are unavailable: ${invalidItems.join(', ')}`,
+        invalidProductIds: invalidProductIds,
+      });
+    }
+
+    // All valid
+    return res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: 'Server error while validating cart.' });
+  }
+};
+
+const removeInvalidCartItems = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    let { invalidProductIds } = req.body;
+
+    if (!Array.isArray(invalidProductIds) || invalidProductIds.length === 0) {
+      return res.json({ success: false, message: 'No invalid items provided.' });
+    }
+invalidProductIds = invalidProductIds.map(id => id.toString());
+console.log('Removing IDs:', invalidProductIds);
+    const cart = await Cart.findOne({ userId }).populate('items.productId'); 
+    if (!cart || cart.items.length === 0) {
+      return res.json({ success: false, message: 'Cart not found.' });
+    }
+
+console.log('Before removal: Items count', cart.items.length); 
+
+    const originalCount = cart.items.length;
+    cart.items = cart.items.filter(item => {
+      const isInvalidProduct = invalidProductIds.includes(item.productId._id.toString());
+      return !isInvalidProduct;
+    });
+console.log("cart items after filtering:",cart.items);
+    cart.items.forEach(item => {
+      const currentPrice = item.productId ? item.productId.price : item.price;
+      if (currentPrice && item.quantity > 0) {
+        item.totalPrice = currentPrice * item.quantity;
+      }
+    });
+
+   const saveResult = await cart.save();
+    if (!saveResult) {
+      throw new Error('Save failed');
+    }
+
+    const removedCount = originalCount - cart.items.length;
+    console.log('Save successful, removed:', removedCount);
+    const newCartTotal = cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+
+    return res.json({ 
+      success: true, 
+      message: 'Invalid items removed from cart successfully.',
+      removedCount,
+      remainingItems: cart.items.length,
+      newCartTotal
+    });
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: 'Server error while removing items.' });
+  }
+};
 
 module.exports={
     getCart,
@@ -354,5 +442,6 @@ module.exports={
     cartCount,
     getCartCount,
     cartCount,
-
+validateCart,
+removeInvalidCartItems
    }
