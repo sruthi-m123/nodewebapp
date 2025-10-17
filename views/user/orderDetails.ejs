@@ -42,6 +42,7 @@
                  order.status !== 'delivered' &&
                  order.status!=='return_requested'&&
                  order.status!=='partially_returned'&&
+                 order.status!=='payment_failed'&&
                  item.status !== 'cancelled'&&
                  item.status!=='returned'&& 
                  item.status!=='partially_returned'&&
@@ -56,6 +57,7 @@
 
           <% if (activeCount > 1 &&
             (order.status === 'delivered' || order.status === 'partially_returned') &&
+            order.status!=='payment_failed'&&
            item.status !== 'returned' &&
            item.status!=='return_requested'&&
             item.status !=='cancelled'&&
@@ -205,7 +207,7 @@
     <% }) %>
   </ul>
 </div> -->
-
+         JSON.stringify({ "<%= order.status %>" })
 <% if (order.status.toUpperCase() === 'PENDING' || 
        order.status.toUpperCase() === 'PROCESSING' || 
        order.status.toUpperCase()==='PAID'||
@@ -216,20 +218,40 @@
                 data-status="<%= order.status %>"
                 onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
     </div>
-<% } else if ((order.status.toUpperCase() === 'DELIVERED' || 
-               order.status.toUpperCase() === 'PARTIALLY_RETURNED') && 
-               order.items.length === 1) { %>
-    <div class="action-buttons">
-        <button class="action-btn return-btn"
-                data-order-id="<%= order._id %>"
-                data-status="<%= order.status %>"
-                onclick="openModal('return', '<%= order._id %>', '<%= order.items[0]._id %>')">Return Item</button>
-    </div>
 <% } else if (order.status.toUpperCase() === 'PAYMENT_FAILED') { %>
     <div class="action-buttons">
         <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">
             Retry Payment
         </a>
+    </div>
+<% } %>
+
+<% 
+// Compute activeCount once for reuse (eligible items for return)
+const activeItems = order.items.filter(i => i.status !== 'cancelled' && i.status !== 'returned' && i.status !== 'return_requested'); 
+const activeCount = activeItems.length; 
+%>
+
+<% if ((order.status.toUpperCase() === 'DELIVERED' || order.status.toUpperCase() === 'PARTIALLY_RETURNED') && 
+      order.status !== 'payment_failed' && activeCount > 0) { %>
+    <div class="action-buttons">
+        <% if (order.items.length === 1) { %>
+            <!-- Single-item: Full return (no itemId) -->
+            <button class="action-btn return-btn"
+                    data-order-id="<%= order._id %>"
+                    data-status="<%= order.status %>"
+                    onclick="openModal('return', '<%= order._id %>')">
+                Return Order
+            </button>
+        <% } else { %>
+            <!-- Multi-item: Full return (no itemId) -->
+            <button class="action-btn return-order-btn"
+                    data-order-id="<%= order._id %>"
+                    data-status="<%= order.status %>"
+                    onclick="openModal('return', '<%= order._id %>')">
+                Return Order
+            </button>
+        <% } %>
     </div>
 <% } %>
 

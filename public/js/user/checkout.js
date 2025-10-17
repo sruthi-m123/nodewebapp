@@ -408,12 +408,16 @@ function applyCouponByCode() {
 // Apply coupon from dropdown
 function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
     const isRetry=window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+    const retryCartItems=window.retryCartItems||[];
+    console.log("retryCartItems:",retryCartItems);
     console.log("isRetry:",isRetry);
     const url=isRetry?'/user/checkout/apply-coupon?retry=true':'/user/checkout/apply-coupon';
     const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall(url, 'POST', { couponId }, 'Coupon applied successfully')
+
+const bodyData=isRetry?{couponId,retryCartItems}:{couponId};
+    apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
         .then(data => {
             if (data.success) {
                 console.log("orderSummary",data.orderSummary)
@@ -423,7 +427,6 @@ function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
             }else{
-                console.log("hiiiiiiii")
                                 showToast(data.message,'error')
    if (data.message === "You have already used this coupon") {
                     applyButton.disabled = true;

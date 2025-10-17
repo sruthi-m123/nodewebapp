@@ -164,35 +164,40 @@ const getReturnDetails = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    // Fetch the order with items populated (if needed)
-    const order = await Order.findOne({orderId}).populate('items.productId');
+    const order = await Order.findOne({ orderId }).populate('items.productId');
     if (!order || !order.returnRequested) {
       return res.status(404).json({ error: 'Return request not found' });
     }
 
     const { returnDetails } = order;
+    const returnType = returnDetails.items?.length > 0 ? 'partial' : 'full';
+    console.log(`Fetching return details for order ${orderId}: type=${returnType}, raw items length=${returnDetails.items?.length || 0}`);
 
-    // Map each return item to the corresponding order item
-    const items = returnDetails.items?.map(returnItem => {
-   const matchedItem = order.items.find(
-    i => i.orderId === returnItem.orderId
-  );
-      return {
-        _id: returnItem.itemId,
-        name: matchedItem?.name || matchedItem?.productId?.name || 'Unknown Item',
-        quantity: matchedItem?.quantity || 0,
-        price: matchedItem?.totalPrice || matchedItem?.price || 'N/A',
-        reason: returnItem.reason || 'Not specified',
-        status: returnItem.status || 'Pending',
-      };
-    }) || [];
+    let items = [];
+    if (returnType === 'partial' && returnDetails.items?.length > 0) {
+      items = returnDetails.items.map(returnItem => {
+        // Fix matching: Use product OID from DB schema (returnItem.product === i.productId)
+        const matchedItem = order.items.find(i => i.productId.toString() === returnItem.product.toString());
+        return {
+          _id: returnItem._id,
+          name: matchedItem?.name || returnItem.name || 'Unknown Item',
+          quantity: matchedItem?.quantity || returnItem.quantity || 0,
+          price: matchedItem?.totalPrice || returnItem.price || 'N/A',
+          reason: returnItem.reason || 'Not specified',
+          status: returnItem.status || matchedItem?.status || 'Pending',
+        };
+      });
+    }
+
+    // Fix reason: Use global if set, else first item's reason for partial
+    const globalReason = returnDetails.reason || (returnType === 'partial' ? items[0]?.reason : 'Not specified');
 
     res.json({
-      reason: returnDetails.reason || 'Not specified', 
-      notes: returnDetails.notes || 'None',           
-      type: returnDetails.type || 'full',             
-      totalItems: order.items.length,                
-      items,                                          
+      reason: globalReason,
+      notes: returnDetails.notes || 'None',
+      type: returnType,  // Use computed returnType (fixes inconsistency!)
+      totalItems: order.items.length,
+      items,
     });
 
   } catch (error) {

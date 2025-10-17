@@ -224,13 +224,11 @@ const deleteOffer = async (req, res) => {
         message: "Offer already deleted"
       });
     }
-    offer.isDeleted = true;
+  
     offer.isActive = false;
 
-    await offer.save();
-
-    await Product.updateMany({ bestOffer: offer._id }, { $unset: { bestOffer: "", discountedPrice: "" } })
-
+ await Product.updateMany({ bestOffer: offer._id }, { $unset: { bestOffer: "", discountedPrice: "" } })
+await Offer.findOneAndDelete({_id:offerId});
     res.status(200).json({
       success: true,
       message: "offer successfully deleted"

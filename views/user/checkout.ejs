@@ -352,11 +352,25 @@
          data-cart='<%- JSON.stringify(cartItems || []) %>'
          data-payment="<%= selectedPayment || '' %>">
     </div>
-   <% if (typeof isRetry !== 'undefined' && isRetry) { %>
+  <% if (typeof isRetry !== 'undefined' && isRetry) { %>
   <script>
+    // Enable retry mode flags
     window.isRetry = true;
-    console.log('Retry mode detected in EJS: window.isRetry = true'); 
-    document.body.dataset.isRetry = 'true'; 
-    </script>
-<% } %> 
+    document.body.dataset.isRetry = 'true';
+    
+    // Safely inject retryCartItems from server
+    window.retryCartItems = <%- JSON.stringify(retryCartItems || []) %>;
+    
+    console.log('Retry mode detected');
+    console.log('Retry cart items:', window.retryCartItems);
+  </script>
+<% } else { %>
+  <script>
+    // Default (non-retry mode)
+    window.isRetry = false;
+    document.body.dataset.isRetry = 'false';
+    window.retryCartItems = [];
+  </script>
+<% } %>
+
 </div>

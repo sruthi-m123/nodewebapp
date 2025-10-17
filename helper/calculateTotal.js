@@ -33,7 +33,9 @@ console.log("cartitems passed to cal:",cartItems);
     }
 console.log("Calculated couponDiscount:", couponDiscount);
     const discount = offerDiscount + couponDiscount;
-   
+   console.log("offerDiscount",offerDiscount);
+   console.log("couponDiscount",couponDiscount);
+   console.log("discount:",discount);
 
     const netAmount = subtotal + delivery - discount;
 

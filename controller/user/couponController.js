@@ -105,6 +105,8 @@ function checkMinCartValue(cartItems, coupon) {
 
 async function applyCouponLogic({userId,coupon,retryCartItems=null}){
   try {
+    console.log("inside the apply coupon logic here")
+    console.log("retryCartItems:",retryCartItems);
     let cartItems=retryCartItems;
     if(!cartItems){
       const userCart=await Cart.findOne({userId}).populate('items.productId');
@@ -120,11 +122,12 @@ async function applyCouponLogic({userId,coupon,retryCartItems=null}){
       }))
     }
 const baseOrderSummary=calculateOrder(cartItems,{coupon});
+console.log("baseOrderSUMMARY",baseOrderSummary);
 const subtotal=baseOrderSummary.subtotal||0;
 const delivery=baseOrderSummary.delivery||0;
 const tax=baseOrderSummary.tax||0;
 console.log("tax inside baseSummary:",baseOrderSummary.tax)
-const totalBeforDiscount=baseOrderSummary.total||0;
+const total=baseOrderSummary.total||0;
 
 
 
@@ -142,7 +145,8 @@ if(coupon.discountType==='fixed'){
 if(discountToApply>subtotal){
 return{success:false,message:"this coupon cannot be applied becuase the coupon value exceedes the subtotal"}
 } 
-const finalPrice=subtotal-discountToApply+delivery+tax;
+// const finalPrice=subtotal-discountToApply+delivery+tax;
+const finalPrice=total;
 const appliedCoupon={
   id:coupon._id,
   code:coupon.code,
@@ -169,7 +173,7 @@ return {success:true,appliedCoupon,discountText,orderSummary}
 
 exports.applyCouponByCode = async (req, res) => {
   try {
-    const { couponCode } = req.body;
+    const { couponCode ,retryCartItems} = req.body;
     const userId = req.session.user.id;
     const isRetry = req.query.retry === 'true';
     console.log("isRetry:", isRetry);
@@ -185,8 +189,11 @@ exports.applyCouponByCode = async (req, res) => {
     };
 
     //retry
-    let retryCartItems = null;
+
+    // let retryCartItems = null;
     if (isRetry) {
+      if(!retryCartItems){
+           
       const failedOrder = await Order.findOne({
         userId,
         status: 'payment_failed'
@@ -205,6 +212,7 @@ exports.applyCouponByCode = async (req, res) => {
         return res.json({ success: false, message: 'No failed order for retry' })
       }
     }
+  }
 
     const result = await applyCouponLogic({ userId, coupon, retryCartItems });
     if (!result.success) return res.json(result);
@@ -226,7 +234,7 @@ exports.applyCouponByCode = async (req, res) => {
 
 exports.applyCoupon = async (req, res) => {
   try {
-    const { couponId } = req.body;
+    const { couponId,retryCartItems } = req.body;
     const userId = req.session.user.id;
     const isRetry = req.query.retry === 'true';
 
@@ -241,8 +249,10 @@ exports.applyCoupon = async (req, res) => {
     }
 
     //retry checkout
-    let retryCartItems = null;
     if (isRetry) {
+      if(!retryCartItems){
+
+      
       const failedOrder = await Order.findOne({
         userId,
         status: 'payment_failed'
@@ -263,6 +273,7 @@ exports.applyCoupon = async (req, res) => {
         return res.json({ success: false, message: 'No failed order for retry' })
       }
     }
+  }
     const result = await applyCouponLogic({ userId, coupon, retryCartItems });
     if (!result.success) return res.json(result);
     console.log("result inside the apply coupon:", result);

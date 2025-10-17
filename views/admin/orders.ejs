@@ -97,7 +97,7 @@
                   </span>
                 </td>
                 <td data-label="Return Request">
-                  <% if (order.status === 'delivered' && order.returnRequest===true ||order.status==='partially_returned'&&  order.returnRequest===true) { %>
+                  <% if (order.status === 'delivered' && order.returnRequest===true ||order.status==='partially_returned'&&  order.returnRequest===true||order.status==='return_requested') { %>
                     <button class="verify-btn" data-order-id="<%= order.orderId%>" >
                       <i class="fas fa-check-circle"></i> Verify
                     </button>
@@ -211,7 +211,6 @@
   <% } %>
 </div>
 <div id="toast-container"></div>
-
 <!-- Return Request Modal -->
 <div class="modal-overlay" id="returnRequestModal">
   <div class="modal-content">
@@ -221,50 +220,33 @@
     </div>
     <div class="modal-body">
       <div class="return-details">
-        <div class="detail-row">
-          <span class="detail-label">Order ID:</span>
-          <span class="detail-value" id="returnOrderId"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Customer:</span>
-          <span class="detail-value" id="returnCustomer"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Order Date:</span>
-          <span class="detail-value" id="returnOrderDate"></span>
-        </div>
-<div class="detail-row">
-  <span class="detail-label">Order Total:</span>
-  <span class="detail-value" id="returnOrderTotal"></span>
-</div>
-        <div class="detail-row">
-          <span class="detail-label">Return Reason:</span>
-          <span class="detail-value" id="returnReason"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Additional Notes:</span>
-          <span class="detail-value" id="returnNotes"></span>
-        </div>
+        <!-- ... existing detail-rows unchanged ... -->
       </div>
-    </div>
 
-   <div class="return-items-section">
+      <div class="return-items-section">
         <div class="detail-row">
           <span class="detail-label">Returning Items:</span>
         </div>
-        <ul id="returnItemsList" class="return-items-list">
-          <!-- Items will be dynamically appended here via JS -->
-        </ul>
+        <div class="full-return-msg">
+          <ul id="returnItemsListFull" class="return-items-list">
+            <li><em>Full order return requested</em></li>
+          </ul>
+        </div>
+        <div class="partial-items">
+          <ul id="returnItemsListPartial" class="return-items-list">
+            <!-- Items will be dynamically appended here via JS for partial returns -->
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-danger" onclick="processReturn('reject')">Reject Return</button>
-      <button type="button" class="btn btn-success" onclick="processReturn('approve')">Approve Return</button>
+      <div class="global-btns">
+        <button type="button" class="btn btn-danger" onclick="processReturn('reject-all', this.closest('.modal').dataset.orderId)">Reject Full Return</button>
+        <button type="button" class="btn btn-success" onclick="processReturn('approve-all', this.closest('.modal').dataset.orderId)">Approve Full Return</button>
+      </div>
     </div>
   </div>
-
-
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -380,16 +362,92 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Verify return buttons (moved out of nested, fixed)
+  // Helper: Populate common order details (always shown)
+  function populateOrderDetails(customOrderId, customer, orderDate, orderTotal, data) {
+    console.log("the populate order detail worked");
+    document.getElementById('returnOrderId').textContent = `#${customOrderId}`;
+    document.getElementById('returnCustomer').textContent = customer;
+    document.getElementById('returnOrderDate').textContent = orderDate;
+    document.getElementById('returnOrderTotal').textContent = orderTotal;
+    document.getElementById('returnReason').textContent = data.reason || 'Not specified';
+    document.getElementById('returnNotes').textContent = data.notes || 'None';
+  }
+
+  // Helper: Handle items section based on return type
+  // Helper: Handle items section based on return type
+function populateItemsSection(data) {
+  console.log("inside the populate item");
+  const itemsSection = document.querySelector('.return-items-section');
+  const fullMsg = itemsSection.querySelector('.full-return-msg');
+  const partialContainer = itemsSection.querySelector('.partial-items');
+  const fullList = document.getElementById('returnItemsListFull');
+  const partialList = document.getElementById('returnItemsListPartial');
+  const globalBtns = document.querySelector('.modal-footer .global-btns');
+
+  // Detection: Prefer data.type; fallback to items.length === 0 for full
+  const isFullReturn = data.type === 'full' || (data.items && data.items.length === 0);
+  console.log("Return type detected:", isFullReturn ? 'full' : 'partial', "Items count:", data.items?.length);
+
+  itemsSection.classList.remove('show-full', 'show-partial'); // Reset classes
+
+  if (isFullReturn) {
+    // Full: Show message, hide partial list, show globals
+    itemsSection.classList.add('show-full');
+    if (partialContainer) partialContainer.style.display = 'none';
+    if (fullMsg) fullMsg.style.display = 'block';  // Explicit show
+    if (globalBtns) globalBtns.classList.remove('hidden');
+    // Static <li> already in fullList—no touch needed
+  } else {
+    // Partial/single: Show list with per-item buttons, hide globals
+    itemsSection.classList.add('show-partial');
+    if (fullMsg) fullMsg.style.display = 'none';
+    if (partialContainer) partialContainer.style.display = 'block';  // Explicit show
+    if (globalBtns) globalBtns.classList.add('hidden');
+    if (partialList) partialList.innerHTML = ''; // Clear correct list
+
+    if (data.items?.length > 0) {
+      data.items.forEach(item => {
+        const li = document.createElement('li');
+        const itemId = item._id || item.product;
+        li.dataset.itemId = itemId;
+        li.innerHTML = `
+          <strong>${item.name}</strong> - Qty: ${item.quantity}, 
+          Price: ₹${item.price || 'N/A'}, 
+          Reason: ${item.reason || 'not specified'}
+          <div class="item-actions">
+            <button class="btn btn-success btn-sm" onclick="processReturn('approve', '${itemId}')">Approve Item</button>
+            <button class="btn btn-danger btn-sm" onclick="processReturn('reject', '${itemId}')">Reject Item</button>
+          </div>
+          <span class="return-status">Pending</span>
+        `;
+        partialList.appendChild(li);  // Append to partial list
+      });
+    } else {
+      // Edge: Empty items but not full—show empty message
+      if (partialList) partialList.innerHTML = '<li><em>No items specified</em></li>';
+    }
+  }
+}
+
+  // Helper: Show the modal with orderId attached
+  function showReturnModal(orderId) {
+    console.log("inside the showreturn modal");
+    const modal = document.getElementById('returnRequestModal');
+    modal.dataset.orderId = orderId;
+    modal.classList.add('active');
+  }
+
+  // Main: Verify button handlers (now simpler, delegates to helpers)
   verifyButtons.forEach(button => {
     button.addEventListener('click', function(e) {
       e.stopPropagation();
       const row = this.closest('tr');
       if (!row) return;
-      const orderId = this.dataset.orderId;  // ObjectId
+      
+      const orderId = this.dataset.orderId;
       console.log("Order ID from dataset:", orderId);
 
-      const customOrderId = row.querySelector('td:first-child').textContent.substring(1);  // For display
+      const customOrderId = row.querySelector('td:first-child').textContent.substring(1);
       const customer = row.querySelector('td:nth-child(2)').textContent;
       const orderDate = row.querySelector('td:nth-child(3)').textContent;
       const orderTotal = row.querySelector('td:nth-child(4)').textContent;
@@ -403,48 +461,12 @@ document.addEventListener('DOMContentLoaded', function() {
           return response.json();
         })
         .then(data => {
-          console.log("the data inside the verify:",data)
-          // Populate
-          document.getElementById('returnOrderId').textContent = `#${customOrderId}`;
-          document.getElementById('returnCustomer').textContent = customer;
-          document.getElementById('returnOrderDate').textContent = orderDate;
-          document.getElementById('returnOrderTotal').textContent = orderTotal;
-          document.getElementById('returnReason').textContent = data.reason || 'Not specified';
-          document.getElementById('returnNotes').textContent = data.notes || 'None';
-
-          // Items
-          const itemContainer = document.getElementById('returnItemsList');
-          if (itemContainer) itemContainer.innerHTML = '';
-          if (data.items?.length > 0) {
-            data.items.forEach(item => {
-              const li = document.createElement('li');
-              const itemId = item._id || item.product;
-              li.dataset.itemId = itemId;
-              li.innerHTML = `
-                <strong>${item.name}</strong> - Qty: ${item.quantity}, 
-                Price: ₹${item.price || 'N/A'}, 
-                Reason: ${item.reason || 'not specified'}
-                <div class="item-actions">
-                  <button class="btn btn-success btn-sm" onclick="processReturn('approve', '${itemId}')">Approve Item</button>
-                  <button class="btn btn-danger btn-sm" onclick="processReturn('reject', '${itemId}')">Reject Item</button>
-                </div>
-                <span class="return-status">Pending</span>
-              `;
-              itemContainer.appendChild(li);
-            });
-            // Hide global if partial (assume data.type from backend)
-            const globalButtons = document.querySelectorAll('#returnRequestModal .modal-footer button');
-            const isPartial = data.type === 'partial'; 
-            globalButtons.forEach(btn => btn.style.display = isPartial ? 'none' : 'inline-block');
-          } else {
-            if (itemContainer) itemContainer.innerHTML = '<li><em>Full order return requested</em></li>';
-          }
-
-          const modal = document.getElementById('returnRequestModal');
-          if (modal) {
-            modal.dataset.orderId = orderId;
-            modal.classList.add('active');
-          }
+          console.log("the data inside the verify:", data);
+          
+          // Delegate to helpers
+          populateOrderDetails(customOrderId, customer, orderDate, orderTotal, data);
+          populateItemsSection(data);
+          showReturnModal(orderId);
         })
         .catch(error => {
           console.error('Error:', error);
@@ -457,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Keyboard shortcut
+  // Keyboard shortcut (single instance)
   document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
       e.preventDefault();
@@ -472,12 +494,12 @@ function closeReturnModal() {
 }
 
 function processReturn(action, itemId = null) {  
-  const modal = document.getElementById('returnRequestModal');
+  const modal = document.getElementById('returnRequestModal');  // Local declaration for clarity
   if (!modal) return;
   const orderId = modal.dataset.orderId;
 
   const payload = { action, itemId };
-  console.log("payload:",payload)
+  console.log("payload:", payload);
 
   fetch(`/admin/orders/${orderId}/verify-return`, {
     method: 'POST',

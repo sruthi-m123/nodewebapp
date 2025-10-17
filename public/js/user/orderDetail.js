@@ -224,7 +224,7 @@ function submitReturn(event) {
     const reason = document.getElementById('returnReason').value;
     const target = event.currentTarget; 
     const orderId = target.dataset.orderId;
-    const itemId = target.dataset.itemId;
+    const itemId = target.dataset.itemId;  // Undefined for full returns
 
     console.log("orderId", orderId);
     console.log("itemId", itemId);
@@ -235,18 +235,7 @@ function submitReturn(event) {
         return;
     }
 
-if(!itemId){
-    console.error("No item found-cannot submit return");
-    Swal.fir({
-        icon:'error',
-        title:'Invalid item selection',
-        timer:2500,
-        showConfirmButton:false,
-        toast:true,
-        position:'top-end'
-    });
-    return;
-}
+    // Removed: if(!itemId) error check—full returns don't have itemId
 
     const status = 'delivered';
 
@@ -256,7 +245,7 @@ if(!itemId){
         body: JSON.stringify({ 
             reason,
             status: status.toLowerCase().trim(),
-            itemId,
+            ...(itemId && { itemId }),  
             returnRequest: true
         })
     })
@@ -274,11 +263,19 @@ if(!itemId){
                 position: 'top-end'
             });
 
-            const returnButton = document.querySelector(`button[data-order-id="${orderId}"]`);
-            if (returnButton) {
-                returnButton.textContent = 'Requested';   
-                returnButton.disabled = true;             
-                returnButton.classList.add('disabled');   
+            // Disable the specific button that was clicked
+            target.textContent = 'Requested';   
+            target.disabled = true;             
+            target.classList.add('disabled');   
+
+            // For per-item buttons, also update the per-item button if needed
+            if (itemId) {
+                const perItemButton = document.querySelector(`button[data-item-id="${itemId}"]`);
+                if (perItemButton) {
+                    perItemButton.textContent = 'Requested';
+                    perItemButton.disabled = true;
+                    perItemButton.classList.add('disabled');
+                }
             }
         } else {
             Swal.fire({
@@ -305,7 +302,6 @@ if(!itemId){
 
     closeModal();
 }
-
         // Close modal when clicking outside
         window.onclick = function(event) {
             if (event.target.className === 'modal') {
