@@ -211,7 +211,7 @@
   <% } %>
 </div>
 <div id="toast-container"></div>
-<!-- Return Request Modal -->
+<!-- Return Request Modal (Full with IDs) -->
 <div class="modal-overlay" id="returnRequestModal">
   <div class="modal-content">
     <div class="modal-header">
@@ -220,7 +220,30 @@
     </div>
     <div class="modal-body">
       <div class="return-details">
-        <!-- ... existing detail-rows unchanged ... -->
+        <div class="detail-row">
+          <span class="detail-label">Order ID:</span>
+          <span class="detail-value" id="returnOrderId"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Customer:</span>
+          <span class="detail-value" id="returnCustomer"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Order Date:</span>
+          <span class="detail-value" id="returnOrderDate"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Order Total:</span>
+          <span class="detail-value" id="returnOrderTotal"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Return Reason:</span>
+          <span class="detail-value" id="returnReason"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Additional Notes:</span>
+          <span class="detail-value" id="returnNotes"></span>
+        </div>
       </div>
 
       <div class="return-items-section">
@@ -242,8 +265,8 @@
 
     <div class="modal-footer">
       <div class="global-btns">
-        <button type="button" class="btn btn-danger" onclick="processReturn('reject-all', this.closest('.modal').dataset.orderId)">Reject Full Return</button>
-        <button type="button" class="btn btn-success" onclick="processReturn('approve-all', this.closest('.modal').dataset.orderId)">Approve Full Return</button>
+        <button type="button" class="btn btn-danger" onclick="processReturn('reject-all', document.getElementById('returnRequestModal').dataset.orderId)">Reject Full Return</button>
+        <button type="button" class="btn btn-success" onclick="processReturn('approve-all', document.getElementById('returnRequestModal').dataset.orderId)">Approve Full Return</button>
       </div>
     </div>
   </div>
@@ -362,19 +385,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Helper: Populate common order details (always shown)
-  function populateOrderDetails(customOrderId, customer, orderDate, orderTotal, data) {
-    console.log("the populate order detail worked");
-    document.getElementById('returnOrderId').textContent = `#${customOrderId}`;
-    document.getElementById('returnCustomer').textContent = customer;
-    document.getElementById('returnOrderDate').textContent = orderDate;
-    document.getElementById('returnOrderTotal').textContent = orderTotal;
-    document.getElementById('returnReason').textContent = data.reason || 'Not specified';
-    document.getElementById('returnNotes').textContent = data.notes || 'None';
+// Helper: Populate common order details (always shown) - with null guards
+function populateOrderDetails(customOrderId, customer, orderDate, orderTotal, data) {
+  const elements = {
+    returnOrderId: document.getElementById('returnOrderId'),
+    returnCustomer: document.getElementById('returnCustomer'),
+    returnOrderDate: document.getElementById('returnOrderDate'),
+    returnOrderTotal: document.getElementById('returnOrderTotal'),
+    returnReason: document.getElementById('returnReason'),
+    returnNotes: document.getElementById('returnNotes')
+  };
+
+  // Log missing elements once (group them)
+  const missing = [];
+  for (const [key, el] of Object.entries(elements)) {
+    if (!el) missing.push(`#${key}`);
+  }
+  if (missing.length > 0) {
+    console.warn('Missing modal elements:', missing);
+    return; // Early exit—don't proceed if core elements absent
   }
 
-  // Helper: Handle items section based on return type
-  // Helper: Handle items section based on return type
+  // All good—populate
+  console.log('Populating order details:', { customOrderId, customer, orderDate, orderTotal });
+  elements.returnOrderId.textContent = `#${customOrderId}`;
+  elements.returnCustomer.textContent = customer;
+  elements.returnOrderDate.textContent = orderDate;
+  elements.returnOrderTotal.textContent = orderTotal;
+  elements.returnReason.textContent = data.reason || 'Not specified';
+  elements.returnNotes.textContent = data.notes || 'None';
+}
+
 function populateItemsSection(data) {
   console.log("inside the populate item");
   const itemsSection = document.querySelector('.return-items-section');
@@ -384,26 +425,26 @@ function populateItemsSection(data) {
   const partialList = document.getElementById('returnItemsListPartial');
   const globalBtns = document.querySelector('.modal-footer .global-btns');
 
-  // Detection: Prefer data.type; fallback to items.length === 0 for full
   const isFullReturn = data.type === 'full' || (data.items && data.items.length === 0);
   console.log("Return type detected:", isFullReturn ? 'full' : 'partial', "Items count:", data.items?.length);
 
-  itemsSection.classList.remove('show-full', 'show-partial'); // Reset classes
+  itemsSection.classList.remove('show-full', 'show-partial'); 
 
   if (isFullReturn) {
-    // Full: Show message, hide partial list, show globals
     itemsSection.classList.add('show-full');
     if (partialContainer) partialContainer.style.display = 'none';
-    if (fullMsg) fullMsg.style.display = 'block';  // Explicit show
+    if (fullMsg) fullMsg.style.display = 'block'; 
     if (globalBtns) globalBtns.classList.remove('hidden');
-    // Static <li> already in fullList—no touch needed
+    globalBtns.style.display = 'inline-block';
   } else {
-    // Partial/single: Show list with per-item buttons, hide globals
     itemsSection.classList.add('show-partial');
     if (fullMsg) fullMsg.style.display = 'none';
-    if (partialContainer) partialContainer.style.display = 'block';  // Explicit show
-    if (globalBtns) globalBtns.classList.add('hidden');
-    if (partialList) partialList.innerHTML = ''; // Clear correct list
+    if (fullList) fullList.style.display = 'none';
+    if (partialContainer) partialContainer.style.display = 'block'; 
+if (globalBtns) {
+      globalBtns.classList.add('hidden');
+      globalBtns.style.display = 'none'; 
+    }    if (partialList) partialList.innerHTML = ''; 
 
     if (data.items?.length > 0) {
       data.items.forEach(item => {
@@ -420,10 +461,9 @@ function populateItemsSection(data) {
           </div>
           <span class="return-status">Pending</span>
         `;
-        partialList.appendChild(li);  // Append to partial list
+        partialList.appendChild(li);  
       });
     } else {
-      // Edge: Empty items but not full—show empty message
       if (partialList) partialList.innerHTML = '<li><em>No items specified</em></li>';
     }
   }

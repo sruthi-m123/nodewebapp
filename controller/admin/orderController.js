@@ -226,8 +226,8 @@ const verifyReturnedRequest = async (req, res) => {
 
     const{action,adminNotes,ItemsIds}=req.body;
     
-
-    if (!['approve', 'reject'].includes(action)) {
+console.log("req.body inside the verify",req.body);
+    if (!['approve', 'reject','reject-all','approve-all'].includes(action)) {
       return res.status(400).json({ 
         error: 'Invalid action. Must be either "approve" or "reject"',
         code: 'INVALID_ACTION'
@@ -265,6 +265,7 @@ const deliveryCharge=order.deliveryCharge||0;
 const totalPaid=order.total;
 let refundAmount=0;
 refundItems.forEach(item=>{
+
   const itemPrice=item.discountedPrice??item.price;
   const itemTotal=itemPrice*item.quantity;
 
@@ -273,7 +274,7 @@ const itemCouponshare=(itemTotal/totalPaid)*couponDiscount;
 const itemDeliveryShare=(itemTotal/totalPaid)*deliveryCharge;
 
 refundAmount+=itemTotal-itemCouponshare+itemDeliveryShare;
-
+console.log("refundAmount:",refundAmount);
 });
 const wallet=await Wallet.findOne({user:order.userId})||new Wallet({user:order.userId,balance:0})
 
@@ -300,6 +301,7 @@ refundItems.forEach(item=>{
 
       order.returnRequested = false;
       order.status =refundItems.length===order.items.length?'returned':'partially_returned';
+      console.log("order status inside the verify :",order.status);
       order.returnProcessedAt = new Date();
       order.adminNotes = adminNotes || 'Return approved by administrator';
 
@@ -321,7 +323,7 @@ await Promise.all([order.save(),wallet.save(),...restockOps]);
 
  return res.json({
       success: true,
-      message: `Return request ${action}d successfully`,
+      message: `Return request ${action} successfully`,
       orderId: order.orderId,
       status: order.status,
       ...(action === 'approve' && { refundAmount, walletBalance: wallet.balance })
