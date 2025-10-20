@@ -224,7 +224,7 @@ function submitReturn(event) {
     const reason = document.getElementById('returnReason').value;
     const target = event.currentTarget; 
     const orderId = target.dataset.orderId;
-    const itemId = target.dataset.itemId;  // Undefined for full returns
+    const itemId = target.dataset.itemId;  
 
     console.log("orderId", orderId);
     console.log("itemId", itemId);
@@ -235,19 +235,20 @@ function submitReturn(event) {
         return;
     }
 
-    // Removed: if(!itemId) error check—full returns don't have itemId
 
     const status = 'delivered';
+    const payload={
+        reason,
+        returnRequest:true
+    }
+    if (itemId) {
+        payload.ItemsIds = [itemId];  
+    }
 
     fetch(`/user/orders/${orderId}/return`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            reason,
-            status: status.toLowerCase().trim(),
-            ...(itemId && { itemId }),  
-            returnRequest: true
-        })
+       body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(data => {

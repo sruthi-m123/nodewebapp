@@ -555,15 +555,15 @@ catch (error) {
 }
 
 
-
 const returnOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     console.log("orderId", orderId);
-    const { reason, itemId, customReason, notes = '' } = req.body;
+    const { reason, itemId, ItemsIds, customReason, notes = '', status } = req.body;  // Added ItemsIds; ignore unused 'status'
     const returnReason = customReason || reason;
     console.log("return reason:", returnReason);
-    console.log("itemId", itemId);
+    console.log("itemId (direct):", itemId);  
+    console.log("ItemsIds (array):", ItemsIds);  
     if (!returnReason) {
       return res.status(400).json({ success: false, message: "Return reason is required" });
     }
@@ -579,7 +579,13 @@ const returnOrder = async (req, res) => {
 
     order.returnRequested = true;
 
-    if (!itemId) {
+    // Fixed: Determine effective itemId from ItemsIds (array) or direct itemId (string)
+    let effectiveItemId = itemId;  // Fallback to direct string
+    if (ItemsIds && ItemsIds.length > 0) {
+      effectiveItemId = ItemsIds[0];  // Use first (for partial/single); ignore bulk for user-side
+    }
+
+    if (!effectiveItemId) {
       // FULL RETURN
       console.log("inside the full order return controller");
       // Don't push items—keep empty for clean full
@@ -601,7 +607,7 @@ const returnOrder = async (req, res) => {
       };
     } else {
       // PARTIAL RETURN
-      const item = order.items.id(itemId);
+      const item = order.items.id(effectiveItemId);  // Use effectiveItemId
       console.log("inside the partial return controller");
       if (!item) {
         return res.status(400).json({ success: false, message: "Item not found in order" });
@@ -630,7 +636,7 @@ const returnOrder = async (req, res) => {
         reason: returnReason,
         price: item.totalPrice
       });
-      order.status = "partially_returned";
+      order.status = "partially_returned";  // Set to partial for consistency
     }
 
     await order.save();
@@ -683,113 +689,114 @@ if (returnType === 'full') {
 };
 
 
-const processReturn = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { ItemsIds, action, adminNotes, rejectionReason } = req.body; 
+// const processReturn = async (req, res) => {
+//   try {
+//     const { orderId } = req.params;
+//     const { ItemsIds, action, adminNotes, rejectionReason } = req.body; 
 
-    if (!['approve', 'reject'].includes(action)) {
-      return res.status(400).json({ error: 'Invalid action. Must be either "approve" or "reject"' });
-    }
+//     if (!['approve', 'reject'].includes(action)) {
+//       return res.status(400).json({ error: 'Invalid action. Must be either "approve" or "reject"' });
+//     }
 
-    const order = await Order.findById(orderId).populate("items.productId");
-    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+//     const order = await Order.findById(orderId).populate("items.productId");
+//     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    if (!order.returnRequested) {
-      return res.status(400).json({ success: false, message: "No return request exists" });
-    }
+//     if (!order.returnRequested) {
+//       return res.status(400).json({ success: false, message: "No return request exists" });
+//     }
 
-    // Get refund items: all return_requested if no ItemsIds (full), else filter
-    const refundItems = ItemsIds?.length
-      ? order.items.filter(i => ItemsIds.includes(i._id.toString()) && i.status === 'return_requested')
-      : order.items.filter(i => i.status === 'return_requested');
+//     // Get refund items: all return_requested if no ItemsIds (full), else filter
+//     const refundItems = ItemsIds?.length
+//       ? order.items.filter(i => ItemsIds.includes(i._id.toString()) && i.status === 'return_requested')
+//       : order.items.filter(i => i.status === 'return_requested');
 
-    if (refundItems.length === 0) {
-      return res.status(400).json({ success: false, message: "No eligible items for processing" });
-    }
+//     if (refundItems.length === 0) {
+//       return res.status(400).json({ success: false, message: "No eligible items for processing" });
+//     }
 
-    // Refund calculation (prorated like verifyReturnedRequest)
-    const couponDiscount = order.appliedCoupon?.value || 0;
-    const deliveryCharge = order.deliveryCharge || 0;
-    const totalPaid = order.total;
-    let refundAmount = 0;
-    refundItems.forEach(item => {
-      const itemPrice = item.discountedPrice ?? item.price;
-      const itemTotal = itemPrice * item.quantity;
-      const itemCouponShare = (itemTotal / totalPaid) * couponDiscount;
-      const itemDeliveryShare = (itemTotal / totalPaid) * deliveryCharge;
-      refundAmount += itemTotal - itemCouponShare + itemDeliveryShare; // Adjust formula if needed
-    });
-    refundAmount = Math.max(refundAmount, 0);
+//     // Refund calculation 
+//     const couponDiscount = order.appliedCoupon?.value || 0;
+//     const deliveryCharge = order.deliveryCharge || 0;
+//     const totalPaid = order.total;
+//     let refundAmount = 0;
+//     refundItems.forEach(item => {
+//       const itemPrice = item.discountedPrice ?? item.price;
+//       const itemTotal = itemPrice * item.quantity;
+//       const itemCouponShare = (itemTotal / totalPaid) * couponDiscount;
+//       const itemDeliveryShare = (itemTotal / totalPaid) * deliveryCharge;
+//       refundAmount += itemTotal - itemCouponShare + itemDeliveryShare; 
+//     });
+//     refundAmount = Math.max(refundAmount, 0);
+//     console.log("refund amount:",refundAmount);
 
-    let wallet = await Wallet.findOne({ user: order.userId }) || new Wallet({ user: order.userId, balance: 0 });
+//     let wallet = await Wallet.findOne({ user: order.userId }) || new Wallet({ user: order.userId, balance: 0 });
 
-    if (action === 'approve') {
-      // Update items
-      refundItems.forEach(item => {
-        item.status = 'returned';
-        item.returnDetails = { // Assuming item has returnDetails sub-obj
-          status: 'approved',
-          processedDate: new Date(),
-          processedBy: req.user.id
-        };
-      });
+//     if (action === 'approve') {
+//       // Update items
+//       refundItems.forEach(item => {
+//         item.status = 'return_approved';
+//         item.returnDetails = {
+//           status: 'approved',
+//           processedDate: new Date(),
+//           processedBy: req.user.id
+//         };
+//       });
 
-      // Wallet refund
-      await wallet.addFunds(refundAmount, {
-        order: order._id,
-        description: `Refund for order #${order.orderId}`,
-        reference: `REFUND=${order.orderId}-${Date.now()}`,
-        status: 'completed'
-      });
+//       // Wallet refund
+//       await wallet.addFunds(refundAmount, {
+//         order: order._id,
+//         description: `Refund for order #${order.orderId}`,
+//         reference: `REFUND=${order.orderId}-${Date.now()}`,
+//         status: 'completed'
+//       });
 
-      // Restock all approved items
-      const restockOps = refundItems.map(item =>
-        Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } }, { new: true })
-      );
-      await Promise.all(restockOps);
+//       // Restock all approved items
+//       const restockOps = refundItems.map(item =>
+//         Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } }, { new: true })
+//       );
+//       await Promise.all(restockOps);
 
-      order.returnProcessedAt = new Date();
-      order.adminNotes = adminNotes || 'Return approved by administrator';
+//       order.returnProcessedAt = new Date();
+//       order.adminNotes = adminNotes || 'Return approved by administrator';
 
-    } else { // reject
-      refundItems.forEach(item => {
-        item.status = 'delivered'; // Or 'return_rejected' if you have that status
-        item.returnDetails = {
-          status: 'rejected',
-          processedDate: new Date(),
-          processedBy: req.user.id,
-          rejectionReason: rejectionReason || 'Not specified'
-        };
-      });
-      order.returnRejectedAt = new Date();
-      order.adminNotes = adminNotes || `Return rejected: ${rejectionReason || 'Not specified'}`;
-    }
+//     } else { // reject
+//       refundItems.forEach(item => {
+//         item.status = 'return_rejected'; 
+//         item.returnDetails = {
+//           status: 'rejected',
+//           processedDate: new Date(),
+//           processedBy: req.user.id,
+//           rejectionReason: rejectionReason || 'Not specified'
+//         };
+//       });
+//       order.returnRejectedAt = new Date();
+//       order.adminNotes = adminNotes || `Return rejected: ${rejectionReason || 'Not specified'}`;
+//     }
 
-    // Update order status & returnDetails
-    order.returnRequested = false;
-    const allReturned = order.items.every(i => i.status === 'returned');
-    order.status = allReturned ? 'returned' : (refundItems.length === order.items.filter(i => i.status === 'return_requested').length ? 'delivered' : 'partially_returned');
-    order.returnDetails.status = action === 'approve' ? 'completed' : 'rejected';
-    order.returnDetails.type = allReturned ? 'full' : 'partial'; // Dynamic
+//     // Update order status & returnDetails
+//     order.returnRequested = false;
+//     const allReturned = order.items.every(i => i.status === 'returned');
+//     order.status = allReturned ? 'returned' : (refundItems.length === order.items.filter(i => i.status === 'return_requested').length ? 'delivered' : 'partially_returned');
+//     order.returnDetails.status = action === 'approve' ? 'completed' : 'rejected';
+//     order.returnDetails.type = allReturned ? 'full' : 'partial'; 
 
-    await Promise.all([order.save(), wallet.save()]);
+//     await Promise.all([order.save(), wallet.save()]);
 
-    return res.json({
-      success: true,
-      message: `Return request ${action}d successfully`,
-      orderId: order.orderId,
-      status: order.status,
-      ...(action === 'approve' && { refundAmount, walletBalance: wallet.balance })
-    });
+//     return res.json({
+//       success: true,
+//       message: `Return request ${action}d successfully`,
+//       orderId: order.orderId,
+//       status: order.status,
+//       ...(action === 'approve' && { refundAmount, walletBalance: wallet.balance })
+//     });
 
-  } catch (error) {
-    console.error("Error processing return:", error);
-    res.status(500).json({ success: false, message: "Failed to process return" });
-  }
-};
+//   } catch (error) {
+//     console.error("Error processing return:", error);
+//     res.status(500).json({ success: false, message: "Failed to process return" });
+//   }
+// };
 
 
 module.exports={
-    processReturn,returnOrder,cancelOrder,invoice,getOrderDetails,getReturnDetails
+    returnOrder,cancelOrder,invoice,getOrderDetails,getReturnDetails
 }

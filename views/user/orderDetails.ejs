@@ -71,13 +71,13 @@
           <% } %>
 
           <!-- Status indicators -->
-          <% if (item.status === 'cancelled') { %>
-            <span class="status-badge cancelled">Cancelled</span>
-          <% } %>
-
-          <% if (item.status === 'returned') { %>
-            <span class="status-badge return-requested">Return Requested</span>
-          <% } %>
+    <% if (item.status === 'cancelled') { %>
+          <span class="status-badge cancelled">Cancelled</span>
+        <% } else if (item.status === 'return_requested') { %>
+          <span class="status-badge return-requested">Return Requested</span>
+        <% } else if (item.status === 'returned') { %>
+          <span class="status-badge returned">Returned</span> 
+        <% } %>
   
  
 

@@ -57,7 +57,8 @@ const orderSchema = new mongoose.Schema({
         'partially_cancelled',
         'return_requested',
         'payment_failed',
-        'return_rejected'
+        'return_rejected',
+        'return_approved'
       ],
 
     default: 'pending'
@@ -128,7 +129,7 @@ const orderSchema = new mongoose.Schema({
     requestDate: Date,
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned','delivered'],
+      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned','delivered','completed'],
       default: 'pending'
     },
     initiatedBy: {

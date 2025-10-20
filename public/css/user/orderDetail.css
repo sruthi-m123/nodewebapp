@@ -577,3 +577,7 @@ button.disabled:hover {
         padding: 6px 10px;
     }
 }
+.status-badge.returned {
+  background-color: #d4edda;  /* Light green */
+  color: #155724;
+}

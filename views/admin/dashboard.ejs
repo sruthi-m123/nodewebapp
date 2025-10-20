@@ -98,12 +98,13 @@
             <th>Amount</th>
             <th>Discount</th>
             <th>Coupons</th>
+            <th>Payment Method</th>
             <th>Net Amount</th>
           </tr>
         </thead>
         <tbody id="sales-report-body">
           <tr>
-            <td colspan="8" class="loading-text">Select date range to view sales report</td>
+            <td colspan="9" class="loading-text">Select date range to view sales report</td>
           </tr>
         </tbody>
       </table>
@@ -153,7 +154,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  console.log("📌 dashboard.js loaded");
+  console.log(" dashboard.js loaded");
 
   document.addEventListener('DOMContentLoaded', function() {
     initDashboard();
@@ -424,7 +425,7 @@
   async function loadSalesReport(page = 1) {
     try {
       const tbody = document.getElementById('sales-report-body');
-      tbody.innerHTML = '<tr><td colspan="8" class="loading-text">Loading sales data...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="loading-text">Loading sales data...</td></tr>';
       
       // Build query parameters
       const params = new URLSearchParams({
@@ -461,6 +462,7 @@
             <td>₹${(order.amount || 0).toLocaleString()}</td>
             <td>₹${(order.discount || 0).toLocaleString()}</td>
             <td>${order.coupons || 'None'}</td>
+            <td>${order.paymentMethod || 'N/A'}</td>
             <td>₹${(order.netAmount || 0).toLocaleString()}</td>
           `;
           tbody.appendChild(row);
@@ -472,7 +474,7 @@
         document.getElementById('report-discount-amount').textContent = `₹ ${(data.summary.totalDiscount || 0).toLocaleString()}`;
         document.getElementById('report-net-revenue').textContent = `₹ ${(data.summary.netRevenue || 0).toLocaleString()}`;
       } else {
-        tbody.innerHTML = '<tr><td colspan="8" class="loading-text">No sales data found for the selected period</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="loading-text">No sales data found for the selected period</td></tr>';
         
         // Reset summary cards
         document.getElementById('report-orders-count').textContent = '0';
@@ -486,7 +488,7 @@
     } catch (error) {
       console.error('Error loading sales report:', error);
       document.getElementById('sales-report-body').innerHTML = 
-        '<tr><td colspan="8" class="error-text">Failed to load sales data</td></tr>';
+        '<tr><td colspan="9" class="error-text">Failed to load sales data</td></tr>';
       showNotification('Failed to load sales report', 'error');
     }
   }

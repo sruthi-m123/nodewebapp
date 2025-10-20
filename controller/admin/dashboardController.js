@@ -307,6 +307,7 @@ const getSalesReport = async (req, res) => {
       amount: order.subtotal,
       discount: order.discount || 0,
       coupons: order.appliedCoupon.code || 'None',
+      paymentMethod: order.paymentMethod || 'N/A',
       netAmount: order.subtotal - (order.discount || 0)-(order.appliedCoupon?.value||0)
     }));
     
@@ -480,9 +481,9 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
   doc.fontSize(12).text('DETAILED ORDERS', { underline: true });
   doc.moveDown(0.5);
   
-  // Table headers (now 8 columns including Coupons)
-  const headers = ['Date', 'Order ID', 'Customer', 'Items', 'Amount (₹)', 'Discount (₹)', 'Coupons', 'Net Amount (₹)'];
-  const columnWidths = [70, 70, 90, 40, 60, 60, 60, 70]; // Adjusted to sum ~530
+  // Table headers (now 9 columns including Payment Method)
+  const headers = ['Date', 'Order ID', 'Customer', 'Items', 'Amount (₹)', 'Discount (₹)', 'Coupons', 'Payment Method', 'Net Amount (₹)'];
+  const columnWidths = [70, 70, 90, 40, 60, 60, 60, 70, 70]; // Adjusted to sum ~590, added 70 for Payment Method
   
   let currentY = doc.y;
   let xPosition = 50;
@@ -492,7 +493,7 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
   });
   
   // Draw header underline
-  doc.moveTo(50, currentY + 15).lineTo(530, currentY + 15).stroke();
+  doc.moveTo(50, currentY + 15).lineTo(590, currentY + 15).stroke();
   currentY += 20;
   doc.y = currentY;
   
@@ -504,7 +505,7 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
     }
     
     xPosition = 50;
-    const preTaxNet = (order.subtotal || 0) - (order.discount || 0);
+    const preTaxNet = (order.subtotal || 0) - (order.discount || 0) - (order.appliedCoupon?.value || 0);
     const rowData = [
       new Date(order.createdAt).toLocaleDateString(),
       order._id.toString().slice(-8).toUpperCase(),
@@ -513,9 +514,8 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
       `₹${(order.subtotal || 0).toLocaleString()}`,
       `₹${(order.discount || 0).toLocaleString()}`,
       order.appliedCoupon?.title || 'None',
-        order.paymentMethod||'N/A'
-      `₹${preTaxNet.toLocaleString()}`,
-    
+      order.paymentMethod || 'N/A',
+      `₹${preTaxNet.toLocaleString()}`
     ];
     
     rowData.forEach((data, i) => {
@@ -524,7 +524,7 @@ async function generateSalesPDFReport(res, orders, summary, dateRange, startDate
     });
     
     // Draw row separator line
-    doc.moveTo(50, currentY + 15).lineTo(530, currentY + 15).stroke();
+    doc.moveTo(50, currentY + 15).lineTo(590, currentY + 15).stroke();
     currentY += 20;
     doc.y = currentY;
   });
@@ -551,7 +551,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
 
   // Add title
   worksheet.insertRow(1, ['SALES REPORT']);
-  worksheet.mergeCells('A1:H1');
+  worksheet.mergeCells('A1:I1');
   worksheet.getCell('A1').font = { size: 16, bold: true };
   worksheet.getCell('A1').alignment = { horizontal: 'center' };
 
@@ -579,11 +579,11 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
 
   // FIXED: Summary section with proper value access
   worksheet.insertRow(6, ['SUMMARY']);
-  worksheet.mergeCells('A6:H6');
+  worksheet.mergeCells('A6:I6');
   worksheet.getCell('A6').font = { bold: true, size: 14 };
 
   // FIXED: Summary headers
-  worksheet.insertRow(7, ['Total Orders', 'Total Sales (₹)', 'Total Discount (₹)', 'Total Tax (₹)', 'Net Revenue (₹)', '', '', '']);
+  worksheet.insertRow(7, ['Total Orders', 'Total Sales (₹)', 'Total Discount (₹)', 'Total Tax (₹)', 'Net Revenue (₹)', '', '', '', '']);
   
   // FIXED: Summary values - ensure we're using the correct properties
   worksheet.insertRow(8, [
@@ -592,7 +592,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
     summary.totalDiscount || 0, 
     summary.totalTax || 0,
     summary.netRevenue || 0,
-    '', '', '' // Empty cells for the merged columns
+    '', '', '', '' // Empty cells for the merged columns
   ]);
 
   // Format summary values as currency
@@ -606,7 +606,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
 
   // Orders data header
   worksheet.insertRow(10, ['DETAILED ORDERS']);
-  worksheet.mergeCells('A10:H10');
+  worksheet.mergeCells('A10:I10');
   worksheet.getCell('A10').font = { bold: true, size: 14 };
 
   // Add column headers for orders
@@ -638,7 +638,7 @@ async function generateSalesExcelReport(res, orders, summary, dateRange, startDa
     });
     
     // Format currency cells for this row
-    ['E', 'F', 'H'].forEach(column => {
+    ['E', 'F', 'I'].forEach(column => {
       const cell = worksheet.getCell(column + currentRow);
       cell.numFmt = '#,##0.00';
     });

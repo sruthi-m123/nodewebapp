@@ -17,7 +17,6 @@ const wishlistController=require('../controller/user/wishlistController');
 const walletController=require('../controller/user/walletController');
 const couponController=require('../controller/user/couponController');
 const razorpayController=require('../controller/user/razorpayController')
-const orderDetailController=require('../controller/user/orderDetailController');
 
 
 router.get("/home", userController.loadHomepage);
@@ -136,7 +135,7 @@ router.get('/orders-details/:orderId',isLoggedIn,checkBlocked,orderdetailControl
 router.post('/orders/:orderId/return',orderdetailController.returnOrder);
 router.get('/orders/:orderId/invoice',orderdetailController.invoice);
 router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
-router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
+// router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
 //wishlist page
 router.get('/wishlist',isLoggedIn,checkBlocked,wishlistController.getWishlistPage);
 router.post('/wishlist/add/:productId',isLoggedIn,wishlistController.addToWishlist);
