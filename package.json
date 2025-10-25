@@ -1,9 +1,14 @@
 {
   "name": "first-project",
   "version": "1.0.0",
+  "type":"module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app"
+    "start": "nodemon app",
+    "dev": "nodemon app.js",
+    "tunnel": "dev-tunnel --framework express --port 3000",
+    "tunnel:no-open": "dev-tunnel --framework express --port 3000 --no-open",
+    "dev:tunnel": "concurrently \"npm run dev\" \"npx @npmx86/dev-tunnel --framework express --port 3000\""
   },
   "author": "",
   "license": "ISC",
@@ -28,5 +33,13 @@
     "pdfkit": "^0.17.1",
     "razorpay": "^2.9.6",
     "sharp": "^0.34.2"
+  },
+  "devDependencies": {
+    "@eslint/css": "^0.13.0",
+    "@eslint/js": "^9.38.0",
+    "@eslint/json": "^0.13.2",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.38.0",
+    "globals": "^16.4.0"
   }
 }

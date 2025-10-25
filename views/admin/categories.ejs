@@ -334,57 +334,76 @@
       closeDeleteModal();
     });
   }
-
-  // Form Submission
-  document.getElementById('categoryForm').addEventListener('submit', function(e) {
+document.getElementById('categoryForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    const formData = new FormData(this);
-    console.log('🔍 croppedImage:', croppedImage);
-    console.log('croppedImage Type:', croppedImage?.constructor?.name); // Should be Blob or File
 
-    // Simplified checkbox handling
-    formData.append('isActive', document.getElementById('isActive').checked);
+    const formData = new FormData(this);
+
+    const isActive = document.getElementById('isActive').checked;
+    formData.set('isActive', isActive);
 
     if (currentCategoryId) {
-      formData.append('id', currentCategoryId);
+        formData.set('id', currentCategoryId);
     }
-    
-    // 
-    
-    if(croppedImage){
-      const file=new File([croppedImage],`category=${Date.now()}.jpg`,{type:'image/jpeg'});
-      formData.append('categoryImage',file);
+
+    if (croppedImage) {
+        if (formData.has('categoryImage')) {
+            formData.delete('categoryImage');
+        }
+
+        const blob = croppedImage instanceof Blob ? croppedImage : dataURLtoBlob(croppedImage);
+
+        let fileExtension;
+        switch (blob.type) {
+            case 'image/png':
+                fileExtension = 'png';
+                break;
+            case 'image/webp':
+                fileExtension = 'webp';
+                break;
+            case 'image/jpeg':
+            case 'image/jpg':
+                fileExtension = 'jpg';
+                break;
+            default:
+                fileExtension = 'jpg';
+        }
+
+        const fileName = `category-${Date.now()}.${fileExtension}`;
+        const file = new File([blob], fileName, { type: blob.type });
+        formData.append('categoryImage', file);
     }
 
     const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
     const method = currentCategoryId ? 'PUT' : 'POST';
 
     fetch(url, {
-      method,
-      body: formData // No headers needed for FormData
+        method,
+        body: formData
     })
-    .then(res => {
-      if (!res.ok) {
-        return res.json().then(err => { throw err; });
-      }
-      return res.json();
+    .then(async res => {
+        if (!res.ok) {
+            const err = await res.json();
+            throw err;
+        }
+        return res.json();
     })
     .then(data => {
-      if (data.success) {
-        const action = currentCategoryId ? 'updated' : 'added';
-        showToast(`Category ${action} successfully!`, 'success');
-        location.reload();
-      } else {
-        showToast(data.message || 'Error saving category', 'error');
-      }
+        if (data.success) {
+            const action = currentCategoryId ? 'updated' : 'added';
+            showToast(`Category ${action} successfully!`, 'success');
+            location.reload();
+        } else {
+            showToast(data.message || 'Error saving category', 'error');
+        }
     })
     .catch(error => {
-      console.error('Error saving category:', error);
-      showToast(error.message || 'Error saving category', 'error');
+        showToast(error.message || 'Error saving category', 'error');
     });
-  });
+});
 
+
+ 
   // Image Cropping Functionality
   document.getElementById('cropImageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];

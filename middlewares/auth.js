@@ -1,6 +1,7 @@
-const User = require("../models/userSchema");
+import User from "../models/userSchema.js"
 
-const userAuth= (req,res,next)=>{
+export const userAuth= (req,res,next)=>{
+
     if(req.session.user){
         User.findById(req.session.user)
         .then(data=>{
@@ -11,7 +12,7 @@ const userAuth= (req,res,next)=>{
             }
         })
         .catch(error=>{
-            console.log("Error in user auth middleware");
+            console.log("Error in user auth middleware",error);
             res.status(500).send("Internal server error")
         })
     }else{
@@ -19,10 +20,12 @@ const userAuth= (req,res,next)=>{
     }
 }
 
-const adminAuth=(req,res,next)=>{
+ export const adminAuth=(req,res,next)=>{
+    
     User.findOne({isAdmin:true})
     .then(data=>{
-        if(data){
+        console.log("i am super admin ",data)
+        if(data&&req.session.admin){
             next();
         }else{
             res.redirect("/admin/login")
@@ -34,7 +37,7 @@ const adminAuth=(req,res,next)=>{
     })
 }
 
-const ifAuthenticated=(req,res,next)=>{
+ export const ifAuthenticated=(req,res,next)=>{
     if(req.session.user){
         return res.redirect('/');      
           
@@ -42,30 +45,18 @@ const ifAuthenticated=(req,res,next)=>{
     }
     next();
 }
-const redirectIfLoggedIn = (req, res, next) => {
-    if (req.session && req.session.user) {
-    }
-    next();
-};
-const isLoggedIn=(req,res,next)=>{
+
+export const isLoggedIn=(req,res,next)=>{
     console.log("user in isLogged middleware",req.session)
     if (req.session && req.session.user && req.session.user.id) {
       return next();
     }
     return res.redirect('/user/login?error=not_logged_in');
 }
-const isNotLoggedIn=(req,res,next)=>{
+export const isNotLoggedIn=(req,res,next)=>{
      if (!req.session || !req.session.user) {
       return next();
     }
     res.redirect('/user/home');
   }
 
-module.exports={
-    userAuth,
-    adminAuth,
-    ifAuthenticated,
-    redirectIfLoggedIn,
-    isLoggedIn,
-    isNotLoggedIn
-}

@@ -67,7 +67,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes[file.mimetype]) {
     cb(null, true);
   } else {
-     console.warn("❌ Rejected file type:", file.mimetype); 
+     console.warn(" Rejected file type:", file.mimetype); 
     cb(new Error(`Invalid file type. Only ${Object.values(allowedTypes).join(', ')} are allowed.`), false);
   }
 };

@@ -1,16 +1,19 @@
-const express = require('express');
-const router = express.Router();
-const adminController = require("../controller/admin/adminController");
-const catController = require("../controller/admin/catController")
-const customerController = require("../controller/admin/customerController")
-const productController = require('../controller/admin/productController');
-const orderController = require('../controller/admin/orderController');
-const offerController = require('../controller/admin/offerController');
-const couponController = require('../controller/admin/couponController');
-const dashboardController = require('../controller/admin/dashboardController'); 
-const { upload, singleUpload, multiUpload, handleMulterError } = require('../config/multer');
-const { adminAuth } = require("../middlewares/auth");
 
+import express from 'express';
+
+import adminController from "../controller/admin/adminController.js";
+import catController from "../controller/admin/catController.js";
+import customerController from "../controller/admin/customerController.js";
+import productController from '../controller/admin/productController.js';
+import orderController from '../controller/admin/orderController.js';
+import offerController from '../controller/admin/offerController.js';
+import couponController from '../controller/admin/couponController.js';
+import dashboardController from '../controller/admin/dashboardController.js';
+
+import { upload, singleUpload, multiUpload, handleMulterError } from '../config/multer.js';
+import { adminAuth } from "../middlewares/auth.js";
+
+const router=express.Router();
 
 router.use((req, res, next) => {
   res.locals.layout = false;

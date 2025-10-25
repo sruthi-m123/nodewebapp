@@ -8,6 +8,9 @@
 <div class="coupon-section">
   <div class="coupon-header">
     <h2>Coupons</h2>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search coupons..." class="form-control">
+    </div>
     <div class="add-coupon-btn">
       <button id="addCouponBtn">Add Coupons</button>
     </div>
@@ -157,11 +160,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const modalTitle = document.getElementById('modalTitle');
   const couponForm = document.getElementById('couponForm');
   const loadingIndicator = document.getElementById('loadingIndicator');
+  const searchInput = document.getElementById('searchInput');
+  const tableRows = document.querySelectorAll('tbody tr');
   
   let isSubmitting = false;
 
   setupEventListeners();
   setDefaultDates();
+  setupSearch();
 
   function setupEventListeners() {
     addBtn.addEventListener('click', openAddModal);
@@ -199,6 +205,37 @@ document.addEventListener('DOMContentLoaded', function() {
         handleDeleteClick(e);
       }
     });
+  }
+
+  function setupSearch() {
+    if (searchInput && tableRows.length > 0) {
+      searchInput.addEventListener('input', function() {
+        const term = this.value.toLowerCase().trim();
+        tableRows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+          let match = false;
+          // Search in all cells except the last one (Action column)
+          for (let i = 0; i < cells.length - 1; i++) {
+            if (cells[i].textContent.toLowerCase().includes(term)) {
+              match = true;
+              break;
+            }
+          }
+          row.style.display = match || term === '' ? '' : 'none';
+        });
+
+        // Optional: Show/hide no-coupons message based on visible rows
+        const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+        const noCouponsMessage = document.querySelector('.no-coupons-message');
+        if (noCouponsMessage) {
+          noCouponsMessage.style.display = 'none'; // Hide if it exists
+        }
+        if (visibleRows.length === 0 && term !== '') {
+          // Optionally add a "No results" message here if desired
+          console.log('No matching coupons found.');
+        }
+      });
+    }
   }
 
   function setDefaultDates() {
@@ -327,12 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify(Object.fromEntries(formData))
       });
 
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.message || 'Failed to save coupon');
-      // }
-
-      // return await response.json();
+      
       console.log(Object.fromEntries(formData));
 const data = await response.json();
 
@@ -340,8 +372,7 @@ if (!data.success||!response.ok) {
   showAlert('error', data.message || 'Something went wrong');
   return; 
 }
-// showAlert('success', data.message || 'Coupon saved successfully!');
-    // closeModal();
+
     setTimeout(() => window.location.reload(), 1000);
 
     return data;

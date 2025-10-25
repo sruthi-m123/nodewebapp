@@ -207,7 +207,7 @@
     <% }) %>
   </ul>
 </div> -->
-         JSON.stringify({ "<%= order.status %>" })
+         <!-- JSON.stringify({ "<%= order.status %>" }) -->
 <% if (order.status.toUpperCase() === 'PENDING' || 
        order.status.toUpperCase() === 'PROCESSING' || 
        order.status.toUpperCase()==='PAID'||
@@ -236,7 +236,6 @@ const activeCount = activeItems.length;
       order.status !== 'payment_failed' && activeCount > 0) { %>
     <div class="action-buttons">
         <% if (order.items.length === 1) { %>
-            <!-- Single-item: Full return (no itemId) -->
             <button class="action-btn return-btn"
                     data-order-id="<%= order._id %>"
                     data-status="<%= order.status %>"
@@ -244,7 +243,6 @@ const activeCount = activeItems.length;
                 Return Order
             </button>
         <% } else { %>
-            <!-- Multi-item: Full return (no itemId) -->
             <button class="action-btn return-order-btn"
                     data-order-id="<%= order._id %>"
                     data-status="<%= order.status %>"
@@ -267,13 +265,11 @@ const activeCount = activeItems.length;
                     <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
                     <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
                     <br>
-                    <!-- <%= history.message %> -->
                 </li>
             <% }) %>
         </ul>
     </div>
 </div>
-<!-- JSON.stringify({ "<%= order.items.length %>" }) -->
 
 <!-- Cancel Order Modal -->
 <div id="cancelModal" class="modal">

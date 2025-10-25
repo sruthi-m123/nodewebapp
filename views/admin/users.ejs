@@ -16,7 +16,7 @@
 <div class="page-content">
   <div class="search-container">
     <form action="/admin/users" method="GET">
-      <input type="text" name="search" placeholder="Search users..." value="<%= search || '' %>">
+      <input type="text"  id="searchInput" name="search" placeholder="Search users..." value="<%= search || '' %>">
       <button type="submit"><i class="fas fa-search"></i></button>
    <% if (search) { %>
         <a href="/admin/users" class="reset-btn">Reset</a>
@@ -24,6 +24,7 @@
     </form>
   </div>
 
+  <div id="usersContainer">
   <div class="table-container">
     <table class="users-table">
       <thead>
@@ -32,7 +33,6 @@
           <th>User Name</th>
           <th>Email</th>
           <th>Phone No</th>
-          <!-- <th>Date of Creation</th> -->
           <th>Action</th>
         </tr>
       </thead>
@@ -42,7 +42,6 @@
             <td><%= user.name %></td>
             <td><%= user.email %></td>
             <td><%= user.phone %></td>
-            <!-- <td><%= new Date(user.createdAt).toLocaleDateString() %></td> -->
             <td>
               <% if (user.isBlocked) { %>
                 <button class="action-btn unblock-btn" data-id="<%= user._id %>" onclick="toggleUserStatus('<%=user._id%>',false)" >Unblock</button>
@@ -54,6 +53,7 @@
         <% }) %>
       </tbody>
     </table>
+  </div>
   </div>
 
   <% if (totalPages > 1) { %>
@@ -83,31 +83,62 @@
     </div>
   <% } %>
 </div>
-<script src="/js/admin/users.js"></script>
-
 <script>
-  async function toggleUserStatus(userId,shouldBlock){
+  async function toggleUserStatus(userId, shouldBlock) {
     try {
-       const response =await fetch('/admin/toggle_block',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json',
-        },
-        body:JSON.stringify({
-            userId,
-            isBlocked:shouldBlock
-        }),
-       }) ;
-if(response.ok){
-    window.location.reload();
-}else{
-    const data = await response.json();
-    alert(data.message||'failed to update user status');
-}
+      const response = await fetch("/admin/toggle_block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, isBlocked: shouldBlock }),
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const data = await response.json();
+        alert(data.message || "Failed to update user status");
+      }
     } catch (error) {
-      console.error('error:',error);  
+      console.error("Error:", error);
     }
-}
+  }
+
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
+  async function fetchUsers(search) {
+    try {
+      const response = await fetch(`/admin/users?search=${encodeURIComponent(search)}`);
+      if (response.ok) {
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const newTable = doc.querySelector("#usersContainer").innerHTML;
+        document.getElementById("usersContainer").innerHTML = newTable;
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  }
+
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.addEventListener(
+      "input",
+      debounce((e) => {
+        console.log("Debounced input:", e.target.value);
+        fetchUsers(e.target.value);
+      }, 300)
+    );
+  }
 </script>
+
 
 <%- include('../partials/admin/admin-footer') %>

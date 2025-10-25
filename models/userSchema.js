@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -23,7 +24,7 @@ const userSchema = new Schema({
   },
   avatar: {
     type: String,
-   default:'/img/admin-products.png'
+    default: '/img/admin-products.png'
   },
   googleId: {
     type: String,
@@ -48,34 +49,31 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Cart"
   },
-  
-
   orderHistory: [{
     type: Schema.Types.ObjectId,
     ref: "Order"
   }],
   referralCode: {
     type: String,
-    unique:true,
-    uppercase:true
+    unique: true,
+    uppercase: true
   },
-  referredBy:{
-    type:Schema.Types.ObjectId,
-    ref:"User"
+  referredBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
   },
-  referralStats:{
-     totalReferrals: { type: Number, default: 0 },
-  successfulReferrals: { type: Number, default: 0 },
-  earnedRewards: { type: Number, default: 0 }
+  referralStats: {
+    totalReferrals: { type: Number, default: 0 },
+    successfulReferrals: { type: Number, default: 0 },
+    earnedRewards: { type: Number, default: 0 }
   },
-  wishlist:{
-    type:Schema.Types.ObjectId,
-    ref:"Wishlist"
+  wishlist: {
+    type: Schema.Types.ObjectId,
+    ref: "Wishlist"
   },
   redeemed: {
     type: Boolean
   },
-  
   redeemedUsers: [{
     type: Schema.Types.ObjectId,
     ref: "User"
@@ -91,7 +89,7 @@ const userSchema = new Schema({
     }
   }]
 }, {
-  timestamps: true 
+  timestamps: true
 });
 
 userSchema.pre('save', function (next) {
@@ -103,12 +101,13 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.pre("save",function(next){
-if(!this.referralCode){
-  this.referralCode=this.name.substring(0,3).toUpperCase()+Math.floor(1000+Math.random()*9000);
-}
-next();
-})
+userSchema.pre("save", function(next) {
+  if (!this.referralCode) {
+    this.referralCode = this.name.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+  }
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
-module.exports = User;
+
+export default User;
