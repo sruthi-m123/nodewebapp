@@ -8,13 +8,14 @@ import session from 'express-session';
 import methodOverride from 'method-override';
 import flash from 'connect-flash';
 import expressLayouts from 'express-ejs-layouts';
+import requestLogger from './middlewares/requestLogger.js';
 
 import passport from './config/passport.js';
 import db from './config/db.js';
 import userRouter from './routes/userRouter.js';
 import adminRouter from './routes/adminRouter.js';
 import { setUserAndCartCount } from './middlewares/global.js';
-import Cart from './models/cartSchema.js';
+
 
 import { fileURLToPath } from 'url';
 import {dirname} from 'path';
@@ -25,7 +26,6 @@ const __dirname=dirname(__filename);
 db();
 
 const app=express();
-
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
@@ -35,6 +35,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(requestLogger);
 
 
 app.use(

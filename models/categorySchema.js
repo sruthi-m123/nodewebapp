@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"
 const { Schema } = mongoose;
 
 const categorySchema = new Schema({
@@ -16,7 +16,7 @@ const categorySchema = new Schema({
     type: String,
     enum: ["active", "inactive","on","off"],
     default: "active",
-    set: function(value) { // Add setter to normalize values
+    set: function(value) { 
       if (value === 'on') return 'active';
       if (value === 'off') return 'inactive';
       return value;
@@ -42,5 +42,5 @@ const categorySchema = new Schema({
  
 },
  {timestamps:true});
-const Category = mongoose.model("Category", categorySchema);
-module.exports = Category;
+ export const Category = mongoose.model("Category", categorySchema);
+

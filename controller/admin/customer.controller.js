@@ -74,6 +74,7 @@ const toggleBlockStatus= async(req,res)=>{
   message: `User ${isBlocked ? "blocked" : "unblocked"} successfully` 
 });
   } catch (error) {
+    
     res.status(500).json({
       success:false,
       message:"Failed to update user status",

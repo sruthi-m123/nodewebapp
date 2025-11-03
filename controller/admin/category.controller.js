@@ -1,7 +1,10 @@
-const Category = require('../../models/categorySchema');
-const Product = require('../../models/productSchema');
-const fs = require('fs');
-const path = require('path');
+import { Category } from '../../models/categorySchema.js';
+import {Product} from '../../models/productSchema.js';
+import fs from 'fs';
+import path from 'path';
+
+
+
 
 const formatResponse = (success, message, data = {}) => ({
   success,

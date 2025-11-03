@@ -1,4 +1,4 @@
-const mongoose=require("mongoose");
+import mongoose from "mongoose"
 const{Schema}=mongoose;
 
 const productSchema= new Schema({
@@ -92,5 +92,4 @@ productSchema.pre("save", function(next) {
 });
 
 
-const Product=mongoose.model("Product",productSchema)
-module.exports=Product;
+ export const Product=mongoose.model("Product",productSchema)
