@@ -1,7 +1,5 @@
 
-import dotenv from 'dotenv';
-dotenv.config();
-
+import './config/env.js';
 import express from 'express';
 import path from 'path';
 import session from 'express-session';
@@ -9,6 +7,8 @@ import methodOverride from 'method-override';
 import flash from 'connect-flash';
 import expressLayouts from 'express-ejs-layouts';
 import requestLogger from './middlewares/requestLogger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+
 
 import passport from './config/passport.js';
 import db from './config/db.js';
@@ -94,7 +94,7 @@ app.get("/error", (req, res) => {
 app.use((req, res) => {
   res.status(404).render("user/pageNotFound");
 });
-
+app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose  from "mongoose";
 
 const transactionSchema = new mongoose.Schema({
   amount: {
@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['deposit', 'withdrawal', 'refund', 'payment', 'transfer','referral','initial','debit'],
+    enum: ['deposit', 'withdrawal', 'refund', 'payment', 'transfer','referral','initial','debit','credit'],
     required: true
   },
   order: {
@@ -67,12 +67,11 @@ walletSchema.methods.addFunds = async function(amount, transactionData) {
     type: 'refund',
      ...transactionData,
 reference: transactionData?.reference ?? `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-   
-     
+        
   });
   return this.save();
 };
 
 
 const Wallet = mongoose.model('Wallet', walletSchema);
-module.exports=Wallet;
+export default Wallet;

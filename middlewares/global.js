@@ -1,7 +1,7 @@
-const Cart=require('../models/cartSchema')
+import Cart from "../models/cartSchema.js";
 
 
-const setUserAndCartCount = async (req, res, next) => {
+ export const setUserAndCartCount = async (req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.currentPath = req.path;
 
@@ -20,4 +20,3 @@ const setUserAndCartCount = async (req, res, next) => {
   next();
 };
 
-module.exports = { setUserAndCartCount };

@@ -1,10 +1,8 @@
-import { Category } from '../../models/categorySchema.js';
-import {Product} from '../../models/productSchema.js';
-import fs from 'fs';
-import path from 'path';
-
-
-
+import { categoryService } from "../../services/category.service.js";
+import logger from "../../utils/logger.js";
+import { categorySchema,categoryStatusSchema } from "../../utils/validation.schema.js";
+import { STATUS_CODES } from "../../utils/statusCodes.js";
+import { deleteFromCloudinary } from "../../utils/cloudinary.js";
 
 const formatResponse = (success, message, data = {}) => ({
   success,
@@ -12,296 +10,94 @@ const formatResponse = (success, message, data = {}) => ({
   ...data
 });
 
-const getAllCategories = async (req, res) => {
-  try {
-    const search = req.query.search || '';
-    const page = parseInt(req.query.page) || 1;
-    const limit = 5;
-    const skip = (page - 1) * limit;
-
-    const searchFilter = {
-      isDeleted: false,
-      name: { $regex: search, $options: 'i' }  // case-insensitive search
-    };
-
-    const [categories, totalCategories] = await Promise.all([
-      Category.find(searchFilter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      Category.countDocuments(searchFilter)
-    ]);
-
-    const startItem = skip + 1;
-    const endItem = Math.min(page * limit, totalCategories);
-    const totalPages = Math.ceil(totalCategories / limit);
-
+export const getAllCategories = async (req, res) => {
+const {search="",page=1}=req.query;
+const {categories,totalCategories,totalPages,skip}=await categoryService.getAll({search,page});
+    
     res.render('admin/categories', {
       layout: false,
       categories,
-      startItem,
-      endItem,
+      startItem:skip+1,
+      endItem:Math.min(page*5,totalCategories),
       totalCategories,
       currentPage: page||1,
       totalPages:totalPages||1,
       search
     });
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).render('admin/error', {
-      layout: false,
-      message: 'Error loading categories'
-    });
-  }
-};
+  } 
 
 // Get category details (for edit)
-const getCategory = async (req, res) => {
-  try {
-    const category = await Category.findById(req.params.id);
-    console.log("Category details editing:",category)
-    if (!category) {
-      return res.status(404).json(formatResponse(false, 'Category not found'));
-    }
-    res.json(formatResponse(true, 'Category found', { category }));
-  } catch (error) {
-    console.error('Error fetching category:', error);
-    res.status(500).json(formatResponse(false, 'Server error'));
-  }
-};
-
-// Add new category with enhanced image validation
-const addCategory = async (req, res) => {
-  try {
-
-   
-    // Validate input
-    if (req.fileValidationError) {
-      return res.status(400).json(formatResponse(false, req.fileValidationError));
-    }
-
-    const { name, description, status = 'active' } = req.body;
-    
-    if (!name || !name.trim()) {
-      return res.status(400).json(formatResponse(false, 'Category name is required'));
-    }
-
-    // Check for duplicate
-    const existingCategory = await Category.findOne({
-      name: { $regex: new RegExp(`^${name.trim()}$`, 'i') },
-      isDeleted: false
-    });
-
-    if (existingCategory) {
-      // If there was a file uploaded but validation failed, remove it
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json(formatResponse(false, 'Category already exists'));
-    }
-
-    // Handle image upload with validation
-    let imagePath = '';
-    if (req.file) {
-      // Verify the file was actually saved
-      if (!fs.existsSync(req.file.path)) {
-        return res.status(500).json(formatResponse(false, 'Failed to save category image'));
-      }
-      
-      // Validate image file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(req.file.mimetype)) {
-        fs.unlinkSync(req.file.path); // Remove invalid file
-        return res.status(400).json(formatResponse(false, 'Only JPEG, PNG, and GIF images are allowed'));
-      }
-
-      imagePath = path.join('/img/admin/category', req.file.filename);
-    }
-console.log(req.body); // Log text fields
-console.log(req.file); //debuging
-    // Create new category
-    const newCategory = new Category({
-      name: name.trim(),
-      description: description || '',
-      status,
-      image: imagePath
-    });
-
-    await newCategory.save();
-console.log("category saved");
-    res.status(201).json(formatResponse(true, 'Category added successfully', { 
-      category: newCategory 
-    }));
-  } catch (error) {
-    // Clean up uploaded file if something went wrong
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-    console.error('Error adding category:', error);
-    res.status(500).json(formatResponse(false, 'Failed to add category'));
-  }
-};
-
-// Update category status
-const updateCategoryStatus = async (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    const { status } = req.body;
-
-const validStatus = (status === true || status === 'active') ? 'active'
-                      : (status === false || status === 'inactive') ? 'inactive'
-                      : null;
-
-
-    if (!validStatus) {
-  return res.status(400).json(formatResponse(false, 'Invalid status value'));
+export const getCategory=async (req,res)=>{
+  const category=await categoryService.getById(req.params.id);
+  if(!category) throw Object.assign(new Error("category not found"),{status:STATUS_CODES.NOT_FOUND});
+  res.json(formatResponse(true,"category found",{category}))
 }
 
-const category = await Category.findByIdAndUpdate(
-  req.params.categoryId,
-  { status: validStatus },
-  { new: true }
-);
 
-    if (!category) {
-      return res.status(404).json(formatResponse(false, 'Category not found'));
-    }
+export const addCategory = async (req, res) => {
+const {error,value}=categorySchema.validate(req.body);
+if(error)throw Object.assign(new Error(error.message),{status:STATUS_CODES.BAD_REQUEST})
 
-    res.json(formatResponse(true, 'Status updated successfully', { category }));
-  } catch (error) {
-    console.error('Error updating status:', error);
-    res.status(500).json(formatResponse(false, 'Failed to update status'));
+  const exists=await categoryService.existsByName(value.name);
+if(exists) throw Object.assign(new Error("category already exists"),{status:STATUS_CODES.NOT_FOUND})
+   
+ const imageUrl=req.file?.path||null;
+ const category=await categoryService.create({...value,image:imageUrl});
+
+ logger.info(`New category added:${category.name}`);
+ res.status(STATUS_CODES.CREATED).json(formatResponse(true,"category added successfully",{category}))
+          
+};
+
+// Update category 
+export const updateCategory = async (req, res) => {
+ 
+    const { id} = req.params;
+   
+
+const{error,value}=categorySchema.validate(req.body);
+if(error)throw Object.assign(new Error (error.message),{status:STATUS_CODES.NOT_FOUND})
+
+const duplicate=await categoryService.existsByName(value.name,id);
+if(duplicate) throw Object.assign(new Error("category name already exists"),{status:STATUS_CODES.NOT_FOUND})
+
+const updateData={...value};
+if(req.file){
+   const category = await categoryService.getById(id);
+  if(category?.image){
+    await deleteFromCloudinary(category.image,"categories")
   }
+   updateData.image=req.file.path;
+}
+
+const updatedCategory=await categoryService.update(id,updateData);
+if(!updatedCategory) throw Object.assign(new Error("category not found"),{status:STATUS_CODES.NOT_FOUND})
+
+  logger.info(`Category updated:${updateCategory.name}`)
+res.json(formatResponse(true,"category updated successfully",{category:updatedCategory}))
 };
+// update cateory status
+export const updateCategoryStatus=async(req,res)=>{
+const {error,value}=categoryStatusSchema.validate(req.body);
+if(error) throw Object.assign(new Error(error.message),{status:STATUS_CODES.BAD_REQUEST});
 
-// Update category with improved image handling
-const updateCategory = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, status = 'active' } = req.body;
+const {categoryId}=req.params;
+const validStatus=value.status===true||value.status==='active'?"active":"inactive";
 
-    // Validate input
-    if (!name || !name.trim()) {
-      
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json(formatResponse(false, 'Category name is required'));
-    }
+const category=await categoryService.updateStatus(categoryId,validStatus);
+if(!category) throw Object.assign(new Error("category not found"),{status:STATUS_CODES.NOT_FOUND});
+res.json(formatResponse(true,"status updated successfully",{category}));
+}
 
-    // Check for duplicate 
-    const existingCategory = await Category.findOne({
-      _id: { $ne: id },
-      name: { $regex: new RegExp(`^${name.trim()}$`, 'i') },
-      isDeleted: false
-    });
+//delete category
 
-    if (existingCategory) {
+export const deleteCategory=async(req,res)=>{
+  const category=await categoryService.softDelete(req.params.id);
+ if (!category) throw Object.assign(new Error("Category not found"), { status: STATUS_CODES.NOT_FOUND});
 
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json(formatResponse(false, 'Category name already exists'));
-    }
+ logger.info(`category deleted:${category.name}`);
+ res.json(formatResponse(true,"category deleted successfully"))
+}
 
-    const updateData = {
-      name: name.trim(),
-      description: description || '',
-      status
-    };
 
-    // Handle image upload
-    if (req.file) {
-      // Validate image file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(req.file.mimetype)) {
-        fs.unlinkSync(req.file.path); // Remove invalid file
-        return res.status(400).json(formatResponse(false, 'Only JPEG, PNG, and GIF images are allowed'));
-      }
 
-      // Verify the file was actually saved
-      if (!fs.existsSync(req.file.path)) {
-        return res.status(500).json(formatResponse(false, 'Failed to save category image'));
-      }
-
-      // Delete old image if exists
-      const oldCategory = await Category.findById(id);
-      if (oldCategory && oldCategory.image) {
-        const oldImagePath = path.join(__dirname, '../../public', oldCategory.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      updateData.image = path.join('/img/admin/category', req.file.filename);
-    }
-
-    const category = await Category.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
-
-    if (!category) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(404).json(formatResponse(false, 'Category not found'));
-    }
-
-    res.json(formatResponse(true, 'Category updated successfully', { category }));
-  } catch (error) {
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-    console.error('Error updating category:', error);
-    res.status(500).json(formatResponse(false, 'Failed to update category'));
-  }
-};
-
-// Delete category (soft delete)
-const deleteCategory = async (req, res) => {
-  try {
-    const { id } = req.params;
-console.log("category id to delete :",id);
-    // const productCount = await Product.countDocuments({ 
-    //   category: id,
-    //   isDeleted: false 
-    // });
-
-    // if (productCount > 0) {
-    //   return res.status(400).json(
-    //     formatResponse(false, `Cannot delete: ${productCount} products exist in this category`)
-    //   );
-    // }
-//firstly ,decative the products 
- await Product.updateMany(
-      { category: id, isDeleted: false },
-      { isActive: false }
-    );
-
-    // Soft delete
-    const category = await Category.findOneAndUpdate(
-  { _id: id, isDeleted: false },
-  { isDeleted: true },
-  { new: true }
-);
-
-    if (!category) {
-      return res.status(404).json(formatResponse(false, 'Category not found'));
-    }
-
-    res.json(formatResponse(true, 'Category deleted successfully'));
-  } catch (error) {
-    console.error('Error deleting category:', error);
-    res.status(500).json(formatResponse(false, 'Failed to delete category'));
-  }
-};
-
-module.exports = {
-  getAllCategories,
-  getCategory,
-  addCategory,
-  updateCategoryStatus,
-  updateCategory,
-  deleteCategory
-};

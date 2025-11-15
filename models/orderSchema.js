@@ -1,69 +1,69 @@
-const mongoose = require('mongoose');
-const razorpay = require('../helper/razorpay');
+import mongoose from "mongoose";
+
 
 const orderSchema = new mongoose.Schema({
   orderId: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
 
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: "User",
+    required: true,
   },
 
   items: [
     {
       productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true
+        ref: "Product",
+        required: true,
       },
       name: {
         type: String,
-        required: true
+        required: true,
       },
       variant: {
         type: String,
-        default: "Default"
+        default: "Default",
       },
       quantity: {
         type: Number,
-        required: true
+        required: true,
       },
       price: {
         type: Number,
-        required: true
+        required: true,
       },
-      discountedPrice:{
-        type:Number,
-        default:null
+      discountedPrice: {
+        type: Number,
+        default: null,
       },
       totalPrice: {
         type: Number,
-        required: true
+        required: true,
       },
       status: {
-    type: String,
-    enum: ['pending',
-       'processing', 
-       'shipped',
-        'delivered', 
-        'cancelled', 
-        'returned',
-        'partially_returned',
-        'partially_cancelled',
-        'return_requested',
-        'payment_failed',
-        'return_rejected',
-        'return_approved'
-      ],
-
-    default: 'pending'
-  },
-    }
+        type: String,
+        enum: [
+          "pending",
+          "processing",
+          "shipped",
+          "delivered",
+          "cancelled",
+          "returned",
+          "partially_returned",
+          "partially_cancelled",
+          "return_requested",
+          "payment_failed",
+          "return_rejected",
+          "return_approved",
+        ],
+        default: "pending",
+      },
+    },
   ],
 
   shippingAddress: {
@@ -74,13 +74,13 @@ const orderSchema = new mongoose.Schema({
     state: { type: String, required: true },
     pincode: { type: String, required: true },
     phone: { type: String, required: true },
-    altPhone: { type: String, default: "" }
+    altPhone: { type: String, default: "" },
   },
 
   paymentMethod: {
     type: String,
-    enum: ['cod', 'netbanking','wallet'],
-    required: true
+    enum: ["cod", "netbanking", "wallet"],
+    required: true,
   },
 
   subtotal: { type: Number, required: true },
@@ -91,8 +91,20 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned','partially_returned','partially_cancelled','return_requested','payment_failed','paid'],
-    default: 'pending'
+    enum: [
+      "pending",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+      "returned",
+      "partially_returned",
+      "partially_cancelled",
+      "return_requested",
+      "payment_failed",
+      "paid",
+    ],
+    default: "pending",
   },
 
   orderedAt: Date,
@@ -106,73 +118,92 @@ const orderSchema = new mongoose.Schema({
   appliedOffers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Offer'
-    }
+      ref: "Offer",
+    },
   ],
-  appliedCoupon:{
-    couponId:{type:mongoose.Schema.Types.ObjectId,ref:'Coupon'},
-    code:String,
-    value:Number
+
+  appliedCoupon: {
+    couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
+    code: String,
+    value: Number,
   },
 
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
+
   returnRequested: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  
+
   returnDetails: {
     reason: String,
     requestDate: Date,
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'processed','partially_returned','delivered','completed'],
-      default: 'pending'
+      enum: [
+        "pending",
+        "approved",
+        "rejected",
+        "processed",
+        "partially_returned",
+        "delivered",
+        "completed",
+      ],
+      default: "pending",
     },
     initiatedBy: {
       type: String,
-      enum: ['customer', 'admin'],
-      default: 'customer'
+      enum: ["customer", "admin"],
+      default: "customer",
     },
     type: {
       type: String,
-      enum: ['full', 'partial']
+      enum: ["full", "partial"],
     },
-     items: [ 
-    {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      name: String,
-      quantity: Number,
-      reason: String,
-      price:Number
-    }
-  ]
+    items: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        name: String,
+        quantity: Number,
+        reason: String,
+        price: Number,
+      },
+    ],
   },
-  cancellation: {
-  reason: String,
-  date: Date,
-  initiatedBy: { type: String, enum: ['customer', 'admin'] },
-  type: { type: String, enum: ['full', 'partial'] },
-  cancelledItems: [
-    {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      quantity: Number,
-      name: String
-    }
-  ]
-},
-refund:{
-  amount:{type:Number,default:0},
-  method:{type:String,enum:['cod','netbanking','wallet'],default:'wallet'},
-status: { type: String, enum: ['pending', 'processed', 'failed','completed'], default: 'pending' },
-    processedAt: Date
-  }
 
+  cancellation: {
+    reason: String,
+    date: Date,
+    initiatedBy: { type: String, enum: ["customer", "admin"] },
+    type: { type: String, enum: ["full", "partial"] },
+    cancelledItems: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: Number,
+        name: String,
+      },
+    ],
+  },
+
+  refund: {
+    amount: { type: Number, default: 0 },
+    method: {
+      type: String,
+      enum: ["cod", "netbanking", "wallet"],
+      default: "wallet",
+    },
+    status: {
+      type: String,
+      enum: ["pending", "processed", "failed", "completed"],
+      default: "pending",
+    },
+    processedAt: Date,
+  },
 });
 
+const Order = mongoose.model("Order", orderSchema);
 
-const Order = mongoose.model('Order', orderSchema);
-module.exports = Order;
+export default Order;

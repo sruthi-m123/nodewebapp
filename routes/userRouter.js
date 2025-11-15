@@ -1,151 +1,187 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const userController = require("../controller/user/userController");
-const passport =require("passport");
-const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require("../middlewares/auth");
-const{checkBlocked}=require('../middlewares/checkBlocked');
-const {singleUpload, multiUpload,upload}=require('../config/multer');
-const profileController = require("../controller/user/profileController");
-const shopController=require("../controller/user/shopController");
-const productController=require("../controller/user/productController")
-const addressController=require("../controller/user/addressController");
-const cartController=require("../controller/user/cartController")
-const checkoutController=require("../controller/user/checkoutController");
-const orderController=require("../controller/user/orderController")
-const orderdetailController=require('../controller/user/orderDetailController');
-const wishlistController=require('../controller/user/wishlistController');
-const walletController=require('../controller/user/walletController');
-const couponController=require('../controller/user/couponController');
-const razorpayController=require('../controller/user/razorpayController')
+
+import userController from "../controller/user/userController.js";
+import passport from "passport";
+
+import {
+
+  redirectIfLoggedIn,
+  isLoggedIn,
+
+} from "../middlewares/auth.js";
+
+import { checkBlocked } from "../middlewares/checkBlocked.js";
+
+import {
+ 
+  upload
+} from "../config/multer.js";
+
+import profileController from "../controller/user/profileController.js";
+import shopController from "../controller/user/shopController.js";
+import productController from "../controller/user/productController.js";
+import addressController from "../controller/user/addressController.js";
+import cartController from "../controller/user/cartController.js";
+import checkoutController from "../controller/user/checkoutController.js";
+import orderController from "../controller/user/orderController.js";
+import orderdetailController from "../controller/user/orderDetailController.js";
+import wishlistController from "../controller/user/wishlistController.js";
+import walletController from "../controller/user/walletController.js";
+import couponController from "../controller/user/couponController.js";
+import razorpayController from "../controller/user/razorpayController.js";
+
 
 
 router.get("/home", userController.loadHomepage);
-router.get("/signup", redirectIfLoggedIn,userController.loadSignup);
+router.get("/signup", redirectIfLoggedIn, userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);
+
 router.post("/signup", userController.signup);
 router.post("/send-otp", userController.sendOtp);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
+
 router.get("/login", userController.loadLogin);
-router.post("/login",userController.login);
+router.post("/login", userController.login);
+
 router.get("/generateotp", userController.loadGenerateotp);
-router.get("/forgotpassword",userController.loadForgotPassword);
-router.get('/validationotp',userController.loadOTPPage)
-router.post("/forgotpassword",userController.sendOTP);
-router.post('/validationotp',userController.verifyOTP);
-router.post("/resend-forgot-otp",userController.resendForgotOtp);
-router.get("/resetpassword",userController.loadResetPassword);
-router.post("/reset-password",userController.resetPassword);
-router.get('/error', (req, res) => {
+router.get("/forgotpassword", userController.loadForgotPassword);
+router.get("/validationotp", userController.loadOTPPage);
+
+router.post("/forgotpassword", userController.sendOTP);
+router.post("/validationotp", userController.verifyOTP);
+router.post("/resend-forgot-otp", userController.resendForgotOtp);
+
+router.get("/resetpassword", userController.loadResetPassword);
+router.post("/reset-password", userController.resetPassword);
+
+
+// Error Page
+router.get("/error", (req, res) => {
   const message = req.query.msg || "Something went wrong!";
-  res.status(500).render('/error', { message });
+  res.status(500).render("user/error", { message });
 });
 
 
-router.get('/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email']
+//google OAuth
+router.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
   })
 );
 
-router.get('/auth/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/login?error=google_failed'
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login?error=google_failed",
   }),
   (req, res) => {
-req.session.user = {
+    req.session.user = {
       id: req.user._id.toString(),
       name: req.user.name,
       email: req.user.email,
       phone: req.user.phone || null,
-       googleId: req.user.googleId || null,
+      googleId: req.user.googleId || null,
     };
- req.session.save((err) => {
+
+    req.session.save((err) => {
       if (err) console.error("Session save error:", err);
-      res.redirect('/user/home');
+      res.redirect("/user/home");
     });
-  
-  });
-//logout
-router.post('/logout',userController.logout);
+  }
+);
 
-//profile page
+router.post("/logout", userController.logout);
 
-router.get('/profile',isLoggedIn,checkBlocked,profileController.getProfile)
-router.get('/profile/edit',checkBlocked,profileController.getEditProfile);
-router.post('/profile/update',checkBlocked, upload.avatar, profileController.updateProfile);
-router.post('/request-email-change',checkBlocked,profileController.requestEmailChangeOTP);
-router.post('/change-password',checkBlocked,profileController.changePassword);
-router.post('/verify-email-change',checkBlocked,profileController.verifyEmailChange);
-//order managment
-router.post('/orders/:orderId/return',  orderdetailController.returnOrder);  
 
-//shopall
-router.get("/shopAll",shopController.loadShopping);
-router.post('/shopall/filter',shopController.applyFilters);
-router.get('/shopall/category/:id', shopController.getProductsByCategory);
-//product detail page 
-router.get('/product/:id',productController.productDetail);
-//address page
-router.get('/address',isLoggedIn,addressController.getAddressPage);
-router.post('/addresses/add',addressController.addAddress);
-router.put('/addresses/edit/:id',addressController.updateAddress);
-router.delete('/addresses/delete/:id',addressController.deleteAddress);
-router.post('/set-default-address/:id',addressController.setDefaultAddress)
-//cart page
-router.get('/cart',isLoggedIn,checkBlocked,cartController.getCart);
-router.post('/cart/add/:productId',cartController.addToCart);
-router.delete('/cart/remove/:itemId',checkBlocked,cartController.removeCartItem);
-router.post('/cart/update',checkBlocked,cartController.updateCart);
-router.get('/cart/validate-cart',cartController.validateCart);
-router.post('/cart/remove-invalid',cartController.removeInvalidCartItems);
+//profile
+router.get("/profile", isLoggedIn, checkBlocked, profileController.getProfile);
+router.get("/profile/edit", checkBlocked, profileController.getEditProfile);
+router.post("/profile/update", checkBlocked, upload.avatar, profileController.updateProfile);
 
-//checkout page
-router.get('/checkout',isLoggedIn,checkBlocked, checkoutController.getCheckoutPage);
-router.get('/retry-checkout/:orderId',isLoggedIn,checkBlocked,checkoutController.getRetryCheckoutPage);
-router.post('/buy-now',checkBlocked,checkoutController.buyNow);
-router.post('/api/addresses',checkoutController.addAddress);
-// router.put('/api/addresses/:id',checkoutController.updateAddress);
-router.get('/api/addresses/:id',checkoutController.getAddress);
-//coupon
-router.post('/checkout/apply-coupon',checkBlocked,couponController.applyCoupon);
-router.post('/checkout/apply-coupon-by-code',checkBlocked,couponController.applyCouponByCode)
-router.post('/checkout/remove-coupon',checkBlocked,couponController.removeCoupon);
-//offer checkout routes
-router.post('/api/offers/apply',checkBlocked,checkoutController.applyOffer);
-//order chekout routes
-router.post('/orders-placed',checkBlocked,checkoutController.placeOrder);
-//razor paymentmethod
+router.post("/request-email-change", checkBlocked, profileController.requestEmailChangeOTP);
+router.post("/change-password", checkBlocked, profileController.changePassword);
+router.post("/verify-email-change", checkBlocked, profileController.verifyEmailChange);
+
+
+//shopall and product
+router.get("/shopAll", shopController.loadShopping);
+router.post("/shopall/filter", shopController.applyFilters);
+router.get("/shopall/category/:id", shopController.getProductsByCategory);
+
+router.get("/product/:id", productController.productDetail);
+
+
+//address
+router.get("/address", isLoggedIn, addressController.getAddressPage);
+router.post("/addresses/add", addressController.addAddress);
+router.put("/addresses/edit/:id", addressController.updateAddress);
+router.delete("/addresses/delete/:id", addressController.deleteAddress);
+router.post("/set-default-address/:id", addressController.setDefaultAddress);
+
+
+//cart 
+router.get("/cart", isLoggedIn, checkBlocked, cartController.getCart);
+router.post("/cart/add/:productId", cartController.addToCart);
+router.delete("/cart/remove/:itemId", checkBlocked, cartController.removeCartItem);
+router.post("/cart/update", checkBlocked, cartController.updateCart);
+router.get("/cart/validate-cart", cartController.validateCart);
+router.post("/cart/remove-invalid", cartController.removeInvalidCartItems);
+
+router.get("/cart/count", cartController.cartCount);
+
+
+//checkout
+router.get("/checkout", isLoggedIn, checkBlocked, checkoutController.getCheckoutPage);
+router.get("/retry-checkout/:orderId", isLoggedIn, checkBlocked, checkoutController.getRetryCheckoutPage);
+
+router.post("/buy-now", checkBlocked, checkoutController.buyNow);
+router.post("/api/addresses", checkoutController.addAddress);
+
+router.get("/api/addresses/:id", checkoutController.getAddress);
+
+// Coupon
+router.post("/checkout/apply-coupon", checkBlocked, couponController.applyCoupon);
+router.post("/checkout/apply-coupon-by-code", checkBlocked, couponController.applyCouponByCode);
+router.post("/checkout/remove-coupon", checkBlocked, couponController.removeCoupon);
+
+// Offers
+router.post("/api/offers/apply", checkBlocked, checkoutController.applyOffer);
+
+// Orders
+router.post("/orders-placed", checkBlocked, checkoutController.placeOrder);
+
+
+//razorpay
 // router.post("/createOrder", razorpayController.createOrder);
-router.post("/verifyPayment",checkBlocked, razorpayController.verifyPayment);//success
-router.post('/mark-payment-failed',checkBlocked,razorpayController.markPaymentFailed);//failure
+router.post("/verifyPayment", checkBlocked, razorpayController.verifyPayment);
+router.post("/mark-payment-failed", checkBlocked, razorpayController.markPaymentFailed);
 
 
+//order
+router.get("/order-success/:orderId", checkBlocked, checkoutController.successPage);
+router.get("/order-failure/:orderId", checkoutController.failurePage);
+
+router.get("/orders", isLoggedIn, checkBlocked, orderController.getOrderHistory);
+router.get("/orders-details/:orderId", isLoggedIn, checkBlocked, orderdetailController.getOrderDetails);
+
+router.post("/orders/:orderId/return", orderdetailController.returnOrder);
+router.get("/orders/:orderId/invoice", orderdetailController.invoice);
+router.post("/orders/:orderId/cancel", orderdetailController.cancelOrder);
+
+//wishlist
+router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
+router.post("/wishlist/add/:productId", isLoggedIn, wishlistController.addToWishlist);
+router.post("/wishlist/add-to-cart/:itemId", isLoggedIn, wishlistController.addToCartFromWishlist);
+router.delete("/wishlist/remove/:itemId", isLoggedIn, wishlistController.removeFromWishlist);
 
 
+//wallet 
+router.get("/wallet", checkBlocked, walletController.getWallet);
+router.post("/add-funds", checkBlocked, walletController.addFunds);
 
-//success page and failure page
-router.get('/order-success/:orderId',checkBlocked,checkoutController.successPage);
-router.get('/order-failure/:orderId',checkoutController.failurePage);
-//order history page
-router.get('/orders',isLoggedIn,checkBlocked,orderController.getOrderHistory);
-//order detail page
-router.get('/orders-details/:orderId',isLoggedIn,checkBlocked,orderdetailController.getOrderDetails);
-router.post('/orders/:orderId/return',orderdetailController.returnOrder);
-router.get('/orders/:orderId/invoice',orderdetailController.invoice);
-router.post('/orders/:orderId/cancel',orderdetailController.cancelOrder);
-// router.post('/orders/:orderId/process-return',orderdetailController.processReturn);
-//wishlist page
-router.get('/wishlist',isLoggedIn,checkBlocked,wishlistController.getWishlistPage);
-router.post('/wishlist/add/:productId',isLoggedIn,wishlistController.addToWishlist);
-router.post('/wishlist/add-to-cart/:itemId',isLoggedIn,wishlistController.addToCartFromWishlist);
-router.delete('/wishlist/remove/:itemId',isLoggedIn,wishlistController.removeFromWishlist);
-//cart count
-router.get('/cart/count',cartController.cartCount);
 
-//wallet routes
-router.get('/wallet',checkBlocked,walletController.getWallet);
-router.post('/add-funds',checkBlocked,walletController.addFunds);
-
-module.exports = router;
+export default router;
