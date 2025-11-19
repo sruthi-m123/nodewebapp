@@ -5,8 +5,6 @@ import userController from "../controller/user/userController.js";
 import passport from "passport";
 
 import {
-
-  redirectIfLoggedIn,
   isLoggedIn,
 
 } from "../middlewares/auth.js";
@@ -18,18 +16,18 @@ import {
   upload
 } from "../config/multer.js";
 
-import profileController from "../controller/user/profileController.js";
-import shopController from "../controller/user/shopController.js";
-import productController from "../controller/user/productController.js";
-import addressController from "../controller/user/addressController.js";
-import cartController from "../controller/user/cartController.js";
-import checkoutController from "../controller/user/checkoutController.js";
-import orderController from "../controller/user/orderController.js";
-import orderdetailController from "../controller/user/orderDetailController.js";
-import wishlistController from "../controller/user/wishlistController.js";
-import walletController from "../controller/user/walletController.js";
-import couponController from "../controller/user/couponController.js";
-import razorpayController from "../controller/user/razorpayController.js";
+import * as  profileController from "../controller/user/profileController.js";
+import * as shopController from "../controller/user/shopController.js";
+import * as productController from "../controller/user/productController.js";
+import * as addressController from "../controller/user/address.controller.js";
+import * as  cartController from "../controller/user/cartController.js";
+import * as checkoutController from "../controller/user/checkoutController.js";
+import * as orderController from "../controller/user/orderController.js";
+import * as orderdetailController from "../controller/user/orderDetailController.js";
+import * as wishlistController from "../controller/user/wishlistController.js";
+import * as walletController from "../controller/user/walletController.js";
+import * as couponController from "../controller/user/couponController.js";
+import * as razorpayController from "../controller/user/razorpayController.js";
 
 
 

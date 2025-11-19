@@ -1,5 +1,5 @@
 
-import OrderService  from "../../services/order.service.js";
+import OrderService  from "../../service/admin/order.service.js";
 export const getOrderAdmin=async(req,res)=>{
     const {
     page = 1,

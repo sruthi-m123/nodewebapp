@@ -1,10 +1,10 @@
-import { Product } from "../models/productSchema.js";
-import { deleteFromCloudinary } from "../utils/cloudinary.js";
+import { Product } from "../../models/productSchema.js";
+import { deleteFromCloudinary } from "../../utils/cloudinary.js";
 
 export const productService={
 
     async getAll({search,page,limit=10}){
-        const skip=(page-1)*limit;
+        const skip=(Math.max(1,parseInt(page))-1)*parseInt(limit);
         const filter=search?{productName:{$regex:search,$options:"i"}}:{};
         const [products,totalProducts]=await Promise.all([
             Product.find(filter)
@@ -15,18 +15,18 @@ export const productService={
         ]);
         return{products,totalProducts,totalPages:Math.ceil(totalProducts/limit),skip}
     },
+async create(data = {}, files = []) {
+const imageUrls = [];
+if (Array.isArray(files) && files.length) {
+for (const file of files) {
+if (file?.path) imageUrls.push(file.path);
+}
+}
 
-    async create(data,files){
-        const imageUrls=[];
-        if(files?.length){
-            for(const file of files){
-            imageUrls.push(file.path);
-         
-        }
-    }
-    const product= new  Product({...data,images:imageUrls})
-    return product.save()
-    },
+
+const product = new Product({ ...data, images: imageUrls });
+return product.save();
+},
 
 async update(id,data,files,removedImages){
     const product=await Product.findById(id);

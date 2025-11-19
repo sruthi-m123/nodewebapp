@@ -1,4 +1,4 @@
-import User from "../models/userSchema.js";
+import User from "../../models/userSchema.js";
 
 export const userService={
     async getAllCustomers(search,page,limit){

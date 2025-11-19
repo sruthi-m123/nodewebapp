@@ -2,7 +2,7 @@
 
 
 
-import { findAdminByEmail,verifyPassword } from "../../services/admin.service.js";
+import { findAdminByEmail,verifyPassword } from "../../service/admin/admin.service.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 import {MESSAGES} from "../../utils/messages.js";
 import logger from "../../utils/logger.js";

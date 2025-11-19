@@ -1,6 +1,6 @@
             const User=require('../models/userSchema');
 
-module.exports.checkBlocked=async function(req,res,next){
+ export const checkBlocked=async function(req,res,next){
     try {
         if(req.session.user){
             const user=await User.findById(req.session.user.id);

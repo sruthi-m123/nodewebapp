@@ -1,4 +1,4 @@
-import { categoryService } from "../../services/category.service.js";
+import { categoryService } from "../../service/admin/category.service.js";
 import logger from "../../utils/logger.js";
 import { categorySchema,categoryStatusSchema } from "../../utils/validation.schema.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";

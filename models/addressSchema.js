@@ -55,4 +55,4 @@ const addressSchema= new Schema({
     }]
 })
 const Address= mongoose.model("Address",addressSchema);
-module.exports=Address;
+export default Address;

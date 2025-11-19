@@ -1,4 +1,4 @@
-import { userService } from "../../services/user.serivce.js";
+import { userService } from "../../service/admin/user.serivce.js";
 import logger from "../../utils/logger.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 

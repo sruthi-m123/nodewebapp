@@ -1,8 +1,8 @@
-import User from '../models/userSchema.js';
-import Order from '../models/orderSchema.js';
-import Wallet from '../models/walletSchema.js';
-import Product from '../models/productSchema.js';
-import logger from '../utils/logger.js';
+import User from '../../models/userSchema.js';
+import Order from '../../models/orderSchema.js';
+import Wallet from '../../models/walletSchema.js';
+import Product from '../../models/productSchema.js';
+import logger from '../../utils/logger.js';
 
 export class OrderService{
     static async getOrders(filter={}){

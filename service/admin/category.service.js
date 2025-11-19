@@ -1,5 +1,5 @@
-import { Category } from "../models/categorySchema.js";
-import { Product } from "../models/productSchema.js";
+import { Category } from "../../models/categorySchema.js";
+import { Product } from "../../models/productSchema.js";
 
 export const categoryService={
     async getAll({search="",page=1,limit=5}){

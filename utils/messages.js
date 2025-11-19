@@ -18,5 +18,38 @@ CATEGORY:{
     INVALID_STATUS: "Invalid status value",
     IMAGE_ERROR: "Invalid or missing image file",
     SERVER_ERROR: "Server error while processing category",
+},
+  ADDRESS: {
+        LOGIN_REQUIRED: "Please login to continue",
+        ADD_SUCCESS: "Address added successfully",
+        UPDATE_SUCCESS: "Address updated successfully",
+        DELETE_SUCCESS: "Address deleted successfully",
+        SET_DEFAULT_SUCCESS: "Default address set successfully",
+        NOT_FOUND: "Address not found",
+        NO_CHANGES: "Address not found or no changes applied",
+        NO_ADDRESSES: "No addresses found",
+        REQUIRED_FIELDS: "Please fill all required fields",
+        INVALID_PHONE: "Phone number must be 10 digits",
+        INVALID_PHONE_SAME: "Phone number cannot have all digits the same",
+        INVALID_ALT_PHONE: "Alternate phone must be 10 digits",
+        INVALID_ALT_PHONE_SAME: "Alternate phone cannot have all digits the same",
+        INVALID_PINCODE: "Pincode must be 6 digits",
+        INVALID_ADDRESS_TYPE: "Invalid address type",
+        UNAUTHORIZED: "Unauthorized: No session found"
+    },
+    CART: {
+    LOGIN_REQUIRED: "Please login to continue shopping",
+    ADD_SUCCESS: "Added to cart",
+    REMOVE_SUCCESS: "Item removed from cart",
+    UPDATE_SUCCESS: "Cart updated successfully",
+    REMOVE_INVALID_SUCCESS: "Invalid items removed from cart successfully",
+    EMPTY: "Your cart is empty",
+    NOT_FOUND: "Cart not found",
+    ITEM_NOT_FOUND: "Item not found in cart",
+    OUT_OF_STOCK: "Product out of stock",
+    EXCEEDS_LIMIT: "Maximum {limit} items per order",
+    EXCEEDS_STOCK: "Only {stock} units available",
+    VALIDATION_ERROR: "Some items exceed stock",
+    SERVER_ERROR: "Internal server error"
 }
 };

@@ -1,4 +1,4 @@
-import { productService } from "../../services/product.service.js";
+import { productService } from "../../service/admin/product.service.js";
 import { Category } from "../../models/categorySchema.js";
 import { productSchema } from "../../utils/validation.schema.js";
 import logger from "../../utils/logger.js";
@@ -50,7 +50,7 @@ export const updateProduct=async(req,res)=>{
   const{id}=req.params;
   logger.info(`update request for product Id:${id}`);
 
-const{error,value}=productSchema.validate(req.body,{abortEary:false});
+const{error,value}=productSchema.validate(req.body,{abortEarly:false});
 if(error){
   const messages=error.details.map((err)=>err.message).join(", ");
   throw Object.assign(new Error(messages),{status:STATUS_CODES.BAD_REQUEST});
