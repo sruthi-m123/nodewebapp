@@ -51,5 +51,27 @@ CATEGORY:{
     EXCEEDS_STOCK: "Only {stock} units available",
     VALIDATION_ERROR: "Some items exceed stock",
     SERVER_ERROR: "Internal server error"
+},
+COUPON: {
+    // Success messages
+    CREATE_SUCCESS: "Coupon created successfully",
+    UPDATE_SUCCESS: "Coupon updated successfully",
+    DELETE_SUCCESS: "Coupon deleted successfully",
+    FETCH_SUCCESS: "Coupons fetched successfully",
+    
+    // Error messages
+    NOT_FOUND: "Coupon not found",
+    DUPLICATE: "Coupon already exists",
+    DUPLICATE_CODE: "Coupon code already exists",
+    CODE_REQUIRED: "Coupon code is required",
+    DISCOUNT_TYPE_REQUIRED: "Discount type is required",
+    DISCOUNT_VALUE_REQUIRED: "Discount value is required",
+    DESCRIPTION_REQUIRED: "Description is required",
+    DATES_REQUIRED: "Valid from and valid till dates are required",
+    INVALID_DATE_FORMAT: "Invalid date format",
+    INVALID_DATE_RANGE: "Valid till date must be after valid from date",
+    INVALID_USAGE_LIMIT: "Usage limit must be at least 1",
+    SERVER_ERROR: "Server error while processing coupon",
+    VALIDATION_ERROR: "Coupon validation failed"
 }
 };

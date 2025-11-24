@@ -1,5 +1,5 @@
 import Joi from 'joi';
-
+import { MESSAGES } from './messages.js';
 export const categorySchema=Joi.object({
     name:Joi.string().trim().required().messages({
 'string.empty': 'Category name is required',
@@ -113,3 +113,102 @@ export const addressSchema = Joi.object({
       "any.required": "Address type is required",
     }),
 });
+
+export const createCouponSchema = Joi.object({
+    description: Joi.string().trim().required().messages({
+        'string.empty': MESSAGES.COUPON.DESCRIPTION_REQUIRED,
+        'any.required': MESSAGES.COUPON.DESCRIPTION_REQUIRED
+    }),
+    code: Joi.string().trim().uppercase().required().messages({
+        'string.empty': MESSAGES.COUPON.CODE_REQUIRED,
+        'any.required': MESSAGES.COUPON.CODE_REQUIRED
+    }),
+    discountType: Joi.string().valid('percentage', 'fixed').required().messages({
+        'any.only': 'Discount type must be either percentage or fixed',
+        'any.required': MESSAGES.COUPON.DISCOUNT_TYPE_REQUIRED
+    }),
+    discountValue: Joi.alternatives().conditional('discountType', {
+        is: 'fixed',
+        then: Joi.number().min(0).required().messages({
+            'number.base': 'Discount value must be a number',
+            'number.min': 'Discount value must be at least 0',
+            'any.required': MESSAGES.COUPON.DISCOUNT_VALUE_REQUIRED
+        }),
+        otherwise: Joi.number().min(0).max(100).required().messages({
+            'number.base': 'Discount value must be a number',
+            'number.min': 'Discount value must be at least 0',
+            'number.max': 'Discount value cannot exceed 100%',
+            'any.required': MESSAGES.COUPON.DISCOUNT_VALUE_REQUIRED
+        })
+    }),
+    redeemAmount: Joi.number().min(0).required().messages({
+        'number.base': 'Redeem amount must be a number',
+        'number.min': 'Redeem amount must be at least 0',
+        'any.required': 'Redeem amount is required'
+    }),
+    minCartValue: Joi.number().min(0).required().messages({
+        'number.base': 'Minimum cart value must be a number',
+        'number.min': 'Minimum cart value must be at least 0',
+        'any.required': 'Minimum cart value is required'
+    }),
+    validFrom: Joi.date().iso().required().messages({
+        'date.base': MESSAGES.COUPON.INVALID_DATE_FORMAT,
+        'date.format': MESSAGES.COUPON.INVALID_DATE_FORMAT,
+        'any.required': MESSAGES.COUPON.DATES_REQUIRED
+    }),
+    validTill: Joi.date().iso().greater(Joi.ref('validFrom')).required().messages({
+        'date.base': MESSAGES.COUPON.INVALID_DATE_FORMAT,
+        'date.format': MESSAGES.COUPON.INVALID_DATE_FORMAT,
+        'date.greater': MESSAGES.COUPON.INVALID_DATE_RANGE,
+        'any.required': MESSAGES.COUPON.DATES_REQUIRED
+    }),
+    usageLimit: Joi.number().min(1).optional().allow(null).messages({
+        'number.base': 'Usage limit must be a number',
+        'number.min': MESSAGES.COUPON.INVALID_USAGE_LIMIT
+    }),
+    isActive: Joi.boolean().default(true)
+});
+
+export const updateCouponSchema = Joi.object({
+    description: Joi.string().trim().optional(),
+    code: Joi.string().trim().uppercase().optional(),
+    discountType: Joi.string().valid('percentage', 'fixed').optional(),
+    discountValue: Joi.alternatives().conditional('discountType', {
+        is: 'fixed',
+        then: Joi.number().min(0).optional(),
+        otherwise: Joi.number().min(0).max(100).optional()
+    }),
+    redeemAmount: Joi.number().min(0).optional(),
+    minCartValue: Joi.number().min(0).optional(),
+    validFrom: Joi.date().iso().optional(),
+    validTill: Joi.date().iso().optional(),
+    usageLimit: Joi.number().min(1).optional().allow(null),
+    isActive: Joi.boolean().optional()
+}).custom((value, helpers) => {
+    // Custom validation for date range when both dates are provided
+    if (value.validFrom && value.validTill) {
+        const validFrom = new Date(value.validFrom);
+        const validTill = new Date(value.validTill);
+        
+        if (validTill <= validFrom) {
+            return helpers.error('date.invalidRange', {
+                message: MESSAGES.COUPON.INVALID_DATE_RANGE
+            });
+        }
+    }
+    return value;
+}).messages({
+    'date.invalidRange': MESSAGES.COUPON.INVALID_DATE_RANGE
+});
+
+export const validateCouponSchema = Joi.object({
+    code: Joi.string().trim().uppercase().required().messages({
+        'string.empty': 'Coupon code is required',
+        'any.required': 'Coupon code is required'
+    }),
+    cartValue: Joi.number().min(0).required().messages({
+        'number.base': 'Cart value must be a number',
+        'number.min': 'Cart value must be at least 0',
+        'any.required': 'Cart value is required'
+    })
+})
