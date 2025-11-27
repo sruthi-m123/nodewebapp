@@ -1,4 +1,5 @@
-const Coupon = require("../../models/couponSchema");
+import * as couponService from '../../service/admin/coupon.service.js';
+import 
 
 const getCouponPage = async (req, res) => {
     try {

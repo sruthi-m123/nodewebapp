@@ -47,6 +47,108 @@ export const createCouponService=async(couponData)=>{
     });
     if(existingCoupon){
         logger.warn('Duplicate coupon creation attempt',description,discountType);
-        throw new Error()
+        throw new Error(MESSAGES.COUPON.DUPLICATE);
+            }
+            // const coupon=new Coupon({
+            //     description:description.trim(),
+            //     code:code.toUpperCase(),
+            //     discountType,
+            //     discountValue:parseFloat(discountValue),
+            //     redeemAmount:parseFloat(redeemAmount),
+            //     minCartValue:parseFloat(minCartValue),
+            //     validFrom:new Date(validFrom),
+            //     validTill:new Date(validTill),
+            //     usageLimit:usageLimit?parseInt(usageLimit):null,
+            //     isActive:isActive==="on"||isActive===true||isActive==="true"
+            // });
+            const coupon =new Coupon({formattedData})
+            await coupon.save();
+            logger.info('coupon created successfully',{couponId:coupon._id,code});
+            return coupon;
+}
+
+export const getCouponByIdService=async(couponId)=>{
+    logger.debug('fetching coupon by ID',{couponId});
+    const coupon=await Coupon.findById({couponId});
+
+    if(!coupon){
+        logger.warn('coupon not found',{couponId});
+        throw new Error(MESSAGES.COUPON.NOT_FOUND)
     }
+logger.debug('coupon fetched carefully',{couponId});
+return coupon;
+}
+
+export const updatedCouponService=async(couponId,updateData)=>{
+    const{
+        description,
+        code,
+        discountType,
+        discountValue,
+        redeemAmount,
+        minCartValue,
+        validFrom,
+        validTill,
+        usageLimit,
+        isActive
+    }=updateData;
+    logger.debug('updating coupon',{couponId,code});
+
+if(code){
+    const existingCoupon=await Coupon.findOne({
+        code:code.toUpperCase(),
+        _id:{$ne:couponId}
+    });
+
+    if(existingCoupon){
+        logger.warn('duplicated coupon code during update',{code,couponId});
+        throw new Error(MESSAGES.COUPON.DUPLICATE_CODE);
+    }
+}
+
+const formattedUpdateData={
+    ...(description && {description}),
+...(code&&{code}),
+...(discountType&&{discountType}),
+...(discountValue&&{discountValue:parseFloat(discountValue)}),
+...(redeemAmount&&{redeemAmount:parseFloat(redeemAmount)}),
+...(minCartValue&&{minCartValue:parseFloat(minCartValue)}),
+...(validFrom&& {validFrom:new Date(validFrom)}),
+...(validTill&&{validTill:new Date(validTill)}),
+...(usageLimit!==undefined&&{usageLimit:usageLimit?parseInt(usageLimit):null}),
+isActive:isActive==='on'||isActive===true||isActive==="true"
+
+};
+
+const coupon=await Coupon.findByIdAndUpdate(couponId,formattedUpdateData,{new:true,runValidators:true})
+if(!coupon){
+    logger.warn('coupon not found for update',{couponId});
+    throw new Error(MESSAGES.COUPON.NOT_FOUND);
+}
+logger.info('coupon updated successfully',{couponId,code:coupon.code});
+return coupon;
+}
+
+export const deleteCouponService=async(couponId)=>{
+    logger.debug('deleting coupon',{couponId});
+
+    const coupon=await Coupon.findByIdAndDelete(couponId);
+    if(!coupon){
+        logger.warn('coupon not found for deletion ',{couponId});
+        throw new Error (MESSAGES.COUPON.NOT_FOUND)
+    }
+    logger.info('coupon deleted successfully',{couponId})
+return coupon;       
+}
+
+export const validateCouponService=async(code,cartValue)=>{
+    logger.debug('validating coupon',{code,cartValue});
+
+    const result =await Coupon.validateCoupon(code,cartValue);
+    logger.info('coupon validation completed',{
+        code,
+        isValid:result.valid,
+        discount:result.discount
+    })
+return result;
 }
