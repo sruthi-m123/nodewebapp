@@ -73,5 +73,32 @@ COUPON: {
     INVALID_USAGE_LIMIT: "Usage limit must be at least 1",
     SERVER_ERROR: "Server error while processing coupon",
     VALIDATION_ERROR: "Coupon validation failed"
+},
+
+OFFER: {
+    // Success messages
+    CREATE_SUCCESS: "Offer created successfully",
+    UPDATE_SUCCESS: "Offer updated successfully",
+    DELETE_SUCCESS: "Offer deleted successfully",
+    FETCH_SUCCESS: "Offers fetched successfully",
+    
+    // Error messages
+    NOT_FOUND: "Offer not found",
+    DUPLICATE_TITLE: "An offer with this title already exists",
+    TITLE_REQUIRED: "Offer title is required",
+    TYPE_REQUIRED: "Offer type is required",
+    DISCOUNT_VALUE_REQUIRED: "Discount value is required",
+    APPLICABLE_TO_REQUIRED: "Applicable to field is required",
+    START_DATE_REQUIRED: "Start date is required",
+    END_DATE_REQUIRED: "End date is required",
+    INVALID_DATE_FORMAT: "Invalid date format",
+    INVALID_DATE_RANGE: "End date must be after start date",
+    INVALID_USAGE_LIMIT: "Usage limit must be at least 1",
+    INVALID_DISCOUNT_VALUE: "Discount value must be a positive number",
+    INVALID_PERCENTAGE: "Percentage discount cannot exceed 95%",
+    NO_APPLICABLE_ITEMS: "Please select at least one applicable item",
+    FIXED_DISCOUNT_EXCEEDS_PRICE: "Fixed discount cannot exceed item price",
+    SERVER_ERROR: "Server error while processing offer",
+    VALIDATION_ERROR: "Offer validation failed"
 }
 };

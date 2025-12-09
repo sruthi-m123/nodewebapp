@@ -1,413 +1,104 @@
-const Offer = require('../../models/offerSchema');
-const Product = require('../../models/productSchema');
-const Category = require('../../models/categorySchema');
-const { updateProductsOffer } = require('../../helper/bestOffer');
 
-const getOfferPage = async (req, res) => {
-  try {
-    const currentPage = parseInt(req.query.page) || 1;
-    const limit = 6;
-    const offerType = req.query.type || 'all';
 
-    let query = { isActive: true };
-    if (offerType !== 'all') {
-      query.applicableTo = offerType;
-    }
 
-    const totalOffers = await Offer.countDocuments(query);
-    const totalPages = Math.ceil(totalOffers / limit);
-    const products = await Product.find(query);
-    const categories = await Category.find({ status: 'active' }).sort({ name: 1 });
-    console.log("categories inside the offer page:", categories)
-    const offers = await Offer.find(query)
-      .sort({ createdAt: -1 })
-      .skip((currentPage - 1) * limit)
-      .limit(limit);
+import * as offerService from '../../service/admin/offer.service.js';
+import Product from '../../models/productSchema.js';
+import Category from '../../models/categorySchema.js';
+import { STATUS_CODES } from '../../utils/statusCodes.js';
+import { MESSAGES } from '../../utils/messages.js';
+import logger from '../../utils/logger.js';
+import { createOfferSchema, updateOfferSchema } from '../../utils/validation.schema.js';
 
-    res.render("admin/offer", {
-      layout: false,
-      offers,
-      currentPage,
-      totalPages,
-      offerType,
-      categories,
-      products
-    });
-  } catch (error) {
-    console.error('error fetching offers:', error);
-    res.status(500).send('Server Error');
-  }
+export const getOfferPage=async(req,res,)=>{
+  logger.info('loading offer managment page');
+
+  const currentPage=parseInt(req.query.page)||1;
+  const offerType=req.query.type||'all';
+
+  const{offers,totalPages}=await offerService.getOffersService(currentPage,6,offerType);
+
+  const  products=await Product.find({});
+  const categories=await Category.find({status:'active'}).sort({name:1});
+
+  res.render("admin/offer",{
+    layout:false,
+    offers,
+    currentPage,
+    totalPages,
+    offerType,
+    categories,
+    products
+  })
 }
 
-const getApplicableItems = async (req, res) => {
-  try {
-    const type = req.query.type;
-    let items = [];
+export const getApplicableItems=async(req,res)=>{
+  const type=req.query.type;
+  logger.info('fetching applicable items',{type});
+  const items=await offerService.getApplicableItemService(type);
 
-    if (type === 'category') {
-      items = await Category.find({}, 'name');
-    } else if (type === 'product') {
-      items = await Product.find({}, 'productName price images');
-    }
-
-    res.json(items);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server Error' });
-  }
+  res.status(STATUS_CODES.SUCCESS).json(items);
 }
 
-
-const createOffer = async (req, res) => {
-  try {
-    const {
-      title,
-      code,
-      type,
-      discountValue,
-      applicableTo,
-      startDate,
-      endDate,
-      minOrderValue,
-      maxDiscount,
-      usageLimit,
-      isActive,
-      applicableItems
-    } = req.body;
-
-    console.log("Raw request body:", req.body);
-
-    if (!title?.trim()) {
-      return res.status(400).json({ message: 'Offer title is required' });
-    }
-    if (!type?.trim()) {
-      return res.status(400).json({ message: 'Discount type is required' });
-    }
-    if (discountValue === undefined || discountValue === null || discountValue === '') {
-      return res.status(400).json({ message: 'Discount value is required' });
-    }
-    const discount = Number(discountValue);
-
-    if (isNaN(discount)) {
-      return res.status(400).json({ message: 'Discount value must be a Number' })
-    };
-    if (discount > 95 && type === 'percentage') {
-      return res.status(400).json({ message: 'Discount percentage cannot exceed 95%' });
-    }
-
-    if (!applicableTo?.trim()) {
-      return res.status(400).json({ message: 'Applicable to field is required' });
-    }
-    if (!startDate) {
-      return res.status(400).json({ message: 'Start date is required' });
-    }
-    if (!endDate) {
-      return res.status(400).json({ message: 'End date is required' });
-    }
-
-    if (isNaN(Number(discountValue)) || Number(discountValue) <= 0) {
-      return res.status(400).json({ message: 'Discount value must be a positive number' });
-    }
-
-    if (type === 'percentage' && Number(discountValue) > 100) {
-      return res.status(400).json({ message: 'Percentage discount cannot exceed 100%' });
-    }
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (start >= end) {
-      return res.status(400).json({ message: 'End date must be after start date' });
-    }
-
-    let finalApplicableItems = [];
-    if (applicableTo !== 'all') {
-      if (!applicableItems || !Array.isArray(applicableItems) || applicableItems.length === 0) {
-        return res.status(400).json({
-          message: `Please select at least one ${applicableTo === 'category' ? 'category' : 'product'}` 
-        });
-      }
-      finalApplicableItems = applicableItems;
-    }
-
-    const minOrderValueNum = minOrderValue !== undefined && minOrderValue !== null && minOrderValue !== ''
-      ? Number(minOrderValue) : 0;
-
-    if (isNaN(minOrderValueNum) || minOrderValueNum < 0) {
-      return res.status(400).json({ message: 'Minimum order value must be a positive number or zero' });
-    }
-
-    let maxDiscountValue = null;
-    if (type === 'percentage' && maxDiscount !== undefined && maxDiscount !== null && maxDiscount !== '') {
-      maxDiscountValue = Number(maxDiscount);
-      if (isNaN(maxDiscountValue) || maxDiscountValue <= 0) {
-        return res.status(400).json({ message: 'Maximum discount must be a positive number' });
-      }
-    }
-
-    let finalUsageLimit = null;
-    if (usageLimit !== undefined && usageLimit !== null && usageLimit !== '') {
-      finalUsageLimit = Number(usageLimit);
-      if (isNaN(finalUsageLimit) || finalUsageLimit <= 0) {
-        return res.status(400).json({ message: 'Usage limit must be a positive number' });
-      }
-    }
-
-    // Fixed: Await the query
-    const existingOffer = await Offer.findOne({ title: title.trim() });
-    if (existingOffer) {
-      return res.status(400).json({ success: false, message: "The offer with this title already exists" });
-    }
-    const isOfferActive = isActive === true || String(isActive).toLowerCase() === 'true';
-
-   
-    const normalizedType = type === 'flat' ? 'fixed' : type;
-
-    const newOffer = new Offer({
-      title: title.trim(),
-      type: normalizedType,  
-      discountValue: Number(discountValue),
-      applicableTo,
-      applicableItems: finalApplicableItems,
-      startDate: start,
-      endDate: end,
-      minOrderValue: minOrderValueNum,
-      maxDiscount: maxDiscountValue,
-      usageLimit: finalUsageLimit,
-      isActive: isOfferActive,
-      usedCount: 0
-    });
-
-    console.log("Processed offer:", newOffer);
-
-    await newOffer.save();
-    console.log("before update bestoffer ")
-    await updateProductsOffer(newOffer);
-    console.log("after updatebestoffer");
-
-    res.status(201).json({
-      success: true,
-      message: 'Offer created successfully',
-      offer: newOffer
-    });
-
-  } catch (error) {
-    console.error("Offer creation failed:", error);
-
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        message: 'Validation error: ' + messages.join(', ')
-      });
-    }
-
-    // if (error.code === 11000) {
-    //   return res.status(400).json({
-    //     message: 'Offer code already exists'
-    //   });
-    // }
-
-    res.status(500).json({
-      message: 'Failed to create offer',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-    });
-  }
-}
-
-const deleteOffer = async (req, res) => {
-  try {
-    const { offerId } = req.params;
-    const offer = await Offer.findOne({ _id: offerId });
-    if (!offer) {
-      return res.status(200).json({
-        success: true,
-        message: "Offer already deleted"
-      });
-    }
-  
-    offer.isActive = false;
-
- await Product.updateMany({ bestOffer: offer._id }, { $unset: { bestOffer: "", discountedPrice: "" } })
-await Offer.findOneAndDelete({_id:offerId});
-    res.status(200).json({
-      success: true,
-      message: "offer successfully deleted"
-    })
-  } catch (error) {
-    console.error("error deleting the offer:", error);
-    res.status(500).json({
-      success: false,
-      message: "server error while deleting the offer"
+export const createOffer=async(req,res)=>{
+  logger.info('creating new Offer');
+  const {error,value}=createOfferSchema.validate(req.body);
+  if(error){
+    logger.warn('offer creation validation failed',{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
     })
   }
+  const offer=await offerService.createOfferService(value);
+  res.status(STATUS_CODES.CREATED).json({
+    success:true,
+    message:MESSAGES.OFFER.CREATE_SUCCESS,
+    offer
+  })
+
 }
 
-const getEditOffer = async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log("offerId", id);
-    const offer = await Offer.findById(id)
-      .populate('applicableItems', 'name price images')
-      .lean();
+export const deleteOffer=async(req,res)=>{
+  const offerId=req.params.offerId;
 
-    if (!offer) {
-      return res.status(404).json({
-        success: false,
-        message: 'Offer not found'
-      });
-    }
-    if (offer.startDate && !isNaN(new Date(offer.startDate).getTime())) {
-      offer.startDate = new Date(offer.startDate).toISOString().split('T')[0];
-    }
+  logger.info('Deletinf offer',{offerId});
 
-    if (offer.endDate && !isNaN(new Date(offer.endDate).getTime())) {
-      offer.endDate = new Date(offer.endDate).toISOString().split('T')[0];
-    }
-    console.log("startDate in DB:", offer.startDate);
-    console.log("endDate in DB:", offer.endDate);
+  await offerService.deleteOfferService(offerId);
+  res.status(STATUS_CODES.SUCCESS).json({
+    success:true,
+    message:MESSAGES.OFFER.DELETE_SUCCESS
+  })
+}
 
-    if (offer.applicableItems && offer.applicableItems.length > 0) {
-      offer.applicableItems = offer.applicableItems.map(item => item._id.toString());
-    }
+export const getEditOffer=async(req,res)=>{
+  const offerId=req.params.id;
+  logger.info('fetching offer for edit',{offerId});
 
-    res.status(200).json({
-      success: true,
-      offer
-    });
+  const offer=await offerService.getEditOfferService(offerId);
+  res.status(STATUS_CODES.SUCCESS).json({
+    success:true,
+    offer
+  })
+}
 
-  } catch (error) {
-    console.error('Error fetching offer:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching offer'
-    });
+export const updateOffer=async(req,res)=>{
+  const offerId=req.params.id;
+  logger.info('updating offer',{offerId});
+
+  const {error,value}=updateOfferSchema.validate(req.body);
+  if(error){
+    logger.warn("offer update valiation failed",{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
+    })
   }
+const updatedOffer=await offerService.updateOfferService(offerId,value);
+
+res.status(STATUS_CODES.SUCCESS).json({
+  success:true,
+  message:MESSAGES.OFFER.UPDATE_SUCCESS,
+  offer:updatedOffer
+})
+
 }
-
-const updateOffer = async (req, res) => {
-  try {
-    const offerId = req.params.id;
-    const {
-      title,
-      type,
-      discountValue,
-      applicableTo,
-      applicableItems,
-      startDate,
-      endDate
-    } = req.body;
-
-    const trimmedTitle = title?.trim();
-    if (!trimmedTitle) {
-      return res.status(400).json({ message: 'Offer title is required' });
-    }
-    const discount = Number(discountValue);
-    if (isNaN(discount) || discount <= 0) {
-      return res.status(400).json({ message: 'Discount value must be a positive number' });
-    }
-    const normalizedType = type === 'flat' ? 'fixed' : type;
-    if (normalizedType === 'percentage' && discount >= 100) {
-      return res.status(400).json({ message: 'Percentage discount cannot be 100% or more' });
-    }
-
-    // Date validation
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) {
-      return res.status(400).json({ message: 'End date must be after start date' });
-    }
-
-    // Fixed discount validation: Cannot exceed the price of applicable items
-    if (normalizedType === 'fixed' && applicableTo !== 'all') {
-      if (!applicableItems || !Array.isArray(applicableItems) || applicableItems.length === 0) {
-        return res.status(400).json({ message: `Please select at least one ${applicableTo === 'category' ? 'category' : 'product'}` });
-      }
-
-      let relevantProductIds = [];
-      if (applicableTo === 'product') {
-        relevantProductIds = applicableItems;
-      } else if (applicableTo === 'category') {
-        // Fetch all products in the selected categories (assuming Category schema has a 'products' array ref)
-        const categories = await Category.find({ _id: { $in: applicableItems } }).populate('products');
-        relevantProductIds = categories.flatMap(cat => cat.products.map(p => p._id));
-      }
-
-      if (relevantProductIds.length === 0) {
-        return res.status(400).json({ message: 'No valid products found for the selected items' });
-      }
-
-      // Fetch prices of relevant products
-      const products = await Product.find({ _id: { $in: relevantProductIds } }, 'price');
-      const minPrice = Math.min(...products.map(p => p.price));
-
-      if (discount > minPrice) {
-        return res.status(400).json({ 
-          message: `Fixed discount (${discount}) cannot exceed the lowest item price (${minPrice})` 
-        });
-      }
-    }
-
-    const updateData = {
-      ...req.body,
-      title: trimmedTitle,
-      type: normalizedType,
-      startDate: start,
-      endDate: end,
-      applicableItems: applicableItems || []
-    };
-
-    // Title uniqueness check (case-insensitive)
-    const existingOffer = await Offer.findOne({
-      title: { $regex: new RegExp(`^${trimmedTitle}$`, 'i') },
-      _id: { $ne: offerId }
-    });
-    if (existingOffer) {
-      return res.status(400).json({
-        success: false,
-        message: 'An offer with this title already exists'
-      });
-    }
-
-    const updatedOffer = await Offer.findByIdAndUpdate(
-      offerId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedOffer) {
-      return res.status(404).json({
-        success: false,
-        message: 'Offer not found'
-      });
-    }
-
-    await updateProductsOffer(updatedOffer);
-    res.status(200).json({
-      success: true,
-      message: 'Offer updated successfully',
-      offer: updatedOffer
-    });
-  } catch (error) {
-    console.error('error updating offer:', error);
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ message: 'Validation error: ' + messages.join(', ') });
-    }
-    if (error.code === 11000) {
-      return res.status(400).json({ message: 'An offer with this title already exists' });
-    }
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating offer'
-    });
-  }
-}
-
-module.exports = {
-  getOfferPage,
-  getApplicableItems,
-  createOffer,
-  deleteOffer,
-  updateOffer,
-  getEditOffer
-};
