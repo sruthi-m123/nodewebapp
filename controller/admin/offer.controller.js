@@ -1,6 +1,3 @@
-
-
-
 import * as offerService from '../../service/admin/offer.service.js';
 import Product from '../../models/productSchema.js';
 import Category from '../../models/categorySchema.js';

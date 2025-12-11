@@ -1,67 +1,46 @@
-const Order = require('../../models/orderSchema');
+import *as orderService from '../../service/user/order.service.js';
+import {getOrderHistorySchema} from '../../utils/validation.schema.js';
+import {STATUS_CODES} from "../../utils/statusCodes.js";
+import { MESSAGES } from '../../utils/messages.js';
+import logger from '../../utils/logger.js';
 
-const getOrderHistory = async (req, res) => {
-  try {
-    const userId = req.session.user.id;
-    const page = parseInt(req.query.page) || 1;
-    const limit = 6;
-    const skip = (page - 1) * limit;
-    const searchQuery = req.query.search?.trim() || '';
+export const getOrderHistory=async(req,res)=>{
+  logger.info('loading order history page');
 
-    let orderFilter = { userId };
-
-    if (searchQuery) {
-      const regex = new RegExp(searchQuery, 'i');
-      orderFilter = {
-        userId,
-        $or: [
-          { orderId: { $regex: regex } },
-          { 'items.name': { $regex: regex } },
-          { 'items.productId.name': { $regex: regex } }
-        ]
-      };
-    }
-
-    const totalOrders = await Order.countDocuments(orderFilter);
-    const totalPages = Math.ceil(totalOrders / limit);
-
-    // Fetching orders
-    const orders = await Order.find(orderFilter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate("items.productId")
-      .lean();
-
-    const formatOrders = orders.map(order => ({
-      id: order.orderId,
-      price: order.total,
-      deliveryDate: new Date(order.createdAt.getTime() + 5 * 24 * 60 * 60 * 1000).toDateString(),
-      imageUrl: order.items[0]?.productId?.images?.[0] || '/img/admin-products.png',
-      productName: order.items[0]?.name || 'Product',
-      varient: order.items[0]?.variant || 'Default',
-      quantity: order.items[0]?.quantity || 1,
-      status: order.status || 'pending'
-    }));
-
-    res.render('user/orderhistory', {
-      pageCSS: 'user/orderHistory.css',
-      pageJS: 'user/orderHistory.js',
-      pagetitle: 'Order History',
-      storeName: 'Chettinad sarees',
-      orders: formatOrders,
-      user: req.session.user,
-      totalPages: totalPages,
-      currentPage: page,
-      searchQuery: searchQuery
-    });
-
-  } catch (error) {
-    console.error('Error loading the history:', error);
-    res.status(500).send("Error loading the order history page");
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('Unathorized access to order history');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.AUTH.LOGIN_REQUIRED
+    })
   }
-};
+  const userId=req.session.user.id;
 
-module.exports = {
-  getOrderHistory
-};
+  const {error,value}=getOrderHistorySchema.validate(req.query);
+  if(error){
+    logger.warn('order history validation failed',{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
+    })
+  }
+
+  const{page,limit,search}=value;
+  const{orders,totalPages,currentPage}=await orderService.getOrderHistoryService(
+    userId,
+    {page,limit,search}
+  );
+
+  const formattedOrders=orderService.formatOrderHistoryService(orders);
+  res.render('user/orderHistory',{
+       pageCSS: 'user/orderHistory.css',
+        pageJS: 'user/orderHistory.js',
+        pagetitle: 'Order History',
+        storeName: 'Chettinad sarees',
+        orders: formattedOrders,
+        user: req.session.user,
+        totalPages: totalPages,
+        currentPage: currentPage,
+        searchQuery: search
+  })
+}

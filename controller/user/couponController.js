@@ -1,295 +1,108 @@
-const User = require('../../models/userSchema');
-const Coupon = require('../../models/couponSchema');
-const Cart = require('../../models/cartSchema');
-const { calculateOrder } = require('../../helper/calculateTotal');
-const Order = require('../../models/orderSchema');
+import * as couponApplicationService from '../../service/user/coupon.service.js';
+import { applyCouponSchema } from '../../utils/validation.schema.js';
+import { STATUS_CODES } from '../../utils/statusCodes.js';
+import { MESSAGES } from '../../utils/messages.js';
+import logger from '../../utils/logger.js';
 
-exports.removeCoupon = async (req, res) => {
-  try {
-    console.log("req session inside the remove coupon:", req.session);
-    if (!req.session.user || !req.session.user.id) {
-      return res.status(401).json({ success: false, message: 'Please log in to continue' });
-    }
-    const userId = req.session.user.id;
-    console.log("userId inside the removecoupon :", userId);
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    console.log("cart inside the removeCoupon", cart);
-    if (!cart) {
-      return res.json({ success: false, message: 'Cart not found' });
-    }
+export const removeCoupon=async (req,res)=>{
+  logger.info('removing applied coupon');
 
-    if (!req.session.appliedCoupon) {
-      return res.json({ success: false, message: 'No coupon applied to remove' })
-    }
-
-    delete req.session.appliedCoupon;
-
-    const cartItems = cart.items
-      .filter(item => item.productId && item.productId.isActive)
-      .map(item => ({
-        id: item.productId._id,
-        name: item.productId.productName,
-        price: item.productId.discountedPrice || item.productId.price,
-        originalPrice: item.productId.price,
-        discountedPrice: item.productId.discountedPrice || null,
-        quantity: item.quantity
-      }));
-
-    const orderSummary = calculateOrder(cartItems, {});
-    console.log("orderSummary", orderSummary);
-    return res.json({
-      success: true,
-      message: 'Coupon removed successfully',
-      orderSummary
-    });
-  } catch (error) {
-    console.error('error removing coupon:', error);
-    res.json({ success: false, message: 'error removing coupon' });
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('unauthorized coupon removal attempt');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.CART.LOGIN_REQUIRED
+    })
   }
+
+  const userId=req.session.user.id;
+  const orderSummary=await couponApplicationService.removeCouponService(userId);
+
+  delete req.session.appliedCoupon;
+  res.status(STATUS_CODES.SUCCESS).json({
+    success:true,
+    message:'Coupon removed successfully',
+    orderSummary
+  })
+
 }
 
-//discount text
-function getDiscountText(coupon) {
-  return coupon.discountType === 'percentage'
-    ? `${coupon.discountValue}% off`
-    : `${coupon.discountValue} off`
-}
 
-//validating coupon per usage
-async function checkCouponUsage(userId, coupon) {
-  const usageCount = await Order.countDocuments({
+export const applyCouponByCode=async(req,res)=>{
+  logger.info('applying coupon by code');
+
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('unauthorized coupon application attempt');
+
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.CART.LOGIN_REQUIRED
+    })
+  }
+  const userId=req.session.user.id;
+  const isRetry=req.query.retry==='true';
+
+  const{error,value}=applyCouponSchema.validate(req.body);
+  if(error){
+    logger.warn('coupon application validation failed',{error:error.details[0].context.message});
+    return res.status=(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
+    });
+  }
+
+  const result=await couponApplicationService.validateAndApplyCouponService(
     userId,
-    'appliedCoupon.couponId': coupon._id,
-    status: { $nin: ['cancelled', 'returned'] }
-  });
-  if (!coupon.reusable && usageCount > 0) {
-    return { valid: false, message: 'you have already used this coupon' }
-  }
-
-  if (coupon.usageLimit && usageCount >= coupon.usageLimit) {
-    return {
-      valid: false,
-      message: `you can use this coupon only ${coupon.usageLimit} times`
-    }
-  }
-
-  return { valid: true };
-}
-
-function prepareCartItems(cart) {
-  return cart.items
-    .filter(item => item.productId && item.productId.isActive)
-    .map(item => ({
-      id: item.productId._id,
-      name: item.productId.productName,
-      price: item.productId.discountedPrice || item.productId.price,
-      originalPrice: item.productId.price,
-      discountedPrice: item.productId.discountedPrice || null,
-      quantity: item.quantity
-    }))
-}
-
-function checkMinCartValue(cartItems, coupon) {
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.originalPrice * item.quantity, 0
+    value.couponCode||value.couponId,
+    isRetry,
+    value.retryCartItems
   );
-  if (subtotal < coupon.minCartValue) {
-    const amountNeeded = parseFloat((coupon.minCartValue - subtotal).toFixed(2));
-    return {
-      valid: false,
-      message: `Add ₹${amountNeeded} more to apply this coupon `
-    };
+
+  req.session.appliedCoupon=result.appliedCoupon;
+  res.status(STATUS_CODES.SUCCESS).json({
+    success:true,
+    couponId:result.coupon._id,
+    couponCode:result.coupon.code,
+    appliedCoupon:result.appliedCoupon,
+    discountText:result.discountText,
+    orderSummary:result.orderSummary
+  });
+}
+
+export const applyCoupon=async(req,res)=>{
+  logger.info('Applying coupon by Id');
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('Unathorized copon application attempt');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.CART.LOGIN_REQUIRED
+    });
   }
-  return { valid: true };
-}
+  const userId=req.session.user.id;
+  const isRetry=req.query.retry==='true';
 
-async function applyCouponLogic({userId,coupon,retryCartItems=null}){
-  try {
-    console.log("inside the apply coupon logic here")
-    console.log("retryCartItems:",retryCartItems);
-    let cartItems=retryCartItems;
-    if(!cartItems){
-      const userCart=await Cart.findOne({userId}).populate('items.productId');
-      if(!userCart||userCart.items.length===0){
-        return{success:false,message:'Cart is empty'};
-      }
-      cartItems=userCart.items.map(item=>({
-        id:item.productId._id,
-        name:item.productId.productName,
-        originalPrice:item.price,
-        discountedPrice:item.discountedPrice||null,
-        quantity:item.quantity
-      }))
-    }
-const baseOrderSummary=calculateOrder(cartItems,{coupon});
-console.log("baseOrderSUMMARY",baseOrderSummary);
-const subtotal=baseOrderSummary.subtotal||0;
-const delivery=baseOrderSummary.delivery||0;
-const tax=baseOrderSummary.tax||0;
-console.log("tax inside baseSummary:",baseOrderSummary.tax)
-const total=baseOrderSummary.total||0;
-
-
-
-if(coupon.minCartValue&&subtotal<coupon.minCartValue){
-  return {success:false,message:`Coupon requires a minimum cart value of ₹${coupon.minCartValue}`}
-}
-let discountToApply=0;
-
-if(coupon.discountType==='fixed'){
-  discountToApply=coupon.discountValue;
-}else if(coupon.discountType==='percentage'){
-  discountToApply=(coupon.discountValue/100)*subtotal;
-}
-//check here 
-if(discountToApply>subtotal){
-return{success:false,message:"this coupon cannot be applied becuase the coupon value exceedes the subtotal"}
-} 
-// const finalPrice=subtotal-discountToApply+delivery+tax;
-const finalPrice=total;
-const appliedCoupon={
-  id:coupon._id,
-  code:coupon.code,
-  discountType:coupon.discountType,
-  discountValue:coupon.discountValue,
-  discountApplied:discountToApply
-}
-const discountText=getDiscountText(coupon)
-const orderSummary={
-  items:cartItems,
-  subtotal,
-  delivery,
-  tax,
-  couponDiscount:discountToApply,
-  total:finalPrice
-}
-
-return {success:true,appliedCoupon,discountText,orderSummary}
-  } catch (error) {
-     console.error('Error in applyCouponLogic:', error);
-    return { success: false, message: 'Error calculating coupon' };
+  const{error,value}=applyCouponSchema.validate(req.body);
+  if(error){
+    logger.warn('coupon application validation failed',{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      messsage:error.details[0].message
+    })
   }
-}
-
-exports.applyCouponByCode = async (req, res) => {
-  try {
-    const { couponCode ,retryCartItems} = req.body;
-    const userId = req.session.user.id;
-    const isRetry = req.query.retry === 'true';
-    console.log("isRetry:", isRetry);
-
-    const coupon = await Coupon.findOne({
-      code: couponCode,
-      isActive: true,
-      validTill: { $gte: new Date() }
+const result=await couponApplicationService.validateAndApplyCouponService(
+  userId,
+  value.couponId||value.couponCode,
+  isRetry,
+  value.retryCartItems
+);
+req.session.appliedCoupon=result.appliedCoupon
+    res.status(STATUS_CODES.SUCCESS).json({
+        success: true,
+        couponId: result.coupon._id,
+        couponCode: result.coupon.code,
+        appliedCoupon: result.appliedCoupon,
+        discountText: result.discountText,
+        orderSummary: result.orderSummary
     });
 
-    if (!coupon) {
-      return res.json({ success: false, message: 'Invalid or expired coupon code' })
-    };
-
-    //retry
-
-    // let retryCartItems = null;
-    if (isRetry) {
-      if(!retryCartItems){
-           
-      const failedOrder = await Order.findOne({
-        userId,
-        status: 'payment_failed'
-      }).populate('items.productId').sort({ createdAt: -1 });
-
-      if (failedOrder) {
-        retryCartItems = failedOrder.items.map(item => ({
-          id: item.productId._id,
-          name: item.productId.productName,
-          price: item.discountedPrice || item.price,
-          originalPrice: item.price,
-          discountedPrice: item.discountedPrice || null,
-          quantity: item.quantity
-        }))
-      } else {
-        return res.json({ success: false, message: 'No failed order for retry' })
-      }
-    }
-  }
-
-    const result = await applyCouponLogic({ userId, coupon, retryCartItems });
-    if (!result.success) return res.json(result);
-    req.session.appliedCoupon = result.appliedCoupon;
-    const responseData = {
-      success: true,
-      couponId: coupon._id,
-      couponCode: coupon.code,
-      appliedCoupon: result.appliedCoupon,
-      discountText: result.discountText,
-      orderSummary: result.orderSummary
-    };
-    return res.json(responseData);
-  } catch (error) {
-    console.error('Error applying coupon by code:', error);
-    res.json({ success: false, message: 'error applying coupon' });
-  }
-}
-
-exports.applyCoupon = async (req, res) => {
-  try {
-    const { couponId,retryCartItems } = req.body;
-    const userId = req.session.user.id;
-    const isRetry = req.query.retry === 'true';
-
-    const coupon = await Coupon.findOne({
-      _id: couponId,
-      isActive: true,
-      validTill: { $gte: new Date() }
-    });
-
-    if (!coupon) {
-      return res.json({ success: false, message: 'Invalid or expired coupon' })
-    }
-
-    //retry checkout
-    if (isRetry) {
-      if(!retryCartItems){
-
-      
-      const failedOrder = await Order.findOne({
-        userId,
-        status: 'payment_failed'
-      }).populate('items.productId');
-
-      if (failedOrder) {
-        retryCartItems = failedOrder.items.map(item => ({
-          id: item.productId._id,
-          name: item.productId.productName,
-          price: item.discountedPrice || item.price,
-          originalPrice: item.price,
-          discountedPrice: item.discountedPrice || null,
-          quantity: item.quantity
-        }));
-        console.log('retry items fetched:', retryCartItems ? retryCartItems.length : 0);
-        console.log('applyCoupon:Retry mode,using failed order items ');
-      } else { 
-        return res.json({ success: false, message: 'No failed order for retry' })
-      }
-    }
-  }
-    const result = await applyCouponLogic({ userId, coupon, retryCartItems });
-    if (!result.success) return res.json(result);
-    console.log("result inside the apply coupon:", result);
-    req.session.appliedCoupon = result.appliedCoupon;
-    const responseData = {
-      success: true,
-      couponId: coupon._id,
-      couponCode: coupon.code,
-      appliedCoupon: result.appliedCoupon,  // Added for consistency
-      discountText: result.discountText,
-      orderSummary: result.orderSummary
-    };
-    console.log('Sending success response:', responseData);
-    return res.json(responseData);
-  } catch (error) {
-    console.error('error applying coupon:', error);
-    res.json({ success: false, message: 'error applying coupon' })
-  }
 }

@@ -100,5 +100,41 @@ OFFER: {
     FIXED_DISCOUNT_EXCEEDS_PRICE: "Fixed discount cannot exceed item price",
     SERVER_ERROR: "Server error while processing offer",
     VALIDATION_ERROR: "Offer validation failed"
+},
+COUPON_APPLICATION: {
+    // Success messages
+    APPLY_SUCCESS: "Coupon applied successfully",
+    REMOVE_SUCCESS: "Coupon removed successfully",
+    
+    // Error messages
+    INVALID_COUPON: "Invalid or expired coupon",
+    EXPIRED_COUPON: "This coupon has expired",
+    MIN_CART_VALUE_NOT_MET: "Add ₹{amount} more to apply this coupon",
+    CART_EMPTY: "Cart is empty",
+    CART_NOT_FOUND: "Cart not found",
+    COUPON_USED: "You have already used this coupon",
+    USAGE_LIMIT_REACHED: "You can use this coupon only {limit} times",
+    DISCOUNT_EXCEEDS_SUBTOTAL: "This coupon cannot be applied because the coupon value exceeds the subtotal",
+    NO_FAILED_ORDER: "No failed order for retry",
+    NO_COUPON_APPLIED: "No coupon applied to remove",
+    LOGIN_REQUIRED: "Please log in to continue",
+    SERVER_ERROR: "Error processing coupon"
+},
+ORDER: {
+   
+    HISTORY_FETCH_SUCCESS: "Order history fetched successfully",
+    DETAILS_FETCH_SUCCESS: "Order details fetched successfully",
+    
+
+    NOT_FOUND: "Order not found",
+    HISTORY_NOT_FOUND: "No order history found",
+    UNAUTHORIZED_ACCESS: "You are not authorized to view this order",
+    INVALID_PAGE: "Invalid page number",
+    INVALID_LIMIT: "Invalid limit value",
+    SERVER_ERROR: "Server error while fetching orders"
+},
+AUTH: {
+    LOGIN_REQUIRED: "Please login to continue",
+    UNAUTHORIZED: "Unauthorized access"
 }
 };

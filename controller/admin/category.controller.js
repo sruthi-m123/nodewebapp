@@ -3,7 +3,7 @@ import logger from "../../utils/logger.js";
 import { categorySchema,categoryStatusSchema } from "../../utils/validation.schema.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 import { deleteFromCloudinary } from "../../utils/cloudinary.js";
-
+import Product from "../../models/productSchema.js";
 const formatResponse = (success, message, data = {}) => ({
   success,
   message,
@@ -86,7 +86,13 @@ const validStatus=value.status===true||value.status==='active'?"active":"inactiv
 
 const category=await categoryService.updateStatus(categoryId,validStatus);
 if(!category) throw Object.assign(new Error("category not found"),{status:STATUS_CODES.NOT_FOUND});
-res.json(formatResponse(true,"status updated successfully",{category}));
+
+const product= await Product.updateMany({category:categoryId},{$set:{
+  isActive:validStatus==='active'?true:false
+}});
+
+res.json(formatResponse(true,"status updated successfully",{category,product}));
+
 }
 
 //delete category

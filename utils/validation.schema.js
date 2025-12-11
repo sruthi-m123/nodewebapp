@@ -317,3 +317,43 @@ export const updateOfferSchema = Joi.object({
 }).messages({
     'date.invalidRange': MESSAGES.OFFER.INVALID_DATE_RANGE
 });
+export const applyCouponSchema = Joi.object({
+    couponCode: Joi.string().trim().uppercase().optional().messages({
+        'string.empty': 'Coupon code is required'
+    }),
+    couponId: Joi.string().optional(),
+    retryCartItems: Joi.array().optional()
+}).or('couponCode', 'couponId').messages({
+    'object.missing': 'Either couponCode or couponId is required'
+});
+
+export const retryCheckoutSchema = Joi.object({
+    couponCode: Joi.string().trim().uppercase().optional(),
+    couponId: Joi.string().optional(),
+    retryCartItems: Joi.array().items(
+        Joi.object({
+            id: Joi.string().required(),
+            name: Joi.string().required(),
+            price: Joi.number().min(0).required(),
+            originalPrice: Joi.number().min(0).required(),
+            discountedPrice: Joi.number().min(0).optional().allow(null),
+            quantity: Joi.number().min(1).required()
+        })
+    ).optional()
+}).or('couponCode', 'couponId');
+
+
+export const getOrderHistorySchema = Joi.object({
+    page: Joi.number().integer().min(1).default(1).messages({
+        'number.base': 'Page must be a number',
+        'number.min': 'Page must be at least 1'
+    }),
+    limit: Joi.number().integer().min(1).max(50).default(6).messages({
+        'number.base': 'Limit must be a number',
+        'number.min': 'Limit must be at least 1',
+        'number.max': 'Limit cannot exceed 50'
+    }),
+    search: Joi.string().trim().allow('').default('').messages({
+        'string.base': 'Search query must be a string'
+    })
+});
