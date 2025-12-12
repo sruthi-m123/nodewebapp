@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { MESSAGES } from './messages.js';
+import Order from '../models/orderSchema.js';
 export const categorySchema=Joi.object({
     name:Joi.string().trim().required().messages({
 'string.empty': 'Category name is required',
@@ -357,3 +358,51 @@ export const getOrderHistorySchema = Joi.object({
         'string.base': 'Search query must be a string'
     })
 });
+
+export const getOrderDetailsSchema=Joi.object({
+  orderId:Joi.string().required().messages({
+    'string.empty':'Order Id is required',
+    'any.required':'Order Id is required'
+  })
+});
+
+export const cancelOrderSchema=Joi.object({
+  orderId:Joi.string().required().messages({
+    'string.empty':'order Id is required',
+    'any.required':'Order Id is required'
+  }),
+
+ reason: Joi.string().optional(),
+    itemId: Joi.string().optional(),
+    customReason: Joi.string().optional(),
+    ItemsIds: Joi.array().items(Joi.string()).optional()
+}).custom((value, helpers) => {
+   
+    if (!value.reason && !value.customReason) {
+        return helpers.error('any.custom', {
+            message: 'Either reason or customReason is required'
+        });
+    }
+    return value;
+});
+
+export const returnOrderSchema = Joi.object({
+    orderId: Joi.string().required().messages({
+        'string.empty': 'Order ID is required',
+        'any.required': 'Order ID is required'
+    }),
+    reason: Joi.string().optional(),
+    itemId: Joi.string().optional(),
+    ItemsIds: Joi.array().items(Joi.string()).optional(),
+    customReason: Joi.string().optional(),
+    notes: Joi.string().allow('').optional(),
+    status: Joi.string().optional()
+}).custom((value, helpers) => {
+    if (!value.reason && !value.customReason) {
+        return helpers.error('any.custom', {
+            message: 'Either reason or customReason is required'
+        });
+    }
+    return value;
+});
+
