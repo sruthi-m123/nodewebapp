@@ -1,662 +1,165 @@
-const Order=require('../../models/orderSchema');
-const Product=require('../../models/productSchema');
-const User=require('../../models/userSchema');
-const Wallet=require('../../models/walletSchema');
-const walletcontroller=require('../../controller/user/walletController')
-const PDFDocument=require('pdfkit');
-const fs=require('fs');
-const { log } = require('console');
-const getOrderDetails = async (req, res) => {
-  try {
-    console.log("👉 Inside the orderDetail controller");
-    console.log(req.session.user)
-
-    const userId = req.session.user.id;
-    const orderId = req.params.orderId;
-
- 
-
-    const order = await Order.findOne({ orderId, userId })
-      .populate('items.productId')
-      .lean();
-console.log("orders",order);
-    if (!order) {
-      return res.status(404).render('error', { message: 'Order not found' });
-    }
-console.log("order inside orderdetailsssssss:",order);
-    const formatItems = order.items.map(item => ({
-      ...item,
-      name: item.productId?.ProductName || item.name,
-      imageUrl: item.productId?.images?.[0] || 'img/admin-workshop',
-      color: item.productId?.color || 'N/A'
-    }));
-
-    const statusHistory = [
-      {
-        date: order.createdAt,
-        message: 'Your order has been placed.'
-      }
-    ];
-
-    if (order.status === 'processing' && order.processingAt) {
-      statusHistory.push({
-        date: order.processingAt,
-        message: 'Your order is being processed.'
-      });
-    }
-
- 
-
-    if (order.status === 'shipped' && order.shippedAt) {
-      statusHistory.push({
-        date: order.shippedAt,
-        message: 'Your order has been shipped.'
-      });
-    }
 
 
+import * as orderManagmentService from '../../service/user/orderDetails.service.js';
+import{
+cancelOrderSchema,
+returnOrderSchema,
+getOrderDetailsSchema
+} from '../../utils/validation.schema.js';
+import {STATUS_CODES} from '../../utils/statusCodes.js';
+import { MESSAGES } from '../../utils/messages.js';
+import logger from '../../utils/logger.js';
 
-    if (order.status === 'delivered' && order.deliveredAt) {
-      statusHistory.push({
-        date: order.deliveredAt,
-        message: 'Your order has been delivered.'
-      });
-    }
+export const getOrderDetails=async (req,res)=>{
+  logger.info('loading order details page');
 
-    if (order.status === 'cancelled' && order.cancelledAt) {
-      statusHistory.push({
-        date: order.cancelledAt,
-        message: 'Your order has been cancelled.'
-      });
-    }
-
-    if (order.status === 'returned' && order.returnedAt) {
-      statusHistory.push({
-        date: order.returnedAt,
-        message: 'Your order has been returned.'
-      });
-    }
-    // if(order.status==='payment_failed'){
-    //   statusHistory.push({
-    //     date:order.createdAt,
-    //     message:"the order payment has been failed "
-    //   })
-    // }
-    
-
-    // Status message map
-    const getStatusMessage = (status) => {
-      const messages = {
-        processing: 'Seller is preparing your item for shipment.',
-        payment_failed:'Your order payment is pending.',
-        shipped: 'Your item has been shipped and is on its way.',
-        delivered: 'Your item has been delivered.',
-        cancelled: 'Your order has been cancelled.',
-        returned: 'The returned product has been received.'
-      };
-      return messages[status.toLowerCase()] || 'Your order is being processed.';
-    };
-
-    // Render the page
-    res.render('user/orderDetails', {
-      pageCSS: 'user/orderDetail.css',
-      pageJS: 'user/orderDetail.js',
-      pageTitle: 'Order Detail',
-      storeName: 'Chettinad Sarees',
-      order: {
-        ...order,
-        items: formatItems,
-        statusHistory
-      },
-      getStatusmessage: getStatusMessage,
-      user: req.session.user
-    });
-  } catch (error) {
-    console.log("Inside catch block");
-    console.error(error.stack);
-    res.status(500).render('user/error', {
-      message: 'Error loading order details'
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('Unauthorized access to order details');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.AUTH.LOGIN_REQUIRED
     });
   }
-};
 
+const userId=req.session.user.id;
+const orderId=req.params.orderId;
 
-const invoice = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
-        const order = await Order.findOne({ orderId: orderId }).populate('items.productId');
-        
-        if (!order) {
-            return res.status(404).json({ error: 'Order not found' });
-        }
-
-        
-        const doc = new PDFDocument({ size: 'A4', margin: 50, rightMargin: 70 });
-        
-        res.setHeader('Content-Type', 'application/pdf');
-res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order_${orderId}.pdf`);        
-        doc.pipe(res);
-        
-        const validateNumber = (value) => {
-            const num = Number(value);
-            return isNaN(num) ? 0 : num;
-        };
-
-        doc.fontSize(20).text('Chettinad Sarees', { align: 'center' });
-        doc.moveDown(0.5);
-        doc.fontSize(10).text('Traditional Handwoven Sarees | Kerala, India', { align: 'center' });
-        doc.moveDown(1.5);
-
-        // Invoice Info Section
-        doc.fontSize(14).text(`Invoice #${order.orderId}`, { align: 'left' });
-        doc.fontSize(12).text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, { align: 'left' });
-        doc.moveDown(1.5);
-
-        // Customer Information
-        doc.fontSize(12).text('Bill To:', { underline: true });
-        doc.text(`Name: ${order.shippingAddress?.name || 'N/A'}`);
-        doc.text(`Address: ${order.shippingAddress?.building || ''}, ${order.shippingAddress?.city || ''}`);
-        doc.text(`Phone: ${order.shippingAddress?.phone || 'N/A'}`);
-        doc.moveDown(2);
-
-        // Items Table Setup
-        const tableTop = doc.y;
-        const colPositions = [50, 300, 370, 450]; 
-        const colWidths = [250, 70, 80, 80];
-
-        // Table Headers
-        doc.font('Helvetica-Bold');
-        doc.text('Product', colPositions[0], tableTop);
-        doc.text('Qty', colPositions[1], tableTop, { width: colWidths[1], align: 'right' });
-        doc.text('Price', colPositions[2], tableTop, { width: colWidths[2], align: 'right' });
-        doc.text('Total', colPositions[3], tableTop, { width: colWidths[3], align: 'right' });
-        
-        // Table Rows
-        doc.font('Helvetica');
-        let y = tableTop + 20;
-        
-        order.items.forEach(item => {
-            const price = validateNumber(item.price);
-            const quantity = validateNumber(item.quantity);
-            const total = price * quantity;
-
-            doc.text(item.name || 'Product', colPositions[0], y);
-            doc.text(quantity.toString(), colPositions[1], y, { width: colWidths[1], align: 'right' });
-            doc.text(`₹${price.toFixed(2)}`, colPositions[2], y, { width: colWidths[2], align: 'right' });
-            doc.text(`₹${total.toFixed(2)}`, colPositions[3], y, { width: colWidths[3], align: 'right' });
-            y += 20;
-        });
-
-        // Order Summary
-        const summaryTop = y + 20;
-        const subtotal = validateNumber(order.subtotal);
-        const delivery = validateNumber(order.delivery);
-        const discount = validateNumber(order.discount);
-        const total = validateNumber(order.total);
-
-        // Draw line above summary
-        doc.moveTo(colPositions[2], summaryTop - 10).lineTo(colPositions[3] + colWidths[3], summaryTop - 10).stroke();
-
-        doc.text('Subtotal:', colPositions[2], summaryTop, { width: colWidths[2], align: 'right' });
-        doc.text(`₹${subtotal.toFixed(2)}`, colPositions[3], summaryTop, { width: colWidths[3], align: 'right' });
-
-        doc.text('Delivery:', colPositions[2], summaryTop + 20, { width: colWidths[2], align: 'right' });
-        doc.text(`₹${delivery.toFixed(2)}`, colPositions[3], summaryTop + 20, { width: colWidths[3], align: 'right' });
-
-        if (discount > 0) {
-            doc.text('Discount:', colPositions[2], summaryTop + 40, { width: colWidths[2], align: 'right' });
-            doc.text(`-₹${discount.toFixed(2)}`, colPositions[3], summaryTop + 40, { width: colWidths[3], align: 'right' });
-        }
-
-        // Total with bold font
-        doc.font('Helvetica-Bold');
-        doc.text('Total:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });
-        doc.text(`₹${total.toFixed(2)}`, colPositions[3], summaryTop + 60, { width: colWidths[3], align: 'right' });
-        doc.font('Helvetica');
-
-        // Footer
-        doc.moveDown(4);
-        doc.fontSize(10).text('Thank you for your purchase!', { align: 'center' });
-        doc.text('Contact us at contact@chettinadsarees.com for any queries', { align: 'center' });
-
-        // Finalize the PDF
-        doc.end();
-        
-    } catch (error) {
-        console.error('Error generating invoice:', error);
-        res.status(500).json({ error: 'Failed to generate invoice' });
-    }
-};
-
-
-const cancelOrder=async(req,res)=>{
-  try {
-    console.log("cancel controler called");
-    const {orderId}=req.params;
-    const{reason,itemId,customReason}=req.body;
-    console.log("orderId",req.params.orderId);
-    console.log("req.body inside the cancel",req.body);
-    if(!orderId){
-      return res.status(400).json({success:false,message:"Order Id is required"});
-
-    }
-    const order=await Order.findById(orderId);
-if(!order){
-  return res.status(404).json({success:false,message:'order not found'})
-}
-
-const cancellationReason=customReason||reason;
-if(!cancellationReason){
-  return res.status(400).json({success:false,message:'Cancellation reason is required'})
-}
-
-if(!['pending','processing','paid','partially_cancelled'].includes(order.status.toLowerCase())){
-  return res.json({success:false,message:"order cannot be cancelled at this stage"});
-}
-
-let cancelledItems=order.cancellation?.cancelledItems||[];
-const deliveryCharge=order.delivery||0;
-const couponAmount=order.appliedCoupon?.value||0;
-const tax=order.tax||0;
-let refundAmount=0;
-
-const getActiveSubtotal=()=>{
-  return order.items.reduce((sum,item)=>{
-    return item.status!=='cancelled'?sum+item.totalPrice:sum;
-  },0);
-}
-
-const activeSubtotal=getActiveSubtotal();
-const activeItems =order.items.filter(item=>item.status!=='cancelled');
-const activeItemsCount=activeItems.length;
-console.log("Active subtotal before cancel:",activeSubtotal,"Active items:",activeItems);
-
-if(!itemId){
-  //full order cancellation
-
-  if(activeItemsCount===0){
-    console.log("all the itens already canceled;no additional refund is needed");
-    refundAmount=0;
-  
-  }else{
-  activeItems.forEach(item=>{
-    item.status='cancelled';
-    cancelledItems.push({
-      product:item.productId,
-      name:item.name,
-      quantity:item.quantity,
-      reason:cancellationReason
-    })
+const {error}=getOrderDetailsSchema.validate({orderId});
+if(error){
+  logger.warn('order details validation failed',{error:error.details[0].message});
+  return res.status(STATUS_CODES.BAD_REQUEST).json({
+    success:false,
+    message:error.details[0].message
   })
-
-//refund
-const netRefundable=activeSubtotal-couponAmount+tax;
-refundAmount=netRefundable-deliveryCharge;
-refundAmount=Math.max(0,refundAmount);
-console.log("full refund calc:activeSubtotal",activeSubtotal,"-coupon",couponAmount,"+tax",tax,"-delivery",deliveryCharge,"=",refundAmount);
-  }
-order.status='cancelled';
-order.cancelledAt=new Date();
-
-order.cancellation={
-  reason:cancellationReason,
-  date:new Date(),
-  intitatedBy:'customer',
-  type:'full',
-  cancelledItems
-}
-await Promise.all(activeItems.map(item=>
-  Product.findByIdAndUpdate(item.productId,{$inc:{stock:item.quantity}})
-))
-}else{
- //partial cancellation
-const item=order.items.id(itemId);
-if(!item){
-  return res.status(404).json({success:false,message:"Item not found in order"});
 }
 
-if(item.status==='cancelled'){
-  return res.status(400).json({success:false,message:'Items already cancelled'});
-}
-//restocking the item
-await Product.findByIdAndUpdate(item.productId,{$inc:{stock:item.quantity}});
-
-item.status='cancelled';
-cancelledItems.push({
-  product:item.productId,
-  name:item.name,
-  quantity:item.quantity,
-  reason:cancellationReason
+const {order,getStatusMessage}=await orderManagmentService.getOrderDetailsService(orderId,userId);
+res.render('user/orderDetails',{
+  pageCSS:'user/orderDetails.css',
+  pageJS: 'user/orderDetail.js',
+        pageTitle: 'Order Detail',
+        storeName: 'Chettinad Sarees',
+        order: order,
+        getStatusmessage: getStatusMessage,
+        user: req.session.user
 })
 
-const allCancelled=order.items.every(i=>i.status==='cancelled');
-order.status=allCancelled?'cancelled':'partially_cancelled';
-
-const itemTotalPrice=item.totalPrice;
-if(activeSubtotal>0){
-  const itemShare=itemTotalPrice/activeSubtotal;
-  const netRefundable=activeSubtotal-couponAmount+tax;
-  refundAmount=itemShare*netRefundable;
-  refundAmount=Math.max(0,refundAmount);
-  console.log("partial refund calc:itemTotalPrice")
-}else{
-  refundAmount=0;
 }
 
-order.cancellation={
-  reason:cancellationReason,
-  date: new Date(),
-        initiatedBy: 'customer',
-        type: allCancelled ? 'full' : 'partial',
-        cancelledItems
-}
-}
-await order.save();
-if(refundAmount>0){
-  order.refund={
-    amount:refundAmount,
-    method:"wallet",
-    status:"completed"
+
+export  const invoice=async(req,res)=>{
+  const orderId=req.params.orderId;
+
+  logger.info('generating invoice',{orderId});
+
+  const{error}=getOrderDetailsSchema.validate({orderId});
+  if(error){
+    logger.warn('Invoice generation validation failed',{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
+    })
   }
-  await order.save();
-}
-//wallet refund
-if(refundAmount>0&&refundAmount!==0){
-  console.log("no refund calculated");
 
- if(order.paymentMethod){
-  const paymentMethod= order.paymentMethod.toLowerCase();
-  if(paymentMethod==='cod'){
-    console.log("cod order:no refund needed for calculation");
-  }else if(paymentMethod==='wallet'||paymentMethod==='netbanking'){
+    try {
+        const pdfBuffer = await orderManagmentService.generateInvoiceService(orderId);
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=ChettinadSarees_Order_${orderId}.pdf`);
+        res.send(pdfBuffer);
+    } catch (error) {
+        logger.error('Error generating invoice:', error);
+        return res.status(STATUS_CODES.NOT_FOUND).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+
+}
+
+export const cancelOrder=async(req,res)=>{
+  logger.info('processing order cancellation');
+
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('unauthorized cancellation attempt');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.AUTH.LOGIN_REQUIRED
+    });
+  }
+
+const userId=req.session.user.id;
+const orderId=req.params.orderId;
+
+const{error,value}=cancelOrderSchema.validate({...req.body,orderId});
+if(error){
+  logger.warn('order cancellation validation failed',{error:error.details[0].message});
+  return res.status(STATUS_CODES.BAD_REQUEST).json({
+    success:false,
+    message:error.details[0].message
+  });
+}
+
+const order=await orderManagmentService.cancelOrderService(userId,orderId,value);
+
+res.status(STATUS_CODES.SUCCESS).json({
+  success:true,
+  message:'Cancellation processed successfully',
+  order
+})
+
+}
+
+export const returnOrder=async(req,res)=>{
+  logger.info('Processing order return');
+
+  if(!req.session.user||!req.session.user.id){
+    logger.warn('Unauthorized return attempt');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.AUTH.LOGIN_REQUIRED
+    })
+  }
+
+  const userId=req.session.user.id;
+  const orderId=req.params.orderId;
+
+  const{error,value}=returnOrderSchema.validate({...req.body,orderId});
+  if(error){
+    logger.warn('other return validation failed ',{error:error.details[0].message});
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success:false,
+      message:error.details[0].message
+    })
+  }
+
+const order=await orderManagmentService.returnOrderService(userId,orderId,value);
+
+res.status(STATUS_CODES.SUCCESS).json({
+  success:true,
+  message:'Return request submitted successfully',
+  order
+})
+
+}
+
+
+export const getReturnDetails=async(req,res)=>{
+  logger.info('fetching return details ');
+
+if(!req.session.user||!req.session.user.id){
+    logger.warn('Unauthorized return attempt');
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      success:false,
+      message:MESSAGES.AUTH.LOGIN_REQUIRED
+    })
+  }
+
+   const userId = req.session.user.id;
+    const orderId = req.params.orderId;
+
+    const returnDetails = await orderManagmentService.getReturnDetailsService(userId, orderId);
     
+    res.status(STATUS_CODES.SUCCESS).json(returnDetails);
 
-    const wallet =await Wallet.findOne({user:order.userId});
-    if(wallet){
-      wallet.balance+=refundAmount;
-
-      wallet.transactions.push({
-        amount:refundAmount,
-        type:'refund',
-        order:order._id,
-        description:`Refund for order ${order.orderId}`,
-        status:'completed'
-      })
-
-      await wallet.save();
-      console.log(`wallet refunded:{refundAmount}`)
-      order.refund.status='completed'
-    }
-
-    }else{
-      console.error('wallet refund failed');
-      order.refund.status='failed';
-    }
-    await order.save();
-  }
-}else{
-  console.log("no refund to process");
-}
-
-
-return res.json({
-      success: true,
-      message: 'Cancellation processed successfully',
-      order
-    });
-
-
-
-  } 
-catch (error) {
-    console.error('Error cancelling order:', error);
-    res.status(500).json({ success: false, message: 'Failed to cancel order', error: error.message });
-  }
-}
-
-
-const returnOrder = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    console.log("orderId", orderId);
-    const { reason, itemId, ItemsIds, customReason, notes = '', status } = req.body;  // Added ItemsIds; ignore unused 'status'
-    const returnReason = customReason || reason;
-    console.log("return reason:", returnReason);
-    console.log("itemId (direct):", itemId);  
-    console.log("ItemsIds (array):", ItemsIds);  
-    if (!returnReason) {
-      return res.status(400).json({ success: false, message: "Return reason is required" });
-    }
-
-    const order = await Order.findById(orderId).populate("items.productId");
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
-    }
-
-    if (!["delivered", "partially_returned"].includes(order.status.toLowerCase())) {
-      return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
-    }
-
-    order.returnRequested = true;
-
-    // Fixed: Determine effective itemId from ItemsIds (array) or direct itemId (string)
-    let effectiveItemId = itemId;  // Fallback to direct string
-    if (ItemsIds && ItemsIds.length > 0) {
-      effectiveItemId = ItemsIds[0];  // Use first (for partial/single); ignore bulk for user-side
-    }
-
-    if (!effectiveItemId) {
-      // FULL RETURN
-      console.log("inside the full order return controller");
-      // Don't push items—keep empty for clean full
-      order.items.forEach(item => {
-        if (!["returned", "return_requested"].includes(item.status)) {
-          item.status = "return_requested";
-        }
-      });
-      const eligibleCount = order.items.filter(i => i.status === "return_requested").length;
-      order.status = eligibleCount === order.items.length ? "return_requested" : "partially_returned";
-      order.returnDetails = {
-        reason: returnReason,
-        notes,
-        requestDate: new Date(),
-        status: "pending",
-        initiatedBy: "customer",
-        type: "full",
-        items: [] 
-      };
-    } else {
-      // PARTIAL RETURN
-      const item = order.items.id(effectiveItemId);  // Use effectiveItemId
-      console.log("inside the partial return controller");
-      if (!item) {
-        return res.status(400).json({ success: false, message: "Item not found in order" });
-      }
-      if (["returned", "return_requested"].includes(item.status)) {
-        return res.status(400).json({ success: false, message: "Item already in return process" });
-      }
-
-      item.status = "return_requested";
-      console.log("item status:", item.status);
-      if (!order.returnDetails) {
-        order.returnDetails = {
-          reason: returnReason,
-          notes,
-          requestDate: new Date(),
-          status: "pending",
-          initiatedBy: "customer",
-          type: "partial",
-          items: []
-        };
-      }
-      order.returnDetails.items.push({
-        product: item.productId._id,
-        quantity: item.quantity,
-        name: item.name,
-        reason: returnReason,
-        price: item.totalPrice
-      });
-      order.status = "partially_returned";  // Set to partial for consistency
-    }
-
-    await order.save();
-    return res.json({ success: true, message: "Return request submitted successfully", order });
-
-  } catch (error) {
-    console.error("Error creating return request:", error);
-    res.status(500).json({ success: false, message: "Failed to submit return request" });
-  }
-};
-const getReturnDetails = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const order = await Order.findById(orderId).populate('items.productId');
-    if (!order || !order.returnRequested) {
-      return res.status(404).json({ error: 'Return request not found' });
-    }
-
-    const { returnDetails } = order;
-  let returnType;
-    if (order.status.toLowerCase() === 'return_requested') {
-      returnType = 'full';
-    } else if (order.status.toLowerCase() === 'partially_returned') {
-      returnType = 'partial';
-    } else {
-      returnType = returnDetails.items?.length > 0 ? 'partial' : 'full';
-    }
-    console.log(`Fetching return details for order ${orderId}: status=${order.status}, derived type=${returnType}, raw items length=${returnDetails.items?.length || 0}`);
-    const items = returnDetails.items?.map(item => ({
-      _id: item._id,
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price || order.items.find(i => i.productId._id.toString() === item.product.toString())?.totalPrice || 'N/A',
-      reason: item.reason
-    })) || [];
-if (returnType === 'full') {
-      items.length = 0; 
-    }
-    res.json({
-      reason: returnDetails.reason || 'Not specified',
-      notes: returnDetails.notes || 'None',
-      type: returnType,
-      totalItems: order.items.length,
-      items
-    });
-  } catch (error) {
-    console.error('error fetching return details:', error);
-    res.status(500).json({ error: 'failed to fetch details' });
-  }
-};
-
-
-// const processReturn = async (req, res) => {
-//   try {
-//     const { orderId } = req.params;
-//     const { ItemsIds, action, adminNotes, rejectionReason } = req.body; 
-
-//     if (!['approve', 'reject'].includes(action)) {
-//       return res.status(400).json({ error: 'Invalid action. Must be either "approve" or "reject"' });
-//     }
-
-//     const order = await Order.findById(orderId).populate("items.productId");
-//     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
-
-//     if (!order.returnRequested) {
-//       return res.status(400).json({ success: false, message: "No return request exists" });
-//     }
-
-//     // Get refund items: all return_requested if no ItemsIds (full), else filter
-//     const refundItems = ItemsIds?.length
-//       ? order.items.filter(i => ItemsIds.includes(i._id.toString()) && i.status === 'return_requested')
-//       : order.items.filter(i => i.status === 'return_requested');
-
-//     if (refundItems.length === 0) {
-//       return res.status(400).json({ success: false, message: "No eligible items for processing" });
-//     }
-
-//     // Refund calculation 
-//     const couponDiscount = order.appliedCoupon?.value || 0;
-//     const deliveryCharge = order.deliveryCharge || 0;
-//     const totalPaid = order.total;
-//     let refundAmount = 0;
-//     refundItems.forEach(item => {
-//       const itemPrice = item.discountedPrice ?? item.price;
-//       const itemTotal = itemPrice * item.quantity;
-//       const itemCouponShare = (itemTotal / totalPaid) * couponDiscount;
-//       const itemDeliveryShare = (itemTotal / totalPaid) * deliveryCharge;
-//       refundAmount += itemTotal - itemCouponShare + itemDeliveryShare; 
-//     });
-//     refundAmount = Math.max(refundAmount, 0);
-//     console.log("refund amount:",refundAmount);
-
-//     let wallet = await Wallet.findOne({ user: order.userId }) || new Wallet({ user: order.userId, balance: 0 });
-
-//     if (action === 'approve') {
-//       // Update items
-//       refundItems.forEach(item => {
-//         item.status = 'return_approved';
-//         item.returnDetails = {
-//           status: 'approved',
-//           processedDate: new Date(),
-//           processedBy: req.user.id
-//         };
-//       });
-
-//       // Wallet refund
-//       await wallet.addFunds(refundAmount, {
-//         order: order._id,
-//         description: `Refund for order #${order.orderId}`,
-//         reference: `REFUND=${order.orderId}-${Date.now()}`,
-//         status: 'completed'
-//       });
-
-//       // Restock all approved items
-//       const restockOps = refundItems.map(item =>
-//         Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } }, { new: true })
-//       );
-//       await Promise.all(restockOps);
-
-//       order.returnProcessedAt = new Date();
-//       order.adminNotes = adminNotes || 'Return approved by administrator';
-
-//     } else { // reject
-//       refundItems.forEach(item => {
-//         item.status = 'return_rejected'; 
-//         item.returnDetails = {
-//           status: 'rejected',
-//           processedDate: new Date(),
-//           processedBy: req.user.id,
-//           rejectionReason: rejectionReason || 'Not specified'
-//         };
-//       });
-//       order.returnRejectedAt = new Date();
-//       order.adminNotes = adminNotes || `Return rejected: ${rejectionReason || 'Not specified'}`;
-//     }
-
-//     // Update order status & returnDetails
-//     order.returnRequested = false;
-//     const allReturned = order.items.every(i => i.status === 'returned');
-//     order.status = allReturned ? 'returned' : (refundItems.length === order.items.filter(i => i.status === 'return_requested').length ? 'delivered' : 'partially_returned');
-//     order.returnDetails.status = action === 'approve' ? 'completed' : 'rejected';
-//     order.returnDetails.type = allReturned ? 'full' : 'partial'; 
-
-//     await Promise.all([order.save(), wallet.save()]);
-
-//     return res.json({
-//       success: true,
-//       message: `Return request ${action}d successfully`,
-//       orderId: order.orderId,
-//       status: order.status,
-//       ...(action === 'approve' && { refundAmount, walletBalance: wallet.balance })
-//     });
-
-//   } catch (error) {
-//     console.error("Error processing return:", error);
-//     res.status(500).json({ success: false, message: "Failed to process return" });
-//   }
-// };
-
-
-module.exports={
-    returnOrder,cancelOrder,invoice,getOrderDetails,getReturnDetails
 }

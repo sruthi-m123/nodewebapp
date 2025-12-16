@@ -131,7 +131,14 @@ ORDER: {
     UNAUTHORIZED_ACCESS: "You are not authorized to view this order",
     INVALID_PAGE: "Invalid page number",
     INVALID_LIMIT: "Invalid limit value",
-    SERVER_ERROR: "Server error while fetching orders"
+    SERVER_ERROR: "Server error while fetching orders",
+
+        CANCELLATION_SUCCESS: "Order cancelled successfully",
+    RETURN_REQUEST_SUCCESS: "Return request submitted successfully",
+    CANCELLATION_FAILED: "Order cannot be cancelled at this stage",
+    RETURN_NOT_ALLOWED: "Only delivered orders can be returned",
+    REFUND_PROCESSED: "Refund processed successfully",
+    INVOICE_GENERATION_FAILED: "Failed to generate invoice",
 },
 AUTH: {
     LOGIN_REQUIRED: "Please login to continue",
