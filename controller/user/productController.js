@@ -1,31 +1,37 @@
-const Product = require("../../models/productSchema");
-const productDetail=async(req,res)=>{
-  try {
-    const productId=req.params.id;
-    const product=await Product.findById(productId).populate('bestOffer');
-    console.log("product in product detail page :",product);
-    if(!product||product.isDeleted||!product.isActive){
-      return res.status(404).render('404');
-    }
-const relatedProducts = await Product.find({
-      category: product.category,
-      _id: { $ne: productId },
-      isActive: true,
-      isDeleted: false
-    }).limit(4);
+import * as productService from '../../service/user/product.service.js';
+import { getProductDetailSchema } from '../../utils/validation.schema.js';
+import logger from '../../utils/logger.js';
+import { STATUS_CODES } from '../../utils/statusCodes.js';
 
 
-    res.render('user/productDetails',{product,
-      relatedProducts,
-      pageCSS:"productdetails.css",
-      isOutofStock:product.stock<=0,
-pageJS:"user/productdetails.js",
-pageTitle:"Product Detail",
-isProductDetail: true
-    })
-  } catch (error) {
-    console.error('Product details error:', error);
-    res.status(500).render('500'); 
+export const productDetail=async(req,res)=>{
+  const productId=req.params.id;
+  logger.info('loading product details page',{productId});
+
+  const {error}=getProductDetailSchema.validate({id:productId});
+  if(error){
+    logger.warn('product detail validation failed',{error:error.details[0].message});
+    const validationError=new Error(error.details[0].message);
+    validationError.statusCode=STATUS_CODES.BAD_REQUEST;
+    throw validationError;
   }
-}
-module.exports={productDetail};
+
+const product=await productService.getProductDetailService(productId);
+const relatedProducts=await productService.getRelatedProductsService(
+  productId,
+  product.category
+);
+const availablity=productService.checkProductAvailabilityService(product);
+
+res.render('user/productDetails',{
+  product,
+  relatedProducts,
+   pageCSS: "productdetails.css",
+        pageJS: "user/productdetails.js",
+        pageTitle: `${product.productName} - Product Detail`,
+        isProductDetail: true,
+        isOutOfStock: availablity.isOutOfStock,
+        isLowStock: availablity.isLowStock,
+        stockMessage: availablity.stockMessage
+})
+};

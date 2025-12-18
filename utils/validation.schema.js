@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { MESSAGES } from './messages.js';
-import Order from '../models/orderSchema.js';
+
 export const categorySchema=Joi.object({
     name:Joi.string().trim().required().messages({
 'string.empty': 'Category name is required',
@@ -406,3 +406,9 @@ export const returnOrderSchema = Joi.object({
     return value;
 });
 
+export const getProductDetailSchema = Joi.object({
+    id: Joi.string().required().messages({
+        'string.empty': 'Product ID is required',
+        'any.required': 'Product ID is required'
+    })
+});

@@ -143,5 +143,20 @@ ORDER: {
 AUTH: {
     LOGIN_REQUIRED: "Please login to continue",
     UNAUTHORIZED: "Unauthorized access"
+},
+
+PRODUCT: {
+ 
+    FETCH_SUCCESS: "Product details fetched successfully",
+    RELATED_PRODUCTS_SUCCESS: "Related products fetched successfully",
+    
+   
+    NOT_FOUND: "Product not found",
+    NOT_AVAILABLE: "Product is not available",
+    OUT_OF_STOCK: "This product is currently out of stock",
+    DELETED: "This product has been deleted",
+    INACTIVE: "This product is currently inactive",
+    INVALID_ID: "Invalid product ID",
+    SERVER_ERROR: "Server error while fetching product details"
 }
 };
