@@ -142,7 +142,13 @@ ORDER: {
 },
 AUTH: {
     LOGIN_REQUIRED: "Please login to continue",
-    UNAUTHORIZED: "Unauthorized access"
+    UNAUTHORIZED: "Unauthorized access",
+     INVALID_OTP: "Invalid OTP",
+    INCORRECT_PASSWORD: "Current password is incorrect",
+    OTP_SENT: "OTP sent to your email",
+    PASSWORD_CHANGE_SUCCESS: "Password changed successfully",
+    SESSION_EXPIRED: "Session expired, please try again",
+     SESSION_LOST: "Session lost, please login again",
 },
 
 PRODUCT: {
@@ -158,5 +164,17 @@ PRODUCT: {
     INACTIVE: "This product is currently inactive",
     INVALID_ID: "Invalid product ID",
     SERVER_ERROR: "Server error while fetching product details"
-}
+},
+USER: {
+    NOT_FOUND: "User not found",
+    EMAIL_EXISTS: "Email is already in use",
+    PROFILE_UPDATE_FAILED: "Failed to update profile"
+},
+PROFILE: {
+    UPDATE_SUCCESS: "Profile updated successfully",
+    EMAIL_UPDATE_SUCCESS: "Email updated successfully",
+    AVATAR_UPDATE_SUCCESS: "Profile picture updated successfully"
+},
+
+
 };
