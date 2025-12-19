@@ -1,203 +1,183 @@
-const path = require("path");
-const bcrypt = require('bcrypt');
-const fs = require("fs");
-const User = require("../../models/userSchema");
-const { sendEmailChangeOTP } = require('../../services/emailService');
+import ProfileService  from "../../service/user/profile.service";
+import{
+  updateProfileSchema,
+  emailChangeSchema,
+  verifyOtpSchema,
+  changePasswordSchema
+} from '../../utils/validation.schema.js';
+import { STATUS_CODES } from "../../utils/statusCodes.js";
+import { MESSAGES } from "../../utils/messages";
+import logger from '../../utils/logger.js';
 
-class profileController {
-  static async getProfile(req, res) {
-    try {
-      console.log("loooogg");
-      console.log('userrrrr',req.session.user)
-      const userId = req.session?.user?.id || req.user?.id;
-      if (!userId) return res.redirect("/user/login?error=session_lost");
-      
-
-      const user = await User.findById(userId).select("-password -googleId -isBlocked -isAdmin");
-console.log("user avatar",user.avatar)
-      res.render("user/profile", {
-        activeTab: "profile",
+export const getProfile=async(req,res)=>{
+  logger.info('loading user profile page');
+  const userId=req.sesssion?.user?.id||req.user?.id;
+  if(!user){
+    const error=new Error(MESSAGES.AUTH.SESSION_LOST);
+    error.statusCode=STATUS_CODES.UNAUTHORIZED;
+    throw error;
+  }
+  const user =await ProfileService.getUserProfile(userId);
+  res.render('user/profile',{
+      activeTab: "profile",
         user: {
-name: user.name || "",
-          email: user.email,
-          phone: user.phone,
-          gender: user.gender || "Prefer not say",
-          avatar: user.avatar|| "/img/admin-products.png",
+            name: user.name || "",
+            email: user.email,
+            phone: user.phone,
+            gender: user.gender || "Prefer not say",
+            avatar: user.avatar || "/img/admin-products.png",
         },
-      });
-    } catch (error) {
-      console.error("Profile load error:", error);
-      res.redirect("/error");
-    }
+
+  })
+}
+
+export const getEditProfile=async(req,res)=>{
+  logger.info('loading edit profile page');
+
+  const userId= req.session?.user?.id;
+  if(!userId){
+    const error=new Error(MESSAGES.AUTH.SESSION_LOST);
+    error.statusCode=STATUS_CODES.UNAUTHORIZED;
+    throw error;
   }
-
-  
-    static async getEditProfile(req, res) {
-    try {
-      console.log("req sesison isde the edit profile:",req.session);
-      console.log(req.session);
-      
-      const userId = req.session?.user?.id ;
-      
-      if (!userId) return res.redirect("/login?error=session_lost");
-
-      const user = await User.findById(userId);
-      if (!user) return res.redirect("/login?error=user_not_found");
-
-      res.render("user/editProfile", {
-        activeTab: "profile",
+  const user= await ProfileService.getUserProfile(userId);
+  res.render('user/editProfile',{
+    
+activeTab: "profile",
         user: {
-          name: user.name || "",
-          email: user.email,
-          phone: user.phone || "",
-          gender: user.gender || "Prefer not say",
-          avatar: user.avatar || "/img/admin-products.png", 
-          googleId:user.googleId
+            name: user.name || "",
+            email: user.email,
+            phone: user.phone || "",
+            gender: user.gender || "Prefer not say",
+            avatar: user.avatar || "/img/admin-products.png",
+            googleId: user.googleId
         }
-      });
-    } catch (error) {
-      console.error("Edit profile page load error:", error);
-      res.redirect("/user/error");
-    }
-  }
-
-
-
-static async updateProfile(req,res){
-  try {
-    const{name,phone,gender}=req.body;
-    const updates={name,phone,gender};
-
-    if(req.file){
-      if(req.user.avatar&& !req.user.avatar.include('admin-products.png')){
-        const oldAvatarPath=path.join(__dirname,'../public',req.user.avatar);
-        if(fs.existsSync(oldAvatarPath)){
-          fs.unlinkSync(oldAvatarPath);
-        }
-      }
-      updates.avatar='/uploads/'+req.file.filename;
-
-    }
-const user=await User.findByIdAndUpdate(
-  req.session.user._id,
-  updates,
-  {new:true,runValidtors:true}
-
-).select('-password');
-res.json({
-  success:true,
-  message:'profile updated successfully',
-  upadatedAvatarUrl:user.avatar
-});
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-      success: false,
-      message: error.message || 'Error updating profile'
     });
-  }
+
 }
 
-static async requestEmailChangeOTP(req,res){
-try {
-  const{newEmail}=req.body;
+export const upadateProfile=asyc(req,res)=>{
+  logger.info('Updating user profile');
+    
+    const userId = req.session?.user?._id;
+    
+    if (!userId) {
+        const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
+        error.statusCode = STATUS_CODES.UNAUTHORIZED;
+        throw error;
+    }
+     const { error, value } = updateProfileSchema.validate(req.body);
+    if (error) {
+        logger.warn('Profile update validation failed', { error: error.details[0].message });
+        const validationError = new Error(error.details[0].message);
+        validationError.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw validationError;
+    }
+    const user = await ProfileService.updateUserProfile(userId, value, req.file);
 
-  const existingUser=await User.findOne({email:newEmail});
-  if(existingUser){
-    return res.status(400).json({
-      success:false,
-      message:'email is already in use '
-    })
-  }
-const otp=Math.floor(100000+Math.random()*900000);
-  console.log("otp:",otp);
-   await sendEmailChangeOTP(newEmail,otp);
-req.session.emailChangeOTP=otp;
-req.session.emailChangeTarget=newEmail;
-
-
-
-res.status(200).json({
-  success:true,
-  message:'OTP sent to your new email'
-});
-
-} catch (error) {
-   console.error(error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Error sending OTP'
+    res.json({
+        success: true,
+        message: MESSAGES.PROFILE.UPDATE_SUCCESS,
+        updatedAvatarUrl: user.avatar
     });
-  }
-
+        
 }
 
-static async verifyEmailChange(req,res){
-const{ enteredOtp}=req.body;
-console.log("enetered otp:",enteredOtp);
-if(parseInt(enteredOtp)===req.session.emailChangeOTP){
-  const newEmail=req.session.emailChangeTarget;
-
-//update user in DB
-await User.findByIdAndUpdate(req.session.user._id,{email:newEmail});
-delete req.session.emailChangeOTP;
-delete req.session.emailChangeTarget;
-
-return res.status(200).json({success:true,message:'email updated successfully'})
-}else{
-  return res.status(400).json({success:false,message:'Inavalid Otp'})
-}
-}
-
-static async changePassword(req,res){
-  try {
-    console.log("inside change password controller ")
-    const userId=req.session?.user?._id;
-    console.log("userId:",userId);
-    const{currentPassword,newPassword}=req.body;
-    console.log(currentPassword,newPassword);
-    if(!userId){
-      return res.status(401).json({message:'unauthorized request.'});
-
+export const requestEmailChangeOTP=async(req,res)=>{
+  logger.info('Requesting email change OTP');
+    
+    const userId = req.session?.user?._id;
+    
+    if (!userId) {
+        const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
+        error.statusCode = STATUS_CODES.UNAUTHORIZED;
+        throw error;
     }
 
-    if(!currentPassword||!newPassword){
-      return res.status(400).json({message:'all field are required.'})
+    const { error, value } = emailChangeSchema.validate(req.body);
+    if (error) {
+        logger.warn('Email change validation failed', { error: error.details[0].message });
+        const validationError = new Error(error.details[0].message);
+        validationError.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw validationError;
     }
 
-const user=await User.findById(userId);
-console.log("user found")
-if(!user){
-  return res.status(404).json({message:'user not found.'})
-}
-const isMatch=await bcrypt.compare(currentPassword,user.password);
+    const { otp, newEmail } = await ProfileService.requestEmailChange(userId, value.newEmail);
 
-if(!isMatch){
-  return res.status(400).json({message:'current password is incorrect.'})
-}
-const hashedPassword=await bcrypt.hash(newPassword,10);
-user.password=hashedPassword;
+    req.session.emailChangeOTP = otp;
+    req.session.emailChangeTarget = newEmail;
 
-await user.save();
-return res.status(200).json({message:'password changed successfully.'})
-  } catch (error) {
-    console.error('password change error:',error);
-    return res.status(500).json({message:'server error.Please try again'})
-  }
+    res.status(STATUS_CODES.SUCCESS).json({
+        success: true,
+        message: MESSAGES.AUTH.OTP_SENT
+    });
 }
 
 
+export const verifyEmailChange = async (req, res) => {
+    logger.info('Verifying email change OTP');
+    
+    const userId = req.session?.user?._id;
+    
+    if (!userId) {
+        const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
+        error.statusCode = STATUS_CODES.UNAUTHORIZED;
+        throw error;
+    }
 
+    const { error, value } = verifyOtpSchema.validate(req.body);
+    if (error) {
+        logger.warn('OTP validation failed', { error: error.details[0].message });
+        const validationError = new Error(error.details[0].message);
+        validationError.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw validationError;
+    }
 
+    if (!req.session.emailChangeOTP || !req.session.emailChangeTarget) {
+        const error = new Error(MESSAGES.AUTH.SESSION_EXPIRED);
+        error.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw error;
+    }
 
+    await ProfileService.verifyEmailChange(
+        userId,
+        value.enteredOtp,
+        req.session.emailChangeOTP,
+        req.session.emailChangeTarget
+    );
 
+    delete req.session.emailChangeOTP;
+    delete req.session.emailChangeTarget;
 
+    res.status(STATUS_CODES.SUCCESS).json({
+        success: true,
+        message: MESSAGES.PROFILE.EMAIL_UPDATE_SUCCESS
+    });
+};
 
+export const changePassword = async (req, res) => {
+    logger.info('Changing user password');
+    
+    const userId = req.session?.user?._id;
+    
+    if (!userId) {
+        const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
+        error.statusCode = STATUS_CODES.UNAUTHORIZED;
+        throw error;
+    }
 
+    const { error, value } = changePasswordSchema.validate(req.body);
+    if (error) {
+        logger.warn('Password change validation failed', { error: error.details[0].message });
+        const validationError = new Error(error.details[0].message);
+        validationError.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw validationError;
+    }
 
+    await ProfileService.changePassword(userId, value.currentPassword, value.newPassword);
 
-
-}
-
-module.exports = profileController;
+    res.status(STATUS_CODES.SUCCESS).json({
+        success: true,
+        message: MESSAGES.AUTH.PASSWORD_CHANGE_SUCCESS
+    });
+};
