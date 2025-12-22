@@ -2,8 +2,8 @@ const Razorpay = require("razorpay");
 const RazorpayHelper=require('../../helper/razorpay');
 const crypto = require("crypto");
 const Order=require('../../models/orderSchema');
-const Coupon = require("../../models/couponSchema");
-const Product=require("../../models/productSchema");
+const Coupon = require('../../models/couponSchema');
+const Product=require('../../models/productSchema');
 exports.createOrder = async (req, res) => {
   try {
     console.log("created order razorpay controller .")

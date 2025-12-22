@@ -29,7 +29,7 @@ import * as walletController from "../controller/user/walletController.js";
 import * as couponController from "../controller/user/couponController.js";
 import * as razorpayController from "../controller/user/razorpayController.js";
 
-
+import {validate } from '../middlewares/validate.js';
 
 router.get("/home", userController.loadHomepage);
 router.get("/signup", redirectIfLoggedIn, userController.loadSignup);
@@ -155,7 +155,7 @@ router.post("/orders-placed", checkBlocked, checkoutController.placeOrder);
 
 //razorpay
 // router.post("/createOrder", razorpayController.createOrder);
-router.post("/verifyPayment", checkBlocked, razorpayController.verifyPayment);
+router.post("/verifyPayment", checkBlocked,validate, razorpayController.verifyPayment);
 router.post("/mark-payment-failed", checkBlocked, razorpayController.markPaymentFailed);
 
 

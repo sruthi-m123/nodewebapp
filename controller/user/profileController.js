@@ -56,7 +56,7 @@ activeTab: "profile",
 
 }
 
-export const upadateProfile=asyc(req,res)=>{
+export const upadateProfile=async(req,res)=>{
   logger.info('Updating user profile');
     
     const userId = req.session?.user?._id;
