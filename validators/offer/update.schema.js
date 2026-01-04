@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { MESSAGES } from '../../utils/messages';
+import { MESSAGES } from '../../utils/messages.js';
 
 
 

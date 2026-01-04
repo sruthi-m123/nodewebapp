@@ -1,5 +1,5 @@
 import * as addressService from "../../service/user/address.service.js";
-import { addressSchema } from "../../validators/index.js";
+import { addressSchema } from "../../validators/address/address.schema.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 import { MESSAGES } from "../../utils/messages.js";
 import logger from "../../utils/logger.js";

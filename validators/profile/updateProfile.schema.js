@@ -1,5 +1,5 @@
 import Joi from "joi";
-exports.updateProfileSchema = Joi.object({
+export const updateProfileSchema = Joi.object({
     name: Joi.string().trim().min(2).max(50).required().messages({
         'string.empty': 'Name is required',
         'string.min': 'Name must be at least 2 characters',

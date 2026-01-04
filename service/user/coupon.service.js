@@ -4,7 +4,7 @@ import Order from '../../models/orderSchema.js';
 import {calculateOrder} from '../../helper/calculateTotal.js';
 // import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
-import items from 'razorpay/dist/types/items';
+// import items from 'razorpay/dist/types/items';
 
 export const removeCouponService=async(userId)=>{
     logger.debug('Removing applied coupon',{userId});
@@ -70,7 +70,7 @@ export const prepareCartItemsService=(cart)=>{
 
 export const checkMinCartValueService=(cartItems,coupon)=>{
     const subtotal=cartItems.reduce(
-        (sum,item)=>sum+items.originalPrice*item.quantity,0
+        (sum,item)=>sum+item.originalPrice*item.quantity,0
     );
 
     if(subtotal<coupon.minCartValue){

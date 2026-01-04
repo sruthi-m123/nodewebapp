@@ -1,4 +1,4 @@
-import { STATUS_CODES } from "../utils/statusCodes";
+import { STATUS_CODES } from "../utils/statusCodes.js";
 
 export const validate=(schema,property='body')=>{
     return(req,res,next)=>{

@@ -1,4 +1,4 @@
-// validators/razorpayValidator.js
+
 import Joi from 'joi';
 
 export const createOrderSchema = Joi.object({

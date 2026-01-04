@@ -30,9 +30,14 @@ import * as couponController from "../controller/user/couponController.js";
 import * as razorpayController from "../controller/user/razorpayController.js";
 
 import {validate } from '../middlewares/validate.js';
+import * as V from '../validators/index.js';
+console.log("validators functions:",Object.keys(V));
+import Joi from 'joi';
+
+
 
 router.get("/home", userController.loadHomepage);
-router.get("/signup", redirectIfLoggedIn, userController.loadSignup);
+router.get("/signup",  userController.loadSignup);
 router.get("/shop", shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);
 
@@ -98,11 +103,10 @@ router.post("/logout", userController.logout);
 //profile
 router.get("/profile", isLoggedIn, checkBlocked, profileController.getProfile);
 router.get("/profile/edit", checkBlocked, profileController.getEditProfile);
-router.post("/profile/update", checkBlocked, upload.avatar, profileController.updateProfile);
-
-router.post("/request-email-change", checkBlocked, profileController.requestEmailChangeOTP);
-router.post("/change-password", checkBlocked, profileController.changePassword);
-router.post("/verify-email-change", checkBlocked, profileController.verifyEmailChange);
+router.post("/profile/update", checkBlocked, upload.avatar,validate(V.updateProfileSchema),profileController.upadateProfile);
+router.post("/request-email-change", checkBlocked,validate(V.emailChangeSchema), profileController.requestEmailChangeOTP);
+router.post("/change-password", checkBlocked, validate(V.changePasswordSchema),profileController.changePassword);
+router.post("/verify-email-change", checkBlocked,validate(V.verifyOtpSchema),profileController.verifyEmailChange);
 
 
 //shopall and product
@@ -115,10 +119,10 @@ router.get("/product/:id", productController.productDetail);
 
 //address
 router.get("/address", isLoggedIn, addressController.getAddressPage);
-router.post("/addresses/add", addressController.addAddress);
-router.put("/addresses/edit/:id", addressController.updateAddress);
-router.delete("/addresses/delete/:id", addressController.deleteAddress);
-router.post("/set-default-address/:id", addressController.setDefaultAddress);
+router.post("/addresses/add",isLoggedIn,validate({body:V.addressSchema}), addressController.addAddress);
+router.put("/addresses/edit/:id",isLoggedIn,validate({body:V.addressSchema,params:Joi.object({id:V.objectIdSchema.required()})}), addressController.updateAddress);
+router.delete("/addresses/delete/:id",isLoggedIn,validate({params:Joi.object({id:V.objectIdSchema.required()})}) ,addressController.deleteAddress);
+router.post("/set-default-address/:id",isLoggedIn,validate({params:Joi.object({id:V.objectIdSchema.required()})}), addressController.setDefaultAddress);
 
 
 //cart 
@@ -154,9 +158,9 @@ router.post("/orders-placed", checkBlocked, checkoutController.placeOrder);
 
 
 //razorpay
-// router.post("/createOrder", razorpayController.createOrder);
-router.post("/verifyPayment", checkBlocked,validate, razorpayController.verifyPayment);
-router.post("/mark-payment-failed", checkBlocked, razorpayController.markPaymentFailed);
+router.post("/createOrder",validate(V.createOrderSchema), razorpayController.createOrder);
+router.post("/verifyPayment", checkBlocked,validate(V.verifyPaymentSchema), razorpayController.verifyPayment);
+router.post("/mark-payment-failed", checkBlocked,validate(V.markPaymentFailedSchema), razorpayController.markPaymentFailed);
 
 
 //order

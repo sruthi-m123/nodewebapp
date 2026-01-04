@@ -1,4 +1,4 @@
-function calculateOrder(cartItems, options = {}) {
+ export function calculateOrder(cartItems, options = {}) {
   const { coupon = null, taxRate = 18 } = options;
 
   console.log("coupon passed to calculateOrder:", coupon);

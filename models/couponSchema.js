@@ -154,4 +154,4 @@ couponSchema.statics.validateCoupon = async function(code, cartValue) {
 
 const Coupon = mongoose.model('Coupon', couponSchema);
 
-module.exports = Coupon;
+export default Coupon;

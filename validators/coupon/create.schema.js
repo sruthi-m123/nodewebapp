@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { MESSAGES } from '../messages.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 
 export const createCouponSchema = Joi.object({

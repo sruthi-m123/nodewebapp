@@ -1,10 +1,10 @@
 // services/razorpayService.js
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import Order from '../models/orderSchema.js';
-import Coupon from '../models/couponSchema.js';
-import Product from '../models/productSchema.js';
-import logger from '../utils/logger.js'; // Assuming you have a logger utility
+import Order from '../../models/orderSchema.js';
+import Coupon from '../../models/couponSchema.js';
+import Product from '../../models/productSchema.js';
+import logger from '../../utils/logger.js'; 
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
