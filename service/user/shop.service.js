@@ -225,17 +225,17 @@ return await this.getProductsWithFilters({
 
         let query = { isActive: true, isDeleted: false };
 
-        // Search query
+        
         if (search) {
             query.productName = { $regex: search, $options: 'i' };
         }
 
-        // Category filter
+        
         if (categories && categories.length > 0) {
             query.category = { $in: categories };
         }
 
-        // Availability filter
+      
         if (availability && availability.length > 0) {
             const hasInStock = availability.includes('in-stock');
             const hasOutOfStock = availability.includes('out-stock');
@@ -247,12 +247,12 @@ return await this.getProductsWithFilters({
             }
         }
 
-        // Color filter
+      
         if (colors && colors.length > 0) {
             query.color = { $in: colors };
         }
 
-        // Price range filter
+    
         if (minPrice !== undefined || maxPrice !== undefined) {
             query.price = {};
             if (minPrice !== undefined && minPrice !== "") {

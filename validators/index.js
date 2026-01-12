@@ -7,6 +7,8 @@ export * from "./category/category.schema.js";
 // product
 export * from "./product/product.schema.js";
 export * from "./product/getProductDetails.schema.js";
+export * from "./product/filter.schema.js";
+export * from "./product/shoppingQuery.schema.js";
 
 // coupon
 export * from "./coupon/create.schema.js";

@@ -110,7 +110,7 @@ router.post("/verify-email-change", checkBlocked,validate(V.verifyOtpSchema),pro
 
 
 //shopall and product
-router.get("/shopAll", shopController.loadShopping);
+router.get("/shopAll",validate(V.shoppingQuerySchema), shopController.loadShopping);
 router.post("/shopall/filter", shopController.applyFilters);
 router.get("/shopall/category/:id", shopController.getProductsByCategory);
 

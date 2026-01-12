@@ -176,5 +176,15 @@ PROFILE: {
     AVATAR_UPDATE_SUCCESS: "Profile picture updated successfully"
 },
 
-
+SHOP: {
+  
+    PRODUCTS_FETCH_SUCCESS: "Products fetched successfully",
+    FILTERS_APPLIED_SUCCESS: "Filters applied successfully",
+    CATEGORY_PRODUCTS_SUCCESS: "Category products fetched successfully",
+    PRODUCTS_FETCH_FAILED: "Failed to fetch products",
+    FILTERS_APPLY_FAILED: "Failed to apply filters",
+    CATEGORY_NOT_FOUND: "Category not found",
+    INVALID_FILTERS: "Invalid filter parameters",
+    SERVER_ERROR: "Server error while processing shop request"
+}
 };
