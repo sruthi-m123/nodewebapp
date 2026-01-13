@@ -1,0 +1,103 @@
+import Wishlist from "../../models/wishlistSchema.js";
+import Cart from "../../models/cartSchema.js";
+import Product from "../../models/productSchema.js";
+import User from "../../models/userSchema.js";
+import logger from "../../utils/logger.js";
+import {STATUS_CODES} from '../../utils/statusCodes.js';
+
+export const WishlistService={
+    async getWishlistPageData(userId){
+        logger.info("fetching wishlist data",{userId});
+
+        const user=await User.findById(userId);
+
+        const wishlist=await Wishlist.findOne({user:userId}).populate({
+            path:"items.productId",
+            match:{isDeleted:false,isBlocked:false}
+        });
+        const validItems=wishlist?.items?.filter(i=>i.productId)||[];
+        const formattedItems=validItems.map(item=>({
+            id:item._id,
+            name:item.productId.productName,
+            discountedPrice:item.productId.discountedPrice,
+            price:item.productId.discountedPrice>0
+            ?item.productId.discountedPrice
+            :item.productId.price,
+            originalPrice:item.productId.price,
+            image:item.productId.images[0],
+            color:item.productId.color
+
+        }));
+        return {
+            user,
+            items:formattedItems
+        }
+            },
+
+            async addToWishlist(userId,productId){
+                logger.info("Adding productto wishlist",{userId,productId});
+                 const product=await Product.findOne({
+                    _id:productId,
+                    isDeleted:false,
+                    isBlocked:false,
+                    status:"In Stock"
+                 })
+                if(!product){
+                    const err=new Error("Product not available");
+                    err.statusCode=STATUS_CODES.NOT_FOUND;
+                    throw err;
+                }
+
+                let wishlist= await Wishlist.findOne({user:userId});
+                if(!wishlist){
+                    wishlist=new Wishlist({
+                        user:userId,
+                        items:[{productId}]
+                    });
+                }else{
+                    const exists=wishlist.items.some(
+                        item=>item.productId.toString()===productId.toString()
+                    );
+
+                    if(exists){
+                        const err=new Error("product already in wishlist");
+                        err.statusCode=STATUS_CODES.NOT_FOUND;
+                        throw err;
+                    }
+                    await wishlist.save();
+                    return wishlist.items.length;
+                }
+            },
+
+            async removeFromWishlist(userId,itemId){
+                logger.info("Removing wishlist item",{userId,itemId});
+                const wishlist=await Wishlist.findOneAndUpdate(
+                    {user:userId},
+                    {$pull:{items:{_id:itemId}}},
+                    {new:true}
+                );
+
+                if(!wishlist){
+                    const err=new Error("wishlit item not found");
+                    err.statusCode=STATUS_CODES.NOT_FOUND;
+                    throw err;
+                }
+                return wishlist.items.length;
+            },
+
+            async addToCartFromWishlist(userId,itemId){
+                logger.info("moving wishlist item to cart",{userId,itemId});
+
+                const wishlist=await Wishlist.finsOne({user:userId}).populate("items.productId");
+const wishlistItem=wishlist?.items.find(
+    i=>i._id.toString()===itemId
+);
+if (!wishlistItem) {
+      const err = new Error("Wishlist item not found");
+      err.statusCode = STATUS_CODES.NOT_FOUND;
+      throw err;
+    }
+ 
+
+            }
+}

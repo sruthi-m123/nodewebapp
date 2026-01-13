@@ -46,3 +46,14 @@ export * from "./common/dateRange.helper.js";
 
 // razorpay
 export * from "./razorpayValidator.js";
+
+// wishlist 
+export * from "./wishlist/add.schema.js";
+export * from "./wishlist/addToCart.schema.js";
+export * from "./wishlist/checkStatus.schema.js";
+export * from "./wishlist/remove.schema.js";
+
+//wallet
+export * from "./wallet/addFunds.schema.js";
+
+
