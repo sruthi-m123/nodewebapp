@@ -88,7 +88,7 @@ export const WishlistService={
             async addToCartFromWishlist(userId,itemId){
                 logger.info("moving wishlist item to cart",{userId,itemId});
 
-                const wishlist=await Wishlist.finsOne({user:userId}).populate("items.productId");
+                const wishlist=await Wishlist.findOne({user:userId}).populate("items.productId");
 const wishlistItem=wishlist?.items.find(
     i=>i._id.toString()===itemId
 );
@@ -97,7 +97,79 @@ if (!wishlistItem) {
       err.statusCode = STATUS_CODES.NOT_FOUND;
       throw err;
     }
- 
+ const product=wishlistItem.productId;
+ if(product.isDeleted||product.isActive===false){
+    await Wishlist.updateOne(
+        {user:userId},
+        {$pull:{items:{_id:itemId}}}
+    );
+    const err=new Error("product no longer available");
+    err.statusCode=STATUS_CODES.NOT_FOUND;
+    throw err;
+ }
+ let cart=await Cart.findOne({userId});
+ const price=product.discountedPrice?? product.price;
+ if(!cart){
+    cart=new Cart({
+        userId,
+        items:[{
+            productId:product._id,
+            quantity:1,
+            price,
+            totalPrice:price
+        }]
+    })
+ }else{
+    const cartItem=cart.items.find(i=>
+        i.productId.equals(product._id)
+    );
+    if(cartItem){
+        if(cartItem.quantity+1>product.stock){
+            const err=new Error("Not enough stock");
+            err.statusCode=STATUS_CODES.NOT_FOUND;
+            throw err;
+        };
+        cartItem.quantity+=1;
+        cartItem.totalPrice=cartItem.quantity*cartItem.price;
 
+    }else{
+        if(product.stock<=0){
+            const err=new Error("product out of stock");
+            err.statusCode=STATUS_CODES.NOT_FOUND;
+            throw err;
+
+        }
+
+        cart.items.push({
+            productId:product._id,
+            quantity:1,
+            price,
+            totalPrice:price
+        });
+    
+    }
+ }
+await cart.save();
+
+await Wishlist.updateOne({user:userId},{
+    $pull:{items:{_id:itemId}}
+});
+
+const [wishlistCount,cartCount]=await Promise.all([
+    Wishlist.countDocuments({user:userId}),
+    Cart.countDocuments({user:userId})
+])
+
+return {wishlistCount,cartCount};
+            },
+
+      
+            
+            async checkWishlistStatus(userId,productId){
+                const exists=await Wishlist.exists({
+                    user:userId,
+                    "items.productId":productId
+                });
+                return Boolean(exists);
             }
 }

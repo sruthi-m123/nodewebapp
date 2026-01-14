@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import userController from "../controller/user/userController.js";
+import * as  userController from "../controller/user/userController.js";
 import passport from "passport";
 
 import {
@@ -176,9 +176,11 @@ router.post("/orders/:orderId/cancel", orderdetailController.cancelOrder);
 
 //wishlist
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
-router.post("/wishlist/add/:productId", isLoggedIn, wishlistController.addToWishlist);
-router.post("/wishlist/add-to-cart/:itemId", isLoggedIn, wishlistController.addToCartFromWishlist);
-router.delete("/wishlist/remove/:itemId", isLoggedIn, wishlistController.removeFromWishlist);
+router.post("/wishlist/add/:productId", isLoggedIn,validate(V.addToWishlistSchema), wishlistController.addToWishlist);
+router.post("/wishlist/add-to-cart/:itemId", isLoggedIn,validate(V.addToCartFromWishlistSchema), wishlistController.addToCartFromWishlist);
+router.delete("/wishlist/remove/:itemId", isLoggedIn,validate(V.removeWishlistSchema), wishlistController.removeFromWishlist);
+router.get("/status/:productId",validate(V.objectIdSchema),wishlistController.checkWishlistStatus)
+
 
 
 //wallet 

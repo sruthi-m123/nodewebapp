@@ -186,5 +186,37 @@ SHOP: {
     CATEGORY_NOT_FOUND: "Category not found",
     INVALID_FILTERS: "Invalid filter parameters",
     SERVER_ERROR: "Server error while processing shop request"
-}
+},
+ WISHLIST: {
+    
+    ADD_SUCCESS: "Product added to wishlist",
+    REMOVE_SUCCESS: "Product removed from wishlist",
+    MOVED_TO_CART: "Product moved to cart successfully",
+
+  
+    EMPTY: "Your wishlist is empty",
+
+
+    NOT_FOUND: "Wishlist item not found",
+    PRODUCT_NOT_AVAILABLE: "Product is no longer available",
+    ALREADY_EXISTS: "Product already in wishlist",
+    UNAUTHORIZED: "Please login to manage wishlist",
+    SERVER_ERROR: "Something went wrong while processing wishlist"
+  },
+  SIGNUP:{
+    SIGNUP_PASSWORD_MISMATCH :'Passwords do not match',
+    SIGNUP_USER_EXISTS : 'User with this email already exists',
+    OTP_SENT_SUCCESS :'OTP sent successfully',
+    OTP_RESENT_SUCCESS : 'OTP resent successfully',
+ SIGNUP_SUCCESS :'User registered successfully',
+ LOGIN_INVALID_CREDENTIALS : 'Email and password are required',
+ LOGIN_USER_BLOCKED :'User is blocked by admin',
+ LOGIN_INCORRECT_PASSWORD : 'Incorrect password',
+ RESET_PASSWORD_MISMATCH :'Passwords do not match',
+ RESET_PASSWORD_SUCCESS : 'Password reset successfully',
+ LOGOUT_FAILED :'Logout failed',
+ FORGOT_PASSWORD_EMAIL_NOT_FOUND :'Email not found',
+ OTP_INVALID :'Invalid OTP',
+ OTP_EXPIRED : 'OTP expired',
+  }
 };

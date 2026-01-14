@@ -1,5 +1,5 @@
 import { productService } from "../../service/admin/product.service.js";
-import { Category } from "../../models/categorySchema.js";
+import  Category  from "../../models/categorySchema.js";
 import { productSchema } from "../../utils/validation.schema.js";
 import logger from "../../utils/logger.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";

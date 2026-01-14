@@ -453,3 +453,29 @@ exports.changePasswordSchema = Joi.object({
         'string.empty': 'New password is required'
     })
 });
+
+
+
+export const signupSchema = Joi.object({
+  name: Joi.string().min(2).max(50).required().messages({ 'string.empty': 'Name is required' }),
+  phone: Joi.string().pattern(/^[0-9]{10}$/).required().messages({ 'string.pattern.base': 'Valid phone number is required' }),
+  email: Joi.string().email().required().messages({ 'string.email': 'Valid email is required' }),
+  password: Joi.string().min(6).required().messages({ 'string.min': 'Password must be at least 6 characters' }),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
+  referralCode: Joi.string().optional().allow('')
+});
+
+export const loginSchema = Joi.object({
+  email: Joi.string().email().required().messages({ 'string.email': 'Valid email is required' }),
+  password: Joi.string().min(6).required().messages({ 'string.min': 'Password is required' })
+});
+
+export const otpSchema = Joi.object({
+  otp: Joi.string().length(6).pattern(/^[0-9]{6}$/).required().messages({ 'string.pattern.base': 'Valid 6-digit OTP is required' })
+});
+
+export const resetPasswordSchema = Joi.object({
+  userId: Joi.string().required().messages({ 'string.empty': 'User ID is required' }),
+  newPassword: Joi.string().min(6).required().messages({ 'string.min': 'Password must be at least 6 characters' }),
+  confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({ 'any.only': 'Passwords do not match' })
+});
