@@ -40,7 +40,7 @@
               <td><%= product._id.toString().slice(-6) %></td>
               <td>
                 <% if (product.images && product.images.length > 0) { %>
-                  <img src="/<%= product.images[0] %>" alt="<%= product.productName %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                  <img src="<%= product.images[0] %>" alt="<%= product.productName %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                 <% } else { %>
                   <div style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
                     📷
@@ -295,78 +295,90 @@
   }
 
   // Product 
-  function editProduct(productId) {
-    currentProductId = productId;
-    document.getElementById('productForm').reset();
-    document.getElementById('croppedImageList').innerHTML = '';
-    document.getElementById('previewArea').innerHTML = '';
-    removedImages = [];
+ function editProduct(productId) {
+  currentProductId = productId;
+  document.getElementById('productForm').reset();
+  document.getElementById('croppedImageList').innerHTML = '';
+  document.getElementById('previewArea').innerHTML = '';
+  removedImages = [];
 
-    fetch(`/admin/products/${productId}/details`)
-      .then(response => response.json())
-      .then(product => {
-        document.getElementById('productName').value = product.productName || '';
-        document.getElementById('sku').value = product.sku || '';
-        document.getElementById('category').value = product.category._id || '';
-        document.getElementById('price').value = product.price || '';
-        document.getElementById('stock').value = product.stock || '';
-        document.getElementById('color').value = product.color || '';
-        document.getElementById('description').value = product.description || '';
-        document.getElementById('isNewArrival').checked = product.isNewArrival || false;
-        document.getElementById('isActive').checked = product.isActive !== false;
+  fetch(`/admin/products/${productId}/details`)
+    .then(response => response.json())
+    .then(data => {
+      console.log("data",data);
+      if (!data.success || !data.product) {
+        throw new Error("Invalid product response");
+      }
 
-        // Show existing images
-        if (product.images && product.images.length > 0) {
-          product.images.forEach((imgPath, index) => {
-            const wrapper = document.createElement("div");
-            wrapper.classList.add("existing-image");
-            wrapper.style.position = "relative";
+      const product = data.product; 
 
-            const img = document.createElement("img");
-            img.src = `/${imgPath}`;
-            img.style.width = "60px";
-            img.style.height = "60px";
-            img.style.objectFit = "cover";
-            img.style.borderRadius = "4px";
-            img.style.marginRight = "10px";
+      document.getElementById('productName').value = product.productName || '';
+      document.getElementById('sku').value = product.sku || '';
+      document.getElementById('category').value = product.category?._id || '';
+      document.getElementById('price').value = product.price || '';
+      document.getElementById('stock').value = product.stock || '';
+      document.getElementById('color').value = product.color || '';
+      document.getElementById('description').value = product.description || '';
+      document.getElementById('isNewArrival').checked = !!product.isNewArrival;
+      document.getElementById('isActive').checked = product.isActive !== false;
 
-            const removeBtn = document.createElement("button");
-            removeBtn.innerHTML = "&times;";
-            removeBtn.classList.add("remove-existing-btn");
-            removeBtn.style.position = "absolute";
-            removeBtn.style.top = "-6px";
-            removeBtn.style.right = "-6px";
+      // Show existing images
+      if (Array.isArray(product.images) && product.images.length > 0) {
+        product.images.forEach((imgPath) => {
+          const wrapper = document.createElement("div");
+          wrapper.classList.add("existing-image");
+          wrapper.style.position = "relative";
 
-            removeBtn.addEventListener("click", () => {
-              wrapper.remove();
-              removedImages.push(imgPath);
-            });
-            
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            document.getElementById('previewArea').appendChild(wrapper);
+          const img = document.createElement("img");
+          img.src = imgPath;   // ✅ FIXED
+          img.style.width = "60px";
+          img.style.height = "60px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "4px";
+          img.style.marginRight = "10px";
+
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "&times;";
+          removeBtn.classList.add("remove-existing-btn");
+          removeBtn.style.position = "absolute";
+          removeBtn.style.top = "-6px";
+          removeBtn.style.right = "-6px";
+
+          removeBtn.addEventListener("click", () => {
+            wrapper.remove();
+            removedImages.push(imgPath);
           });
-        }
 
-        document.querySelector('.modal-title').textContent = 'Edit Product';
-        document.getElementById('productModal').style.display = 'flex';
-      })
-      .catch(error => {
-        console.error('Error fetching product:', error);
-        showToast('Error loading product data', 'error');
-      });
-  }
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          document.getElementById('previewArea').appendChild(wrapper);
+        });
+      }
+
+      document.querySelector('.modal-title').textContent = 'Edit Product';
+      document.getElementById('productModal').style.display = 'flex';
+    })
+    .catch(error => {
+      console.error('Error fetching product:', error);
+      showToast('Error loading product data', 'error');
+    });
+}
+
 
   function viewProduct(productId) {
     fetch(`/admin/products/${productId}/details`)
       .then(response => response.json())
-      .then(product => {
+      .then(data => {
+        if(!data.success){
+          throw new Error("Invalid product response");
+        }
+        const product=data.product;
         const content = `
           <div class="product-view">
             <div class="product-images">
               ${product.images && product.images.length > 0
                 ? product.images.map(
-                    img => `<img src="/${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
+                    img => `<img src="${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
                   ).join('')
                 : '<div style="width: 100px; height: 100px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">📷</div>'
               }

@@ -342,9 +342,9 @@ document.getElementById('categoryForm').addEventListener('submit', function(e) {
     const isActive = document.getElementById('isActive').checked;
     formData.set('isActive', isActive);
 
-    if (currentCategoryId) {
-        formData.set('id', currentCategoryId);
-    }
+    // if (currentCategoryId) {
+    //     formData.set('id', currentCategoryId);
+    // }
 
     if (croppedImage) {
         if (formData.has('categoryImage')) {

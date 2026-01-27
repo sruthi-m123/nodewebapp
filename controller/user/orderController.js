@@ -1,5 +1,4 @@
 import *as orderService from '../../service/user/order.service.js';
-import {getOrderHistorySchema} from '../../utils/validation.schema.js';
 import {STATUS_CODES} from "../../utils/statusCodes.js";
 import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
@@ -16,16 +15,8 @@ export const getOrderHistory=async(req,res)=>{
   }
   const userId=req.session.user.id;
 
-  const {error,value}=getOrderHistorySchema.validate(req.query);
-  if(error){
-    logger.warn('order history validation failed',{error:error.details[0].message});
-    return res.status(STATUS_CODES.BAD_REQUEST).json({
-      success:false,
-      message:error.details[0].message
-    })
-  }
 
-  const{page,limit,search}=value;
+  const{page,limit,search}=req.query;
   const{orders,totalPages,currentPage}=await orderService.getOrderHistoryService(
     userId,
     {page,limit,search}

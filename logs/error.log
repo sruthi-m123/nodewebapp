@@ -1,0 +1,54 @@
+[2026-01-22 11:38:41] [31merror[39m: monogoDB connection error:bad auth : authentication failed
+[2026-01-22 11:49:16] [31merror[39m: GET /user/shopall-Cannot read properties of undefined (reading 'validate')
+[2026-01-22 11:49:38] [31merror[39m: GET /user/cart-cart.items is not iterable
+[2026-01-22 11:50:42] [31merror[39m: GET /user/shopall-Cannot read properties of undefined (reading 'validate')
+[2026-01-23 10:25:40] [31merror[39m: GET /admin/products-Invalid sort() argument. Must be a string, object, array, or map.
+[2026-01-24 18:50:09] [31merror[39m: GET /admin/products-Invalid sort() argument. Must be a string, object, array, or map.
+[2026-01-24 19:33:40] [31merror[39m: POST /admin/addCategory-error.details.amp is not a function
+[2026-01-25 11:57:07] [31merror[39m: DELETE /admin/products/6975b60e7b151c2bd140a908-Cast to ObjectId failed for value "{ isDelete: false }" (type Object) at path "_id" for model "Product"
+[2026-01-25 12:29:35] [31merror[39m: DELETE /admin/products/6975b60e7b151c2bd140a908-Cast to ObjectId failed for value "{ isDelete: false }" (type Object) at path "_id" for model "Product"
+[2026-01-25 14:27:17] [31merror[39m: DELETE /admin/products/6975b60e7b151c2bd140a908-Cast to ObjectId failed for value "{ isDelete: false }" (type Object) at path "_id" for model "Product"
+[2026-01-25 22:41:11] [31merror[39m: DELETE /admin/products/6975b60e7b151c2bd140a908-Cast to ObjectId failed for value "{ isDelete: false }" (type Object) at path "_id" for model "Product"
+[2026-01-26 17:01:50] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:01:51] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:02:22] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:03:14] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:03:33] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:03:42] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:03:45] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:01] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:03] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:05] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:37] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:43] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:04:52] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:05:11] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:05:29] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:05:44] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:05:56] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:06:04] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:06:21] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:06:35] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:06:44] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:02] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:36] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:36] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:43] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:45] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:07:59] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:08:00] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:08:34] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:03] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:03] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:30] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:31] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:41] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 17:09:53] [31merror[39m: POST /admin/addProducts-E11000 duplicate key error collection: test.products index: sku_1 dup key: { sku: "SKU-BOTTLE-GREEN-MAHESHWARI-SAREE" }
+[2026-01-26 19:35:47] [31merror[39m: POST /admin/addProducts-Cannot read properties of undefined (reading 'productName')
+[2026-01-26 19:52:02] [31merror[39m: monogoDB connection error: querySrv ECONNREFUSED _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-01-27 08:51:40] [31merror[39m: monogoDB connection error: querySrv ECONNREFUSED _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-01-27 08:51:42] [31merror[39m: monogoDB connection error: querySrv ECONNREFUSED _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-01-27 09:01:54] [31merror[39m: PUT /admin/products/697774b6e96d913dfdfd822e-productService.findById is not a function
+[2026-01-27 11:40:18] [31merror[39m: PUT /admin/products/status/697774b6e96d913dfdfd822e-schema.validate is not a function
+[2026-01-27 13:07:47] [31merror[39m: GET /admin/offers-Cannot read properties of undefined (reading 'validate')
+[2026-01-27 13:13:04] [31merror[39m: monogoDB connection error: querySrv ETIMEOUT _mongodb._tcp.chettinad.9d7kbbi.mongodb.net

@@ -24,7 +24,6 @@ export const userAuth= (req,res,next)=>{
     
     User.findOne({isAdmin:true})
     .then(data=>{
-        console.log("i am super admin ",data)
         if(data&&req.session.admin){
             next();
         }else{

@@ -4,9 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import dotenv from "dotenv";
+import logger from "../utils/logger.js";
 
 dotenv.config();
-
+logger.info("hi inside the multer");
+logger.info(process.env.CLOUDINARY_API_KEY);
+logger.info(process.env.CLOUDINARY_CLOUD_NAME);
+logger.info(process.env.CLOUDINARY_API_SECRET);
 //Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -28,7 +32,6 @@ const getCloudFolder = (uploadType) => {
   return folders[uploadType] || folders.misc;
 };
 
-// Main Cloudinary storage config
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
@@ -57,7 +60,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = {
     "image/jpeg": "jpg",

@@ -5,30 +5,61 @@ export const productService={
 
     async getAll({search,page,limit=10}){
         const skip=(Math.max(1,parseInt(page))-1)*parseInt(limit);
-        const filter=search?{productName:{$regex:search,$options:"i"}}:{};
+const filter={
+    isDeleted:false,
+    ...(search&&{
+        productName:{$regex:search,$options:"i"}
+    })
+}
+
         const [products,totalProducts]=await Promise.all([
             Product.find(filter)
             .populate("category")
-            .sort(skip)
+            .sort({createdAt:-1})
+            .skip(skip)
             .limit(limit),
             Product.countDocuments(filter)
         ]);
+        console.log("products :",products);
         return{products,totalProducts,totalPages:Math.ceil(totalProducts/limit),skip}
     },
 async create(data = {}, files = []) {
-const imageUrls = [];
+    
+console.log("data being here :",data );
+let imageUrls = [];
 if (Array.isArray(files) && files.length) {
 for (const file of files) {
 if (file?.path) imageUrls.push(file.path);
 }
 }
+ if (!imageUrls.length && Array.isArray(data.images)) {
+    imageUrls = data.images;
+  }
+const {sku}=data;
+const existing=await Product.findOne({sku});
 
+if(existing && existing.isDeleted){
+    existing.set({
+        ...data,
+        images:imageUrls.length?imageUrls:existing.images,
+        isDeleted:false,
+        isActive:true,
+        isBlocked:false
+    });
+    await existing.save();
+    return {type:"RESTORED",product:existing};
+}
+
+if(existing && !existing.isDeleted){
+    return {message:"the product is already existing "}
+}
 
 const product = new Product({ ...data, images: imageUrls });
-return product.save();
+await product.save();
+return {type:"CREATED",product};
 },
 
-async update(id,data,files,removedImages){
+async update(id,data={},files=[],removedImages=[]){
     const product=await Product.findById(id);
     if(!product)return null;
     let updatedImages=[...product.images];
@@ -52,8 +83,11 @@ async delete(id){
     const product=await Product.findById(id);
     if(!product)return null;
 
-   await Product.findByIdAndUpdate({isDelete:false})
-   return product
+    if(product.isDeleted) return product;
+
+
+   const updatedProduct=await Product.findByIdAndUpdate(id,{isActive:false,isDeleted:true},{new :true})
+   return updatedProduct;
 },
 
 async updateProductStatus(id,isActive){

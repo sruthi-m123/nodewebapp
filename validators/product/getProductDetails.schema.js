@@ -1,8 +1,5 @@
 import Joi from "joi";
-
+import { objectIdSchema } from "../common/objectId.schema.js";
 export const getProductDetailSchema = Joi.object({
-    id: Joi.string().required().messages({
-        'string.empty': 'Product ID is required',
-        'any.required': 'Product ID is required'
-    })
+   id:objectIdSchema
 });

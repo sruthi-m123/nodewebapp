@@ -1,4 +1,4 @@
-            const User=require('../models/userSchema');
+import User from '../models/userSchema.js';
 
  export const checkBlocked=async function(req,res,next){
     try {
@@ -20,3 +20,5 @@
         res.redirect('/user/error');
     }
 }
+
+

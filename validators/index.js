@@ -8,8 +8,7 @@ export * from "./category/category.schema.js";
 export * from "./product/product.schema.js";
 export * from "./product/getProductDetails.schema.js";
 export * from "./product/filter.schema.js";
-export * from "./product/shoppingQuery.schema.js";
-
+export * from "./product/updateProductStatus.schema.js";
 // coupon
 export * from "./coupon/create.schema.js";
 export * from "./coupon/update.schema.js";
@@ -19,7 +18,8 @@ export * from "./coupon/applyCoupon.schema.js";
 // offer
 export * from "./offer/create.schema.js";
 export * from "./offer/update.schema.js";
-export * from "./offer/validate.schema.js";
+export * from "./offer/offerQuerySchema.js";
+export * from "./offer/getOfferByIdSchema.js";
 
 // order
 export * from "./order/history.schema.js";
@@ -55,5 +55,9 @@ export * from "./wishlist/remove.schema.js";
 
 //wallet
 export * from "./wallet/addFunds.schema.js";
+
+//checkout
+export * from './checkout/checkout.schema.js';
+
 
 

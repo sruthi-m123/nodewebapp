@@ -31,14 +31,13 @@ import * as razorpayController from "../controller/user/razorpayController.js";
 
 import {validate } from '../middlewares/validate.js';
 import * as V from '../validators/index.js';
-console.log("validators functions:",Object.keys(V));
 import Joi from 'joi';
 
 
 
 router.get("/home", userController.loadHomepage);
 router.get("/signup",  userController.loadSignup);
-router.get("/shop", shopController.loadShopping);
+router.get("/shop", shopController.loadShoppping);
 router.get("/pageNotFound", userController.pageNotFound);
 
 router.post("/signup", userController.signup);
@@ -103,14 +102,14 @@ router.post("/logout", userController.logout);
 //profile
 router.get("/profile", isLoggedIn, checkBlocked, profileController.getProfile);
 router.get("/profile/edit", checkBlocked, profileController.getEditProfile);
-router.post("/profile/update", checkBlocked, upload.avatar,validate(V.updateProfileSchema),profileController.upadateProfile);
+router.post("/profile/update", checkBlocked, upload.avatar,validate(V.updateProfileSchema),profileController.updateProfile);
 router.post("/request-email-change", checkBlocked,validate(V.emailChangeSchema), profileController.requestEmailChangeOTP);
 router.post("/change-password", checkBlocked, validate(V.changePasswordSchema),profileController.changePassword);
 router.post("/verify-email-change", checkBlocked,validate(V.verifyOtpSchema),profileController.verifyEmailChange);
 
 
 //shopall and product
-router.get("/shopAll",validate(V.shoppingQuerySchema), shopController.loadShopping);
+router.get("/shopAll", shopController.loadShoppping);
 router.post("/shopall/filter", shopController.applyFilters);
 router.get("/shopall/category/:id", shopController.getProductsByCategory);
 
@@ -140,21 +139,21 @@ router.get("/cart/count", cartController.cartCount);
 router.get("/checkout", isLoggedIn, checkBlocked, checkoutController.getCheckoutPage);
 router.get("/retry-checkout/:orderId", isLoggedIn, checkBlocked, checkoutController.getRetryCheckoutPage);
 
-router.post("/buy-now", checkBlocked, checkoutController.buyNow);
-router.post("/api/addresses", checkoutController.addAddress);
+router.post("/buy-now", checkBlocked,validate({body:V.buyNowSchema}), checkoutController.buyNow);
+router.post("/api/addresses",isLoggedIn,checkBlocked,validate({body:V.addAddressSchema}), checkoutController.addAddress);
 
 router.get("/api/addresses/:id", checkoutController.getAddress);
 
 // Coupon
-router.post("/checkout/apply-coupon", checkBlocked, couponController.applyCoupon);
-router.post("/checkout/apply-coupon-by-code", checkBlocked, couponController.applyCouponByCode);
-router.post("/checkout/remove-coupon", checkBlocked, couponController.removeCoupon);
+router.post("/checkout/apply-coupon", checkBlocked,validate(V.applyCouponSchema), couponController.applyCoupon);
+router.post("/checkout/apply-coupon-by-code", checkBlocked,validate(V.validateCouponSchema), couponController.applyCouponByCode);
+router.post("/checkout/remove-coupon", isLoggedIn,checkBlocked, couponController.removeCoupon);
 
 // Offers
-router.post("/api/offers/apply", checkBlocked, checkoutController.applyOffer);
+router.post("/api/offers/apply", checkBlocked, validate({body:V.applyOfferSchema}),checkoutController.applyOffer);
 
 // Orders
-router.post("/orders-placed", checkBlocked, checkoutController.placeOrder);
+router.post("/orders-placed", checkBlocked,validate({body:V.placeOrderSchema}), checkoutController.placeOrder);
 
 
 //razorpay
@@ -164,15 +163,15 @@ router.post("/mark-payment-failed", checkBlocked,validate(V.markPaymentFailedSch
 
 
 //order
-router.get("/order-success/:orderId", checkBlocked, checkoutController.successPage);
-router.get("/order-failure/:orderId", checkoutController.failurePage);
+router.get("/order-success/:orderId", checkBlocked,validate(V.getOrderDetailsSchema), checkoutController.successPage);
+router.get("/order-failure/:orderId", validate(V.getOrderDetailsSchema),checkoutController.failurePage);
 
 router.get("/orders", isLoggedIn, checkBlocked, orderController.getOrderHistory);
-router.get("/orders-details/:orderId", isLoggedIn, checkBlocked, orderdetailController.getOrderDetails);
+router.get("/orders-details/:orderId", isLoggedIn, checkBlocked, validate(V.getOrderDetailsSchema),orderdetailController.getOrderDetails);
 
-router.post("/orders/:orderId/return", orderdetailController.returnOrder);
-router.get("/orders/:orderId/invoice", orderdetailController.invoice);
-router.post("/orders/:orderId/cancel", orderdetailController.cancelOrder);
+router.post("/orders/:orderId/return", isLoggedIn,checkBlocked,validate(V.returnOrderSchema),orderdetailController.returnOrder);
+router.get("/orders/:orderId/invoice",validate(V.getOrderDetailsSchema), orderdetailController.invoice);
+router.post("/orders/:orderId/cancel",isLoggedIn,checkBlocked,validate(V.cancelOrderSchema), orderdetailController.cancelOrder);
 
 //wishlist
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
