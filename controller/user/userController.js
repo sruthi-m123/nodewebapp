@@ -37,17 +37,28 @@ export const signup=async(req,res)=>{
     return res.render('user/signup',{layout:false,pageCSS: 'signup.css', message: MESSAGES.SIGNUP_PASSWORD_MISMATCH})
   }
   const result = await userService.handleSingup({ name, phone, email, password, referralCode });
+
+
   if (!result.success) {
     logger.warn('Signup failed', { error: result.message });
     return res.render('user/signup', { layout: false, pageCSS: 'signup.css', message: result.message });
   }
 
+ req.session.userData=result.sessionUserData;
+ req.session.userOtp=result.otp;
+ req.session.otpExpires=Date.now()+5*60*1000;
+ req.session.referralInfo = result.referralInfo;
+
+ 
+ await req.session.save();
   res.render('user/generateotp', {
     layout: false,
     email,
     pageCSS: 'generateotp.css',
     pageTitle: 'Chettinad - Premium Sarees'
   });
+
+  
 }
 
 export const sendOtp = async (req, res) => {
@@ -63,11 +74,17 @@ export const sendOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   logger.info('Verifying signup OTP');
   const { otp } = req.body;
-  const result = await userService.verifySignupOtp(otp, req.session);
+  const session=req.session;
+  const result = await userService.verifySignupOtp(otp,session);
   if (!result.success) {
     logger.warn('OTP verification failed', { error: result.message });
     return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.message });
   }
+
+    delete req.session.userOtp;
+  delete req.session.userData;
+  delete req.session.otpExpires;
+
   res.json({ success: true, message: MESSAGES.SIGNUP_SUCCESS });
 };
 export const resendOtp = async (req, res) => {
@@ -134,7 +151,7 @@ export const loadOTPPage = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   logger.info('Verifying forgot password OTP');
   const { otp } = req.body;
-  const result = await userService.verifyForgotPasswordOtp(otp, req.session.resetEmail);
+  const result = await userService.verifyForgotPassword(otp, req.session.resetEmail);
   if (!result.success) {
     logger.warn('Forgot password OTP verification failed', { error: result.message });
     return res.render('user/validationotp', {

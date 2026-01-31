@@ -17,7 +17,7 @@ export const getCouponPage = async (req, res) => {
 export const createCoupon = async (req, res) => {
   logger.info('creating new coupon');
 
-  const coupon = await couponService.createCouponService(req.validatedData); // Use validated body
+  const coupon = await couponService.createCouponService(req.validatedData); 
   res.status(STATUS_CODES.CREATED).json({
     success: true,
     message: MESSAGES.COUPON.CREATE_SUCCESS,
@@ -26,6 +26,7 @@ export const createCoupon = async (req, res) => {
 };
 
 export const getCouponById = async (req, res) => {
+  console.log("validated data:",req.validatedData);
   const { id } = req.validatedData; 
   logger.info('Fetching coupon by Id', { id });
 

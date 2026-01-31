@@ -98,7 +98,7 @@
 
               <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
                 <a href="/user/product/<%= product._id %>">
-                  <img src="/<%= product.images[0] %>" alt="<%= product.productName %>">
+                  <img src="<%= product.images[0] %>" alt="<%= product.productName %>">
                 </a>
                 <div class="quick-view">Quick View</div>
               </div>

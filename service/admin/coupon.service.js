@@ -61,7 +61,7 @@ export const createCouponService=async(couponData)=>{
             //     usageLimit:usageLimit?parseInt(usageLimit):null,
             //     isActive:isActive==="on"||isActive===true||isActive==="true"
             // });
-            const coupon =new Coupon({formattedData})
+            const coupon =new Coupon(formattedData)
             await coupon.save();
             logger.info('coupon created successfully',{couponId:coupon._id,code});
             return coupon;

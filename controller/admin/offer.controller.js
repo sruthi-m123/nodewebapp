@@ -7,7 +7,7 @@ import { MESSAGES } from '../../utils/messages.js';
 
 export const getOfferPage = async (req, res) => {
   logger.info('loading offer management page');
-
+console.log("req.validateData",req.validatedData);
   const { page = 1, type = 'all' } = req.validatedData; 
   const currentPage = parseInt(page);
   const offerType = type;

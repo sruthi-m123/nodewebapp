@@ -2803,3 +2803,1839 @@
 [2026-01-27 13:11:27] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
 [2026-01-27 13:11:49] [32minfo[39m: GET /admin/offers 500 21 - 10044.271 ms
 [2026-01-27 13:13:04] [31merror[39m: monogoDB connection error: querySrv ETIMEOUT _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-01-27 23:14:10] [32minfo[39m: hi inside the multer
+[2026-01-27 23:14:10] [32minfo[39m: 698139445174944
+[2026-01-27 23:14:10] [32minfo[39m: dma409l7q
+[2026-01-27 23:14:10] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:14:12] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:14:26] [32minfo[39m: GET /admin 302 41 - 140.226 ms
+[2026-01-27 23:14:26] [32minfo[39m: GET /admin/login 200 3335 - 31.868 ms
+[2026-01-27 23:14:26] [32minfo[39m: GET /css/admin/login.css 200 4353 - 3.548 ms
+[2026-01-27 23:14:26] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 3.533 ms
+[2026-01-27 23:14:27] [32minfo[39m: GET /favicon.ico 404 7371 - 18.451 ms
+[2026-01-27 23:14:40] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:14:40] [32minfo[39m: POST /admin/login 302 45 - 228.574 ms
+[2026-01-27 23:14:40] [32minfo[39m: GET /admin/dashboard 200 36681 - 185.051 ms
+[2026-01-27 23:14:40] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 5.546 ms
+[2026-01-27 23:14:40] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 6.285 ms
+[2026-01-27 23:14:40] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 7.033 ms
+[2026-01-27 23:14:40] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 5.853 ms
+[2026-01-27 23:14:41] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:14:41] [32minfo[39m: Fetching top products
+[2026-01-27 23:14:41] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:14:41] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:14:41] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:14:41] [32minfo[39m: GET /admin/api/sales-data 200 179 - 326.514 ms
+[2026-01-27 23:14:42] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:14:42] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 458.881 ms
+[2026-01-27 23:14:42] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:14:42] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:14:42] [32minfo[39m: GET /admin/api/stats 200 63 - 592.242 ms
+[2026-01-27 23:30:51] [32minfo[39m: GET /admin/products 200 33785 - 602.992 ms
+[2026-01-27 23:30:51] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 20.467 ms
+[2026-01-27 23:30:51] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 25.539 ms
+[2026-01-27 23:30:51] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 35.045 ms
+[2026-01-27 23:30:51] [32minfo[39m: GET /css/admin/category.css 200 12433 - 12.384 ms
+[2026-01-27 23:30:56] [32minfo[39m: loading offer management page
+[2026-01-27 23:30:56] [31merror[39m: GET /admin/offers-Cannot read properties of undefined (reading 'page')
+[2026-01-27 23:30:56] [32minfo[39m: GET /admin/offers 500 82 - 159.229 ms
+[2026-01-27 23:34:41] [32minfo[39m: hi inside the multer
+[2026-01-27 23:34:41] [32minfo[39m: 698139445174944
+[2026-01-27 23:34:41] [32minfo[39m: dma409l7q
+[2026-01-27 23:34:41] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:34:44] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:34:48] [32minfo[39m: hi inside the multer
+[2026-01-27 23:34:48] [32minfo[39m: 698139445174944
+[2026-01-27 23:34:48] [32minfo[39m: dma409l7q
+[2026-01-27 23:34:48] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:34:57] [32minfo[39m: hi inside the multer
+[2026-01-27 23:34:57] [32minfo[39m: 698139445174944
+[2026-01-27 23:34:57] [32minfo[39m: dma409l7q
+[2026-01-27 23:34:57] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:34:59] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:35:10] [32minfo[39m: hi inside the multer
+[2026-01-27 23:35:10] [32minfo[39m: 698139445174944
+[2026-01-27 23:35:10] [32minfo[39m: dma409l7q
+[2026-01-27 23:35:10] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:35:12] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:35:14] [32minfo[39m: hi inside the multer
+[2026-01-27 23:35:14] [32minfo[39m: 698139445174944
+[2026-01-27 23:35:14] [32minfo[39m: dma409l7q
+[2026-01-27 23:35:14] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:35:17] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:35:17] [32minfo[39m: GET /admin/offers 302 41 - 790.615 ms
+[2026-01-27 23:35:18] [32minfo[39m: GET /admin/login 200 3335 - 24.243 ms
+[2026-01-27 23:35:18] [32minfo[39m: GET /css/admin/login.css 200 4353 - 7.136 ms
+[2026-01-27 23:35:18] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 10.133 ms
+[2026-01-27 23:35:27] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:35:27] [32minfo[39m: POST /admin/login 302 45 - 264.474 ms
+[2026-01-27 23:35:27] [32minfo[39m: GET /admin/dashboard 200 36681 - 210.408 ms
+[2026-01-27 23:35:27] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 28.441 ms
+[2026-01-27 23:35:27] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 27.136 ms
+[2026-01-27 23:35:27] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 23.057 ms
+[2026-01-27 23:35:28] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 32.967 ms
+[2026-01-27 23:35:28] [32minfo[39m: Fetching top products
+[2026-01-27 23:35:28] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:35:28] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:35:28] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:35:28] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:35:28] [32minfo[39m: GET /admin/api/sales-data 200 179 - 179.334 ms
+[2026-01-27 23:35:29] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:35:29] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 271.404 ms
+[2026-01-27 23:35:29] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:35:29] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:35:29] [32minfo[39m: GET /admin/api/stats 200 63 - 617.412 ms
+[2026-01-27 23:35:37] [32minfo[39m: loading offer management page
+[2026-01-27 23:35:37] [31merror[39m: GET /admin/offers-Cannot read properties of undefined (reading 'page')
+[2026-01-27 23:35:37] [32minfo[39m: GET /admin/offers 500 82 - 99.913 ms
+[2026-01-27 23:44:31] [32minfo[39m: hi inside the multer
+[2026-01-27 23:44:31] [32minfo[39m: 698139445174944
+[2026-01-27 23:44:31] [32minfo[39m: dma409l7q
+[2026-01-27 23:44:31] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:44:34] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:44:57] [32minfo[39m: GET /admin/offers 302 41 - 207.155 ms
+[2026-01-27 23:44:57] [32minfo[39m: GET /admin/login 200 3335 - 31.534 ms
+[2026-01-27 23:44:57] [32minfo[39m: GET /css/admin/login.css 200 4353 - 6.505 ms
+[2026-01-27 23:44:57] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 3.586 ms
+[2026-01-27 23:45:05] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:45:05] [32minfo[39m: POST /admin/login 302 45 - 291.806 ms
+[2026-01-27 23:45:05] [32minfo[39m: GET /admin/dashboard 200 36681 - 190.831 ms
+[2026-01-27 23:45:06] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 13.728 ms
+[2026-01-27 23:45:06] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 13.974 ms
+[2026-01-27 23:45:06] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 9.213 ms
+[2026-01-27 23:45:06] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 13.133 ms
+[2026-01-27 23:45:06] [32minfo[39m: Fetching top products
+[2026-01-27 23:45:06] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:45:06] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:45:06] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:45:06] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:45:06] [32minfo[39m: GET /admin/api/sales-data 200 179 - 220.020 ms
+[2026-01-27 23:45:06] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:45:06] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 290.422 ms
+[2026-01-27 23:45:06] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:45:06] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:45:06] [32minfo[39m: GET /admin/api/stats 200 63 - 534.525 ms
+[2026-01-27 23:45:07] [31merror[39m: GET /admin/offers-schema.validate is not a function
+[2026-01-27 23:45:07] [32minfo[39m: GET /admin/offers 500 63 - 167.082 ms
+[2026-01-27 23:47:00] [32minfo[39m: hi inside the multer
+[2026-01-27 23:47:00] [32minfo[39m: 698139445174944
+[2026-01-27 23:47:00] [32minfo[39m: dma409l7q
+[2026-01-27 23:47:00] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:47:03] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:47:04] [32minfo[39m: GET /admin/offers 302 41 - 566.828 ms
+[2026-01-27 23:47:04] [32minfo[39m: GET /admin/login 200 3335 - 15.494 ms
+[2026-01-27 23:47:04] [32minfo[39m: GET /css/admin/login.css 200 4353 - 6.012 ms
+[2026-01-27 23:47:04] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 6.350 ms
+[2026-01-27 23:47:14] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:47:14] [32minfo[39m: POST /admin/login 302 45 - 283.209 ms
+[2026-01-27 23:47:14] [32minfo[39m: GET /admin/dashboard 200 36681 - 118.922 ms
+[2026-01-27 23:47:15] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 6.548 ms
+[2026-01-27 23:47:15] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 15.168 ms
+[2026-01-27 23:47:15] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 20.395 ms
+[2026-01-27 23:47:15] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 20.809 ms
+[2026-01-27 23:47:15] [32minfo[39m: Fetching top products
+[2026-01-27 23:47:15] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:47:15] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:47:15] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:47:15] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:47:15] [32minfo[39m: GET /admin/api/sales-data 200 179 - 173.628 ms
+[2026-01-27 23:47:15] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:47:15] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 239.616 ms
+[2026-01-27 23:47:16] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:47:16] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:47:16] [32minfo[39m: GET /admin/api/stats 200 63 - 485.209 ms
+[2026-01-27 23:47:27] [32minfo[39m: loading offer management page
+[2026-01-27 23:47:27] [31merror[39m: GET /admin/offers-Cannot read properties of undefined (reading 'page')
+[2026-01-27 23:47:27] [32minfo[39m: GET /admin/offers 500 82 - 216.891 ms
+[2026-01-27 23:48:07] [32minfo[39m: hi inside the multer
+[2026-01-27 23:48:07] [32minfo[39m: 698139445174944
+[2026-01-27 23:48:07] [32minfo[39m: dma409l7q
+[2026-01-27 23:48:07] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:48:09] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:48:13] [32minfo[39m: hi inside the multer
+[2026-01-27 23:48:13] [32minfo[39m: 698139445174944
+[2026-01-27 23:48:13] [32minfo[39m: dma409l7q
+[2026-01-27 23:48:13] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:48:15] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:49:44] [32minfo[39m: GET /admin/offers 302 41 - 170.414 ms
+[2026-01-27 23:49:44] [32minfo[39m: GET /admin/login 200 3335 - 14.939 ms
+[2026-01-27 23:49:44] [32minfo[39m: GET /css/admin/login.css 200 4353 - 6.537 ms
+[2026-01-27 23:49:44] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 9.668 ms
+[2026-01-27 23:49:51] [33mwarn[39m: Invalid password.
+[2026-01-27 23:49:51] [32minfo[39m: POST /admin/login 302 41 - 282.305 ms
+[2026-01-27 23:49:51] [32minfo[39m: GET /admin/login 200 3335 - 18.331 ms
+[2026-01-27 23:49:51] [32minfo[39m: GET /css/admin/login.css 200 4353 - 6.002 ms
+[2026-01-27 23:49:51] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 10.923 ms
+[2026-01-27 23:50:00] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:50:00] [32minfo[39m: POST /admin/login 302 45 - 384.719 ms
+[2026-01-27 23:50:00] [32minfo[39m: GET /admin/dashboard 200 36681 - 151.718 ms
+[2026-01-27 23:50:00] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 7.265 ms
+[2026-01-27 23:50:00] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 14.305 ms
+[2026-01-27 23:50:00] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 10.139 ms
+[2026-01-27 23:50:00] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 17.882 ms
+[2026-01-27 23:50:01] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:50:01] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:50:01] [32minfo[39m: Fetching top products
+[2026-01-27 23:50:01] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:50:01] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:50:01] [32minfo[39m: GET /admin/api/sales-data 200 179 - 258.195 ms
+[2026-01-27 23:50:01] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:50:01] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 329.361 ms
+[2026-01-27 23:50:01] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:50:01] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:50:01] [32minfo[39m: GET /admin/api/stats 200 63 - 479.369 ms
+[2026-01-27 23:50:10] [32minfo[39m: GET /admin/products 200 33785 - 698.138 ms
+[2026-01-27 23:50:10] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 12.072 ms
+[2026-01-27 23:50:10] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 18.266 ms
+[2026-01-27 23:50:10] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 15.394 ms
+[2026-01-27 23:50:10] [32minfo[39m: GET /css/admin/category.css 200 12433 - 9.552 ms
+[2026-01-27 23:50:12] [31merror[39m: PUT /admin/products/status/697774b6e96d913dfdfd822e-schema.validate is not a function
+[2026-01-27 23:50:12] [32minfo[39m: PUT /admin/products/status/697774b6e96d913dfdfd822e 500 63 - 111.182 ms
+[2026-01-27 23:51:07] [32minfo[39m: hi inside the multer
+[2026-01-27 23:51:07] [32minfo[39m: 698139445174944
+[2026-01-27 23:51:07] [32minfo[39m: dma409l7q
+[2026-01-27 23:51:07] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:51:10] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:51:10] [32minfo[39m: GET /admin/products 302 41 - 174.279 ms
+[2026-01-27 23:51:10] [32minfo[39m: GET /admin/login 200 3335 - 19.057 ms
+[2026-01-27 23:51:10] [32minfo[39m: GET /css/admin/login.css 200 4353 - 3.055 ms
+[2026-01-27 23:51:10] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 2.247 ms
+[2026-01-27 23:53:40] [32minfo[39m: hi inside the multer
+[2026-01-27 23:53:40] [32minfo[39m: 698139445174944
+[2026-01-27 23:53:40] [32minfo[39m: dma409l7q
+[2026-01-27 23:53:40] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:53:42] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:55:06] [32minfo[39m: hi inside the multer
+[2026-01-27 23:55:06] [32minfo[39m: 698139445174944
+[2026-01-27 23:55:06] [32minfo[39m: dma409l7q
+[2026-01-27 23:55:06] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:55:08] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:55:14] [32minfo[39m: GET /admin/login 200 3335 - 37.248 ms
+[2026-01-27 23:55:14] [32minfo[39m: GET /css/admin/login.css 200 4353 - 13.831 ms
+[2026-01-27 23:55:14] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 14.428 ms
+[2026-01-27 23:55:22] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:55:22] [32minfo[39m: POST /admin/login 302 45 - 288.035 ms
+[2026-01-27 23:55:22] [32minfo[39m: GET /admin/dashboard 200 36681 - 190.806 ms
+[2026-01-27 23:55:22] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 12.681 ms
+[2026-01-27 23:55:22] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 14.267 ms
+[2026-01-27 23:55:22] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 20.287 ms
+[2026-01-27 23:55:22] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 19.770 ms
+[2026-01-27 23:55:23] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:55:23] [32minfo[39m: Fetching top products
+[2026-01-27 23:55:23] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:55:23] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:55:23] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:55:23] [32minfo[39m: GET /admin/api/sales-data 200 179 - 355.201 ms
+[2026-01-27 23:55:23] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:55:23] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 440.252 ms
+[2026-01-27 23:55:24] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:55:24] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:55:24] [32minfo[39m: GET /admin/api/stats 200 63 - 585.481 ms
+[2026-01-27 23:55:25] [32minfo[39m: loading offer management page
+[2026-01-27 23:55:25] [32minfo[39m: Offers fetched successfully
+[2026-01-27 23:55:25] [32minfo[39m: GET /admin/offers 200 32198 - 751.207 ms
+[2026-01-27 23:55:26] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 20.416 ms
+[2026-01-27 23:55:26] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 20.360 ms
+[2026-01-27 23:55:26] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 24.574 ms
+[2026-01-27 23:55:26] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 24.295 ms
+[2026-01-27 23:57:09] [32minfo[39m: hi inside the multer
+[2026-01-27 23:57:09] [32minfo[39m: 698139445174944
+[2026-01-27 23:57:09] [32minfo[39m: dma409l7q
+[2026-01-27 23:57:09] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-27 23:57:12] [32minfo[39m: connected to mongodb atlas
+[2026-01-27 23:58:27] [32minfo[39m: GET /admin/offers 302 41 - 134.894 ms
+[2026-01-27 23:58:27] [32minfo[39m: GET /admin/login 200 3335 - 27.205 ms
+[2026-01-27 23:58:28] [32minfo[39m: GET /css/admin/login.css 200 4353 - 14.076 ms
+[2026-01-27 23:58:28] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 32.778 ms
+[2026-01-27 23:58:35] [32minfo[39m: Admin logged in successfully.
+[2026-01-27 23:58:35] [32minfo[39m: POST /admin/login 302 45 - 295.056 ms
+[2026-01-27 23:58:35] [32minfo[39m: GET /admin/dashboard 200 36681 - 95.240 ms
+[2026-01-27 23:58:36] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 6.641 ms
+[2026-01-27 23:58:36] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 10.275 ms
+[2026-01-27 23:58:36] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 9.823 ms
+[2026-01-27 23:58:36] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 6.239 ms
+[2026-01-27 23:58:37] [32minfo[39m: Fetching top products
+[2026-01-27 23:58:37] [32minfo[39m: Fetching dashboard stats
+[2026-01-27 23:58:37] [32minfo[39m: Fetching sales chart data
+[2026-01-27 23:58:37] [32minfo[39m: Sales data processed successfully
+[2026-01-27 23:58:37] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-27 23:58:37] [32minfo[39m: GET /admin/api/sales-data 200 179 - 227.214 ms
+[2026-01-27 23:58:37] [32minfo[39m: Top products delivered successfully
+[2026-01-27 23:58:37] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 294.365 ms
+[2026-01-27 23:58:37] [32minfo[39m: Dashboard stats calculated
+[2026-01-27 23:58:37] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-27 23:58:37] [32minfo[39m: GET /admin/api/stats 200 63 - 443.848 ms
+[2026-01-27 23:58:41] [32minfo[39m: GET /admin/products 200 33785 - 594.335 ms
+[2026-01-27 23:58:41] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 13.034 ms
+[2026-01-27 23:58:41] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 14.416 ms
+[2026-01-27 23:58:41] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 19.777 ms
+[2026-01-27 23:58:41] [32minfo[39m: GET /css/admin/category.css 200 12433 - 7.633 ms
+[2026-01-27 23:58:45] [32minfo[39m: GET /admin/products/697774b6e96d913dfdfd822e/details 200 1203 - 378.588 ms
+[2026-01-27 23:58:50] [32minfo[39m: loading offer management page
+[2026-01-27 23:58:50] [32minfo[39m: Offers fetched successfully
+[2026-01-27 23:58:50] [32minfo[39m: GET /admin/offers 200 32198 - 610.492 ms
+[2026-01-27 23:58:50] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 5.154 ms
+[2026-01-27 23:58:50] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 4.539 ms
+[2026-01-27 23:58:50] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 4.414 ms
+[2026-01-27 23:58:50] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 7.319 ms
+[2026-01-27 23:58:58] [32minfo[39m: GET /admin/products 200 33785 - 741.502 ms
+[2026-01-27 23:58:58] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 5.968 ms
+[2026-01-27 23:58:58] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 8.502 ms
+[2026-01-27 23:58:58] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.622 ms
+[2026-01-27 23:58:58] [32minfo[39m: GET /css/admin/category.css 200 12433 - 6.822 ms
+[2026-01-28 00:00:04] [32minfo[39m: product added:Black Organza Floral Sarees
+[2026-01-28 00:00:04] [32minfo[39m: POST /admin/addProducts 201 822 - 15170.497 ms
+[2026-01-28 00:00:05] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 42.860 ms
+[2026-01-28 00:00:05] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 68.630 ms
+[2026-01-28 00:00:05] [32minfo[39m: GET /css/admin/category.css 200 12433 - 66.141 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /admin/products 200 35202 - 342.600 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 8.725 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 7.134 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 23.705 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 23.370 ms
+[2026-01-28 00:00:07] [32minfo[39m: GET /css/admin/category.css 200 12433 - 2.346 ms
+[2026-01-28 00:00:09] [32minfo[39m: POST /admin/addProducts - - - - ms
+[2026-01-28 00:00:11] [32minfo[39m: GET /admin/products/6979042c65ffdf6b53736be3/details 200 1186 - 331.507 ms
+[2026-01-28 00:00:20] [32minfo[39m: update request for product Id: 6979042c65ffdf6b53736be3
+[2026-01-28 00:00:20] [32minfo[39m: Product updated: Black Organza Floral Sarees
+[2026-01-28 00:00:20] [32minfo[39m: PUT /admin/products/6979042c65ffdf6b53736be3 200 824 - 588.562 ms
+[2026-01-28 00:00:23] [32minfo[39m: GET /admin/products 200 35200 - 689.533 ms
+[2026-01-28 00:00:23] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 2.640 ms
+[2026-01-28 00:00:23] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 4.413 ms
+[2026-01-28 00:00:23] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 4.756 ms
+[2026-01-28 00:00:23] [32minfo[39m: GET /css/admin/category.css 200 12433 - 2.533 ms
+[2026-01-28 00:00:33] [32minfo[39m: loading offer management page
+[2026-01-28 00:00:34] [32minfo[39m: Offers fetched successfully
+[2026-01-28 00:00:34] [32minfo[39m: GET /admin/offers 200 33313 - 584.527 ms
+[2026-01-28 00:00:34] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 16.004 ms
+[2026-01-28 00:00:34] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 16.078 ms
+[2026-01-28 00:00:34] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 20.359 ms
+[2026-01-28 00:00:34] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 8.285 ms
+[2026-01-28 00:00:55] [32minfo[39m: hi inside the multer
+[2026-01-28 00:00:55] [32minfo[39m: 698139445174944
+[2026-01-28 00:00:55] [32minfo[39m: dma409l7q
+[2026-01-28 00:00:55] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-28 00:00:58] [32minfo[39m: hi inside the multer
+[2026-01-28 00:00:58] [32minfo[39m: 698139445174944
+[2026-01-28 00:00:58] [32minfo[39m: dma409l7q
+[2026-01-28 00:00:58] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-28 00:01:00] [32minfo[39m: connected to mongodb atlas
+[2026-01-28 00:01:43] [32minfo[39m: POST /admin/offers/add-offer 302 34 - 208.828 ms
+[2026-01-28 00:01:43] [32minfo[39m: GET /admin/login 200 3335 - 24.939 ms
+[2026-01-28 00:02:06] [32minfo[39m: GET /admin/offers 302 41 - 88.475 ms
+[2026-01-28 00:02:06] [32minfo[39m: GET /admin/login 200 3335 - 4.812 ms
+[2026-01-28 00:02:06] [32minfo[39m: GET /css/admin/login.css 200 4353 - 10.601 ms
+[2026-01-28 00:02:06] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 15.515 ms
+[2026-01-28 00:02:19] [32minfo[39m: Admin logged in successfully.
+[2026-01-28 00:02:19] [32minfo[39m: POST /admin/login 302 45 - 336.390 ms
+[2026-01-28 00:02:20] [32minfo[39m: GET /admin/dashboard 200 36681 - 194.293 ms
+[2026-01-28 00:02:20] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 9.720 ms
+[2026-01-28 00:02:20] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 12.429 ms
+[2026-01-28 00:02:20] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 14.720 ms
+[2026-01-28 00:02:20] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 18.748 ms
+[2026-01-28 00:02:20] [32minfo[39m: Fetching sales chart data
+[2026-01-28 00:02:20] [32minfo[39m: Fetching top products
+[2026-01-28 00:02:20] [32minfo[39m: Fetching dashboard stats
+[2026-01-28 00:02:20] [32minfo[39m: Sales data processed successfully
+[2026-01-28 00:02:20] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-28 00:02:20] [32minfo[39m: GET /admin/api/sales-data 200 179 - 293.071 ms
+[2026-01-28 00:02:21] [32minfo[39m: Top products delivered successfully
+[2026-01-28 00:02:21] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 623.801 ms
+[2026-01-28 00:02:21] [32minfo[39m: Dashboard stats calculated
+[2026-01-28 00:02:21] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-28 00:02:21] [32minfo[39m: GET /admin/api/stats 200 63 - 1084.263 ms
+[2026-01-28 00:02:23] [32minfo[39m: loading offer management page
+[2026-01-28 00:02:24] [32minfo[39m: Offers fetched successfully
+[2026-01-28 00:02:24] [32minfo[39m: GET /admin/offers 200 33313 - 722.202 ms
+[2026-01-28 00:02:24] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 10.458 ms
+[2026-01-28 00:02:24] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 14.586 ms
+[2026-01-28 00:02:24] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.656 ms
+[2026-01-28 00:02:24] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 21.095 ms
+[2026-01-28 00:02:47] [32minfo[39m: creating new Offer
+[2026-01-28 00:02:48] [32minfo[39m: offer created successfullly
+[2026-01-28 00:02:48] [32minfo[39m: POST /admin/offers/add-offer 201 487 - 1191.229 ms
+[2026-01-28 00:02:50] [32minfo[39m: loading offer management page
+[2026-01-28 00:02:50] [32minfo[39m: Offers fetched successfully
+[2026-01-28 00:02:51] [32minfo[39m: GET /admin/offers 200 35477 - 684.807 ms
+[2026-01-28 00:02:51] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 17.452 ms
+[2026-01-28 00:02:51] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 13.261 ms
+[2026-01-28 00:02:51] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 15.439 ms
+[2026-01-28 00:02:51] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 17.353 ms
+[2026-01-28 00:03:12] [31merror[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-01-28 00:03:12] [32minfo[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8 500 105 - 298.650 ms
+[2026-01-28 00:03:44] [32minfo[39m: loading offer management page
+[2026-01-28 00:03:44] [32minfo[39m: Offers fetched successfully
+[2026-01-28 00:03:45] [32minfo[39m: GET /admin/offers 200 35486 - 1062.287 ms
+[2026-01-28 00:03:45] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 11.511 ms
+[2026-01-28 00:03:45] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 10.921 ms
+[2026-01-28 00:03:45] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 23.753 ms
+[2026-01-28 00:03:45] [32minfo[39m: GET /css/admin/offer.css 200 4443 - 9.425 ms
+[2026-01-28 00:14:26] [32minfo[39m: loading offer management page
+[2026-01-28 00:14:27] [32minfo[39m: Offers fetched successfully
+[2026-01-28 00:14:27] [32minfo[39m: GET /admin/offers 200 35477 - 525.504 ms
+[2026-01-28 00:14:27] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 6.681 ms
+[2026-01-28 00:14:27] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 7.589 ms
+[2026-01-28 00:14:27] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 8.819 ms
+[2026-01-28 00:14:27] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 1.254 ms
+[2026-01-28 00:14:45] [31merror[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-01-28 00:14:45] [32minfo[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8 500 105 - 92.271 ms
+[2026-01-28 09:45:45] [31merror[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-01-28 09:45:45] [32minfo[39m: GET /admin/offers/get-offer/697904cf2ae0f96aedc692c8 500 105 - 1337.074 ms
+[2026-01-29 10:10:58] [32minfo[39m: hi inside the multer
+[2026-01-29 10:10:58] [32minfo[39m: 698139445174944
+[2026-01-29 10:10:58] [32minfo[39m: dma409l7q
+[2026-01-29 10:10:58] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 10:11:02] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 10:12:21] [32minfo[39m: GET /admin 302 41 - 156.208 ms
+[2026-01-29 10:12:21] [32minfo[39m: GET /admin/login 200 3335 - 44.341 ms
+[2026-01-29 10:12:21] [32minfo[39m: GET /css/admin/login.css 200 4353 - 15.357 ms
+[2026-01-29 10:12:21] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 22.165 ms
+[2026-01-29 10:12:22] [32minfo[39m: GET /favicon.ico 404 7371 - 20.634 ms
+[2026-01-29 10:12:29] [32minfo[39m: Admin logged in successfully.
+[2026-01-29 10:12:29] [32minfo[39m: POST /admin/login 302 45 - 326.882 ms
+[2026-01-29 10:12:29] [32minfo[39m: GET /admin/dashboard 200 36681 - 140.942 ms
+[2026-01-29 10:12:29] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 18.569 ms
+[2026-01-29 10:12:29] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 28.710 ms
+[2026-01-29 10:12:29] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 28.295 ms
+[2026-01-29 10:12:29] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 17.088 ms
+[2026-01-29 10:12:30] [32minfo[39m: Fetching top products
+[2026-01-29 10:12:30] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 10:12:30] [32minfo[39m: Fetching sales chart data
+[2026-01-29 10:12:30] [32minfo[39m: Sales data processed successfully
+[2026-01-29 10:12:30] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 10:12:30] [32minfo[39m: GET /admin/api/sales-data 200 179 - 304.318 ms
+[2026-01-29 10:12:30] [32minfo[39m: Top products delivered successfully
+[2026-01-29 10:12:30] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 418.810 ms
+[2026-01-29 10:12:30] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 10:12:30] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 10:12:30] [32minfo[39m: GET /admin/api/stats 200 63 - 602.671 ms
+[2026-01-29 10:12:36] [32minfo[39m: GET /admin/products 200 35200 - 830.369 ms
+[2026-01-29 10:12:36] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 6.963 ms
+[2026-01-29 10:12:36] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 11.271 ms
+[2026-01-29 10:12:36] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.739 ms
+[2026-01-29 10:12:36] [32minfo[39m: GET /css/admin/category.css 200 12433 - 5.042 ms
+[2026-01-29 10:12:44] [32minfo[39m: GET /admin 200 36681 - 131.326 ms
+[2026-01-29 10:12:44] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 2.177 ms
+[2026-01-29 10:12:44] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 7.437 ms
+[2026-01-29 10:12:44] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 10.889 ms
+[2026-01-29 10:12:44] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 9.050 ms
+[2026-01-29 10:12:44] [32minfo[39m: Fetching top products
+[2026-01-29 10:12:44] [32minfo[39m: Fetching sales chart data
+[2026-01-29 10:12:44] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 10:12:45] [32minfo[39m: Sales data processed successfully
+[2026-01-29 10:12:45] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 10:12:45] [32minfo[39m: GET /admin/api/sales-data 200 179 - 356.424 ms
+[2026-01-29 10:12:45] [32minfo[39m: Top products delivered successfully
+[2026-01-29 10:12:45] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 426.459 ms
+[2026-01-29 10:12:45] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 10:12:45] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 10:12:45] [32minfo[39m: GET /admin/api/stats 200 63 - 748.105 ms
+[2026-01-29 10:12:52] [32minfo[39m: GET / 302 39 - 3.026 ms
+[2026-01-29 10:12:52] [32minfo[39m: loading homepage
+[2026-01-29 10:12:52] [32minfo[39m: GET /user/home 200 9445 - 374.679 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /css/common.css 200 2780 - 9.333 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /css/header.css 200 5759 - 16.231 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 18.926 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /css/home.css 200 6666 - 33.803 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 30.890 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /css/footer.css 200 4817 - 34.861 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/customer.jpg 200 73230 - 35.205 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /js/common.js 200 2070 - 28.347 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 23.142 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 25.995 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 15.302 ms
+[2026-01-29 10:12:53] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 13.773 ms
+[2026-01-29 10:13:38] [32minfo[39m: loading shopping page
+[2026-01-29 10:13:38] [32minfo[39m: categories fetched successfully
+[2026-01-29 10:13:39] [32minfo[39m: Products fetched successfully
+[2026-01-29 10:13:39] [32minfo[39m: GET /user/shopall 200 14391 - 805.992 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /css/common.css 200 2780 - 1.675 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /css/header.css 200 5759 - 5.827 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769538598/chettinad/admin/products/product-99f735c8-b294-4810-b750-7ccbc9477a64.jpg 404 7371 - 14.478 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 18.210 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 28.719 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /css/footer.css 200 4817 - 31.172 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 19.902 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 34.730 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /js/common.js 200 2070 - 16.747 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 16.437 ms
+[2026-01-29 10:13:39] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 17.072 ms
+[2026-01-29 15:33:09] [32minfo[39m: hi inside the multer
+[2026-01-29 15:33:09] [32minfo[39m: 698139445174944
+[2026-01-29 15:33:09] [32minfo[39m: dma409l7q
+[2026-01-29 15:33:09] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 15:33:12] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 15:39:25] [32minfo[39m: GET /admin 302 41 - 201.222 ms
+[2026-01-29 15:39:25] [32minfo[39m: GET /admin/login 200 3335 - 20.606 ms
+[2026-01-29 15:39:25] [32minfo[39m: GET /css/admin/login.css 200 4353 - 7.790 ms
+[2026-01-29 15:39:25] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 9.244 ms
+[2026-01-29 15:39:26] [32minfo[39m: GET /favicon.ico 404 7371 - 16.127 ms
+[2026-01-29 15:39:42] [32minfo[39m: Admin logged in successfully.
+[2026-01-29 15:39:42] [32minfo[39m: POST /admin/login 302 45 - 418.643 ms
+[2026-01-29 15:39:43] [32minfo[39m: GET /admin/dashboard 200 36681 - 315.088 ms
+[2026-01-29 15:39:43] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 8.790 ms
+[2026-01-29 15:39:43] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 13.985 ms
+[2026-01-29 15:39:43] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 12.031 ms
+[2026-01-29 15:39:43] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 13.368 ms
+[2026-01-29 15:39:44] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 15:39:44] [32minfo[39m: Fetching top products
+[2026-01-29 15:39:44] [32minfo[39m: Fetching sales chart data
+[2026-01-29 15:39:44] [32minfo[39m: Sales data processed successfully
+[2026-01-29 15:39:44] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 15:39:44] [32minfo[39m: GET /admin/api/sales-data 200 179 - 438.830 ms
+[2026-01-29 15:39:44] [32minfo[39m: Top products delivered successfully
+[2026-01-29 15:39:44] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 533.104 ms
+[2026-01-29 15:39:44] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 15:39:44] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 15:39:44] [32minfo[39m: GET /admin/api/stats 200 63 - 773.596 ms
+[2026-01-29 15:43:46] [32minfo[39m: fetching order with filters
+[2026-01-29 15:43:47] [32minfo[39m: GET /admin/orders 200 26628 - 953.256 ms
+[2026-01-29 15:43:47] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 11.133 ms
+[2026-01-29 15:43:47] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 17.714 ms
+[2026-01-29 15:43:47] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 17.428 ms
+[2026-01-29 15:43:47] [32minfo[39m: GET /css/admin/order.css 200 16312 - 13.015 ms
+[2026-01-29 15:44:00] [32minfo[39m: GET /admin/dashboard 200 36681 - 208.056 ms
+[2026-01-29 15:44:00] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 11.274 ms
+[2026-01-29 15:44:00] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 14.436 ms
+[2026-01-29 15:44:00] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 3.908 ms
+[2026-01-29 15:44:00] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 10.746 ms
+[2026-01-29 15:44:14] [32minfo[39m: GET /admin 200 36681 - 152.084 ms
+[2026-01-29 15:44:14] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 16.005 ms
+[2026-01-29 15:44:14] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 8.932 ms
+[2026-01-29 15:44:14] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 9.360 ms
+[2026-01-29 15:44:14] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 9.694 ms
+[2026-01-29 15:44:14] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 15:44:14] [32minfo[39m: Fetching top products
+[2026-01-29 15:44:14] [32minfo[39m: Fetching sales chart data
+[2026-01-29 15:44:14] [32minfo[39m: Sales data processed successfully
+[2026-01-29 15:44:14] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 15:44:14] [32minfo[39m: GET /admin/api/sales-data 200 179 - 297.854 ms
+[2026-01-29 15:44:15] [32minfo[39m: Top products delivered successfully
+[2026-01-29 15:44:15] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 619.572 ms
+[2026-01-29 15:44:15] [32minfo[39m: Fetching sales chart data
+[2026-01-29 15:44:15] [32minfo[39m: Fetching top products
+[2026-01-29 15:44:15] [32minfo[39m: Sales data processed successfully
+[2026-01-29 15:44:15] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 15:44:15] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 15:44:15] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 15:44:15] [32minfo[39m: GET /admin/api/sales-data 200 179 - 778.557 ms
+[2026-01-29 15:44:15] [32minfo[39m: GET /admin/api/stats 200 63 - 1103.626 ms
+[2026-01-29 15:44:15] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 15:44:15] [32minfo[39m: Top products delivered successfully
+[2026-01-29 15:44:15] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 760.556 ms
+[2026-01-29 15:44:16] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 15:44:16] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 15:44:16] [32minfo[39m: GET /admin/api/stats 200 63 - 815.581 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET / 302 39 - 3.359 ms
+[2026-01-29 15:44:17] [32minfo[39m: loading homepage
+[2026-01-29 15:44:17] [32minfo[39m: GET /user/home 200 9445 - 402.836 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /css/common.css 200 2780 - 16.750 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /css/header.css 200 5759 - 13.641 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /css/home.css 200 6666 - 15.514 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /css/footer.css 200 4817 - 20.963 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 28.691 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /js/common.js 200 2070 - 14.226 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 44.191 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 24.971 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 17.864 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/customer.jpg 200 73230 - 48.113 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 23.844 ms
+[2026-01-29 15:44:17] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 23.383 ms
+[2026-01-29 15:44:19] [32minfo[39m: loading homepage
+[2026-01-29 15:44:20] [32minfo[39m: GET /user/home 200 9445 - 420.908 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /css/home.css 200 6666 - 7.952 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /css/common.css 200 2780 - 12.257 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /css/header.css 200 5759 - 11.739 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /css/footer.css 200 4817 - 40.318 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 35.905 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /js/common.js 200 2070 - 52.470 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/customer.jpg 200 73230 - 50.877 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 57.916 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 58.478 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 71.558 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 32.302 ms
+[2026-01-29 15:44:20] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 28.059 ms
+[2026-01-29 15:44:23] [32minfo[39m: loading homepage
+[2026-01-29 15:44:23] [32minfo[39m: GET /user/home 200 9445 - 213.496 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /css/common.css 200 2780 - 10.690 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /css/header.css 200 5759 - 12.741 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /css/home.css 200 6666 - 13.236 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /css/footer.css 200 4817 - 14.916 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 28.215 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /js/common.js 200 2070 - 32.311 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 40.934 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/customer.jpg 200 73230 - 32.537 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 30.981 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 38.278 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 14.540 ms
+[2026-01-29 15:44:23] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 15.419 ms
+[2026-01-29 15:44:27] [32minfo[39m: loading shopping page
+[2026-01-29 15:44:27] [32minfo[39m: categories fetched successfully
+[2026-01-29 15:44:28] [32minfo[39m: Products fetched successfully
+[2026-01-29 15:44:28] [32minfo[39m: GET /user/shopall 200 14391 - 1361.229 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /css/common.css 200 2780 - 5.380 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /css/header.css 200 5759 - 4.342 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 6.299 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769538598/chettinad/admin/products/product-99f735c8-b294-4810-b750-7ccbc9477a64.jpg 404 7371 - 8.266 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 11.911 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /css/footer.css 200 4817 - 19.300 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 21.752 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 21.995 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /js/common.js 200 2070 - 12.990 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 22.318 ms
+[2026-01-29 15:44:28] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 14.932 ms
+[2026-01-29 15:47:20] [32minfo[39m: loading shopping page
+[2026-01-29 15:47:21] [32minfo[39m: categories fetched successfully
+[2026-01-29 15:47:21] [32minfo[39m: Products fetched successfully
+[2026-01-29 15:47:21] [32minfo[39m: GET /user/shopall 200 14389 - 900.367 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /css/common.css 200 2780 - 1.335 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /css/header.css 200 5759 - 5.661 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 7.344 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /css/footer.css 200 4817 - 24.620 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 22.002 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /js/common.js 200 2070 - 22.414 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 25.907 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 24.845 ms
+[2026-01-29 15:47:21] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 27.420 ms
+[2026-01-29 15:47:40] [32minfo[39m: GET /css/common.css 200 2780 - 20.961 ms
+[2026-01-29 15:47:40] [32minfo[39m: GET /css/header.css 200 5759 - 22.426 ms
+[2026-01-29 15:47:40] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 21.596 ms
+[2026-01-29 15:47:40] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 11.901 ms
+[2026-01-29 15:47:40] [32minfo[39m: GET /css/footer.css 200 4817 - 29.823 ms
+[2026-01-29 15:55:38] [32minfo[39m: GET /admin/products 200 35200 - 777.707 ms
+[2026-01-29 15:55:38] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 4.043 ms
+[2026-01-29 15:55:38] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 3.678 ms
+[2026-01-29 15:55:38] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 18.534 ms
+[2026-01-29 15:55:38] [32minfo[39m: GET /css/admin/category.css 200 12433 - 3.946 ms
+[2026-01-29 15:55:44] [32minfo[39m: loading offer management page
+[2026-01-29 15:55:44] [32minfo[39m: Offers fetched successfully
+[2026-01-29 15:55:44] [32minfo[39m: GET /admin/offers 200 35477 - 848.322 ms
+[2026-01-29 15:55:44] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 7.695 ms
+[2026-01-29 15:55:44] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 13.981 ms
+[2026-01-29 15:55:44] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.443 ms
+[2026-01-29 15:55:44] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 20.722 ms
+[2026-01-29 15:55:51] [32minfo[39m: Loading coupon management page
+[2026-01-29 15:55:51] [32minfo[39m: coupons fetched successfully
+[2026-01-29 15:55:51] [32minfo[39m: GET /admin/coupons 200 23641 - 386.492 ms
+[2026-01-29 15:55:51] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 24.430 ms
+[2026-01-29 15:55:51] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 35.687 ms
+[2026-01-29 15:55:51] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 47.690 ms
+[2026-01-29 15:55:51] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 31.476 ms
+[2026-01-29 15:55:51] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 44.753 ms
+[2026-01-29 15:56:29] [33mwarn[39m: validation error at /admin/coupons/add-coupon
+[2026-01-29 15:56:29] [33mwarn[39m: Method: POST
+[2026-01-29 15:56:29] [33mwarn[39m: Errors: [
+  "Expiry date is required",
+  "\"isActive\" must be a boolean",
+  "Invalid fields provided",
+  "Invalid fields provided",
+  "Invalid fields provided",
+  "Invalid fields provided"
+]
+[2026-01-29 15:56:29] [33mwarn[39m: Payload: {
+  "id": "",
+  "code": "VH6Y6NXF",
+  "description": "summer sale 10% off",
+  "discountType": "fixed",
+  "discountValue": "25",
+  "minCartValue": "500",
+  "validFrom": "2026-01-29T15:55",
+  "validTill": "2026-03-07T15:55",
+  "usageLimit": "1",
+  "isActive": "on"
+}
+[2026-01-29 15:56:29] [32minfo[39m: POST /admin/coupons/add-coupon 400 34 - 125.511 ms
+[2026-01-29 15:56:33] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 35.648 ms
+[2026-01-29 15:56:33] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 23.236 ms
+[2026-01-29 15:56:33] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 12.371 ms
+[2026-01-29 15:56:33] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 8.077 ms
+[2026-01-29 16:26:58] [33mwarn[39m: validation error at /admin/coupons/add-coupon
+[2026-01-29 16:26:58] [33mwarn[39m: Method: POST
+[2026-01-29 16:26:58] [33mwarn[39m: Errors: [
+  "Expiry date is required",
+  "\"isActive\" must be a boolean",
+  "Invalid fields provided",
+  "Invalid fields provided",
+  "Invalid fields provided",
+  "Invalid fields provided"
+]
+[2026-01-29 16:26:58] [33mwarn[39m: Payload: {
+  "id": "",
+  "code": "VH6Y6NXF",
+  "description": "summer sale 10% off",
+  "discountType": "fixed",
+  "discountValue": "25",
+  "minCartValue": "500",
+  "validFrom": "2026-01-29T15:55",
+  "validTill": "2026-03-07T15:55",
+  "usageLimit": "1",
+  "isActive": "on"
+}
+[2026-01-29 16:26:58] [32minfo[39m: POST /admin/coupons/add-coupon 400 34 - 1381.601 ms
+[2026-01-29 16:29:04] [32minfo[39m: hi inside the multer
+[2026-01-29 16:29:04] [32minfo[39m: 698139445174944
+[2026-01-29 16:29:04] [32minfo[39m: dma409l7q
+[2026-01-29 16:29:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:29:06] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:29:39] [32minfo[39m: hi inside the multer
+[2026-01-29 16:29:39] [32minfo[39m: 698139445174944
+[2026-01-29 16:29:39] [32minfo[39m: dma409l7q
+[2026-01-29 16:29:39] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:29:42] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:38:18] [32minfo[39m: hi inside the multer
+[2026-01-29 16:38:18] [32minfo[39m: 698139445174944
+[2026-01-29 16:38:18] [32minfo[39m: dma409l7q
+[2026-01-29 16:38:18] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:38:21] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:39:23] [32minfo[39m: hi inside the multer
+[2026-01-29 16:39:23] [32minfo[39m: 698139445174944
+[2026-01-29 16:39:23] [32minfo[39m: dma409l7q
+[2026-01-29 16:39:23] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:39:26] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:40:12] [32minfo[39m: hi inside the multer
+[2026-01-29 16:40:12] [32minfo[39m: 698139445174944
+[2026-01-29 16:40:12] [32minfo[39m: dma409l7q
+[2026-01-29 16:40:12] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:40:15] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:40:16] [32minfo[39m: hi inside the multer
+[2026-01-29 16:40:16] [32minfo[39m: 698139445174944
+[2026-01-29 16:40:16] [32minfo[39m: dma409l7q
+[2026-01-29 16:40:16] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:40:20] [32minfo[39m: hi inside the multer
+[2026-01-29 16:40:20] [32minfo[39m: 698139445174944
+[2026-01-29 16:40:20] [32minfo[39m: dma409l7q
+[2026-01-29 16:40:20] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:40:22] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:40:24] [32minfo[39m: GET /admin/coupons 302 41 - 217.969 ms
+[2026-01-29 16:40:24] [32minfo[39m: GET /admin/login 200 3335 - 18.968 ms
+[2026-01-29 16:40:24] [32minfo[39m: GET /css/admin/login.css 200 4353 - 11.211 ms
+[2026-01-29 16:40:24] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 33.387 ms
+[2026-01-29 16:40:24] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 62.149 ms
+[2026-01-29 16:40:34] [33mwarn[39m: Invalid password.
+[2026-01-29 16:40:34] [32minfo[39m: POST /admin/login 302 41 - 356.481 ms
+[2026-01-29 16:40:34] [32minfo[39m: GET /admin/login 200 3335 - 10.632 ms
+[2026-01-29 16:40:34] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 19.543 ms
+[2026-01-29 16:40:34] [32minfo[39m: GET /css/admin/login.css 200 4353 - 14.365 ms
+[2026-01-29 16:40:34] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 13.576 ms
+[2026-01-29 16:40:42] [32minfo[39m: Admin logged in successfully.
+[2026-01-29 16:40:42] [32minfo[39m: POST /admin/login 302 45 - 399.689 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /admin/dashboard 200 36681 - 222.344 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 16.095 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 28.895 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 23.787 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 32.220 ms
+[2026-01-29 16:40:43] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 32.447 ms
+[2026-01-29 16:40:44] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 16:40:44] [32minfo[39m: Fetching top products
+[2026-01-29 16:40:44] [32minfo[39m: Fetching sales chart data
+[2026-01-29 16:40:44] [32minfo[39m: Sales data processed successfully
+[2026-01-29 16:40:44] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 16:40:44] [32minfo[39m: GET /admin/api/sales-data 200 179 - 235.325 ms
+[2026-01-29 16:40:44] [32minfo[39m: Top products delivered successfully
+[2026-01-29 16:40:44] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 330.933 ms
+[2026-01-29 16:40:44] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 16:40:44] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 16:40:44] [32minfo[39m: GET /admin/api/stats 200 63 - 762.493 ms
+[2026-01-29 16:41:00] [32minfo[39m: Loading coupon management page
+[2026-01-29 16:41:00] [32minfo[39m: coupons fetched successfully
+[2026-01-29 16:41:00] [32minfo[39m: GET /admin/coupons 200 23641 - 359.198 ms
+[2026-01-29 16:41:00] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 14.603 ms
+[2026-01-29 16:41:00] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 19.108 ms
+[2026-01-29 16:41:00] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 19.596 ms
+[2026-01-29 16:41:00] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 16.744 ms
+[2026-01-29 16:41:00] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 9.965 ms
+[2026-01-29 16:48:51] [32minfo[39m: creating new coupon
+[2026-01-29 16:48:52] [31merror[39m: POST /admin/coupons/add-coupon-Coupon validation failed: validTill: Path `validTill` is required., redeemAmount: Path `redeemAmount` is required., minCartValue: Path `minCartValue` is required., discountValue: Path `discountValue` is required., description: Path `description` is required., code: Path `code` is required.
+[2026-01-29 16:48:52] [32minfo[39m: POST /admin/coupons/add-coupon 500 320 - 386.045 ms
+[2026-01-29 16:51:54] [32minfo[39m: hi inside the multer
+[2026-01-29 16:51:54] [32minfo[39m: 698139445174944
+[2026-01-29 16:51:54] [32minfo[39m: dma409l7q
+[2026-01-29 16:51:54] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:51:57] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:54:16] [32minfo[39m: hi inside the multer
+[2026-01-29 16:54:16] [32minfo[39m: 698139445174944
+[2026-01-29 16:54:16] [32minfo[39m: dma409l7q
+[2026-01-29 16:54:16] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:54:19] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:54:21] [32minfo[39m: GET /admin/coupons 302 41 - 227.107 ms
+[2026-01-29 16:54:21] [32minfo[39m: GET /admin/login 200 3335 - 14.380 ms
+[2026-01-29 16:54:21] [32minfo[39m: GET /css/admin/login.css 200 4353 - 7.357 ms
+[2026-01-29 16:54:21] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 10.560 ms
+[2026-01-29 16:54:28] [32minfo[39m: Admin logged in successfully.
+[2026-01-29 16:54:28] [32minfo[39m: POST /admin/login 302 45 - 379.980 ms
+[2026-01-29 16:54:28] [32minfo[39m: GET /admin/dashboard 200 36681 - 219.447 ms
+[2026-01-29 16:54:29] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 10.114 ms
+[2026-01-29 16:54:29] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 14.109 ms
+[2026-01-29 16:54:29] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 17.986 ms
+[2026-01-29 16:54:29] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 24.733 ms
+[2026-01-29 16:54:29] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 16:54:29] [32minfo[39m: Fetching top products
+[2026-01-29 16:54:29] [32minfo[39m: Fetching sales chart data
+[2026-01-29 16:54:29] [32minfo[39m: Sales data processed successfully
+[2026-01-29 16:54:29] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 16:54:29] [32minfo[39m: GET /admin/api/sales-data 200 179 - 257.956 ms
+[2026-01-29 16:54:30] [32minfo[39m: Top products delivered successfully
+[2026-01-29 16:54:30] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 1037.580 ms
+[2026-01-29 16:54:30] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 16:54:30] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 16:54:30] [32minfo[39m: GET /admin/api/stats 200 63 - 1437.007 ms
+[2026-01-29 16:54:33] [32minfo[39m: GET /admin/products 200 35200 - 722.269 ms
+[2026-01-29 16:54:33] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 14.429 ms
+[2026-01-29 16:54:33] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 15.824 ms
+[2026-01-29 16:54:33] [32minfo[39m: GET /css/admin/category.css 200 12433 - 14.688 ms
+[2026-01-29 16:54:33] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 15.632 ms
+[2026-01-29 16:54:35] [32minfo[39m: Loading coupon management page
+[2026-01-29 16:54:36] [32minfo[39m: coupons fetched successfully
+[2026-01-29 16:54:36] [32minfo[39m: GET /admin/coupons 200 23641 - 297.125 ms
+[2026-01-29 16:54:36] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 16.606 ms
+[2026-01-29 16:54:36] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 16.253 ms
+[2026-01-29 16:54:36] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 19.151 ms
+[2026-01-29 16:54:36] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 21.408 ms
+[2026-01-29 16:54:36] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 18.760 ms
+[2026-01-29 16:54:59] [32minfo[39m: creating new coupon
+[2026-01-29 16:55:00] [32minfo[39m: coupon created successfully
+[2026-01-29 16:55:00] [32minfo[39m: POST /admin/coupons/add-coupon 201 424 - 531.443 ms
+[2026-01-29 16:55:01] [32minfo[39m: Loading coupon management page
+[2026-01-29 16:55:01] [32minfo[39m: coupons fetched successfully
+[2026-01-29 16:55:01] [32minfo[39m: GET /admin/coupons 200 24521 - 366.871 ms
+[2026-01-29 16:55:01] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 14.946 ms
+[2026-01-29 16:55:01] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 13.696 ms
+[2026-01-29 16:55:01] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 16.835 ms
+[2026-01-29 16:55:01] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 17.187 ms
+[2026-01-29 16:55:01] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 16.300 ms
+[2026-01-29 16:55:09] [31merror[39m: GET /admin/coupons/697b438cf8bf92096818175c-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-01-29 16:55:09] [32minfo[39m: GET /admin/coupons/697b438cf8bf92096818175c 500 105 - 205.954 ms
+[2026-01-29 16:55:45] [32minfo[39m: hi inside the multer
+[2026-01-29 16:55:45] [32minfo[39m: 698139445174944
+[2026-01-29 16:55:45] [32minfo[39m: dma409l7q
+[2026-01-29 16:55:45] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:56:04] [32minfo[39m: hi inside the multer
+[2026-01-29 16:56:04] [32minfo[39m: 698139445174944
+[2026-01-29 16:56:04] [32minfo[39m: dma409l7q
+[2026-01-29 16:56:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:56:07] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:56:14] [32minfo[39m: hi inside the multer
+[2026-01-29 16:56:14] [32minfo[39m: 698139445174944
+[2026-01-29 16:56:14] [32minfo[39m: dma409l7q
+[2026-01-29 16:56:14] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-29 16:56:17] [32minfo[39m: connected to mongodb atlas
+[2026-01-29 16:56:20] [32minfo[39m: GET /admin/coupons 302 41 - 260.859 ms
+[2026-01-29 16:56:20] [32minfo[39m: GET /admin/login 200 3335 - 16.980 ms
+[2026-01-29 16:56:20] [32minfo[39m: GET /css/admin/login.css 200 4353 - 8.276 ms
+[2026-01-29 16:56:20] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 13.132 ms
+[2026-01-29 16:56:27] [32minfo[39m: Admin logged in successfully.
+[2026-01-29 16:56:27] [32minfo[39m: POST /admin/login 302 45 - 377.738 ms
+[2026-01-29 16:56:27] [32minfo[39m: GET /admin/dashboard 200 36681 - 232.067 ms
+[2026-01-29 16:56:28] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 22.868 ms
+[2026-01-29 16:56:28] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 21.935 ms
+[2026-01-29 16:56:28] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 22.645 ms
+[2026-01-29 16:56:28] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 22.433 ms
+[2026-01-29 16:56:29] [32minfo[39m: Fetching top products
+[2026-01-29 16:56:29] [32minfo[39m: Fetching dashboard stats
+[2026-01-29 16:56:29] [32minfo[39m: Fetching sales chart data
+[2026-01-29 16:56:30] [32minfo[39m: Sales data processed successfully
+[2026-01-29 16:56:30] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-29 16:56:30] [32minfo[39m: GET /admin/api/sales-data 200 179 - 555.910 ms
+[2026-01-29 16:56:30] [32minfo[39m: Top products delivered successfully
+[2026-01-29 16:56:30] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 956.430 ms
+[2026-01-29 16:56:30] [32minfo[39m: Dashboard stats calculated
+[2026-01-29 16:56:30] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-29 16:56:30] [32minfo[39m: GET /admin/api/stats 200 63 - 1368.237 ms
+[2026-01-29 16:56:32] [32minfo[39m: Loading coupon management page
+[2026-01-29 16:56:33] [32minfo[39m: coupons fetched successfully
+[2026-01-29 16:56:33] [32minfo[39m: GET /admin/coupons 200 24521 - 988.303 ms
+[2026-01-29 16:56:33] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 15.381 ms
+[2026-01-29 16:56:33] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 19.215 ms
+[2026-01-29 16:56:33] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 24.002 ms
+[2026-01-29 16:56:33] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 23.851 ms
+[2026-01-29 16:56:33] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 23.653 ms
+[2026-01-29 16:56:35] [31merror[39m: GET /admin/coupons/697b438cf8bf92096818175c-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-01-29 16:56:35] [32minfo[39m: GET /admin/coupons/697b438cf8bf92096818175c 500 105 - 278.246 ms
+[2026-01-30 08:20:31] [32minfo[39m: hi inside the multer
+[2026-01-30 08:20:31] [32minfo[39m: 698139445174944
+[2026-01-30 08:20:31] [32minfo[39m: dma409l7q
+[2026-01-30 08:20:31] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:20:33] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:22:04] [32minfo[39m: hi inside the multer
+[2026-01-30 08:22:04] [32minfo[39m: 698139445174944
+[2026-01-30 08:22:04] [32minfo[39m: dma409l7q
+[2026-01-30 08:22:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:22:06] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:22:10] [32minfo[39m: hi inside the multer
+[2026-01-30 08:22:10] [32minfo[39m: 698139445174944
+[2026-01-30 08:22:10] [32minfo[39m: dma409l7q
+[2026-01-30 08:22:10] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:22:11] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:22:26] [32minfo[39m: GET /admin 302 41 - 101.494 ms
+[2026-01-30 08:22:26] [32minfo[39m: GET /admin/login 200 3335 - 16.245 ms
+[2026-01-30 08:22:26] [32minfo[39m: GET /css/admin/login.css 200 4353 - 7.356 ms
+[2026-01-30 08:22:26] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 10.388 ms
+[2026-01-30 08:22:28] [32minfo[39m: GET /favicon.ico 404 7371 - 16.152 ms
+[2026-01-30 08:22:36] [32minfo[39m: Admin logged in successfully.
+[2026-01-30 08:22:36] [32minfo[39m: POST /admin/login 302 45 - 192.990 ms
+[2026-01-30 08:22:36] [32minfo[39m: GET /admin/dashboard 200 36681 - 77.308 ms
+[2026-01-30 08:22:36] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 13.382 ms
+[2026-01-30 08:22:36] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 30.623 ms
+[2026-01-30 08:22:36] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 36.665 ms
+[2026-01-30 08:22:36] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 27.670 ms
+[2026-01-30 08:22:36] [32minfo[39m: Fetching dashboard stats
+[2026-01-30 08:22:36] [32minfo[39m: Fetching sales chart data
+[2026-01-30 08:22:36] [32minfo[39m: Fetching top products
+[2026-01-30 08:22:36] [32minfo[39m: Sales data processed successfully
+[2026-01-30 08:22:36] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-30 08:22:36] [32minfo[39m: GET /admin/api/sales-data 200 179 - 176.986 ms
+[2026-01-30 08:22:36] [32minfo[39m: Top products delivered successfully
+[2026-01-30 08:22:36] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 249.832 ms
+[2026-01-30 08:22:36] [32minfo[39m: Dashboard stats calculated
+[2026-01-30 08:22:36] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-30 08:22:36] [32minfo[39m: GET /admin/api/stats 200 63 - 333.703 ms
+[2026-01-30 08:22:41] [32minfo[39m: GET /admin/products 200 35200 - 425.906 ms
+[2026-01-30 08:22:41] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 11.049 ms
+[2026-01-30 08:22:41] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 11.692 ms
+[2026-01-30 08:22:41] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.058 ms
+[2026-01-30 08:22:41] [32minfo[39m: GET /css/admin/category.css 200 12433 - 35.508 ms
+[2026-01-30 08:22:53] [32minfo[39m: Loading coupon management page
+[2026-01-30 08:22:53] [32minfo[39m: coupons fetched successfully
+[2026-01-30 08:22:53] [32minfo[39m: GET /admin/coupons 200 24521 - 351.846 ms
+[2026-01-30 08:22:53] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 7.947 ms
+[2026-01-30 08:22:53] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 7.868 ms
+[2026-01-30 08:22:53] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 7.965 ms
+[2026-01-30 08:22:53] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 10.186 ms
+[2026-01-30 08:22:53] [32minfo[39m: GET /css/admin/coupon.css 200 3287 - 10.215 ms
+[2026-01-30 08:22:56] [32minfo[39m: loading offer management page
+[2026-01-30 08:22:57] [32minfo[39m: Offers fetched successfully
+[2026-01-30 08:22:57] [32minfo[39m: GET /admin/offers 200 35477 - 482.092 ms
+[2026-01-30 08:22:57] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 7.058 ms
+[2026-01-30 08:22:57] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 14.043 ms
+[2026-01-30 08:22:57] [32minfo[39m: GET /css/admin/offer.css 200 4447 - 13.311 ms
+[2026-01-30 08:22:57] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 14.935 ms
+[2026-01-30 08:22:59] [32minfo[39m: GET /admin/settings 404 7371 - 9.720 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /css/header.css 200 5759 - 13.488 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /css/footer.css 200 4817 - 14.041 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /css/common.css 200 2780 - 16.554 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /css/pageNotFound.css 200 2786 - 16.466 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 56.951 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 58.866 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /css/saree-pattern-bg.jpg 404 7371 - 40.563 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /js/common.js 200 2070 - 47.450 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 49.608 ms
+[2026-01-30 08:23:00] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 54.412 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /admin/settings 404 7371 - 5.659 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /css/common.css 200 2780 - 9.043 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /css/pageNotFound.css 200 2786 - 9.135 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /css/header.css 200 5759 - 12.077 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /css/footer.css 200 4817 - 13.123 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 14.325 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /css/saree-pattern-bg.jpg 404 7371 - 11.487 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 22.483 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 16.271 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /js/common.js 200 2070 - 16.976 ms
+[2026-01-30 08:23:05] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 15.877 ms
+[2026-01-30 08:23:14] [32minfo[39m: admin session cleared successfully
+[2026-01-30 08:23:14] [32minfo[39m: GET /admin/logout 302 41 - 1.659 ms
+[2026-01-30 08:23:14] [32minfo[39m: GET /admin/login 200 3335 - 2.766 ms
+[2026-01-30 08:23:14] [32minfo[39m: GET /css/admin/login.css 200 4353 - 3.378 ms
+[2026-01-30 08:23:14] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 5.957 ms
+[2026-01-30 08:23:25] [32minfo[39m: Admin logged in successfully.
+[2026-01-30 08:23:25] [32minfo[39m: POST /admin/login 302 45 - 194.616 ms
+[2026-01-30 08:23:25] [32minfo[39m: GET /admin/dashboard 200 36681 - 87.348 ms
+[2026-01-30 08:23:25] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 9.923 ms
+[2026-01-30 08:23:25] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 9.938 ms
+[2026-01-30 08:23:25] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 7.357 ms
+[2026-01-30 08:23:25] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 8.269 ms
+[2026-01-30 08:23:25] [32minfo[39m: Fetching top products
+[2026-01-30 08:23:25] [32minfo[39m: Fetching sales chart data
+[2026-01-30 08:23:25] [32minfo[39m: Fetching dashboard stats
+[2026-01-30 08:23:25] [32minfo[39m: Sales data processed successfully
+[2026-01-30 08:23:25] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-30 08:23:25] [32minfo[39m: GET /admin/api/sales-data 200 179 - 188.853 ms
+[2026-01-30 08:23:25] [32minfo[39m: Top products delivered successfully
+[2026-01-30 08:23:25] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 249.361 ms
+[2026-01-30 08:23:25] [32minfo[39m: Dashboard stats calculated
+[2026-01-30 08:23:25] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-30 08:23:25] [32minfo[39m: GET /admin/api/stats 200 63 - 431.735 ms
+[2026-01-30 08:23:49] [32minfo[39m: GET /admin 200 36681 - 106.579 ms
+[2026-01-30 08:23:49] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 2.744 ms
+[2026-01-30 08:23:49] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 6.435 ms
+[2026-01-30 08:23:49] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 9.448 ms
+[2026-01-30 08:23:49] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 9.566 ms
+[2026-01-30 08:23:49] [32minfo[39m: Fetching top products
+[2026-01-30 08:23:49] [32minfo[39m: Fetching sales chart data
+[2026-01-30 08:23:49] [32minfo[39m: Fetching dashboard stats
+[2026-01-30 08:23:49] [32minfo[39m: Sales data processed successfully
+[2026-01-30 08:23:49] [32minfo[39m: Sales chart data delivered successfully
+[2026-01-30 08:23:49] [32minfo[39m: GET /admin/api/sales-data 200 179 - 161.531 ms
+[2026-01-30 08:23:49] [32minfo[39m: Top products delivered successfully
+[2026-01-30 08:23:49] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 225.079 ms
+[2026-01-30 08:23:49] [32minfo[39m: Dashboard stats calculated
+[2026-01-30 08:23:49] [32minfo[39m: Dashboard stats delivered successfully
+[2026-01-30 08:23:49] [32minfo[39m: GET /admin/api/stats 200 63 - 397.148 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET / 302 39 - 1.294 ms
+[2026-01-30 08:23:53] [32minfo[39m: loading homepage
+[2026-01-30 08:23:53] [32minfo[39m: GET /user/home 200 9445 - 202.514 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /css/common.css 200 2780 - 5.564 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 8.517 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /css/header.css 200 5759 - 15.479 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /css/footer.css 200 4817 - 13.596 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /css/home.css 200 6666 - 15.683 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 19.498 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/customer.jpg 200 73230 - 22.691 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /js/common.js 200 2070 - 6.891 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 9.093 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 7.018 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 9.626 ms
+[2026-01-30 08:23:53] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 7.431 ms
+[2026-01-30 08:23:56] [32minfo[39m: loading shopping page
+[2026-01-30 08:23:56] [32minfo[39m: categories fetched successfully
+[2026-01-30 08:23:56] [32minfo[39m: Products fetched successfully
+[2026-01-30 08:23:56] [32minfo[39m: GET /user/shopall 200 14389 - 493.096 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /css/common.css 200 2780 - 15.430 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /css/header.css 200 5759 - 14.560 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /css/footer.css 200 4817 - 15.750 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 17.321 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 15.993 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 17.816 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /js/common.js 200 2070 - 12.635 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 7.019 ms
+[2026-01-30 08:23:56] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 13.061 ms
+[2026-01-30 08:24:10] [32minfo[39m: GET /css/common.css 200 2780 - 3.796 ms
+[2026-01-30 08:24:10] [32minfo[39m: GET /css/header.css 200 5759 - 3.788 ms
+[2026-01-30 08:24:10] [32minfo[39m: GET /css/footer.css 200 4817 - 3.423 ms
+[2026-01-30 08:24:10] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 4.132 ms
+[2026-01-30 08:24:10] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 5.284 ms
+[2026-01-30 08:25:25] [32minfo[39m: Loading login page
+[2026-01-30 08:25:25] [32minfo[39m: GET /user/login 200 4026 - 8.177 ms
+[2026-01-30 08:25:25] [32minfo[39m: GET /css/login.css 200 5958 - 3.543 ms
+[2026-01-30 08:25:25] [32minfo[39m: GET /css/login-bg.jpg 404 7371 - 4.994 ms
+[2026-01-30 08:25:39] [32minfo[39m: Processing login
+[2026-01-30 08:25:39] [33mwarn[39m: Login failed
+[2026-01-30 08:25:39] [32minfo[39m: POST /user/login 200 4161 - 152.388 ms
+[2026-01-30 08:25:39] [32minfo[39m: GET /css/login.css 200 5958 - 1.230 ms
+[2026-01-30 08:25:39] [32minfo[39m: GET /css/login-bg.jpg 404 7371 - 3.574 ms
+[2026-01-30 08:25:44] [32minfo[39m: Loading signup page
+[2026-01-30 08:25:44] [32minfo[39m: GET /user/signup 200 11454 - 9.702 ms
+[2026-01-30 08:25:44] [32minfo[39m: GET /css/signup.css 200 6812 - 4.296 ms
+[2026-01-30 08:25:44] [32minfo[39m: GET /css/signup-bg.jpg 404 7371 - 4.500 ms
+[2026-01-30 08:26:28] [32minfo[39m: Processing signUp
+[2026-01-30 08:26:30] [33mwarn[39m: Signup failed
+[2026-01-30 08:26:30] [32minfo[39m: POST /user/signup 200 11544 - 1317.440 ms
+[2026-01-30 08:26:30] [32minfo[39m: GET /css/signup.css 200 6812 - 1.193 ms
+[2026-01-30 08:26:30] [32minfo[39m: GET /css/signup-bg.jpg 404 7371 - 11.325 ms
+[2026-01-30 08:47:51] [32minfo[39m: hi inside the multer
+[2026-01-30 08:47:51] [32minfo[39m: 698139445174944
+[2026-01-30 08:47:51] [32minfo[39m: dma409l7q
+[2026-01-30 08:47:51] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:47:52] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:47:58] [32minfo[39m: hi inside the multer
+[2026-01-30 08:47:58] [32minfo[39m: 698139445174944
+[2026-01-30 08:47:58] [32minfo[39m: dma409l7q
+[2026-01-30 08:47:58] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:00] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:00] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:00] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:00] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:04] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:04] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:04] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:05] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:48:13] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:13] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:13] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:13] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:15] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:15] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:15] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:15] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:17] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:17] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:17] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:17] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:18] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:48:19] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:19] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:19] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:19] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:24] [32minfo[39m: hi inside the multer
+[2026-01-30 08:48:24] [32minfo[39m: 698139445174944
+[2026-01-30 08:48:24] [32minfo[39m: dma409l7q
+[2026-01-30 08:48:24] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:48:25] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:49:49] [32minfo[39m: hi inside the multer
+[2026-01-30 08:49:49] [32minfo[39m: 698139445174944
+[2026-01-30 08:49:49] [32minfo[39m: dma409l7q
+[2026-01-30 08:49:49] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:49:51] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:49:59] [32minfo[39m: hi inside the multer
+[2026-01-30 08:49:59] [32minfo[39m: 698139445174944
+[2026-01-30 08:49:59] [32minfo[39m: dma409l7q
+[2026-01-30 08:49:59] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:50:01] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:50:03] [32minfo[39m: hi inside the multer
+[2026-01-30 08:50:03] [32minfo[39m: 698139445174944
+[2026-01-30 08:50:03] [32minfo[39m: dma409l7q
+[2026-01-30 08:50:03] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:50:04] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:50:07] [32minfo[39m: hi inside the multer
+[2026-01-30 08:50:07] [32minfo[39m: 698139445174944
+[2026-01-30 08:50:07] [32minfo[39m: dma409l7q
+[2026-01-30 08:50:07] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:50:09] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:50:24] [32minfo[39m: Processing signUp
+[2026-01-30 08:50:29] [32minfo[39m: POST /user/signup 200 8237 - 4949.929 ms
+[2026-01-30 08:50:29] [32minfo[39m: GET /css/generateotp.css 200 4273 - 7.596 ms
+[2026-01-30 08:50:29] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 9.847 ms
+[2026-01-30 08:51:51] [32minfo[39m: hi inside the multer
+[2026-01-30 08:51:51] [32minfo[39m: 698139445174944
+[2026-01-30 08:51:51] [32minfo[39m: dma409l7q
+[2026-01-30 08:51:51] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:51:53] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:55:33] [32minfo[39m: hi inside the multer
+[2026-01-30 08:55:33] [32minfo[39m: 698139445174944
+[2026-01-30 08:55:33] [32minfo[39m: dma409l7q
+[2026-01-30 08:55:33] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:55:35] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:55:38] [32minfo[39m: hi inside the multer
+[2026-01-30 08:55:38] [32minfo[39m: 698139445174944
+[2026-01-30 08:55:38] [32minfo[39m: dma409l7q
+[2026-01-30 08:55:38] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:55:41] [32minfo[39m: hi inside the multer
+[2026-01-30 08:55:41] [32minfo[39m: 698139445174944
+[2026-01-30 08:55:41] [32minfo[39m: dma409l7q
+[2026-01-30 08:55:41] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:55:43] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:55:54] [32minfo[39m: hi inside the multer
+[2026-01-30 08:55:54] [32minfo[39m: 698139445174944
+[2026-01-30 08:55:54] [32minfo[39m: dma409l7q
+[2026-01-30 08:55:54] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:55:56] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:56:32] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:32] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:32] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:32] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:33] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:56:35] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:35] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:35] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:35] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:37] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:37] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:37] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:37] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:39] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:39] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:39] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:39] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:42] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:42] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:42] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:42] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:44] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:44] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:44] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:44] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:46] [32minfo[39m: hi inside the multer
+[2026-01-30 08:56:46] [32minfo[39m: 698139445174944
+[2026-01-30 08:56:46] [32minfo[39m: dma409l7q
+[2026-01-30 08:56:46] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 08:56:47] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 08:56:56] [32minfo[39m: Processing signUp
+[2026-01-30 08:57:01] [32minfo[39m: POST /user/signup 200 8237 - 4762.996 ms
+[2026-01-30 08:57:01] [32minfo[39m: GET /css/generateotp.css 200 4273 - 3.702 ms
+[2026-01-30 08:57:01] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 10.243 ms
+[2026-01-30 08:57:16] [32minfo[39m: Verifying signup OTP
+[2026-01-30 08:57:16] [33mwarn[39m: OTP verification failed
+[2026-01-30 08:57:16] [32minfo[39m: POST /user/verify-otp 400 52 - 3.907 ms
+[2026-01-30 08:57:46] [32minfo[39m: loading homepage
+[2026-01-30 08:57:47] [32minfo[39m: GET /user/home 200 9445 - 701.721 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /css/common.css 200 2780 - 15.941 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /css/header.css 200 5759 - 15.929 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /css/home.css 200 6666 - 13.731 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /css/footer.css 200 4817 - 11.320 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 14.283 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /js/common.js 200 2070 - 28.829 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/customer.jpg 200 73230 - 27.882 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 27.883 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 14.557 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 16.245 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 15.150 ms
+[2026-01-30 08:57:47] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 6.043 ms
+[2026-01-30 08:57:50] [32minfo[39m: Loading signup page
+[2026-01-30 08:57:50] [32minfo[39m: GET /user/signup 200 11454 - 3.952 ms
+[2026-01-30 08:57:51] [32minfo[39m: GET /css/signup.css 200 6812 - 3.122 ms
+[2026-01-30 08:57:51] [32minfo[39m: GET /css/signup-bg.jpg 404 7371 - 7.082 ms
+[2026-01-30 08:58:33] [32minfo[39m: Processing signUp
+[2026-01-30 08:58:38] [32minfo[39m: POST /user/signup 200 8237 - 4981.827 ms
+[2026-01-30 08:58:38] [32minfo[39m: GET /css/generateotp.css 200 4273 - 2.489 ms
+[2026-01-30 08:58:38] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 7.290 ms
+[2026-01-30 08:58:55] [32minfo[39m: Verifying signup OTP
+[2026-01-30 08:58:55] [33mwarn[39m: OTP verification failed
+[2026-01-30 08:58:55] [32minfo[39m: POST /user/verify-otp 400 52 - 2.594 ms
+[2026-01-30 09:04:13] [32minfo[39m: hi inside the multer
+[2026-01-30 09:04:13] [32minfo[39m: 698139445174944
+[2026-01-30 09:04:13] [32minfo[39m: dma409l7q
+[2026-01-30 09:04:13] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:04:15] [32minfo[39m: hi inside the multer
+[2026-01-30 09:04:15] [32minfo[39m: 698139445174944
+[2026-01-30 09:04:15] [32minfo[39m: dma409l7q
+[2026-01-30 09:04:15] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:04:17] [32minfo[39m: hi inside the multer
+[2026-01-30 09:04:17] [32minfo[39m: 698139445174944
+[2026-01-30 09:04:17] [32minfo[39m: dma409l7q
+[2026-01-30 09:04:17] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:04:19] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:04:34] [32minfo[39m: Processing signUp
+[2026-01-30 09:04:39] [32minfo[39m: POST /user/signup 200 8237 - 4761.904 ms
+[2026-01-30 09:04:39] [32minfo[39m: GET /css/generateotp.css 200 4273 - 8.417 ms
+[2026-01-30 09:04:39] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 21.336 ms
+[2026-01-30 09:05:23] [32minfo[39m: Verifying signup OTP
+[2026-01-30 09:05:23] [33mwarn[39m: OTP verification failed
+[2026-01-30 09:05:23] [32minfo[39m: POST /user/verify-otp 400 52 - 2.521 ms
+[2026-01-30 09:09:07] [32minfo[39m: hi inside the multer
+[2026-01-30 09:09:07] [32minfo[39m: 698139445174944
+[2026-01-30 09:09:07] [32minfo[39m: dma409l7q
+[2026-01-30 09:09:07] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:09:09] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:09:19] [32minfo[39m: Processing signUp
+[2026-01-30 09:09:23] [32minfo[39m: POST /user/signup 200 8237 - 4548.982 ms
+[2026-01-30 09:09:23] [32minfo[39m: GET /css/generateotp.css 200 4273 - 4.469 ms
+[2026-01-30 09:09:23] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 4.572 ms
+[2026-01-30 09:09:35] [32minfo[39m: Verifying signup OTP
+[2026-01-30 09:09:35] [33mwarn[39m: OTP verification failed
+[2026-01-30 09:09:35] [32minfo[39m: POST /user/verify-otp 400 67 - 3.421 ms
+[2026-01-30 09:11:10] [32minfo[39m: hi inside the multer
+[2026-01-30 09:11:10] [32minfo[39m: 698139445174944
+[2026-01-30 09:11:10] [32minfo[39m: dma409l7q
+[2026-01-30 09:11:10] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:11:12] [32minfo[39m: hi inside the multer
+[2026-01-30 09:11:12] [32minfo[39m: 698139445174944
+[2026-01-30 09:11:12] [32minfo[39m: dma409l7q
+[2026-01-30 09:11:12] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:11:13] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:11:27] [32minfo[39m: hi inside the multer
+[2026-01-30 09:11:27] [32minfo[39m: 698139445174944
+[2026-01-30 09:11:27] [32minfo[39m: dma409l7q
+[2026-01-30 09:11:27] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:11:29] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:11:30] [32minfo[39m: hi inside the multer
+[2026-01-30 09:11:30] [32minfo[39m: 698139445174944
+[2026-01-30 09:11:30] [32minfo[39m: dma409l7q
+[2026-01-30 09:11:30] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:11:32] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:11:43] [32minfo[39m: hi inside the multer
+[2026-01-30 09:11:43] [32minfo[39m: 698139445174944
+[2026-01-30 09:11:43] [32minfo[39m: dma409l7q
+[2026-01-30 09:11:43] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:11:44] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:12:26] [32minfo[39m: hi inside the multer
+[2026-01-30 09:12:26] [32minfo[39m: 698139445174944
+[2026-01-30 09:12:26] [32minfo[39m: dma409l7q
+[2026-01-30 09:12:26] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:12:29] [32minfo[39m: hi inside the multer
+[2026-01-30 09:12:29] [32minfo[39m: 698139445174944
+[2026-01-30 09:12:29] [32minfo[39m: dma409l7q
+[2026-01-30 09:12:29] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:12:31] [32minfo[39m: hi inside the multer
+[2026-01-30 09:12:31] [32minfo[39m: 698139445174944
+[2026-01-30 09:12:31] [32minfo[39m: dma409l7q
+[2026-01-30 09:12:31] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:12:33] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:41:29] [32minfo[39m: hi inside the multer
+[2026-01-30 09:41:29] [32minfo[39m: 698139445174944
+[2026-01-30 09:41:29] [32minfo[39m: dma409l7q
+[2026-01-30 09:41:29] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:41:48] [32minfo[39m: hi inside the multer
+[2026-01-30 09:41:48] [32minfo[39m: 698139445174944
+[2026-01-30 09:41:48] [32minfo[39m: dma409l7q
+[2026-01-30 09:41:48] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:41:54] [32minfo[39m: hi inside the multer
+[2026-01-30 09:41:54] [32minfo[39m: 698139445174944
+[2026-01-30 09:41:54] [32minfo[39m: dma409l7q
+[2026-01-30 09:41:54] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:42:21] [32minfo[39m: hi inside the multer
+[2026-01-30 09:42:21] [32minfo[39m: 698139445174944
+[2026-01-30 09:42:21] [32minfo[39m: dma409l7q
+[2026-01-30 09:42:21] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:42:24] [32minfo[39m: hi inside the multer
+[2026-01-30 09:42:24] [32minfo[39m: 698139445174944
+[2026-01-30 09:42:24] [32minfo[39m: dma409l7q
+[2026-01-30 09:42:24] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:42:32] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:42:50] [32minfo[39m: hi inside the multer
+[2026-01-30 09:42:50] [32minfo[39m: 698139445174944
+[2026-01-30 09:42:50] [32minfo[39m: dma409l7q
+[2026-01-30 09:42:50] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:42:55] [32minfo[39m: hi inside the multer
+[2026-01-30 09:42:55] [32minfo[39m: 698139445174944
+[2026-01-30 09:42:55] [32minfo[39m: dma409l7q
+[2026-01-30 09:42:55] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:43:00] [32minfo[39m: hi inside the multer
+[2026-01-30 09:43:00] [32minfo[39m: 698139445174944
+[2026-01-30 09:43:00] [32minfo[39m: dma409l7q
+[2026-01-30 09:43:00] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:43:02] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:44:25] [32minfo[39m: hi inside the multer
+[2026-01-30 09:44:25] [32minfo[39m: 698139445174944
+[2026-01-30 09:44:25] [32minfo[39m: dma409l7q
+[2026-01-30 09:44:25] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:44:26] [31merror[39m: monogoDB connection error: querySrv ECONNREFUSED _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-01-30 09:45:01] [32minfo[39m: hi inside the multer
+[2026-01-30 09:45:01] [32minfo[39m: 698139445174944
+[2026-01-30 09:45:01] [32minfo[39m: dma409l7q
+[2026-01-30 09:45:01] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:46:25] [32minfo[39m: hi inside the multer
+[2026-01-30 09:46:25] [32minfo[39m: 698139445174944
+[2026-01-30 09:46:25] [32minfo[39m: dma409l7q
+[2026-01-30 09:46:25] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:46:27] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:46:45] [32minfo[39m: GET / 302 39 - 8.980 ms
+[2026-01-30 09:46:45] [32minfo[39m: loading homepage
+[2026-01-30 09:46:46] [32minfo[39m: GET /user/home 200 9445 - 191.985 ms
+[2026-01-30 09:46:46] [32minfo[39m: GET /css/common.css 200 2780 - 3.817 ms
+[2026-01-30 09:46:46] [32minfo[39m: GET /css/header.css 200 5759 - 4.259 ms
+[2026-01-30 09:46:46] [32minfo[39m: GET /css/home.css 200 6666 - 29.509 ms
+[2026-01-30 09:46:46] [32minfo[39m: GET /css/footer.css 200 4817 - 27.711 ms
+[2026-01-30 09:46:48] [32minfo[39m: loading homepage
+[2026-01-30 09:46:48] [32minfo[39m: GET /user/home 200 9445 - 178.432 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /css/common.css 200 2780 - 4.930 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /css/header.css 200 5759 - 4.614 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /css/home.css 200 6666 - 9.875 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /css/footer.css 200 4817 - 10.013 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 10.140 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /js/common.js 200 2070 - 17.343 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/customer.jpg 200 73230 - 17.191 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 18.786 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 6.752 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 7.074 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 10.780 ms
+[2026-01-30 09:46:48] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 10.351 ms
+[2026-01-30 09:46:50] [32minfo[39m: Loading signup page
+[2026-01-30 09:46:50] [32minfo[39m: GET /user/signup 200 11454 - 10.402 ms
+[2026-01-30 09:46:50] [32minfo[39m: GET /css/signup.css 200 6812 - 2.246 ms
+[2026-01-30 09:47:24] [32minfo[39m: Processing signUp
+[2026-01-30 09:47:29] [32minfo[39m: POST /user/signup 200 8237 - 4822.629 ms
+[2026-01-30 09:47:29] [32minfo[39m: GET /css/generateotp.css 200 4273 - 2.684 ms
+[2026-01-30 09:47:41] [32minfo[39m: Verifying signup OTP
+[2026-01-30 09:47:41] [33mwarn[39m: OTP verification failed
+[2026-01-30 09:47:41] [32minfo[39m: POST /user/verify-otp 400 67 - 8.057 ms
+[2026-01-30 09:48:32] [32minfo[39m: hi inside the multer
+[2026-01-30 09:48:32] [32minfo[39m: 698139445174944
+[2026-01-30 09:48:32] [32minfo[39m: dma409l7q
+[2026-01-30 09:48:32] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:48:34] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 09:48:44] [32minfo[39m: Processing signUp
+[2026-01-30 09:48:50] [32minfo[39m: POST /user/signup 200 8237 - 5367.674 ms
+[2026-01-30 09:48:50] [32minfo[39m: GET /css/generateotp.css 200 4273 - 6.589 ms
+[2026-01-30 09:48:59] [32minfo[39m: Verifying signup OTP
+[2026-01-30 09:48:59] [33mwarn[39m: OTP verification failed
+[2026-01-30 09:48:59] [32minfo[39m: POST /user/verify-otp 400 67 - 8.107 ms
+[2026-01-30 09:49:15] [32minfo[39m: hi inside the multer
+[2026-01-30 09:49:15] [32minfo[39m: 698139445174944
+[2026-01-30 09:49:15] [32minfo[39m: dma409l7q
+[2026-01-30 09:49:15] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-30 09:49:17] [32minfo[39m: connected to mongodb atlas
+[2026-01-30 21:05:07] [32minfo[39m: GET /admin - - - - ms
+[2026-01-31 15:06:42] [32minfo[39m: hi inside the multer
+[2026-01-31 15:06:42] [32minfo[39m: 698139445174944
+[2026-01-31 15:06:42] [32minfo[39m: dma409l7q
+[2026-01-31 15:06:42] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-31 15:06:47] [32minfo[39m: GET / 302 39 - 34.972 ms
+[2026-01-31 15:06:47] [32minfo[39m: loading homepage
+[2026-01-31 15:06:57] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-01-31 15:06:57] [32minfo[39m: GET /user/home 500 93 - 10064.771 ms
+[2026-01-31 15:06:57] [32minfo[39m: GET /favicon.ico 404 7371 - 41.199 ms
+[2026-01-31 15:07:17] [31merror[39m: monogoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-01-31 15:07:37] [32minfo[39m: hi inside the multer
+[2026-01-31 15:07:37] [32minfo[39m: 698139445174944
+[2026-01-31 15:07:37] [32minfo[39m: dma409l7q
+[2026-01-31 15:07:37] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-31 15:07:46] [32minfo[39m: GET / 302 39 - 21.932 ms
+[2026-01-31 15:07:46] [32minfo[39m: loading homepage
+[2026-01-31 15:07:56] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-01-31 15:07:56] [32minfo[39m: GET /user/home 500 93 - 10037.085 ms
+[2026-01-31 15:07:56] [32minfo[39m: GET / 302 39 - 13.189 ms
+[2026-01-31 15:07:56] [32minfo[39m: loading homepage
+[2026-01-31 15:08:06] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-01-31 15:08:06] [32minfo[39m: GET /user/home 500 93 - 10036.891 ms
+[2026-01-31 15:08:09] [31merror[39m: monogoDB connection error: connect ETIMEDOUT 159.41.183.34:27017
+[2026-01-31 22:07:04] [32minfo[39m: hi inside the multer
+[2026-01-31 22:07:04] [32minfo[39m: 698139445174944
+[2026-01-31 22:07:04] [32minfo[39m: dma409l7q
+[2026-01-31 22:07:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-01-31 22:07:06] [32minfo[39m: connected to mongodb atlas
+[2026-01-31 22:07:13] [32minfo[39m: GET / 302 39 - 15.879 ms
+[2026-01-31 22:07:13] [32minfo[39m: loading homepage
+[2026-01-31 22:07:13] [32minfo[39m: GET /user/home 200 9445 - 239.647 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /css/common.css 200 2780 - 19.667 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /css/header.css 200 5759 - 19.119 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /css/home.css 200 6666 - 12.776 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /css/footer.css 200 4817 - 24.483 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 17.034 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /js/common.js 200 2070 - 22.115 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/customer.jpg 200 73230 - 36.204 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 18.762 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 29.956 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 18.822 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 9.665 ms
+[2026-01-31 22:07:13] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 12.631 ms
+[2026-01-31 22:07:16] [32minfo[39m: loading shopping page
+[2026-01-31 22:07:17] [32minfo[39m: categories fetched successfully
+[2026-01-31 22:07:18] [32minfo[39m: Products fetched successfully
+[2026-01-31 22:07:19] [32minfo[39m: GET /user/shopall 200 14389 - 2718.540 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /css/common.css 200 2780 - 24.971 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /css/header.css 200 5759 - 25.433 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /css/footer.css 200 4817 - 25.976 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 23.759 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 34.809 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 66.803 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /js/common.js 200 2070 - 56.396 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 13.309 ms
+[2026-01-31 22:07:19] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 59.544 ms
+[2026-01-31 22:08:09] [32minfo[39m: Loading product details page
+[2026-01-31 22:08:09] [32minfo[39m: product details fetched successfully
+[2026-01-31 22:08:09] [32minfo[39m: GET /user/product/6979042c65ffdf6b53736be3 200 10398 - 355.405 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /css/common.css 200 2780 - 6.685 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769538598/chettinad/admin/products/product-99f735c8-b294-4810-b750-7ccbc9477a64.jpg 404 7371 - 11.408 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769538604/chettinad/admin/products/product-3d86de45-185b-40a1-954b-823f1516ece4.jpg 404 7371 - 40.314 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /css/header.css 200 5759 - 54.477 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /css/footer.css 200 4817 - 59.022 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /css/productdetails.css 200 8643 - 62.602 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 27.485 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /js/common.js 200 2070 - 29.830 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 34.048 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /js/user/productdetails.js 200 5357 - 48.032 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 33.564 ms
+[2026-01-31 22:08:09] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 40.991 ms
+[2026-01-31 22:08:21] [32minfo[39m: loading shopping page
+[2026-01-31 22:08:21] [32minfo[39m: categories fetched successfully
+[2026-01-31 22:08:21] [32minfo[39m: Products fetched successfully
+[2026-01-31 22:08:21] [32minfo[39m: GET /user/shopall 200 14389 - 431.655 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /css/common.css 200 2780 - 20.538 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /css/header.css 200 5759 - 21.280 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 25.481 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /css/footer.css 200 4817 - 13.396 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 23.569 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 23.776 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /js/common.js 200 2070 - 63.226 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 60.380 ms
+[2026-01-31 22:08:21] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 63.371 ms
+[2026-01-31 22:08:34] [32minfo[39m: GET /css/common.css 200 2780 - 6.755 ms
+[2026-01-31 22:08:34] [32minfo[39m: GET /css/header.css 200 5759 - 7.522 ms
+[2026-01-31 22:08:34] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 6.731 ms
+[2026-01-31 22:08:34] [32minfo[39m: GET /css/footer.css 200 4817 - 6.789 ms
+[2026-01-31 22:08:34] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 6.002 ms
+[2026-01-31 22:16:50] [32minfo[39m: loading shopping page
+[2026-01-31 22:16:50] [32minfo[39m: categories fetched successfully
+[2026-01-31 22:16:51] [32minfo[39m: Products fetched successfully
+[2026-01-31 22:16:51] [32minfo[39m: GET /user/shopall 200 14389 - 755.957 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 11.424 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /css/common.css 200 2780 - 50.591 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /css/header.css 200 5759 - 50.499 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 56.959 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /css/footer.css 200 4817 - 30.299 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 30.884 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 19.763 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /js/common.js 200 2070 - 20.279 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 26.389 ms
+[2026-01-31 22:16:51] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 21.354 ms
+[2026-01-31 22:22:52] [32minfo[39m: loading shopping page
+[2026-01-31 22:22:53] [32minfo[39m: categories fetched successfully
+[2026-01-31 22:22:55] [32minfo[39m: Products fetched successfully
+[2026-01-31 22:22:55] [32minfo[39m: GET /user/shopall 200 14389 - 2908.153 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /.well-known/appspecific/com.chrome.devtools.json 404 7371 - 30.617 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /css/header.css 200 5759 - 22.268 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /css/common.css 200 2780 - 35.463 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 31.036 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /css/footer.css 200 4817 - 20.501 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 33.196 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /js/common.js 200 2070 - 29.814 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 30.330 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 36.895 ms
+[2026-01-31 22:22:55] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 30.881 ms
+[2026-01-31 22:23:39] [32minfo[39m: Loading login page
+[2026-01-31 22:23:39] [32minfo[39m: GET /user/login 200 4026 - 19.323 ms
+[2026-01-31 22:23:39] [32minfo[39m: GET /css/login.css 200 5958 - 4.359 ms
+[2026-01-31 22:23:40] [32minfo[39m: GET /css/login-bg.jpg 404 7371 - 5.533 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET / 302 39 - 4.798 ms
+[2026-01-31 22:23:55] [32minfo[39m: loading homepage
+[2026-01-31 22:23:55] [32minfo[39m: GET /user/home 200 9445 - 157.024 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /css/common.css 200 2780 - 10.124 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /css/header.css 200 5759 - 7.694 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /css/home.css 200 6666 - 13.380 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /css/footer.css 200 4817 - 7.296 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 12.364 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /js/common.js 200 2070 - 2.072 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 5.189 ms
+[2026-01-31 22:23:55] [32minfo[39m: GET /img/customer.jpg 200 73230 - 2.848 ms
+[2026-01-31 22:23:56] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 2.664 ms
+[2026-01-31 22:23:56] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 2.737 ms
+[2026-01-31 22:23:56] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 2.932 ms
+[2026-01-31 22:23:56] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 8.337 ms
+[2026-01-31 22:23:56] [32minfo[39m: GET /img/customer.jpg 200 73230 - 4.385 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET / 302 39 - 7.904 ms
+[2026-02-01 00:54:29] [32minfo[39m: loading homepage
+[2026-02-01 00:54:29] [32minfo[39m: GET /user/home 200 9445 - 821.174 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 4.844 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /css/common.css 200 2780 - 11.372 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /css/header.css 200 5759 - 10.234 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /css/home.css 200 6666 - 12.684 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /css/footer.css 200 4817 - 23.608 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 11.050 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /js/common.js 200 2070 - 14.440 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/customer.jpg 200 73230 - 15.726 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 15.794 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 14.850 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 9.660 ms
+[2026-02-01 00:54:29] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 14.134 ms
+[2026-02-01 00:54:34] [32minfo[39m: Loading login page
+[2026-02-01 00:54:34] [32minfo[39m: GET /user/login 200 4026 - 5.633 ms
+[2026-02-01 00:54:34] [32minfo[39m: GET /css/login.css 200 5958 - 1.349 ms
+[2026-02-01 00:54:34] [32minfo[39m: GET /css/login-bg.jpg 404 7371 - 7.154 ms
+[2026-02-01 00:54:43] [32minfo[39m: Processing login
+[2026-02-01 00:54:43] [33mwarn[39m: Login failed
+[2026-02-01 00:54:43] [32minfo[39m: POST /user/login 200 4161 - 139.382 ms
+[2026-02-01 00:54:43] [32minfo[39m: GET /css/login.css 200 5958 - 1.317 ms
+[2026-02-01 00:54:43] [32minfo[39m: GET /css/login-bg.jpg 404 7371 - 7.776 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET / 302 39 - 0.989 ms
+[2026-02-01 00:54:48] [32minfo[39m: loading homepage
+[2026-02-01 00:54:48] [32minfo[39m: GET /user/home 200 9445 - 364.753 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /css/common.css 200 2780 - 3.833 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /css/header.css 200 5759 - 5.099 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /css/home.css 200 6666 - 5.146 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /css/footer.css 200 4817 - 1.722 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 2.152 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /https://res.cloudinary.com/dma409l7q/image/upload/v1769436336/chettinad/admin/products/product-97c56ef7-922f-4796-9fed-f7d2f6744e52.jpg 404 7371 - 8.369 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /img/customer.jpg 200 73230 - 10.840 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /js/common.js 200 2070 - 12.078 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 2.975 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 2.904 ms
+[2026-02-01 00:54:48] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 4.531 ms
+[2026-02-01 00:54:49] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 2.495 ms
+[2026-02-01 00:54:49] [32minfo[39m: GET /img/customer.jpg 200 73230 - 1.056 ms
+[2026-02-01 00:54:50] [32minfo[39m: GET /admin 302 41 - 280.675 ms
+[2026-02-01 00:54:50] [32minfo[39m: GET /admin/login 200 3335 - 5.519 ms
+[2026-02-01 00:54:50] [32minfo[39m: GET /css/admin/login.css 200 4353 - 2.593 ms
+[2026-02-01 00:54:50] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 6.717 ms
+[2026-02-01 00:55:01] [32minfo[39m: Admin logged in successfully.
+[2026-02-01 00:55:01] [32minfo[39m: POST /admin/login 302 45 - 295.819 ms
+[2026-02-01 00:55:01] [32minfo[39m: GET /admin/dashboard 200 36681 - 115.069 ms
+[2026-02-01 00:55:01] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 18.648 ms
+[2026-02-01 00:55:01] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 19.864 ms
+[2026-02-01 00:55:01] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 31.114 ms
+[2026-02-01 00:55:01] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 32.155 ms
+[2026-02-01 00:55:02] [32minfo[39m: Fetching dashboard stats
+[2026-02-01 00:55:03] [32minfo[39m: Dashboard stats calculated
+[2026-02-01 00:55:03] [32minfo[39m: Dashboard stats delivered successfully
+[2026-02-01 00:55:03] [32minfo[39m: GET /admin/api/stats 200 63 - 434.651 ms
+[2026-02-01 00:55:03] [32minfo[39m: Fetching sales chart data
+[2026-02-01 00:55:03] [32minfo[39m: Fetching top products
+[2026-02-01 00:55:03] [32minfo[39m: Sales data processed successfully
+[2026-02-01 00:55:03] [32minfo[39m: Sales chart data delivered successfully
+[2026-02-01 00:55:03] [32minfo[39m: GET /admin/api/sales-data 200 179 - 877.422 ms
+[2026-02-01 00:55:03] [32minfo[39m: Top products delivered successfully
+[2026-02-01 00:55:03] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 30 - 976.923 ms
+[2026-02-01 00:55:08] [32minfo[39m: fetcing users | page:1,search:""
+[2026-02-01 00:55:09] [32minfo[39m: GET /admin/users 200 10957 - 279.583 ms
+[2026-02-01 00:55:09] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 6.325 ms
+[2026-02-01 00:55:09] [32minfo[39m: GET /css/admin/users.css 200 3409 - 8.730 ms
+[2026-02-01 00:55:09] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 9.213 ms
+[2026-02-01 00:55:09] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 9.554 ms
+[2026-02-01 00:55:16] [32minfo[39m: Loading signup page
+[2026-02-01 00:55:16] [32minfo[39m: GET /user/signup 200 11454 - 6.728 ms
+[2026-02-01 00:55:16] [32minfo[39m: GET /css/signup.css 200 6812 - 4.694 ms
+[2026-02-01 00:55:16] [32minfo[39m: GET /css/signup-bg.jpg 404 7371 - 6.878 ms
+[2026-02-01 00:55:54] [32minfo[39m: Processing signUp
+[2026-02-01 00:56:00] [32minfo[39m: POST /user/signup 200 8237 - 6089.340 ms
+[2026-02-01 00:56:00] [32minfo[39m: GET /css/generateotp.css 200 4273 - 2.930 ms
+[2026-02-01 00:56:00] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 8.063 ms
+[2026-02-01 00:56:24] [32minfo[39m: Verifying signup OTP
+[2026-02-01 00:56:24] [33mwarn[39m: OTP verification failed
+[2026-02-01 00:56:24] [32minfo[39m: POST /user/verify-otp 400 67 - 2.133 ms
+[2026-02-01 00:56:40] [32minfo[39m: Verifying signup OTP
+[2026-02-01 00:56:40] [33mwarn[39m: OTP verification failed
+[2026-02-01 00:56:40] [32minfo[39m: POST /user/verify-otp 400 67 - 2.124 ms
+[2026-02-01 01:04:38] [32minfo[39m: hi inside the multer
+[2026-02-01 01:04:38] [32minfo[39m: 698139445174944
+[2026-02-01 01:04:38] [32minfo[39m: dma409l7q
+[2026-02-01 01:04:38] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:04:40] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:04:50] [32minfo[39m: hi inside the multer
+[2026-02-01 01:04:50] [32minfo[39m: 698139445174944
+[2026-02-01 01:04:50] [32minfo[39m: dma409l7q
+[2026-02-01 01:04:50] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:04:52] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:04:55] [32minfo[39m: hi inside the multer
+[2026-02-01 01:04:55] [32minfo[39m: 698139445174944
+[2026-02-01 01:04:55] [32minfo[39m: dma409l7q
+[2026-02-01 01:04:55] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:04:58] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:05:07] [32minfo[39m: Processing signUp
+[2026-02-01 01:05:13] [32minfo[39m: POST /user/signup 200 8237 - 6264.618 ms
+[2026-02-01 01:05:13] [32minfo[39m: GET /css/generateotp.css 200 4273 - 3.387 ms
+[2026-02-01 01:05:13] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 10.925 ms
+[2026-02-01 01:05:36] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:05:36] [31merror[39m: POST /user/verify-otp-Cannot destructure property 'name' of 'session.userData' as it is undefined.
+[2026-02-01 01:05:36] [32minfo[39m: POST /user/verify-otp 500 106 - 26.305 ms
+[2026-02-01 01:06:50] [32minfo[39m: hi inside the multer
+[2026-02-01 01:06:50] [32minfo[39m: 698139445174944
+[2026-02-01 01:06:50] [32minfo[39m: dma409l7q
+[2026-02-01 01:06:50] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:06:55] [32minfo[39m: hi inside the multer
+[2026-02-01 01:06:55] [32minfo[39m: 698139445174944
+[2026-02-01 01:06:55] [32minfo[39m: dma409l7q
+[2026-02-01 01:06:55] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:06:56] [32minfo[39m: hi inside the multer
+[2026-02-01 01:06:56] [32minfo[39m: 698139445174944
+[2026-02-01 01:06:56] [32minfo[39m: dma409l7q
+[2026-02-01 01:06:56] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:06:58] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:07:01] [32minfo[39m: Processing signUp
+[2026-02-01 01:07:07] [32minfo[39m: POST /user/signup 200 8237 - 6082.667 ms
+[2026-02-01 01:07:07] [32minfo[39m: GET /css/generateotp.css 200 4273 - 8.386 ms
+[2026-02-01 01:07:07] [32minfo[39m: GET /css/otp-bg.jpg 404 7371 - 8.353 ms
+[2026-02-01 01:08:24] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:08:24] [31merror[39m: POST /user/verify-otp-Cannot destructure property 'name' of 'session.userData' as it is undefined.
+[2026-02-01 01:08:24] [32minfo[39m: POST /user/verify-otp 500 106 - 21.874 ms
+[2026-02-01 01:09:01] [32minfo[39m: hi inside the multer
+[2026-02-01 01:09:01] [32minfo[39m: 698139445174944
+[2026-02-01 01:09:01] [32minfo[39m: dma409l7q
+[2026-02-01 01:09:01] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:09:03] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:09:05] [32minfo[39m: hi inside the multer
+[2026-02-01 01:09:05] [32minfo[39m: 698139445174944
+[2026-02-01 01:09:05] [32minfo[39m: dma409l7q
+[2026-02-01 01:09:05] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:09:07] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:09:41] [32minfo[39m: hi inside the multer
+[2026-02-01 01:09:41] [32minfo[39m: 698139445174944
+[2026-02-01 01:09:41] [32minfo[39m: dma409l7q
+[2026-02-01 01:09:41] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:09:42] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:16:18] [32minfo[39m: hi inside the multer
+[2026-02-01 01:16:18] [32minfo[39m: 698139445174944
+[2026-02-01 01:16:18] [32minfo[39m: dma409l7q
+[2026-02-01 01:16:18] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:16:21] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:19:19] [32minfo[39m: hi inside the multer
+[2026-02-01 01:19:19] [32minfo[39m: 698139445174944
+[2026-02-01 01:19:19] [32minfo[39m: dma409l7q
+[2026-02-01 01:19:19] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:19:21] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:19:46] [32minfo[39m: hi inside the multer
+[2026-02-01 01:19:46] [32minfo[39m: 698139445174944
+[2026-02-01 01:19:46] [32minfo[39m: dma409l7q
+[2026-02-01 01:19:46] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:19:48] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:21:43] [32minfo[39m: hi inside the multer
+[2026-02-01 01:21:43] [32minfo[39m: 698139445174944
+[2026-02-01 01:21:43] [32minfo[39m: dma409l7q
+[2026-02-01 01:21:43] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:21:44] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:21:53] [32minfo[39m: hi inside the multer
+[2026-02-01 01:21:53] [32minfo[39m: 698139445174944
+[2026-02-01 01:21:53] [32minfo[39m: dma409l7q
+[2026-02-01 01:21:53] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:21:54] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:21:56] [32minfo[39m: hi inside the multer
+[2026-02-01 01:21:56] [32minfo[39m: 698139445174944
+[2026-02-01 01:21:56] [32minfo[39m: dma409l7q
+[2026-02-01 01:21:56] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:00] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:00] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:00] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:00] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:02] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:02] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:02] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:02] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:04] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:04] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:04] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:05] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:05] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:05] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:05] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:25] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:25] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:25] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:25] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:31] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:31] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:31] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:31] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:40] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:40] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:40] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:40] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:42] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:42] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:42] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:42] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:44] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:22:49] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:49] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:49] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:49] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:51] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:51] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:51] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:51] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:53] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:53] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:53] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:53] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:55] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:22:57] [32minfo[39m: hi inside the multer
+[2026-02-01 01:22:57] [32minfo[39m: 698139445174944
+[2026-02-01 01:22:57] [32minfo[39m: dma409l7q
+[2026-02-01 01:22:57] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:22:58] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:23:14] [32minfo[39m: hi inside the multer
+[2026-02-01 01:23:14] [32minfo[39m: 698139445174944
+[2026-02-01 01:23:14] [32minfo[39m: dma409l7q
+[2026-02-01 01:23:14] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:23:15] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:23:22] [32minfo[39m: hi inside the multer
+[2026-02-01 01:23:22] [32minfo[39m: 698139445174944
+[2026-02-01 01:23:22] [32minfo[39m: dma409l7q
+[2026-02-01 01:23:22] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:23:24] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:23:25] [32minfo[39m: hi inside the multer
+[2026-02-01 01:23:25] [32minfo[39m: 698139445174944
+[2026-02-01 01:23:25] [32minfo[39m: dma409l7q
+[2026-02-01 01:23:25] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:23:26] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:26:00] [32minfo[39m: Processing signUp
+[2026-02-01 01:26:05] [32minfo[39m: POST /user/signup 200 8237 - 5274.018 ms
+[2026-02-01 01:26:05] [32minfo[39m: GET /css/generateotp.css 200 4273 - 3.318 ms
+[2026-02-01 01:26:20] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:26:20] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userData')
+[2026-02-01 01:26:20] [32minfo[39m: POST /user/verify-otp 500 86 - 5.712 ms
+[2026-02-01 01:26:42] [32minfo[39m: hi inside the multer
+[2026-02-01 01:26:42] [32minfo[39m: 698139445174944
+[2026-02-01 01:26:42] [32minfo[39m: dma409l7q
+[2026-02-01 01:26:42] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:26:44] [32minfo[39m: hi inside the multer
+[2026-02-01 01:26:44] [32minfo[39m: 698139445174944
+[2026-02-01 01:26:44] [32minfo[39m: dma409l7q
+[2026-02-01 01:26:44] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:27:02] [32minfo[39m: hi inside the multer
+[2026-02-01 01:27:02] [32minfo[39m: 698139445174944
+[2026-02-01 01:27:02] [32minfo[39m: dma409l7q
+[2026-02-01 01:27:02] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:27:04] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:27:21] [32minfo[39m: hi inside the multer
+[2026-02-01 01:27:21] [32minfo[39m: 698139445174944
+[2026-02-01 01:27:21] [32minfo[39m: dma409l7q
+[2026-02-01 01:27:21] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:27:23] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:27:27] [32minfo[39m: hi inside the multer
+[2026-02-01 01:27:27] [32minfo[39m: 698139445174944
+[2026-02-01 01:27:27] [32minfo[39m: dma409l7q
+[2026-02-01 01:27:27] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:27:29] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:28:47] [32minfo[39m: hi inside the multer
+[2026-02-01 01:28:47] [32minfo[39m: 698139445174944
+[2026-02-01 01:28:47] [32minfo[39m: dma409l7q
+[2026-02-01 01:28:47] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:28:54] [32minfo[39m: hi inside the multer
+[2026-02-01 01:28:54] [32minfo[39m: 698139445174944
+[2026-02-01 01:28:54] [32minfo[39m: dma409l7q
+[2026-02-01 01:28:54] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:28:55] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:28:59] [32minfo[39m: hi inside the multer
+[2026-02-01 01:28:59] [32minfo[39m: 698139445174944
+[2026-02-01 01:28:59] [32minfo[39m: dma409l7q
+[2026-02-01 01:28:59] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:29:04] [32minfo[39m: hi inside the multer
+[2026-02-01 01:29:04] [32minfo[39m: 698139445174944
+[2026-02-01 01:29:04] [32minfo[39m: dma409l7q
+[2026-02-01 01:29:04] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:29:07] [32minfo[39m: hi inside the multer
+[2026-02-01 01:29:07] [32minfo[39m: 698139445174944
+[2026-02-01 01:29:07] [32minfo[39m: dma409l7q
+[2026-02-01 01:29:07] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:29:10] [32minfo[39m: hi inside the multer
+[2026-02-01 01:29:10] [32minfo[39m: 698139445174944
+[2026-02-01 01:29:10] [32minfo[39m: dma409l7q
+[2026-02-01 01:29:10] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:29:21] [32minfo[39m: hi inside the multer
+[2026-02-01 01:29:21] [32minfo[39m: 698139445174944
+[2026-02-01 01:29:21] [32minfo[39m: dma409l7q
+[2026-02-01 01:29:21] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:29:22] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:29:33] [32minfo[39m: Processing signUp
+[2026-02-01 01:29:38] [32minfo[39m: POST /user/signup 200 8237 - 4919.369 ms
+[2026-02-01 01:29:38] [32minfo[39m: GET /css/generateotp.css 200 4273 - 2.088 ms
+[2026-02-01 01:29:53] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:29:53] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userOtp')
+[2026-02-01 01:29:53] [32minfo[39m: POST /user/verify-otp 500 85 - 5.131 ms
+[2026-02-01 01:30:49] [32minfo[39m: hi inside the multer
+[2026-02-01 01:30:49] [32minfo[39m: 698139445174944
+[2026-02-01 01:30:49] [32minfo[39m: dma409l7q
+[2026-02-01 01:30:49] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:30:51] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:40:59] [32minfo[39m: hi inside the multer
+[2026-02-01 01:40:59] [32minfo[39m: 698139445174944
+[2026-02-01 01:40:59] [32minfo[39m: dma409l7q
+[2026-02-01 01:40:59] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:41:02] [32minfo[39m: hi inside the multer
+[2026-02-01 01:41:02] [32minfo[39m: 698139445174944
+[2026-02-01 01:41:02] [32minfo[39m: dma409l7q
+[2026-02-01 01:41:02] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:41:04] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:42:14] [32minfo[39m: hi inside the multer
+[2026-02-01 01:42:14] [32minfo[39m: 698139445174944
+[2026-02-01 01:42:14] [32minfo[39m: dma409l7q
+[2026-02-01 01:42:14] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:42:16] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:42:25] [32minfo[39m: hi inside the multer
+[2026-02-01 01:42:25] [32minfo[39m: 698139445174944
+[2026-02-01 01:42:25] [32minfo[39m: dma409l7q
+[2026-02-01 01:42:25] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:42:27] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:42:32] [32minfo[39m: hi inside the multer
+[2026-02-01 01:42:32] [32minfo[39m: 698139445174944
+[2026-02-01 01:42:32] [32minfo[39m: dma409l7q
+[2026-02-01 01:42:32] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:42:34] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:43:01] [32minfo[39m: hi inside the multer
+[2026-02-01 01:43:01] [32minfo[39m: 698139445174944
+[2026-02-01 01:43:01] [32minfo[39m: dma409l7q
+[2026-02-01 01:43:01] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:43:03] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:43:06] [32minfo[39m: hi inside the multer
+[2026-02-01 01:43:06] [32minfo[39m: 698139445174944
+[2026-02-01 01:43:06] [32minfo[39m: dma409l7q
+[2026-02-01 01:43:06] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:43:07] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:43:22] [32minfo[39m: Processing signUp
+[2026-02-01 01:43:28] [32minfo[39m: POST /user/signup 200 8237 - 6159.991 ms
+[2026-02-01 01:43:28] [32minfo[39m: GET /css/generateotp.css 200 4273 - 12.882 ms
+[2026-02-01 01:43:41] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:43:41] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userOtp')
+[2026-02-01 01:43:41] [32minfo[39m: POST /user/verify-otp 500 85 - 15.563 ms
+[2026-02-01 01:44:13] [32minfo[39m: hi inside the multer
+[2026-02-01 01:44:13] [32minfo[39m: 698139445174944
+[2026-02-01 01:44:13] [32minfo[39m: dma409l7q
+[2026-02-01 01:44:13] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:44:15] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:44:19] [32minfo[39m: hi inside the multer
+[2026-02-01 01:44:19] [32minfo[39m: 698139445174944
+[2026-02-01 01:44:19] [32minfo[39m: dma409l7q
+[2026-02-01 01:44:19] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:44:21] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:44:38] [32minfo[39m: hi inside the multer
+[2026-02-01 01:44:38] [32minfo[39m: 698139445174944
+[2026-02-01 01:44:38] [32minfo[39m: dma409l7q
+[2026-02-01 01:44:38] [32minfo[39m: DRjWUJtgCysBWbMC3neHCVDAGzo
+[2026-02-01 01:44:41] [32minfo[39m: connected to mongodb atlas
+[2026-02-01 01:44:49] [32minfo[39m: Processing signUp
+[2026-02-01 01:44:56] [32minfo[39m: POST /user/signup 200 8237 - 6898.878 ms
+[2026-02-01 01:44:56] [32minfo[39m: GET /css/generateotp.css 200 4273 - 9.076 ms
+[2026-02-01 01:45:05] [32minfo[39m: Verifying signup OTP
+[2026-02-01 01:45:06] [32minfo[39m: POST /user/verify-otp 200 16 - 725.581 ms
+[2026-02-01 01:45:08] [32minfo[39m: Loading login page
+[2026-02-01 01:45:08] [32minfo[39m: GET /user/login 200 4026 - 12.052 ms
+[2026-02-01 01:45:08] [32minfo[39m: GET /css/login.css 200 5958 - 2.138 ms

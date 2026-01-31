@@ -27,8 +27,7 @@ export const  handleSingup=async({name,phone,email,password,referralCode})=>{
         return {success:false,message:'User with this email already exists'};
 
     }
-    const hashedPassword=await bcrypt.hash(password,10);
-    const sessionUserData={name,phone,email,password:hashedPassword};
+    const sessionUserData={name,phone,email,password};
 
     let referralInfo=null;
     if(referralCode){
@@ -39,11 +38,14 @@ export const  handleSingup=async({name,phone,email,password,referralCode})=>{
         }
     }
     const otp=generateOtp();
+
     const emailSent=await sendVerificationEmail(email,otp);
     if(!emailSent){
         return {success:false,message:'Failed to send OTP.Please try again.'};
 
     }
+
+    console.log("session user data inside hanlesignup",sessionUserData);
     return {success:true,otp,sessionUserData:sessionUserData,referralInfo};
 
 }
@@ -84,10 +86,24 @@ export const sendSignupOtp=async(email)=>{
 }
 
 export const verifySignupOtp=async (otp,session)=>{
-    if(!session.userOtp||!session.userData||session.userOtp!==String(otp)||Date.now()>session.otpExpires){
-        return {success:false,message:'Invalid or expired OTP'};
-            }
+    
+     if (!session.userOtp || !session.userData) {
+    return { success: false, message: 'Session expired. Please signup again.' };
+  }
+
+  if (Date.now() > session.otpExpires) {
+    return { success: false, message: 'OTP expired' };
+  }
+
+  if (session.userOtp !== String(otp)) {
+    return { success: false, message: 'Invalid OTP' };
+  }
       const {name,phone,password,email}=session.userData;
+
+      const existingUser=await User.findOne({email});
+if(existingUser){
+    return {success:false,message:'User already exists'};
+}
       const hashedPassword=await bcrypt.hash(password,10);
       const newUser=await User.create({name,email,phone,password:hashedPassword});
      await Wallet.create({
