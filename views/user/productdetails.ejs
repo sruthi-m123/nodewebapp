@@ -10,7 +10,7 @@
         <div class="thumbnail-images">
           <% product.images.forEach((img, index) => { %>
             <div class="thumbnail <%= index === 0 ? 'active' : '' %>">
-              <img src="/<%= img %>" alt="Thumbnail <%= index + 1 %>">
+              <img src="<%= img %>" alt="Thumbnail <%= index + 1 %>">
             </div>
           <% }) %>
         </div>
@@ -147,7 +147,7 @@
            if (prod.isNewArrival) { %>
         <div class="product-card">
           <div class="product-image">
-            <img src="/<%= prod.images[0] %>" alt="<%= prod.productName %>">
+            <img src="<%= prod.images[0] %>" alt="<%= prod.productName %>">
             <div class="product-actions">
               <button class="wishlist-btn"><i class="far fa-heart"></i></button>
             </div>

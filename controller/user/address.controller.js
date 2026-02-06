@@ -34,7 +34,7 @@ if(error){
   const messages=error.details.map((err)=>err.message).join(", ");
   throw Object.assign(new Error(messages),{status:STATUS_CODES.BAD_REQUEST})
 }
- const result =await addressService.addAddress(userId,value);
+ const result =await addressService.addAddressService(userId,value);
  res.status(STATUS_CODES.SUCCESS).json({
   success:true,
   message:MESSAGES.ADDRESS.ADD_SUCCESS,
@@ -47,7 +47,7 @@ export const deleteAddress=async(req,res)=>{
   const addressId=req.params.id;
 
   logger.info('Deleting address',{userId,addressId});
-  await addressService.deleteAddress(userId,addressId);
+  await addressService.deleteAddressService(userId,addressId);
 
   res.status(STATUS_CODES.SUCCESS).json({
     success:true,
@@ -60,7 +60,7 @@ export const getEditAddress=async(req,res)=>{
   const addressId=req.params.id;
 
   logger.info('Fetching address for edit',{userId,addressId});
-  const data =await addressService.getEditAddress(userId,addressId);
+  const data =await addressService.getEditAddressService(userId,addressId);
 
   res.status(STATUS_CODES.SUCCESS).json({
     success:true,
@@ -86,7 +86,7 @@ export const updateAddress=async(req,res)=>{
     {status:STATUS_CODES.BAD_REQUEST});
   }
 
- await addressService.updateAddress(userId,addressId,value);
+ await addressService.updateAddressService(userId,addressId,value);
 
  res.status(STATUS_CODES.SUCCESS).json({
   success:true,
@@ -103,7 +103,7 @@ export const setDefaultAddress=async(req,res)=>{
     return res.status(STATUS_CODES.UNAUTHORIZED).json(MESSAGES.LOGIN_REQUIRED);
     
   }
-await addressService.setDefaultAddress(userId,addressId);
+await addressService.setDefaultAddressService(userId,addressId);
 
 res.status(STATUS_CODES.SUCCESS).json({
   success:true,

@@ -13,7 +13,7 @@ export const getCart=async(req,res)=>{
  
   }
   const userId=req.session.user.id;
-  const cart=await cartService.getCartCountService(userId);
+  const cart=await cartService.getCartService(userId);
   const{validItems,outOfStockItems}=await cartService.processCartItemsService(cart);
 
   if(outOfStockItems.length>0){
@@ -52,7 +52,7 @@ const total = validItems.reduce((sum, item) => sum + item.totalPrice, 0);
 };
 
 export const addToCart=async(req,res)=>{
-  logger.infp('Adding product to cart');
+  logger.info('Adding product to cart');
   if(!req.session.user){
     logger.warn('Unathorized cart add attempt ');
     return res.status(STATUS_CODES.UNAUTHORIZED).json({

@@ -75,3 +75,40 @@
 [2026-02-01 01:26:20] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userData')
 [2026-02-01 01:29:53] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userOtp')
 [2026-02-01 01:43:41] [31merror[39m: POST /user/verify-otp-Cannot read properties of undefined (reading 'userOtp')
+[2026-02-02 08:38:59] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-02-02 21:09:57] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-02-02 21:10:07] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-02-02 22:07:56] [31merror[39m: POST /user/cart/add/6979042c65ffdf6b53736be3-logger.infp is not a function
+[2026-02-02 22:09:19] [31merror[39m: GET /user/cart-cart.items is not iterable
+[2026-02-02 22:13:24] [31merror[39m: GET /user/cart-cart.items is not iterable
+[2026-02-02 22:23:09] [31merror[39m: POST /user/login-Operation `users.findOne()` buffering timed out after 10000ms
+[2026-02-02 22:23:11] [31merror[39m: POST /user/login-Operation `users.findOne()` buffering timed out after 10000ms
+[2026-02-02 22:23:18] [31merror[39m: monogoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-02-02 22:24:05] [31merror[39m: POST /user/login-Operation `users.findOne()` buffering timed out after 10000ms
+[2026-02-02 22:24:05] [31merror[39m: monogoDB connection error: Server selection timed out after 30000 ms
+[2026-02-03 07:59:06] [31merror[39m: POST /user/addresses/add-addressService.addAddress is not a function
+[2026-02-03 08:02:13] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `home` is not a valid enum value for path `addressType`.
+[2026-02-03 08:05:41] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `home` is not a valid enum value for path `addressType`.
+[2026-02-03 08:08:34] [31merror[39m: GET /user/api/addresses/69815fa1d6170d2f4a297d38-Cannot read properties of undefined (reading 'success')
+[2026-02-03 11:40:28] [31merror[39m: POST /user/orders-placed-adresses is not defined
+[2026-02-03 16:26:54] [31merror[39m: POST /user/orders-placed-Cannot read properties of undefined (reading 'id')
+[2026-02-03 16:33:11] [31merror[39m: GET /user/orders-details/ORD-1770116423424-543-Order not found
+[2026-02-03 16:41:21] [31merror[39m: GET /user/orders-details/ORD-1770116423424-543-C:\Users\sruth\codes\nodewebapp\views\user\orderDetails.ejs:4
+    2|     <h1>ORDER DETAILS</h1>
+    3|     <div class="order-header">
+ >> 4|         <p><strong>Order #</strong> <%= order.orderId %></p>
+    5|             <% if (order.paymentMethod==='cod'||order.status == 'delivered'||order.paymentMethod==='netbanking') { %>
+    6| 
+    7|         <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
+
+Cannot read properties of undefined (reading 'orderId')
+[2026-02-03 21:13:35] [31merror[39m: GET /user/orders-details/ORD-1770116423424-543-C:\Users\sruth\codes\nodewebapp\views\user\orderDetails.ejs:5
+    3|     <div class="order-header">
+    4|       console.log("order:",order);
+ >> 5|         <p><strong>Order #</strong> <%= order.orderId %></p>
+    6|             <% if (order.paymentMethod==='cod'||order.status == 'delivered'||order.paymentMethod==='netbanking') { %>
+    7| 
+    8|         <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
+
+Cannot read properties of undefined (reading 'orderId')
+[2026-02-03 21:21:15] [31merror[39m: GET /user/orders-details/ORD-1770116423424-543-Failed to lookup view "user/orderNotFound" in views directory "C:\Users\sruth\codes\nodewebapp\views"

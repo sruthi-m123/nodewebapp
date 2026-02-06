@@ -53,7 +53,7 @@ import ShopService from "../../service/user/shop.service.js";
     const wishlist=await ShopService.getUserWishlist(req.session.user?.id);
     res.render("user/shopall",{
       pageCSS:"user/shopall.css",
-      pageJs:"user/shopall.js",
+      pageJS:"user/shopall.js",
       pageTitle:"Chettinad - Premium Saree Botique",
       user:userData,
       currentPath:req.path,
@@ -68,7 +68,7 @@ import ShopService from "../../service/user/shop.service.js";
   }
 
  export const applyFilters = async (req, res) => {
-    logger.info("Applyin product filters");
+    logger.info("Applying product filters");
 
     const filters=req.body;
     const query=ShopService.buildProductQuery(filters);
@@ -86,7 +86,6 @@ import ShopService from "../../service/user/shop.service.js";
     sort,
     direction
   });
-
   const wishlist = await ShopService.getUserWishlist(req.session.user?._id);
 
   res.status(STATUS_CODES.SUCCESS).json({

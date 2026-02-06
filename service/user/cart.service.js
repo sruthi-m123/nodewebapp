@@ -17,7 +17,7 @@ export const processCartItemsService=async(cart)=>{
     logger.debug('Processing cart items for stock validation');
     const outOfStockItems=[];
     const validItems=[];
-
+console.log("cart ",cart);
     for(const item of cart.items){
         const product=item.productId;
 

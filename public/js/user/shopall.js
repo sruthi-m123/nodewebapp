@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
   // Elements
   const searchInput = document.getElementById('product-search');
@@ -11,10 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const colorOptions = document.querySelectorAll('.color-option');
   const availabilityCheckboxes = document.querySelectorAll('input[name="availability"]');
 
-  // Server-passed wishlist (from EJS script tag)
   let serverWishlist = window.wishlist || [];
 
-  // Helper: Collect ALL current filter states
   function getAllFilters() {
     return {
       search: searchInput.value.trim(),
@@ -159,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ${product.isNewArrival ? '<div class="product-badge">New</div>' : ''}
         <div class="product-image ${product.stock === 0 ? 'grayscale' : ''}">
           <a href="/user/product/${product._id}">
-            <img src="/${product.images[0]}" alt="${product.productName}">
+            <img src="${product.images[0]}" alt="${product.productName}">
           </a>
           <div class="quick-view">Quick View</div>
         </div>
@@ -332,6 +331,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Implement cart badge update if needed
   }
 
-  // Optional initial load (EJS handles, but for refresh)
-  // loadAllProducts();
 });

@@ -1,20 +1,35 @@
 // controllers/user/orderDetails.controller.js
 import * as orderManagmentService from '../../service/user/orderDetails.service.js';
 import { STATUS_CODES } from '../../utils/statusCodes.js';
-import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
 
 export const getOrderDetails = async (req, res) => {
   logger.info('loading order details page');
+  const {orderId}=req.params;
+  const userId=req.session.user.id;
+  console.log("orderId",orderId);
+  console.log("userId",userId);
+const result=
+await orderManagmentService.getOrderDetailsService(
+ userId,
+ orderId
+);
 
-  const { order, getStatusMessage } = await orderManagmentService.getOrderDetailsService(req.orderId, req.userId);
+if(!result||result.success===false){
+  return res.status(404).render('user/pageNotFound',{
+     pageTitle: 'Order Not Found',
+      message: result?.message || 'Order not found',
+      user: req.session.user
+  })
+}
+
   res.render('user/orderDetails', {
-    pageCSS: 'user/orderDetails.css',
+    pageCSS: 'user/orderDetail.css',
     pageJS: 'user/orderDetail.js',
     pageTitle: 'Order Detail',
     storeName: 'Chettinad Sarees',
-    order: order,
-    getStatusmessage: getStatusMessage,
+    order: result.order,
+    getStatusmessage: result.getStatusMessage,
     user: req.session.user
   });
 };

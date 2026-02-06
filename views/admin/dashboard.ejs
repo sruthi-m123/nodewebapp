@@ -238,7 +238,7 @@
           row.innerHTML = `
             <td>#${product.id.toString().slice(-4)}</td>
             <td>
-              <img src="/${product.image}" 
+              <img src="${product.image}" 
                    alt="${product.name || 'Product'}" 
                    onerror="this.src='/images/placeholder.jpg'">
             </td>

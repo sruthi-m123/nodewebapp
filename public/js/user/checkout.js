@@ -40,7 +40,6 @@ function openAddressModal(addressId = null) {
         fetch(`/user/api/addresses/${addressId}`)
             .then(response => response.json())
             .then(data => {
-                console.log("data inside the edit address ate checkout page:",data);
                 if (data.success) {
                     const address = data.address;
                     form.reset();
@@ -677,7 +676,7 @@ console.log("submiting payload:",payload);
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ payload})
+    body: JSON.stringify( payload)
   })
   .then(res => res.json())
   .then(data => {

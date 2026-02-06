@@ -128,8 +128,8 @@ export const placeOrder=async (req,res)=>{
   if(!userId){
     return res.status(STATUS_CODES.UNAUTHORIZED).json({success:false,message:"please login to continue"});
       }
-
-      const{addressId,paymentMethod,appliedOffers=[],isRetry=false}=req.body.payload||{};
+console.log("req.body",req.body);
+      const{addressId,paymentMethod,appliedOffers=[],isRetry=false}=req.body||{};
       const orderData={userId,addressId,paymentMethod,appliedOffers,isRetry,session:req.session};
       const result=await checkoutService.placeOrder(orderData);
       if(!result.success){

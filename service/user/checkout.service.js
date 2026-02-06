@@ -10,6 +10,7 @@ import Razorpay  from 'razorpay';
 import {calculateOrder } from '../../helper/calculateTotal.js';
 // import {debitWallet } from '../../controller/user/walletController.js';
 import { MESSAGES } from '../../utils/messages.js';
+import mongoose from 'mongoose';
 export const getCheckoutData=async(userId,session)=>{
     const userData=await User.findById(userId);
     let addressesDoc=await Address.findOne({userId}).lean();
@@ -298,7 +299,10 @@ isBuyNow=true;
             }
         }
     }
+    console.log("userId:",userId);
+    console.log("addressId:",addressId);
     const addresses=await Address.findOne({userId,'address._id':addressId},{address:{$elemMatch:{_id:addressId}}});
+    
     if(!addresses||addresses.address.length===0){
         return {success:false,message:MESSAGES.ADDRESS.NOT_FOUND};
 

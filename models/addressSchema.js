@@ -10,7 +10,7 @@ const addressSchema= new Schema({
         addressType:{
             type:String,
             required:true,
-             enum: ["Home", "Work", "Other"]
+             enum: ["home", "work", "other"]
         },
         name:{
             type:String,

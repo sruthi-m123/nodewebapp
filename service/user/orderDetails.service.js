@@ -7,14 +7,18 @@ import logger from '../../utils/logger.js';
 
 export const getOrderDetailsService=async(userId,orderId)=>{
     logger.debug('fetching order details',{userId,orderId});
-
+console.log("userID:",userId);
+console.log("orderId",orderId);
     const order=await Order.findOne({orderId,userId})
     .populate('items.productId')
     .lean();
 
     if(!order){
         logger.warn('order not found',{userId,orderId});
-        throw new Error(MESSAGES.ORDER.NOT_FOUND);
+        return {
+            success:false,
+            message:MESSAGES.ORDER.NOT_FOUND
+        }
     }
 
 const formatItems=order.items.map(item=>({

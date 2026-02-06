@@ -1,9 +1,10 @@
-import Joi from 'joi';
+import  Joi from 'joi';
 import { phoneSchema } from '../common/phone.schema.js';
-
 export const addressSchema = Joi.object({
   name: Joi.string().trim().required(),
   building: Joi.string().trim().required(),
+  landmark: Joi.string().trim().allow("", null),
+
   city: Joi.string().trim().required(),
   state: Joi.string().trim().required(),
 
@@ -24,5 +25,10 @@ export const addressSchema = Joi.object({
       "any.same": "Alternate phone cannot be the same as primary phone"
     }),
 
-  addressType: Joi.string().valid("home","office","other").required()
+  addressType: Joi.string()
+    .lowercase()
+    .valid("home","office","other")
+    .required(),
+
+  isDefault: Joi.boolean().default(false)
 });
