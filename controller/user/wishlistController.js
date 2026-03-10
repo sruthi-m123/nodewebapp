@@ -6,6 +6,7 @@ import {MESSAGES} from "../../utils/messages.js";
 export const getWishlistPage=async(req,res)=>{
   const userId=req.session.user.id;
   const {user,items}=await WishlistService.getWishlistPageData(userId);
+  console.log("items in the wishlist",items);
   res.render("user/wishlist",{
     pageCSS: "user/wishlist.css",
     pageJS: "user/wishlist.js",

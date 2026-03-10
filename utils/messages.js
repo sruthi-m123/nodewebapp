@@ -218,5 +218,9 @@ SHOP: {
  FORGOT_PASSWORD_EMAIL_NOT_FOUND :'Email not found',
  OTP_INVALID :'Invalid OTP',
  OTP_EXPIRED : 'OTP expired',
-  }
+  },
+  PAYMENT: {
+    VERIFICATION_SUCCESS: "Payment verified successfully",
+    VERIFICATION_FAILED: "Payment verification failed",
+}
 };

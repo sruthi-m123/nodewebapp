@@ -112,3 +112,22 @@ Cannot read properties of undefined (reading 'orderId')
 
 Cannot read properties of undefined (reading 'orderId')
 [2026-02-03 21:21:15] [31merror[39m: GET /user/orders-details/ORD-1770116423424-543-Failed to lookup view "user/orderNotFound" in views directory "C:\Users\sruth\codes\nodewebapp\views"
+[2026-02-13 08:04:35] [31merror[39m: DELETE /user/cart/remove/698e8daeda5dfa69fba69a8a-Cannot read properties of undefined (reading 'toString')
+[2026-02-13 08:04:40] [31merror[39m: DELETE /user/cart/remove/698e8daeda5dfa69fba69a8d-Cannot read properties of undefined (reading 'toString')
+[2026-02-14 07:35:08] [31merror[39m: DELETE /user/cart/remove/698e8dadda5dfa69fba69a86-Cannot read properties of undefined (reading 'toString')
+[2026-02-14 07:37:32] [31merror[39m: DELETE /user/cart/remove/698e8dadda5dfa69fba69a86-Cannot read properties of undefined (reading 'toString')
+[2026-02-14 07:46:55] [31merror[39m: DELETE /user/cart/remove/698e8dadda5dfa69fba69a86-Cannot read properties of undefined (reading 'toString')
+[2026-02-14 07:50:36] [31merror[39m: DELETE /user/cart/remove/698e8dadda5dfa69fba69a86-Cannot read properties of undefined (reading 'toString')
+[2026-02-14 07:53:02] [31merror[39m: DELETE /user/cart/remove/698e8dadda5dfa69fba69a86-Cannot read properties of undefined (reading 'toString')
+[2026-02-16 21:02:01] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-02-16 21:02:11] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
+[2026-02-16 21:03:23] [31merror[39m: monogoDB connection error: querySrv ETIMEOUT _mongodb._tcp.chettinad.9d7kbbi.mongodb.net
+[2026-03-03 08:12:24] [31merror[39m: POST /user/verifyPayment-Cannot read properties of undefined (reading 'VERIFICATION_SUCCESS')
+[2026-03-03 10:31:03] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot destructure property 'reason' of 'returnData' as it is undefined.
+[2026-03-03 10:39:01] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot destructure property 'reason' of 'returnData' as it is undefined.
+[2026-03-03 10:40:46] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot destructure property 'reason' of 'returnData' as it is undefined.
+[2026-03-03 10:45:19] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'toString')
+[2026-03-03 10:55:59] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cast to ObjectId failed for value "{ orderId: '69a64a4ea6e1e4d24d861601' }" (type Object) at path "_id" for model "Order"
+[2026-03-03 10:58:05] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'toString')
+[2026-03-03 11:02:14] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'toString')
+[2026-03-03 11:03:47] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'id')

@@ -67,8 +67,9 @@ export const cancelOrder = async (req, res) => {
 
 export const returnOrder = async (req, res) => {
   logger.info('Processing order return');
-
-  const order = await orderManagmentService.returnOrderService(req.userId, req.orderId, req.returnData);
+  console.log("inside the controler",req.validatedData);
+  const {orderId,...returnData}=req.validatedData;
+  const order = await orderManagmentService.returnOrderService(req.session.user.id, orderId, returnData);
 
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,

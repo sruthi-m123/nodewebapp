@@ -11,10 +11,10 @@ export const WishlistService={
 
         const user=await User.findById(userId);
 
-        const wishlist=await Wishlist.findOne({user:userId}).populate({
-            path:"items.productId",
-            match:{isDeleted:false,isBlocked:false}
-        });
+       
+
+        const wishlist=await Wishlist.findOne({user:userId}).populate("items.productId");
+
         const validItems=wishlist?.items?.filter(i=>i.productId)||[];
         const formattedItems=validItems.map(item=>({
             id:item._id,
@@ -28,6 +28,7 @@ export const WishlistService={
             color:item.productId.color
 
         }));
+        console.log("formated items inside the wishlist controller :",formattedItems);
         return {
             user,
             items:formattedItems

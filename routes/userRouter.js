@@ -175,7 +175,7 @@ router.post("/orders/:orderId/cancel",isLoggedIn,checkBlocked,validate(V.cancelO
 
 //wishlist
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
-router.post("/wishlist/add/:productId", isLoggedIn,validate(V.addToWishlistSchema), wishlistController.addToWishlist);
+router.post("/wishlist/add/:productId", isLoggedIn,validate(V.addToWishlistSchema,"params"), wishlistController.addToWishlist);
 router.post("/wishlist/add-to-cart/:itemId", isLoggedIn,validate(V.addToCartFromWishlistSchema), wishlistController.addToCartFromWishlist);
 router.delete("/wishlist/remove/:itemId", isLoggedIn,validate(V.removeWishlistSchema), wishlistController.removeFromWishlist);
 router.get("/status/:productId",validate(V.objectIdSchema),wishlistController.checkWishlistStatus)

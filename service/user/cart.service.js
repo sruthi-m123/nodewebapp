@@ -140,18 +140,22 @@ logger.info("Item added to cart",{userId,productId});
 
 export const removeCartItemService=async(userId,itemId)=>{
     logger.debug('Removing cart item',{userId,itemId});
+    console.log("itemId:",itemId);
     const cart= await Cart.findOne({userId});
     if(!cart){
         logger.warn('cart not found for removal',{userId});
         throw new Error('Cart not found');
     }
-    const removedItem=cart.items.find(items=>items.itemId.toString()===itemId);
+    for(let i=0;i<cart.items.length;i++){
+        console.log(cart.items[i]);
+    }
+    const removedItem=cart.items.find(item=>item._id.toString()===itemId);
     if(!removedItem){
         logger.warn('Item not found in cart for removal',{userId,itemId});
         throw new Error('Item not found in cart');
 
     }
-        cart.items=cart.items.filter(i=>i.itemId.toString()!== itemId);
+        cart.items=cart.items.filter(i=>i._id.toString()!== itemId);
 
         await cart.save();
         logger.info("Item removed from cart",{userId,itemId});

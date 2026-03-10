@@ -117,6 +117,7 @@ return order;
 }
 
 export const returnOrderService=async(userId,orderId,returnData)=>{
+    console.log("check inside the service :",returnData);
     const{reason,itemIds,customReason,notes}=returnData;
     logger.debug('processing order return',{userId,orderId,itemIds});
     const order=await Order.findById(orderId).populate("items.productId");
