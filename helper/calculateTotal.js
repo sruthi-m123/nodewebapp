@@ -16,6 +16,7 @@
   let offerDiscount = 0;
 
   for (const item of cartItems) {
+   
     if (item.discountedPrice) {
       const itemDiscount =
         (item.originalPrice - item.discountedPrice) * item.quantity;
@@ -52,8 +53,12 @@
 
 
   const netAmount = subtotal + delivery - discount;
+  
+  console.log("net amount after discount :", netAmount);
+
 
   const tax = netAmount * (taxRate / 100);
+  console.log("tax :",tax);
   const total = netAmount + tax;
 
   return {

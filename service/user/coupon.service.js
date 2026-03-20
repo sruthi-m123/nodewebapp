@@ -55,18 +55,47 @@ export const checkCouponUsageService=async(userId,coupon)=>{
     return true;
 }
 
+// export const prepareCartItemsService=(cart)=>{
+//     return cart.items
+//     .filter(item=>item.productId&&item.productId.isActive)
+//     .map(item=>({
+//         id:item.productId._id,
+//         name:item.productId.productName,
+//         price:item.productId.price,
+//         originalPrice:item.productId.price,
+//         discountedPrice:item.productId.discountedPrice||null,
+//         quantity:item.quantity
+//     }))
+// }
+
 export const prepareCartItemsService=(cart)=>{
     return cart.items
-    .filter(item=>item.productId&&item.productId.isActive)
-    .map(item=>({
-        id:item.productId._id,
-        name:item.productId.productName,
-        price:item.productId.price,
-        originalPrice:item.productId.price,
-        discountedPrice:item.productId.discountedPrice||null,
-        quantity:item.quantity
-    }))
+    .filter(item=>item.productId&& item.productId.isActive)
+    .map(item=>{
+        const product=item.productId;
+
+        const  isOfferValid=
+        product.offer&&
+        product.offer.isActive&& 
+        new Date(product.offer.validTill)>new Date();
+
+        const finalPrice=isOfferValid
+        ?product.discountedPrice
+        :product.price;
+
+        return {
+            id:product._id,
+            name:product.productName,
+            price: finalPrice,
+        originalPrice: product.price,
+        discountedPrice: isOfferValid ? product.discountedPrice : null,
+        quantity: item.quantity
+        }
+    })
 }
+
+
+
 
 export const checkMinCartValueService=(cartItems,coupon)=>{
     const subtotal=cartItems.reduce(
@@ -134,7 +163,6 @@ var orderSummary=calculateOrder(cartItems,{coupon});
 const delivery=orderSummary.delivery||0;
 const tax=orderSummary.tax||0;
 const total=orderSummary.total||0;
-
 let discountToApply=0;
 if(coupon.discountType==='fixed'){
     discountToApply=coupon.discountValue;
@@ -147,8 +175,11 @@ if(discountToApply>subtotal){
     throw new Error("this coupon cannot be applied because the coupon value exceeds the subtaotal");
 
 }
-
-const finalPrice=total;
+console.log("dicount to apply here :",discountToApply);
+console.log("total:",total);
+const finalPrice=total-discountToApply;
+console.log("finalPrice inside the applycoupon service logic:",finalPrice);
+// const finalPrice=total;
 const discountText=getDiscountTextService(coupon);
 const appliedCoupon={
     id:coupon._id,
@@ -197,6 +228,7 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
 
     }
     await checkCouponUsageService(userId,coupon);
+    console.log("userId inside the apply coupon :",userId);
     const result=await applyCouponLogicService({userId,coupon,retryCartItems});
 
     return {

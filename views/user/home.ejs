@@ -52,8 +52,9 @@
      if (product.isNewArrival && product.isActive) { %>
   <div class="product-card">
     <a href="/user/product/<%= product._id %>" class="product-link">
-      <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" />
-      <div class="product-info">
+     <img src="<%= product.images[0] ? product.images[0] : '/img/placeholder.jpg' %>" />
+      <!-- <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" /> -->
+  <div class="product-info">                                
         <p><%= product.productName %></p>
         <p class="price">₹<%= product.price %></p>
       </div>

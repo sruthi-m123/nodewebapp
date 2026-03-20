@@ -44,11 +44,12 @@ export const applyCouponByCode = async (req, res) => {
 
 export const applyCoupon = async (req, res) => {
   logger.info('Applying coupon by Id');
-
-  const userId = req.userId;
+console.log("session details:",req.session.user)
+  const userId = req.session.user.id;
   const isRetry = req.query.retry === 'true';
 
   const { couponCode, couponId, retryCartItems } = req.validatedData;
+  console.log("userId in the apply coupon :",userId);
 
   const result = await couponApplicationService.validateAndApplyCouponService(
     userId,

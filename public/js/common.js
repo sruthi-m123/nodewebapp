@@ -34,19 +34,23 @@ window.addEventListener("click",(e)=>{
 }
  });
 
-  document.getElementById('logoutBtn').addEventListener('click', function (e) {
+ const logoutBtn=document.getElementById('logoutBtn');
+ if(logoutBtn){
+  logoutBtn.addEventListener('click',function(e){
     e.preventDefault();
-    fetch('/user/logout', {
-      method: 'POST',
-      credentials: 'include'
+    fetch('/user/logout',{
+      method:'POST',
+      credentials:'include'
     })
-      .then(res => {
-        if (res.ok) {
-          window.location.href = '/user/home'; 
-        }
-      })
-      .catch(err => console.error('Logout failed:', err));
-  });
+    .then(res=>{
+      if(res.ok){
+        window.location.href='/user/home';
+      }
+    })
+    .catch(err=>console.error('logout failed:',err));
+  })
+ }
+  
 
 
 async function updateCartCount(){

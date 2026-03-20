@@ -101,6 +101,8 @@
                     <div class="section-title">ORDER ITEMS</div>
                     
                     <% cartItems.forEach(item => { %>
+                        console.log(items:,item.name);
+                        console.log(price:item.totalPrice);
                         <div class="product-item">
                             <img src="<%= item.image || 'images/placeholder.jpg' %>" alt="<%= item.name || 'Product' %>" class="product-image">
                             <div class="product-details">

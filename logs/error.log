@@ -131,3 +131,7 @@ Cannot read properties of undefined (reading 'orderId')
 [2026-03-03 10:58:05] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'toString')
 [2026-03-03 11:02:14] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'toString')
 [2026-03-03 11:03:47] [31merror[39m: POST /user/orders/69a64a4ea6e1e4d24d861601/return-Cannot read properties of undefined (reading 'id')
+[2026-03-20 21:05:34] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
+[2026-03-20 21:22:31] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
+[2026-03-20 21:27:07] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
+[2026-03-20 21:28:03] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
