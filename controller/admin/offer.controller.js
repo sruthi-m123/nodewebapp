@@ -73,7 +73,7 @@ export const updateOffer = async (req, res) => {
   const { id } = req.validatedData; 
   logger.info('updating offer', { id });
 
-  const updatedOffer = await offerService.updateOfferService(id, req.validatedData); // Use validated body
+  const updatedOffer = await offerService.updateOfferService(id, req.validatedData); 
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,
     message: MESSAGES.OFFER.UPDATE_SUCCESS,

@@ -73,7 +73,8 @@ router.get('/orders/:orderId/verify-return', adminAuth, orderController.getRetur
 //offer managment
 router.get('/offers', adminAuth ,validate(V.offerQuerySchema,'query'),offerController.getOfferPage);
 router.post('/offers/add-offer', adminAuth, validate(V.createOfferSchema),offerController.createOffer);
-router.delete('/offers/delete-offer/:offerId', adminAuth, validate(V.getOfferByIdSchema),offerController.deleteOffer);
+router.delete('/offers/delete-offer/:offerId', adminAuth, validate({params:V.getOfferByIdSchema}),offerController.deleteOffer);
+
 router.get('/offers/get-offer/:id', adminAuth,validate(V.getOfferByIdSchema), offerController.getEditOffer);
 router.put('/offers/update-offer/:id', adminAuth, validate(V.getOfferByIdSchema),offerController.updateOffer);
 

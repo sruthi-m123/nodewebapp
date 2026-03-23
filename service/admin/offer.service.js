@@ -9,7 +9,9 @@ import logger from '../../utils/logger.js';
 export const getOffersService=async(currentPage=1,limit=6,offerType='all')=>{
     logger.debug('fetching offers',{currentPage,limit,offerType});
 
-    let query={isActive:true};
+    let query={isActive:true,
+        endDate:{$gte:new Date()}
+    };
     if(offerType!=='all'){
         query.applicableTo=offerType;
     }
@@ -134,7 +136,7 @@ export const getEditOfferService=async(offerId)=>{
         offer.startDate=new Date(offer.startDate).toISOString().split('T')[0];
     }
 
-    if(offer.endDate&&!isNaN(new Date(offer.endDate)).getTime()){
+    if(offer.endDate&&!isNaN(new Date(offer.endDate).getTime())){
         offer.endDate=new Date(offer.endDate).toISOString().split('T')[0];
     }
 
