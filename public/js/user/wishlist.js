@@ -93,7 +93,17 @@ async function addToCart(itemId) {
     if (!response.ok) {
       throw new Error(data.error || 'Failed to add to cart');
     }
+Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: data.message || 'Item added to cart',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });
 
+<<<<<<< Updated upstream
     if (typeof Swal !== 'undefined') {
       Swal.fire({
         toast: true,
@@ -192,3 +202,21 @@ async function addToCart(itemId) {
 //     return { success: false };
 //   }
 // }
+=======
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error:', error);
+ Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: error.message,
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });  }
+}
+>>>>>>> Stashed changes

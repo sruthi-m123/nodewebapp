@@ -83,10 +83,31 @@
       </div>
     </div>
 
+<<<<<<< Updated upstream
     <div class="product-grid" id="product-grid">
       <% if (products.length === 0) { %>
         <div class="no-products-message">
           <p>No products available.</p>
+=======
+   <div class="product-grid" id="product-grid">
+  <% if (products.length === 0) { %>
+    <div class="no-products-message">
+      <p>No products available.</p>
+    </div>
+  <% } else { %>
+    <% products.forEach(product => { %>
+      <% if (product.isActive) { %>
+<div class="product-card ">
+       <% if (product.isNewArrival) { %>
+  <div class="product-badge">New</div>
+<% } %>
+
+        <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
+           <a href="/user/product/<%= product._id %>">
+          <img src="<%= product.images[0] %>" alt="<%= product.productName %>">
+          </a>
+          <div class="quick-view">Quick View</div>
+>>>>>>> Stashed changes
         </div>
       <% } else { %>
         <% products.forEach(product => { %>

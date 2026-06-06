@@ -601,6 +601,7 @@ function apiCall(url, method = 'GET', data = null, successMessage = null) {
             throw error;
         });
 }
+<<<<<<< Updated upstream
 
 // Allow pressing Enter in coupon input
 document.getElementById('couponCodeInput')?.addEventListener('keypress', function(e) {
@@ -640,6 +641,9 @@ function initializeCheckout() {
 
 
 
+=======
+// Place Order Function
+>>>>>>> Stashed changes
 function placeOrder() {
   const btn = document.querySelector('.continue-btn');
   btn.disabled = true;
@@ -659,6 +663,7 @@ function placeOrder() {
   }
 console.log("appliedCoupon in place order",appliedCoupon);
 
+<<<<<<< Updated upstream
 const isRetry=window.isRetry||window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
 
 const payload={
@@ -674,10 +679,24 @@ if(isRetry){
 console.log("submiting payload:",payload);
   // single fetch call
   fetch('/user/orders-placed', {
+=======
+  // Show loading indicator
+  Swal.fire({
+    title: 'Processing...',
+    text: 'Please wait while we process your order',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  fetch('/api/orders', {  
+>>>>>>> Stashed changes
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify( payload)
   })
+<<<<<<< Updated upstream
   .then(res => res.json())
   .then(data => {
     if (!data.success) {
@@ -689,6 +708,38 @@ console.log("submiting payload:",payload);
     if (paymentMethod === 'netbanking') {
       payWithRazorpay(data.order, data.key,data.dborderID);
     } else {
+=======
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        if (data.razorpay) {
+          Swal.close();
+          
+          initializeRazorpayPayment(data);
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Placed!',
+            text: 'Your order was placed successfully.',
+            confirmButtonText: 'View Order'
+          }).then(() => {
+            window.location.href = `/order-success/${data.orderId}`;
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Error placing order',
+          confirmButtonText: 'Try Again'
+        });
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+>>>>>>> Stashed changes
       Swal.fire({
         icon: 'success',
         title: 'Order Placed!',
@@ -707,7 +758,118 @@ console.log("submiting payload:",payload);
 }
 
 
+<<<<<<< Updated upstream
 
+=======
+// Function to initialize Razorpay payment
+function initializeRazorpayPayment(orderData) {
+  const options = {
+    key: orderData.razorpayOrder.key_id,
+    amount: orderData.razorpayOrder.amount,
+    currency: orderData.razorpayOrder.currency,
+    name: 'Chettinad Sarees',
+    description: `Order ${orderData.order.orderId}`,
+    image: '/images/logo.png', // Optional: Add your logo
+    order_id: orderData.razorpayOrder.id,
+    handler: function(response) {
+      // Payment successful - verify payment
+      verifyPayment(response, orderData.order.orderId);
+    },
+    prefill: {
+      name: document.querySelector('[name="name"]')?.value || '',
+      email: document.querySelector('[name="email"]')?.value || '',
+      contact: document.querySelector('[name="phone"]')?.value || ''
+    },
+    theme: {
+      color: '#c39d6b' // Your brand color
+    },
+    modal: {
+      ondismiss: function() {
+        // Payment cancelled
+        Swal.fire({
+          icon: 'info',
+          title: 'Payment Cancelled',
+          text: 'Your order has not been placed. You can try again.',
+          confirmButtonText: 'Okay'
+        });
+        
+        // Re-enable the place order button
+        const btn = document.querySelector('.continue-btn');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Place Order';
+        }
+      }
+    }
+  };
+
+  const razorpay = new Razorpay(options);
+  razorpay.open();
+}
+// Function to verify payment after successful Razorpay payment
+function verifyPayment(paymentResponse, orderId) {
+  // Show verification loading
+  Swal.fire({
+    title: 'Verifying Payment...',
+    text: 'Please wait while we verify your payment',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  fetch('/user/verify-payment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      razorpay_order_id: paymentResponse.razorpay_order_id,
+      razorpay_payment_id: paymentResponse.razorpay_payment_id,
+      razorpay_signature: paymentResponse.razorpay_signature,
+      orderId: orderId
+    })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Payment Successful!',
+          text: 'Your order has been placed successfully.',
+          confirmButtonText: 'View Order'
+        }).then(() => {
+          window.location.href = `/order-success/${orderId}`;
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Verification Failed',
+          text: data.message || 'Payment verification failed. Please contact support.',
+          confirmButtonText: 'Contact Support'
+        }).then(() => {
+          window.location.href = '/checkout';
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Verification error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong during payment verification.',
+        confirmButtonText: 'Go to Home'
+      }).then(() => {
+        window.location.href = '/';
+      });
+    });
+}
+
+
+
+
+// Close modal when clicking outside
+>>>>>>> Stashed changes
 window.addEventListener('click', function(event) {
     const modal = document.getElementById('addressModal');
     if (event.target === modal) {

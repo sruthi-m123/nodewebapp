@@ -1,5 +1,23 @@
 import express from "express";
 const router = express.Router();
+<<<<<<< Updated upstream
+=======
+const userController = require("../controller/user/userController");
+const passport =require("passport");
+const { ifAuthenticated ,redirectIfLoggedIn,isLoggedIn,isNotLoggedIn} = require("../middlewares/auth");
+const {singleUpload, multiUpload,upload}=require('../config/multer');
+const profileController = require("../controller/user/profileController");
+const shopController=require("../controller/user/shopController");
+const productController=require("../controller/user/productController")
+const addressController=require("../controller/user/addressController");
+const cartController=require("../controller/user/cartController")
+const checkoutController=require("../controller/user/checkoutController");
+const orderController=require("../controller/user/orderController")
+const orderdetailController=require('../controller/user/orderDetailController');
+const wishlistController=require('../controller/user/wishlistController');
+const walletController=require('../controller/user/walletController');
+const razorpayController=require("../controller/user/razorpayController");
+>>>>>>> Stashed changes
 
 import * as  userController from "../controller/user/userController.js";
 import passport from "passport";
@@ -107,11 +125,40 @@ router.post("/request-email-change", checkBlocked,validate(V.emailChangeSchema),
 router.post("/change-password", checkBlocked, validate(V.changePasswordSchema),profileController.changePassword);
 router.post("/verify-email-change", checkBlocked,validate(V.verifyOtpSchema),profileController.verifyEmailChange);
 
+<<<<<<< Updated upstream
 
 //shopall and product
 router.get("/shopAll", shopController.loadShoppping);
 router.post("/shopall/filter", shopController.applyFilters);
 router.get("/shopall/category/:id", shopController.getProductsByCategory);
+=======
+//shopall
+router.get("/shopAll",shopController.loadShopping);
+router.post('/shopall/filter',shopController.applyFilters);
+router.get('/shopall/category/:id', shopController.getProductsByCategory);
+//product detail page 
+router.get('/product/:id',productController.productDetail);
+//address page
+router.get('/address',isLoggedIn,addressController.getAddressPage);
+router.post('/addresses/add',addressController.addAddress);
+router.put('/addresses/edit/:id',addressController.updateAddress);
+router.delete('/addresses/delete/:id',addressController.deleteAddress);
+router.post('/set-default-address/:id',addressController.setDefaultAddress)
+//cart page
+router.get('/cart',isLoggedIn,cartController.getCart);
+router.post('/cart/add/:productId',isLoggedIn,cartController.addToCart);
+router.delete('/cart/remove/:itemId',isLoggedIn,cartController.removeCartItem);
+router.post('/cart/update',cartController.updateCart);
+
+//checkout page
+router.get('/checkout', checkoutController.getCheckoutPage);
+router.post('/buy-now',checkoutController.buyNow);
+router.post('/verify-payment',razorpayController.verifyPayment);
+//address checkout page 
+router.post('/api/addresses',checkoutController.addAddress);
+router.put('/api/addresses/:id',checkoutController.updateAddress);
+router.get('/api/addresses/:id',checkoutController.getAddress);
+>>>>>>> Stashed changes
 
 router.get("/product/:id", productController.productDetail);
 

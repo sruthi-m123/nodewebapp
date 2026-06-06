@@ -171,3 +171,115 @@ export const removeInvalidCartItems = async (req, res) => {
         newCartTotal: result.newCartTotal
     });
 };
+<<<<<<< Updated upstream
+=======
+
+const removeCartItem=async(req,res)=>{
+  console.log("remove controller hit  ")
+  if (!req.session.user && !req.user) {
+  return res.status(401).json({ message: 'please login to continue' });
+}
+
+    const userId=req.session.user?.id;
+    const itemId=req.params.itemId;
+    if(!userId){
+        return res.status(401).json({message:'please login to continue'});
+    }
+    try {
+        const cart=await Cart.findOne({userId});
+        if(!cart){
+            return res.status(404).json({message:'cart not found'});
+        }
+
+cart.items=cart.items.filter(item=>item._id.toString()!==itemId)
+.map(item=>({
+  ...item.toObject(),
+  totalPrice:item.price*item.quantity
+}))
+await cart.save();
+return res.status(200).json({ message: 'Item removed from cart' ,cartCount:cartCount});
+    } catch (error) {
+        console.error('Error removing item from cart:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+//quantity update in cart
+const updateCart = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const updates = req.body.updates;
+
+    console.log(" Updates received:", updates);
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.status(200).json({ message: "Cart is empty or not found", cart: [] });
+    }
+
+    for (const update of updates) {
+      const item = cart.items.find((i) => i._id.toString() === update.id);
+
+      if (item) {
+        const product=await Product.findById(item.productId);
+        if(update.quantity>product.stock){
+          return res.status(400).json({
+            message:`cannot update quantity:Only ${product.stock}
+            units available for ${product.name}`,
+            productId:item.productId
+          })
+        }
+       
+      }
+    }
+
+for(const update of updates){
+  const item=cart.items.find((i)=>i._id.toString()===update.id);
+
+if(item){
+  item.quantity=update.quantity;
+item.totalPrice=item.quantity*item.price;
+}
+}
+
+
+
+    await cart.save();
+
+    console.log(" Cart updated successfully:", cart);
+
+    res.status(200).json({ message: "Cart updated successfully", cart,cartCount:cartCount });
+
+  } catch (error) {
+    console.error("Error updating cart:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getCartCount=async(userId)=>{
+  const cart=await Cart.findOne({userId});
+  return cart?cart.items.length:0;
+};
+const cartCount=async(req,res)=>{
+  if(!req.session.user) return res.json({cartCount:0});
+
+  try {
+    const count=await getCartCount(req.session.user._id);
+    res.json({cartCount:count});
+  } catch (error) {
+    console.error("cart count fetch error:",error);
+  }
+}
+
+
+module.exports={
+    getCart,
+    addToCart,
+    removeCartItem,
+    updateCart,
+    cartCount,
+    getCartCount,
+    cartCount
+   }
+>>>>>>> Stashed changes

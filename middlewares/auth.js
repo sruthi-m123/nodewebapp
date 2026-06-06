@@ -44,9 +44,21 @@ export const userAuth= (req,res,next)=>{
     }
     next();
 }
+<<<<<<< Updated upstream
 
 export const isLoggedIn=(req,res,next)=>{
     console.log("user in isLogged middleware",req.session)
+=======
+const redirectIfLoggedIn = (req, res, next) => {
+    if (req.session && req.session.user) {
+    }
+    next();
+};
+const isLoggedIn=(req,res,next)=>{
+    console.log("req.session =", req.session);
+    console.log("req.user =", req.user);
+     // Check if session exists and has user data
+>>>>>>> Stashed changes
     if (req.session && req.session.user && req.session.user.id) {
       return next();
     }

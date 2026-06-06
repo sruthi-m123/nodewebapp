@@ -18,10 +18,23 @@ import ShopService from "../../service/user/shop.service.js";
 
     const filters={isDeleted:false};
 
+<<<<<<< Updated upstream
     if(availability==='Instock'){
       filters.stock={$gt:0};
     }else if(availability==="out of stock"){
       filters.stock=0;
+=======
+const loadShopping = async (req, res) => {
+  try {
+    const isAjaxRequest = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
+    
+    const filters = { isDeleted: false }; 
+    //availability
+    if (req.query.availability === "In Stock") {
+      filters.stock = { $gt: 0 };
+    } else if (req.query.availability === "out of stock") {
+      filters.stock = 0;
+>>>>>>> Stashed changes
     }
 
     if(minPrice||maxPrice){
@@ -29,6 +42,7 @@ import ShopService from "../../service/user/shop.service.js";
       if(minPrice) filters.price.$gte=Number(minPrice);
       if(maxPrice) filters.price.$lte=Number(maxPrice);
     }
+<<<<<<< Updated upstream
     if(color && color!=="all"){
       filters.color=color;
     }
@@ -39,6 +53,64 @@ import ShopService from "../../service/user/shop.service.js";
 
     const categories=await ShopService.getCategories();
     const {
+=======
+    // color
+    if (req.query.color && req.query.color !== "all") {
+      filters.color = req.query.color;
+    }
+    //search
+    let searchQuery = {};
+    if (req.query.search) {
+      console.log("hii search here")
+      searchQuery = {
+        productName: { $regex: req.query.search, $options: "i" },
+      };
+    }
+    
+    let userData = null;
+    const limit=6;
+    const page=parseInt(req.query.page)||1;
+    
+    const totalProducts=await Product.countDocuments();
+    const totalPages=Math.ceil(totalProducts/limit);
+    if (req.session.user) {
+          console.log("userId iside the shopall page",req.session.user.id);
+      userData = await User.findById(req.session.user.id);
+    }
+    const categories = await Category.find({ isDeleted: false });
+
+
+    const products = await Product.find({
+      ...filters,
+      ...searchQuery,
+    })
+    .skip((page-1)*limit)
+    .limit(limit)
+    .populate("category");
+
+ if (isAjaxRequest) {
+      return res.json({
+        products: products,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalProducts: totalProducts,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      });
+      console.log('📄 Returning HTML response');
+    }
+
+
+    return res.render("user/shopall", {
+
+      pageCSS: "user/shopall.css",
+      pageJS:"user/shopall.js",
+       pageTitle: 'Chettinad - Premium Saree Boutique',
+        user: userData,
+         currentPath: req.path,
+>>>>>>> Stashed changes
       products,
       totalPages,
       currentPage,
@@ -65,6 +137,16 @@ import ShopService from "../../service/user/shop.service.js";
       currentPage,
       message:MESSAGES.SHOP.PRODUCTS_FETCH_SUCCESS
     });
+<<<<<<< Updated upstream
+=======
+  } catch (error) {
+    console.log("shopping page not loading:", error);
+    if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
+      return res.status(500).json({ error: "Server error" });
+    }
+
+    res.status(500).send("server error");
+>>>>>>> Stashed changes
   }
 
  export const applyFilters = async (req, res) => {
@@ -108,12 +190,43 @@ export const getProductsByCategory = async (req, res) => {
   const { products, totalProducts } =
     await ShopService.getProductsByCategory(id);
 
+<<<<<<< Updated upstream
   res.status(STATUS_CODES.SUCCESS).json({
     success:true,
     message:MESSAGES.SHOP.CATEGORY_PRODUCTS_SUCCESS,
     products,
     total: totalProducts
   });
+=======
+    if (availability && availability.length > 0) {
+      if (
+        availability.includes('in-stock') &&
+        !availability.includes('out-stock')
+      ) {
+        query.stock = { $gt: 0 }; // In-stock
+      } else if (
+        !availability.includes('in-stock') &&
+        availability.includes('out-stock')
+      ) {
+        query.stock = { $lte: 0 }; // Out-of-stock
+      }
+    }
+
+    //  Color Filter
+    if (colors && colors.length > 0) {
+      query.color = { $in: colors };
+    }
+
+    //  Price Range
+    if (minPrice !== undefined || maxPrice !== undefined) {
+  query.price = {};
+  if (minPrice !== undefined && minPrice !== "") {
+    query.price.$gte = Number(minPrice);
+  }
+  if (maxPrice !== undefined && maxPrice !== "") {
+    query.price.$lte = Number(maxPrice);
+  }
+>>>>>>> Stashed changes
 }
 export const loadAllProducts = async (req, res) => {
   logger.info("Loading all products");
