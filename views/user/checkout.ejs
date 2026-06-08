@@ -1,378 +1,386 @@
 <!-- Main Checkout Content -->
 <div class="main-content">
-    <div class="container">
-        <h1>Checkout</h1>
-        <p class="subtitle">Review your order and complete your purchase</p>
-<form action="/user/place-order" method="POST" id="checkoutForm">
+  <div class="container">
+    <h1>Checkout</h1>
+    <p class="subtitle">Review your order and complete your purchase</p>
+    <form action="/user/place-order" method="POST" id="checkoutForm">
 
       <div class="checkout-grid">
-  <div class="left-column">
-    <!-- Address Selection -->
-    <div class="address-list" id="addressList">
-      <input type="hidden" name="addressId" id="selectedAddressId">
+        <div class="left-column">
+          <div class="address-list" id="addressList">
+            <input type="hidden" name="addressId" id="selectedAddressId">
 
-      <% if (addresses.length === 0) { %>
-        <!-- Show when no addresses exist -->
-        <div class="no-addresses">
-          <div class="no-address-message">
-            No address is added
+            <% if (addresses.length===0) { %>
+              <div class="no-addresses">
+                <div class="no-address-message">
+                  No address is added
+                </div>
+                <button type="button" class="add-address-btn" onclick="openAddressModal('new')">
+                  Add Address
+                </button>
+              </div>
+              <% } else { %>
+                <% addresses.forEach((addr, index)=> { %>
+
+                  <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" data-address-id="<%= addr._id %>"
+                    onclick="setupAddressSelection(this, '<%= addr._id %>')">
+
+                    <div class="address-name">
+                      <%= addr.name || 'Unknown' %>
+                    </div>
+
+                    <div class="address-details">
+                      <%= addr.building || '' %><br>
+                        <%= addr.landmark ? addr.landmark : '' %><br>
+                          <%= addr.city || '' %>, <%= addr.state || '' %> - <%= addr.pincode || '' %><br>
+                                Phone: <%= addr.phone || 'N/A' %><br>
+                                  <% if (addr.altPhone) { %>
+                                    Alt: <%= addr.altPhone %><br>
+                                      <% } %>
+                    </div>
+
+                    <div class="address-tags">
+                      <span class="tag <%= addr.addressType || 'other' %>">
+                        <%= (addr.addressType || 'Other' ).charAt(0).toUpperCase() + (addr.addressType || 'Other'
+                          ).slice(1) %>
+                      </span>
+                      <% if (addr.isDefault) { %>
+                        <span class="tag default">Default</span>
+                        <% } %>
+                    </div>
+
+                    <div class="address-actions">
+                      <a href="#" class="edit-address"
+                        onclick="event.stopPropagation(); openAddressModal('<%= addr._id %>')">Edit</a>
+                      <a href="#" class="delete-address"
+                        onclick="event.stopPropagation(); confirmDeleteAddress('<%= addr._id %>')">Delete</a>
+                    </div>
+                  </div>
+
+                  <% }) %>
+                    <% } %>
           </div>
-          <button type="button" class="add-address-btn" onclick="openAddressModal('new')">
-             Add Address
+        </div>
+      </div>
+
+      <% if (addresses && addresses.length> 0) { %>
+        <div class="add-more-address-container">
+          <button type="button" class="add-more-address-btn" onclick="openAddressModal('new')">
+            <span class="plus-icon">+</span>
+            Add More Address
           </button>
         </div>
-      <% } else { %>
-        <!--  address cards -->
-        <% addresses.forEach((addr, index) => { %>
+        <% } %>
 
-          <div class="address-card <%= addr.isDefault ? 'selected' : '' %>" 
-               data-address-id="<%= addr._id %>" 
-               onclick="setupAddressSelection(this, '<%= addr._id %>')">
 
-            <!-- Name -->
-            <div class="address-name"><%= addr.name || 'Unknown' %></div>
-
-            <!-- Full Address -->
-            <div class="address-details">
-              <%= addr.building || '' %><br>
-              <%= addr.landmark ? addr.landmark  : '' %><br>
-              <%= addr.city || '' %>, <%= addr.state || '' %> - <%= addr.pincode || '' %><br>
-              Phone: <%= addr.phone || 'N/A' %><br>
-              <% if (addr.altPhone) { %>
-                Alt: <%= addr.altPhone %><br>
-              <% } %>
-            </div>
-
-            <!-- Tags -->
-            <div class="address-tags">
-              <span class="tag <%= addr.addressType || 'other' %>">
-                <%= (addr.addressType || 'Other').charAt(0).toUpperCase() + (addr.addressType || 'Other').slice(1) %>
-              </span>
-              <% if (addr.isDefault) { %>
-                <span class="tag default">Default</span>
-              <% } %>
-            </div>
-
-            <!-- Actions -->
-            <div class="address-actions">
-              <a href="#" class="edit-address" onclick="event.stopPropagation(); openAddressModal('<%= addr._id %>')">Edit</a>
-              <a href="#" class="delete-address" onclick="event.stopPropagation(); confirmDeleteAddress('<%= addr._id %>')">Delete</a>
+          <!-- Delete Confirmation Modal -->
+          <div id="deleteConfirmModal" class="modal"
+            style="display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+            <div class="modal-content"
+              style="background:#fff; padding:20px; border-radius:8px; width:300px; text-align:center;">
+              <h3>Confirm Delete</h3>
+              <p>Are you sure you want to delete this address?</p>
+              <div style="margin-top:15px;">
+                <button type="button" class="delete-confirm-btn" onclick="deleteAddress()"
+                  style="background:#d9534f; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Yes,
+                  Delete</button>
+                <button type="button" onclick="closeDeleteModal()"
+                  style="margin-left:10px; background:#6c757d; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Cancel</button>
+              </div>
             </div>
           </div>
-  
-        <% }) %>
-      <% } %>
-    </div>
+
+
+
+          <div class="delivery-info">
+            <div class="delivery-title">Estimated Delivery Date</div>
+            <div class="delivery-date">Monday, 13 | 12:00 - 16:00</div>
+          </div>
   </div>
-</div>
 
-<% if (addresses && addresses.length > 0) { %>
-  <div class="add-more-address-container">
-    <button type="button" class="add-more-address-btn" onclick="openAddressModal('new')">
-      <span class="plus-icon">+</span>
-      Add More Address
-    </button>
-  </div>
-<% } %>
+  <!-- Products in Cart -->
+  <div class="product-section">
+    <div class="section-title">ORDER ITEMS</div>
 
-
-<!-- Delete Confirmation Modal -->
-<div id="deleteConfirmModal" class="modal" style="display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-  <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; width:300px; text-align:center;">
-    <h3>Confirm Delete</h3>
-    <p>Are you sure you want to delete this address?</p>
-    <div style="margin-top:15px;">
-      <button type="button" class="delete-confirm-btn" onclick="deleteAddress()" style="background:#d9534f; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Yes, Delete</button>
-      <button type="button" onclick="closeDeleteModal()" style="margin-left:10px; background:#6c757d; color:#fff; padding:8px 12px; border:none; border-radius:4px; cursor:pointer;">Cancel</button>
-    </div>
-  </div>
-</div>
-
-
-
-                    <div class="delivery-info">
-                        <div class="delivery-title">Estimated Delivery Date</div>
-                        <div class="delivery-date">Monday, 13 | 12:00 - 16:00</div>
-                    </div>
-                </div>
-
-                <!-- Products in Cart -->
-                <div class="product-section">
-                    <div class="section-title">ORDER ITEMS</div>
-                    
-                    <% cartItems.forEach(item => { %>
-                        console.log(items:,item.name);
-                        console.log(price:item.totalPrice);
-                        <div class="product-item">
-                            <img src="<%= item.image || 'images/placeholder.jpg' %>" alt="<%= item.name || 'Product' %>" class="product-image">
-                            <div class="product-details">
-                                <div class="product-name"><%= item.name || 'Unknown Product' %></div>
-                                <div class="product-variant"><%= item.variant || 'Default' %></div>
-                                <div class="product-price-info">
-                                    <div class="quantity-price">Qty: <%= item.quantity || 1 %> × ₹<%= item.price || 0 %></div>
-                                    <div class="item-total">₹<%= (item.quantity || 1) * (item.price || 0) %></div>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
-
-
-<!-- Coupon Selection Section -->
-<div class="coupon-section">
-    <div class="section-title">APPLY COUPONS</div>
-    
-    <!-- Coupon Input Field -->
-    <div class="coupon-input-container">
-        <input type="text" id="couponCodeInput" placeholder="Enter coupon code" class="coupon-input">
-        <button type="button" class="apply-coupon-input-btn" onclick="applyCouponByCode()">Apply</button>
-    </div>
-    
-    <!-- Available Coupons Dropdown -->
-    <div class="coupon-dropdown-container">
-        <div class="coupon-dropdown-header" onclick="toggleCouponDropdown()">
-            <span>Available Coupons</span>
-            <span class="dropdown-arrow">▼</span>
+    <% cartItems.forEach(item=> { %>
+      <div class="product-item">
+        <img src="<%= item.image || 'images/placeholder.jpg' %>" alt="<%= item.name || 'Product' %>"
+          class="product-image">
+        <div class="product-details">
+          <div class="product-name">
+            <%= item.name || 'Unknown Product' %>
+          </div>
+          <div class="product-variant">
+            <%= item.variant || 'Default' %>
+          </div>
+          <div class="product-price-info">
+            <div class="quantity-price">Qty: <%= item.quantity || 1 %> × ₹<%= item.price || 0 %>
+            </div>
+            <div class="item-total">₹<%= (item.quantity || 1) * (item.price || 0) %>
+            </div>
+          </div>
         </div>
-            <!-- <pre><%= JSON.stringify(coupons) %></pre> -->
+      </div>
+      <% }); %>
+  </div>
 
-        <div class="coupon-dropdown-content" id="couponDropdown">
-            <% if (coupons && coupons.length > 0) { %>
-                <% coupons.forEach(coupon => { 
-                    // Filter out expired coupons
-                    const isExpired = new Date(coupon.validTill) < new Date();
-                    if (isExpired) return; // Skip expired coupons
-                    
-                    const isApplicable = subtotal >= coupon.minCartValue;
-                    const isValid = isApplicable;
-                %>
-                    <div class="coupon-dropdown-item <%= isValid ? '' : 'coupon-invalid' %>" 
-                         data-coupon-id="<%= coupon._id %>" 
-                         data-coupon-code="<%= coupon.code %>">
-                        <div class="coupon-dropdown-info">
-                            <div class="coupon-dropdown-name"><%= coupon.description  %></div>
-                            <div class="coupon-dropdown-details">
-                                <span class="coupon-dropdown-code">Code: <%= coupon.code %></span>
-                                <span class="coupon-dropdown-validity">
-                                    Valid until: <%= new Date(coupon.validTill).toLocaleDateString() %> 
-                                    <%= new Date(coupon.validTill).toLocaleTimeString() %>
-                                </span>
-                            </div>
-                            <div class="coupon-dropdown-discount">
-                                <% if (coupon.discountType === 'percentage') { %>
-                                    <%= coupon.discountValue %>% OFF
-                                <% } else { %>
-                                    ₹<%= coupon.discountValue %> OFF
-                                <% } %>
-                                <!-- <% if (coupon.maxDiscount) { %>
+
+  <div class="coupon-section">
+    <div class="section-title">APPLY COUPONS</div>
+
+    <div class="coupon-input-container">
+      <input type="text" id="couponCodeInput" placeholder="Enter coupon code" class="coupon-input">
+      <button type="button" class="apply-coupon-input-btn" onclick="applyCouponByCode()">Apply</button>
+    </div>
+
+    <div class="coupon-dropdown-container">
+      <div class="coupon-dropdown-header" onclick="toggleCouponDropdown()">
+        <span>Available Coupons</span>
+        <span class="dropdown-arrow">▼</span>
+      </div>
+
+      <div class="coupon-dropdown-content" id="couponDropdown">
+        <% if (coupons && coupons.length> 0) { %>
+          <% coupons.forEach(coupon=> {
+            // Filter out expired coupons
+            const isExpired = new Date(coupon.validTill) < new Date(); if (isExpired) return; // Skip expired coupons
+              const isApplicable=subtotal>= coupon.minCartValue;
+              const isValid = isApplicable;
+              %>
+              <div class="coupon-dropdown-item <%= isValid ? '' : 'coupon-invalid' %>"
+                data-coupon-id="<%= coupon._id %>" data-coupon-code="<%= coupon.code %>">
+                <div class="coupon-dropdown-info">
+                  <div class="coupon-dropdown-name">
+                    <%= coupon.description %>
+                  </div>
+                  <div class="coupon-dropdown-details">
+                    <span class="coupon-dropdown-code">Code: <%= coupon.code %></span>
+                    <span class="coupon-dropdown-validity">
+                      Valid until: <%= new Date(coupon.validTill).toLocaleDateString() %>
+                        <%= new Date(coupon.validTill).toLocaleTimeString() %>
+                    </span>
+                  </div>
+                  <div class="coupon-dropdown-discount">
+                    <% if (coupon.discountType==='percentage' ) { %>
+                      <%= coupon.discountValue %>% OFF
+                        <% } else { %>
+                          ₹<%= coupon.discountValue %> OFF
+                            <% } %>
+                              <!-- <% if (coupon.maxDiscount) { %>
                                     (Max ₹<%= coupon.maxDiscount %>)
                                 <% } %> -->
-                            </div>
-                            <% if (!isValid) { %>
-                                <div class="coupon-dropdown-condition">
-                                    Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply
-                                </div>
-                            <% } %>
-                        </div>
-                       <button type="button" 
-        class="apply-coupon-dropdown-btn <%=( isValid&&!coupon.isUsed) ? '' : 'btn-disabled' %>" 
-        onclick="<%= (isValid &&!coupon.isUsed)? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}', '${coupon.discountType}', ${coupon.discountValue})` : '' %>"
-        <%= (isValid&&!coupon.isUsed )? '' : 'disabled' %>>
-    Apply
-</button>
-
+                  </div>
+                  <% if (!isValid) { %>
+                    <div class="coupon-dropdown-condition">
+                      Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply
                     </div>
-                <% }); %>
-            <% } else { %>
-                <div class="no-coupons-dropdown">
-                    No valid coupons available at this time
+                    <% } %>
                 </div>
-            <% } %>
-        </div>
+                <button type="button"
+                  class="apply-coupon-dropdown-btn <%=( isValid&&!coupon.isUsed) ? '' : 'btn-disabled' %>"
+                  onclick="<%= (isValid &&!coupon.isUsed)? `applyCouponFromDropdown('${coupon._id}', '${coupon.code}', '${coupon.discountType}', ${coupon.discountValue})` : '' %>"
+                  <%=(isValid&&!coupon.isUsed )? '' : 'disabled' %>>
+                  Apply
+                </button>
+
+              </div>
+              <% }); %>
+                <% } else { %>
+                  <div class="no-coupons-dropdown">
+                    No valid coupons available at this time
+                  </div>
+                  <% } %>
+      </div>
     </div>
-    
+
     <!-- Applied Coupon Display -->
     <div class="applied-coupon" id="appliedCouponContainer" style="display: none;">
-        <div class="applied-coupon-info">
-            <span id="appliedCouponText"></span>
-            <button type="button" class="remove-coupon-btn" onclick="removeCoupon()">Remove</button>
-        </div>
-        <input type="hidden" id="appliedCouponId" name="appliedCouponId">
+      <div class="applied-coupon-info">
+        <span id="appliedCouponText"></span>
+        <button type="button" class="remove-coupon-btn" onclick="removeCoupon()">Remove</button>
+      </div>
+      <input type="hidden" id="appliedCouponId" name="appliedCouponId">
     </div>
+  </div>
+
+
+  <!-- Payment Options -->
+  <div class="payment-section">
+    <div class="section-title">PAYMENT OPTIONS</div>
+
+    <div class="payment-methods">
+      <% paymentMethods.forEach(method=> { %>
+        <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %>"
+          data-payment="<%= method.id %>">
+          <div class="payment-radio">
+            <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>"
+              <%=method.id===selectedPayment ? 'checked' : '' %>>
+            <label for="<%= method.id %>"></label>
+          </div>
+          <div class="payment-info">
+            <div class="payment-icon">
+              <%= method.icon || '💳' %>
+            </div>
+            <div class="payment-details">
+              <div class="payment-title">
+                <%= method.title || 'Payment Method' %>
+              </div>
+              <div class="payment-description">
+                <%= method.description || 'No description' %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+    </div>
+    <input type="hidden" id="selectedPaymentId" name="paymentMethod">
+  </div>
 </div>
 
 
-                <!-- Payment Options -->
-                <div class="payment-section">
-                    <div class="section-title">PAYMENT OPTIONS</div>
-                    
-                    <div class="payment-methods">
-                        <% paymentMethods.forEach(method => { %>
-                            <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %>" data-payment="<%= method.id %>">
-                                <div class="payment-radio">
-                                    <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>" <%= method.id === selectedPayment ? 'checked' : '' %>>
-                                    <label for="<%= method.id %>"></label>
-                                </div>
-                                <div class="payment-info">
-                                    <div class="payment-icon"><%= method.icon || '💳' %></div>
-                                    <div class="payment-details">
-                                        <div class="payment-title"><%= method.title || 'Payment Method' %></div>
-                                        <div class="payment-description"><%= method.description || 'No description' %></div>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
-                     <input type="hidden" id="selectedPaymentId" name="paymentMethod">
-                </div>
-            </div>
-
-          
-                 <div class="right-column">
-                <div class="order-summary">
-                                    <div class="summary-title">ORDER SUMMARY</div>
-<!-- <div class="summary-row">
+<div class="right-column">
+  <div class="order-summary">
+    <div class="summary-title">ORDER SUMMARY</div>
+    <!-- <div class="summary-row">
   <span>Subtotal</span>
   <span id="summary-subtotal">₹<%= subtotal || 0 %></span>
 </div> -->
 
-<div class="summary-row">
-  <span>Total</span>
-  <span id="summary-subtotal">₹<%= netAmount %></span>
-</div>
+    <div class="summary-row">
+      <span>Total</span>
+      <span id="summary-subtotal">₹<%= netAmount %></span>
+    </div>
 
 
 
 
-<div class="summary-row">
-  <span>Delivery</span>
-  <span id="summary-delivery">₹<%= delivery || 0 %></span>
-</div>
+    <div class="summary-row">
+      <span>Delivery</span>
+      <span id="summary-delivery">₹<%= delivery || 0 %></span>
+    </div>
 
-<div class="summary-row">
-  <span>Tax (GST <%= taxRate || 0 %>%)</span>
-  <span id="summary-tax">₹<%= tax || 0 %></span>
-</div>
+    <div class="summary-row">
+      <span>Tax (GST <%= taxRate || 0 %>%)</span>
+      <span id="summary-tax">₹<%= tax || 0 %></span>
+    </div>
 
-<div class="summary-row">
-  <span>Coupon Discount</span>
-  <span id="summary-couponDiscount">₹<%= couponDiscount||0 %></span>
-</div>
+    <div class="summary-row">
+      <span>Coupon Discount</span>
+      <span id="summary-couponDiscount">₹<%= couponDiscount||0 %></span>
+    </div>
 
-<!-- <div class="summary-row">
+    <!-- <div class="summary-row">
   <span> Total Discount</span>
   <span id="summary-discount" style="color: #28a745;">-₹<%= discount || 0 %></span>
 </div> -->
 
-<div class="summary-row total">
-  <span>TOTAL</span>
-  <span id="summary-total">₹<%= total || 0 %></span>
+    <div class="summary-row total">
+      <span>TOTAL</span>
+      <span id="summary-total">₹<%= total || 0 %></span>
+
+    </div>
+    </form>
+
+  </div>
+
 
 </div>
-            </form>
 
-        </div>
-    
+<button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
 
+
+
+<!-- Add/Edit Address Modal -->
+<div class="modal" id="addressModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Add New Address</h3>
+      <button class="close-btn" id="closeSuccessModal" onclick="closeAddressModal()">×</button>
     </div>
 
-                <button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
-
-
-
-    <!-- Add/Edit Address Modal -->
-    <div class="modal" id="addressModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Add New Address</h3>
-                <button class="close-btn"  id="closeSuccessModal" onclick="closeAddressModal()">×</button>
-            </div>
-            
-            <form id="addressForm">
-    <div class="form-group">
+    <form id="addressForm">
+      <div class="form-group">
         <label class="form-label">Full Name *</label>
         <input type="text" class="form-input" id="name" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Building / House No. *</label>
         <input type="text" class="form-input" id="building" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Landmark (optional)</label>
         <input type="text" class="form-input" id="landmark">
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">City *</label>
         <input type="text" class="form-input" id="city" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">State *</label>
         <input type="text" class="form-input" id="state" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Pincode *</label>
         <input type="number" class="form-input" id="pincode" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Phone *</label>
         <input type="tel" class="form-input" id="phone" required>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Alternate Phone (optional)</label>
         <input type="tel" class="form-input" id="altPhone">
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Address Type *</label>
         <select class="form-input" id="addressType" required>
-            <option value="Home">Home</option>
-            <option value="Work">Work</option>
-            <option value="Other">Other</option>
+          <option value="Home">Home</option>
+          <option value="Work">Work</option>
+          <option value="Other">Other</option>
         </select>
-    </div>
+      </div>
 
-    <div class="checkbox-group">
+      <div class="checkbox-group">
         <input type="checkbox" id="setDefault">
         <label for="setDefault">Set as default address</label>
-    </div>
+      </div>
 
-    <button type="submit" class="save-btn">Save Address</button>
-</form>
+      <button type="submit" class="save-btn">Save Address</button>
+    </form>
 
-        </div>
-    </div>
-    <div id="checkout-data"
-         data-offers='<%- JSON.stringify(appliedOffers || []) %>'
-         data-addresses='<%- JSON.stringify(addresses || []) %>'
-         data-cart='<%- JSON.stringify(cartItems || []) %>'
-         data-payment="<%= selectedPayment || '' %>">
-    </div>
-  <% if (typeof isRetry !== 'undefined' && isRetry) { %>
+  </div>
+</div>
+<div id="checkout-data" data-offers='<%- JSON.stringify(appliedOffers || []) %>'
+  data-addresses='<%- JSON.stringify(addresses || []) %>' data-cart='<%- JSON.stringify(cartItems || []) %>'
+  data-payment="<%= selectedPayment || '' %>">
+</div>
+<% if (typeof isRetry !=='undefined' && isRetry) { %>
   <script>
     // Enable retry mode flags
     window.isRetry = true;
     document.body.dataset.isRetry = 'true';
-    
+
     // Safely inject retryCartItems from server
-    window.retryCartItems = <%- JSON.stringify(retryCartItems || []) %>;
-    
+    window.retryCartItems = <% - JSON.stringify(retryCartItems || []) %>;
+
     console.log('Retry mode detected');
     console.log('Retry cart items:', window.retryCartItems);
   </script>
-<% } else { %>
-  <script>
-    // Default (non-retry mode)
-    window.isRetry = false;
-    document.body.dataset.isRetry = 'false';
-    window.retryCartItems = [];
-  </script>
-<% } %>
+  <% } else { %>
+    <script>
+      // Default (non-retry mode)
+      window.isRetry = false;
+      document.body.dataset.isRetry = 'false';
+      window.retryCartItems = [];
+    </script>
+    <% } %>
 
-</div>
+      </div>

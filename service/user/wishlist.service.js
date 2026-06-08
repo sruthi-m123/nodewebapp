@@ -10,12 +10,13 @@ export const WishlistService={
         logger.info("fetching wishlist data",{userId});
 
         const user=await User.findById(userId);
-
+console.log("userId:",userId);
        
 
         const wishlist=await Wishlist.findOne({user:userId}).populate("items.productId");
-
+console.log("wishlist :",wishlist);
         const validItems=wishlist?.items?.filter(i=>i.productId)||[];
+      
         const formattedItems=validItems.map(item=>({
             id:item._id,
             name:item.productId.productName,
@@ -36,7 +37,7 @@ export const WishlistService={
             },
 
             async addToWishlist(userId,productId){
-                logger.info("Adding productto wishlist",{userId,productId});
+                logger.info("Adding products to wishlist",{userId,productId});
                  const product=await Product.findOne({
                     _id:productId,
                     isDeleted:false,
@@ -55,6 +56,8 @@ export const WishlistService={
                         user:userId,
                         items:[{productId}]
                     });
+                    await wishlist.save();
+                    return wishlist.items.length;
                 }else{
                     const exists=wishlist.items.some(
                         item=>item.productId.toString()===productId.toString()
@@ -65,7 +68,9 @@ export const WishlistService={
                         err.statusCode=STATUS_CODES.NOT_FOUND;
                         throw err;
                     }
+                    wishlist.items.push({productId});
                     await wishlist.save();
+                    console.log("wishlist.items:",wishlist.items);
                     return wishlist.items.length;
                 }
             },

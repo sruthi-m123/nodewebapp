@@ -83,12 +83,6 @@
       </div>
     </div>
 
-<<<<<<< Updated upstream
-    <div class="product-grid" id="product-grid">
-      <% if (products.length === 0) { %>
-        <div class="no-products-message">
-          <p>No products available.</p>
-=======
    <div class="product-grid" id="product-grid">
   <% if (products.length === 0) { %>
     <div class="no-products-message">
@@ -97,96 +91,80 @@
   <% } else { %>
     <% products.forEach(product => { %>
       <% if (product.isActive) { %>
-<div class="product-card ">
-       <% if (product.isNewArrival) { %>
-  <div class="product-badge">New</div>
-<% } %>
-
-        <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
-           <a href="/user/product/<%= product._id %>">
-          <img src="<%= product.images[0] %>" alt="<%= product.productName %>">
-          </a>
-          <div class="quick-view">Quick View</div>
->>>>>>> Stashed changes
-        </div>
-      <% } else { %>
-        <% products.forEach(product => { %>
-          <% if (product.isActive) { %>
-            <div class="product-card">
-              <% if (product.isNewArrival) { %>
-                <div class="product-badge">New</div>
-              <% } %>
-
-              <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
-                <a href="/user/product/<%= product._id %>">
-                  <img src="<%= product.images[0] %>" alt="<%= product.productName %>">
-                </a>
-                <div class="quick-view">Quick View</div>
-              </div>
-              <div class="product-info">
-                <h4 class="product-name">
-                  <a href="/user/product/<%= product._id %>" class="product-link-name">
-                    <%= product.productName %>
-                  </a>
-                </h4>
-                <div class="product-meta">
-                  <div class="product-rating">
-                    <% for(let i = 0; i < 5; i++) { %>
-                      <i class="<%= i < product.rating ? 'fas' : 'far' %> fa-star"></i>
-                    <% } %>
-                    <span>(<%= product.reviews || 0 %>)</span>
-                  </div>
-
-                  <% 
-                    let originalPrice = product.price;
-                    let finalPrice = originalPrice;
-                    let discountLabel = '';
-                    let discountValue = 0;
-
-                    if (product.bestOffer && product.bestOffer.discountValue != null) {
-                      discountValue = product.bestOffer.discountValue;
-
-                      if (product.bestOffer.type === 'percentage') {
-                        finalPrice = Math.round(originalPrice - (originalPrice * discountValue / 100));
-                        discountLabel = discountValue + '%OFF';
-                      } else if (product.bestOffer.type === 'fixed') {
-                        finalPrice = Math.max(0, originalPrice - discountValue);
-                        discountLabel = '₹' + discountValue.toLocaleString() + 'OFF';
-                      }
-                    }
-                  %>
-
-                  <p class="product-pricing">
-                    <span class="offer-price">₹<%= finalPrice.toLocaleString() %></span>
-                    <% if (finalPrice < originalPrice) { %>
-                      <span class="mrp">₹<%= originalPrice.toLocaleString() %></span>
-                      <span class="discount">(<%= discountLabel %>)</span>
-                    <% } %>
-                  </p>
-                </div>
-                <div class="product-actions">
-                  <button 
-                    class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" 
-                    data-product-id="<%= product._id %>"  
-                    title="Add to wishlist"
-                  >
-                    <i class="<%= wishlist.includes(product._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
-                  </button>
-
-                  <% if (product.stock === 0) { %>
-                    <p class="out-of-stock-message">Out of Stock</p>
-                  <% } else { %>
-                    <button class="add-to-cart primary-btn" data-id="<%= product._id %>">
-                      Add to Cart
-                    </button>
-                  <% } %>
-                </div>
-              </div>
-            </div>
+        <div class="product-card">
+          <% if (product.isNewArrival) { %>
+            <div class="product-badge">New</div>
           <% } %>
-        <% }) %>
+
+          <div class="product-image <%= product.stock === 0 ? 'grayscale' : '' %>">
+            <a href="/user/product/<%= product._id %>">
+              <img src="<%= product.images[0] %>" alt="<%= product.productName %>">
+            </a>
+            <div class="quick-view">Quick View</div>
+          </div>
+          <div class="product-info">
+            <h4 class="product-name">
+              <a href="/user/product/<%= product._id %>" class="product-link-name">
+                <%= product.productName %>
+              </a>
+            </h4>
+            <div class="product-meta">
+              <div class="product-rating">
+                <% for(let i = 0; i < 5; i++) { %>
+                  <i class="<%= i < product.rating ? 'fas' : 'far' %> fa-star"></i>
+                <% } %>
+                <span>(<%= product.reviews || 0 %>)</span>
+              </div>
+
+              <% 
+                let originalPrice = product.price;
+                let finalPrice = originalPrice;
+                let discountLabel = '';
+                let discountValue = 0;
+
+                if (product.bestOffer && product.bestOffer.discountValue != null) {
+                  discountValue = product.bestOffer.discountValue;
+
+                  if (product.bestOffer.type === 'percentage') {
+                    finalPrice = Math.round(originalPrice - (originalPrice * discountValue / 100));
+                    discountLabel = discountValue + '%OFF';
+                  } else if (product.bestOffer.type === 'fixed') {
+                    finalPrice = Math.max(0, originalPrice - discountValue);
+                    discountLabel = '₹' + discountValue.toLocaleString() + 'OFF';
+                  }
+                }
+              %>
+
+              <p class="product-pricing">
+                <span class="offer-price">₹<%= finalPrice.toLocaleString() %></span>
+                <% if (finalPrice < originalPrice) { %>
+                  <span class="mrp">₹<%= originalPrice.toLocaleString() %></span>
+                  <span class="discount">(<%= discountLabel %>)</span>
+                <% } %>
+              </p>
+            </div>
+            <div class="product-actions">
+              <button 
+                class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" 
+                data-product-id="<%= product._id %>"  
+                title="Add to wishlist"
+              >
+                <i class="<%= wishlist.includes(product._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
+              </button>
+
+              <% if (product.stock === 0) { %>
+                <p class="out-of-stock-message">Out of Stock</p>
+              <% } else { %>
+                <button class="add-to-cart primary-btn" data-id="<%= product._id %>">
+                  Add to Cart
+                </button>
+              <% } %>
+            </div>
+          </div>
+        </div>
       <% } %>
-    </div>
+    <% }) %>
+  <% } %>
 
     <div class="pagination">
       <!-- Previous button -->

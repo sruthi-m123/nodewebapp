@@ -15,7 +15,7 @@ import db from './config/db.js';
 import userRouter from './routes/userRouter.js';
 import adminRouter from './routes/adminRouter.js';
 import { setUserAndCartCount } from './middlewares/global.js';
-
+import { startCronJobs } from './cron/offerExpiry.js';
 
 import { fileURLToPath } from 'url';
 import {dirname} from 'path';
@@ -24,6 +24,7 @@ const __filename=fileURLToPath(import.meta.url);
 const __dirname=dirname(__filename);
 
 db();
+startCronJobs();
 
 const app=express();
 app.use((req, res, next) => {
@@ -52,7 +53,6 @@ app.use(
   })
 );
 
-<<<<<<< Updated upstream
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -60,32 +60,7 @@ app.use(flash());
 
 app.use(setUserAndCartCount);
 
-=======
-app.use(async (req, res, next) => {
-  res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path;
 
-  if (req.session.user) {
-    try {
-      const cart = await Cart.findOne({ userId: req.session.user._id });
-     
-      res.locals.cartCount = cart ? cart.items.length : 0;
-    } catch (error) {
-      console.error("Cart count middleware error:", error);
-      res.locals.cartCount = 0;
-    }
-  } else {
-    res.locals.cartCount = 0;
-  }
-
-  next();
-});
-
-
-
-app.use(passport.initialize());
-app.use(passport.session());
->>>>>>> Stashed changes
 
 app.use(methodOverride('_method'));
 

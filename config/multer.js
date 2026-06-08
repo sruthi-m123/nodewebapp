@@ -6,7 +6,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 import logger from "../utils/logger.js";
 
-<<<<<<< Updated upstream
 dotenv.config();
 logger.info("hi inside the multer");
 logger.info(process.env.CLOUDINARY_API_KEY);
@@ -29,29 +28,13 @@ const getCloudFolder = (uploadType) => {
     admin: "chettinad/admin",
     logo: "chettinad/admin/logo",
     misc: "chettinad/misc",
-=======
-const getUploadPath = (uploadType) => {
-  const paths = {
-    avatar: 'public/img/uploads/avatar',
-    product: 'public/img/admin/products',
-    category: 'public/img/admin/category',
-    review: 'public/img/admin/reviews',
-    admin: 'public/img/admin',
-    logo: 'public/img/admin/logo',
-    misc: 'public/img/misc'
->>>>>>> Stashed changes
   };
   return folders[uploadType] || folders.misc;
 };
 
-<<<<<<< Updated upstream
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-=======
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
->>>>>>> Stashed changes
     let uploadType;
 
     if (file.fieldname === "avatar") {

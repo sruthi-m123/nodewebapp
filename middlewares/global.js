@@ -7,7 +7,7 @@ import Cart from "../models/cartSchema.js";
 
   if (req.session.user) {
     try {
-      const cart = await Cart.findOne({ userId: req.session.user._id });
+      const cart = await Cart.findOne({ userId: req.session.user.id });
       res.locals.cartCount = cart ? cart.items.length : 0;
     } catch (error) {
       console.error("Cart count middleware error:", error);

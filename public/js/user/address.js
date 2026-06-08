@@ -27,7 +27,7 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
     e.preventDefault();
     const addressCard = e.target.closest('.address-card');
     const addressId = e.target.getAttribute('href').split('/').pop();
-        const name = addressCard.querySelector('[data-name]')?.textContent;
+    const name = addressCard.querySelector('[data-name]')?.textContent;
     const phone = addressCard.querySelector('[data-phone]')?.textContent;
     const city = addressCard.querySelector('[data-city]')?.textContent;
     const state = addressCard.querySelector('[data-state]')?.textContent;
@@ -43,8 +43,8 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
     addressForm.querySelector('[name="state"]').value = state || '';
     addressForm.querySelector('[name="pincode"]').value = pincode || '';
     addressForm.querySelector('[name="landmark"]').value = landmark || '';
-    
-    addressForm.action = `/addresses/edit/${addressId}`;
+
+    addressForm.action = `/user/addresses/edit/${addressId}`;
     modal.style.display = 'flex';
   });
 });
@@ -73,13 +73,29 @@ addressForm.addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (data.success) {
-      location.reload();
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Address saved successfully',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        location.reload();
+      });
     } else {
-      alert(data.message || 'Failed to save address');
+      console.log("message:", data.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: data.message || 'Failed to save address'
+      });
     }
   } catch (error) {
-    console.error('Error:', error);
-    alert('An error occurred while saving the address');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while saving the address'
+    });
   }
 });
 
@@ -87,71 +103,104 @@ addressForm.addEventListener('submit', async (e) => {
 document.querySelectorAll('.delete-btn').forEach((btn) => {
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
-    
-    const confirmDelete = confirm("Are you sure you want to delete this address?");
-    if (!confirmDelete) return;
-    
-    const form = e.target.closest('form');
-    console.log("form action:",form.action);
-    
-    try {
-      const response = await fetch(form.action, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
 
-              });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        location.reload();
-      } else {
-        alert('Failed to delete address');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while deleting the address');
-    }
-  });
-});
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const form = e.target.closest('form');
+        console.log("form action:", form.action);
 
+        try {
+          const response = await fetch(form.action, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          });
 
-  document.querySelectorAll('.set-default-btn').forEach(button => {
-    button.addEventListener('click', async (e) => {
-      e.preventDefault(); 
+          const data = await response.json();
 
-      const form = e.target.closest('form');
-      const actionUrl = form.getAttribute('action'); 
-
-      try {
-        const response = await fetch(actionUrl, {
-          method: 'POST',
-          credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json'
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Address has been deleted.',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete address'
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while deleting the address'
+          });
         }
-        });
-
-         if (response.ok) {
-        const result = await response.json();
-        console.log('Default address updated:', result.message);
-        alert(result.message); 
-        location.reload(); 
-      } else {
-        const error = await response.json();
-        console.error('Error:', error.message || 'Something went wrong');
-        alert(error.message || 'Something went wrong');
-      }
-      } catch (err) {
-        console.error('AJAX error:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Server error. Please try again later.'
-        });
       }
     });
   });
+});
 
+document.querySelectorAll('.set-default-btn').forEach(button => {
+  button.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const form = e.target.closest('form');
+    const actionUrl = form.getAttribute('action');
+
+    try {
+      const response = await fetch(actionUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Default address updated:', result.message);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: result.message,
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        const error = await response.json();
+        console.error('Error:', error.message || 'Something went wrong');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message || 'Something went wrong'
+        });
+      }
+    } catch (err) {
+      console.error('AJAX error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Server error. Please try again later.'
+      });
+    }
+  });
+});

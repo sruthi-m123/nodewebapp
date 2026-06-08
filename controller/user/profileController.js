@@ -6,7 +6,7 @@ import logger from "../../utils/logger.js";
 export const getProfile = async (req, res) => {
   logger.info("Loading user profile page");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.SESSION_LOST);
@@ -31,7 +31,7 @@ export const getProfile = async (req, res) => {
 export const getEditProfile = async (req, res) => {
   logger.info("Loading edit profile page");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.SESSION_LOST);
@@ -57,7 +57,7 @@ export const getEditProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   logger.info("Updating user profile");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
@@ -78,7 +78,7 @@ export const updateProfile = async (req, res) => {
 export const requestEmailChangeOTP = async (req, res) => {
   logger.info("Requesting email change OTP");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
@@ -104,7 +104,7 @@ export const requestEmailChangeOTP = async (req, res) => {
 export const verifyEmailChange = async (req, res) => {
   logger.info("Verifying email change OTP");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);
@@ -137,7 +137,7 @@ export const verifyEmailChange = async (req, res) => {
 export const changePassword = async (req, res) => {
   logger.info("Changing password");
 
-  const userId = req.session?.user?._id;
+  const userId = req.session?.user?.id;
 
   if (!userId) {
     const error = new Error(MESSAGES.AUTH.UNAUTHORIZED);

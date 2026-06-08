@@ -1,50 +1,52 @@
-const mongoose=require('mongoose');
+import mongoose from 'mongoose';
 
-const referralSchema=new mongoose.Schema({
-    referrer:{
-        type:mongoose.Types.ObjectId,
-        ref:'User',
-        required:true
+const referralSchema = new mongoose.Schema({
+    referrer: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    referee:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        required:true
+    referee: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    referralMethod:{
-        type:String,
-        enum:['code','link'],
-        required:true
+    referralMethod: {
+        type: String,
+        enum: ['code', 'link'],
+        required: true
     },
-    referralCode:{
-        type:String,
-        uppercase:true
+    referralCode: {
+        type: String,
+        uppercase: true
     },
-    status:{
-        type:String,
-        enum:['pending','completed','failed'],
-        default:'pending'
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'failed'],
+        default: 'pending'
     },
-    rewardDetails:{
-        amount:{
-            type:Number,
-            required:true
+    rewardDetails: {
+        amount: {
+            type: Number,
+            required: true
         },
-        rewardType:{
-            type:String,
-            default:'wallet-credit'
+        rewardType: {
+            type: String,
+            default: 'wallet-credit'
         },
-        couponCode:String,
-        discountValue:Number,
-        creditedAt:Date
+        couponCode: String,
+        discountValue: Number,
+        creditedAt: Date
     },
-    createdAt:{
-        type:Date,
-        default:Date.now
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
-    completedAt:{
-        type:Date
+    completedAt: {
+        type: Date
     }
 });
- const Referral=mongoose.model('Referral',referralSchema);
- module.exports=Referral;
+
+const Referral = mongoose.model('Referral', referralSchema);
+
+export default Referral;

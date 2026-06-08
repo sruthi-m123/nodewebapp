@@ -139,9 +139,10 @@ static async updateOrderStatus(orderId,status){
 }
 
 static async getReturnDetails(orderId){
-    logger.info('Fetching retun details',{orderId});
+    logger.info('Fetching return details',{orderId});
 
     const order=await Order.findOne({orderId}).populate('items.productId');
+
 
     if(!order||!order.returnRequested){
              const error = new Error('Return request not found');
@@ -150,10 +151,13 @@ static async getReturnDetails(orderId){
     }
 
     const {returnDetails}=order;
-    const returnType=returnDetails.items?.length>0?'partial':'full';
+    console.log("return details:",returnDetails);
+    const returnType =
+  returnDetails.type ||
+  (returnDetails.items?.length > 0 ? 'partial' : 'full');
     logger.debug(`Return details for order ${orderId}`,{returnType,itemsCount:returnDetails.items?.length||0});
    let items=[];
-   if(returnType==="partial"&& returnDetails.items?.length>0){
+  
     items=returnDetails.items.map(returnItem=>{
         const matchedItem=order.items.map(returnItem=>{
            const matchedItem = order.items.find(i => 
@@ -172,7 +176,7 @@ static async getReturnDetails(orderId){
         
         })
     })
-   }
+   
     const globalReason = returnDetails.reason || 
       (returnType === 'partial' ? items[0]?.reason : 'Not specified');
 
@@ -185,9 +189,10 @@ static async getReturnDetails(orderId){
     };
 }
 
+
 static async processReturnRequest(orderId,action,options={}){
     const{adminNotes,ItemsIds,rejectionReason}=options;
-    logger.info('processing return request',{orderId,action,ItemIds});
+    logger.info('processing return request',{orderId,action,ItemsIds});
 
     const validActions=['approve','reject','reject-all','approve-all'];
   

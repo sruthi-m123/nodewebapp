@@ -396,17 +396,15 @@ function populateOrderDetails(customOrderId, customer, orderDate, orderTotal, da
     returnNotes: document.getElementById('returnNotes')
   };
 
-  // Log missing elements once (group them)
   const missing = [];
   for (const [key, el] of Object.entries(elements)) {
     if (!el) missing.push(`#${key}`);
   }
   if (missing.length > 0) {
     console.warn('Missing modal elements:', missing);
-    return; // Early exit—don't proceed if core elements absent
+    return; 
   }
 
-  // All good—populate
   console.log('Populating order details:', { customOrderId, customer, orderDate, orderTotal });
   elements.returnOrderId.textContent = `#${customOrderId}`;
   elements.returnCustomer.textContent = customer;
@@ -469,15 +467,14 @@ if (globalBtns) {
   }
 }
 
-  // Helper: Show the modal with orderId attached
   function showReturnModal(orderId) {
     console.log("inside the showreturn modal");
     const modal = document.getElementById('returnRequestModal');
     modal.dataset.orderId = orderId;
     modal.classList.add('active');
+    
   }
 
-  // Main: Verify button handlers (now simpler, delegates to helpers)
   verifyButtons.forEach(button => {
     button.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -496,14 +493,36 @@ if (globalBtns) {
       this.disabled = true;
 
       fetch(`/admin/orders/${orderId}/verify-return`)
-        .then(response => {
-          if (!response.ok) throw new Error('Failed to fetch return details');
-          return response.json();
-        })
+       .then(async(response)=>{
+        console.log("response status:",response.status);
+        console.log("response ok:",response.ok);
+
+if(!response.ok){
+  let errorMessage="failed to fetch return details";
+  try {
+    const errorData=await response.json();
+    console.error("backed error",errorData);
+    errorMessage= errorData.message ||
+          errorData.error ||
+          errorMessage;
+  } catch (error) {
+    console.error("failed to parse error response:",error);
+  }
+   showToast(errorMessage, 'error');
+      throw new Error(errorMessage);
+}
+return response.json();
+
+       })
         .then(data => {
           console.log("the data inside the verify:", data);
-          
-          // Delegate to helpers
+          const modal=document.getElementById('returnRequestModal');
+          modal.dataset.orderId=orderId;
+          if(data.returnType==='partial'&&data.items?.length){
+            modal.dataset.itemIds=JSON.stringify(
+              data.items.map(item=>item.itemId)
+            )
+          }
           populateOrderDetails(customOrderId, customer, orderDate, orderTotal, data);
           populateItemsSection(data);
           showReturnModal(orderId);
@@ -519,7 +538,6 @@ if (globalBtns) {
     });
   });
 
-  // Keyboard shortcut (single instance)
   document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
       e.preventDefault();
@@ -528,17 +546,23 @@ if (globalBtns) {
   });
 });
 
-// Global functions (outside DOMContentLoaded)
 function closeReturnModal() {
-  document.getElementById('returnRequestModal')?.classList.remove('active');
+  console.log("hi inside the close modal");
+  const modal=document.getElementById('returnRequestModal');
+  if(modal){
+    modal.style.display='none';
+  }
 }
 
-function processReturn(action, itemId = null) {  
-  const modal = document.getElementById('returnRequestModal');  // Local declaration for clarity
+function processReturn(action) {  
+  const modal = document.getElementById('returnRequestModal');
+    const itemIds = modal.dataset.itemIds
+        ? JSON.parse(modal.dataset.itemIds)
+        : [];
   if (!modal) return;
   const orderId = modal.dataset.orderId;
 
-  const payload = { action, itemId };
+  const payload = { action, itemIds };
   console.log("payload:", payload);
 
   fetch(`/admin/orders/${orderId}/verify-return`, {
@@ -547,6 +571,7 @@ function processReturn(action, itemId = null) {
     body: JSON.stringify(payload)
   })
   .then(response => {
+    console.log("response",response);
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
   })
@@ -579,14 +604,17 @@ function processReturn(action, itemId = null) {
       }
     }
 
-    showToast(`${itemId ? 'Item' : 'Order'} return ${action}d successfully`);
+    showToast(`${itemId ? 'Item' : 'Order'} return ${action}ed successfully`);
   })
   .catch(error => {
     console.error('Error:', error);
     alert(`Failed to ${action} return request`);
   })
   .finally(() => {
-    if (!itemId) closeReturnModal();  // Keep open for partial
+    // console.log("itemId:",itemId);
+    // console.log("finally is running now here ")
+    // if (!itemId) closeReturnModal();  
+    closeReturnModal();
   });
 }
 

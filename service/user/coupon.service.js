@@ -46,7 +46,7 @@ export const checkCouponUsageService=async(userId,coupon)=>{
         'appliedCoupon.couponId':coupon._id,
         status:{$nin:['cancelled','returned']}
     });
-   
+ 
 
     if(coupon.usageLimit&&usageCount>=coupon.usageLimit){
         logger.warn('coupon usage limit reached',{userId,couponId:coupon._id,usageCount});
@@ -98,14 +98,21 @@ export const prepareCartItemsService=(cart)=>{
 
 
 export const checkMinCartValueService=(cartItems,coupon)=>{
+    console.log("cartItems:",cartItems);
+
     const subtotal=cartItems.reduce(
         (sum,item)=>sum+item.originalPrice*item.quantity,0
     );
-
+console.log("subtotal",subtotal);
     if(subtotal<coupon.minCartValue){
         const amountNeeded=parseFloat((coupon.minCartValue-subtotal).toFixed(2));
         logger.warn('minimum cart value not met',{subtotal,minCartValue:coupon.minCartValue});
-        throw new Error(`Add ${amountNeeded} more to apply this coupon`);
+
+        const err=new Error(
+            `Add ${amountNeeded} more to apply this coupon`
+        );
+        err.status=400;
+        throw err;
     }
     return subtotal;
 }
@@ -177,7 +184,8 @@ if(discountToApply>subtotal){
 }
 console.log("dicount to apply here :",discountToApply);
 console.log("total:",total);
-const finalPrice=total-discountToApply;
+// const finalPrice=total-discountToApply;
+const finalPrice=total;
 console.log("finalPrice inside the applycoupon service logic:",finalPrice);
 // const finalPrice=total;
 const discountText=getDiscountTextService(coupon);

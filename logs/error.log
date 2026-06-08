@@ -144,3 +144,67 @@ Cannot read properties of undefined (reading 'orderId')
 [2026-03-23 23:11:53] [31merror[39m: GET /user/home-Operation `categories.find()` buffering timed out after 10000ms
 [2026-03-24 00:50:15] [31merror[39m: DELETE /admin/offers/delete-offer/697904cf2ae0f96aedc692c8-Cannot destructure property 'offerId' of 'req.validatedData' as it is undefined.
 [2026-03-24 00:52:41] [31merror[39m: DELETE /admin/offers/delete-offer/697904cf2ae0f96aedc692c8-Cannot destructure property 'offerId' of 'req.validatedData' as it is undefined.
+[2026-06-07 02:21:04] [31merror[39m: GET /user/api/addresses/69815fa1d6170d2f4a297d38-Cannot read properties of undefined (reading 'success')
+[2026-06-07 02:24:09] [31merror[39m: DELETE /admin/coupons/delete-coupon/69bd693a8e0e584bc6027584-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-07 02:29:43] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 02:29:50] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 02:30:12] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 02:30:52] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 02:32:41] [31merror[39m: GET /admin/coupons/6a248927e79f3a1654c2e4ac-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-07 02:32:46] [31merror[39m: GET /admin/coupons/6a248927e79f3a1654c2e4ac-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-07 02:33:55] [31merror[39m: GET /admin/offers/get-offer/6a248b35e79f3a1654c2e76a-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-07 02:34:26] [31merror[39m: POST /admin/offers/add-offer-An offer with this title already exists
+[2026-06-07 02:35:15] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-07 02:35:36] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-07 02:36:22] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-07 02:40:29] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-07 02:40:49] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-07 02:40:49] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-07 02:40:49] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-07 02:41:31] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 13:05:30] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 13:10:13] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 13:10:52] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 13:14:10] [31merror[39m: GET /user/profile-Session lost, please login again
+[2026-06-07 13:45:03] [31merror[39m: PUT /user/addresses/edit/6a2488b1e79f3a1654c2e3f7-"pincode" must be a string
+[2026-06-08 09:13:00] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:13:20] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-08 09:14:33] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:14:35] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:14:53] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-08 09:14:55] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-08 09:16:30] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:16:30] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:16:50] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-08 09:16:50] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-08 09:18:36] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 09:18:36] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-08 10:24:17] [31merror[39m: GET /admin/offers/get-offer/6a248b35e79f3a1654c2e76a-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-08 10:30:35] [31merror[39m: GET /user/wishlist-Cannot read properties of null (reading 'items')
+[2026-06-08 11:23:16] [31merror[39m: POST /user/wishlist/add-to-cart/6a265745fe521b114ba95453-Wishlist item not found
+[2026-06-08 11:24:45] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 11:24:52] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 11:25:44] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 11:48:40] [31merror[39m: POST /user/checkout/apply-coupon-Cannot read properties of undefined (reading 'id')
+[2026-06-08 12:01:08] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:10:56] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:11:14] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:11:28] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:15:16] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:15:30] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 12:15:38] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:17:34] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 12:26:46] [31merror[39m: POST /user/checkout/apply-coupon-Add 500 more to apply this coupon
+[2026-06-08 14:58:02] [31merror[39m: GET /admin/orders/ORD-1780906110551-249/verify-return-Assignment to constant variable.
+[2026-06-08 14:58:10] [31merror[39m: GET /admin/orders/ORD-1780906110551-249/verify-return-Assignment to constant variable.
+[2026-06-08 15:00:53] [31merror[39m: GET /admin/orders/ORD-1780906110551-249/verify-return-Cannot access 'returnType' before initialization
+[2026-06-08 15:00:57] [31merror[39m: GET /admin/orders/ORD-1780906110551-249/verify-return-Cannot access 'returnType' before initialization
+[2026-06-08 15:03:01] [31merror[39m: GET /admin/orders/ORD-1780906110551-249/verify-return-Cannot access 'returnType' before initialization
+[2026-06-08 16:31:15] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 16:31:16] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 16:32:03] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 18:02:15] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 18:02:31] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 18:08:18] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 18:10:40] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')
+[2026-06-08 18:11:47] [31merror[39m: POST /user/cart/update-Cannot read properties of undefined (reading 'toString')

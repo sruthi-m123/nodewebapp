@@ -68,3 +68,29 @@ export const getReturnDetails = async (req, res) => {
   const returnDetails = await OrderService.getReturnDetails(orderId);
   res.json(returnDetails);
 };
+
+export const verifyReturnRequest=async(req,res)=>{
+  try {
+    const {orderId}=req.params;
+    const{action,adminNotes,itemIds,rejectReason}=req.body;
+
+    const result=await OrderService.processReturnRequest(
+      orderId,
+      action,
+      {
+        adminNotes,
+        itemIds:itemIds,
+        rejectReason
+      }
+    );
+    res.json({
+      success:true,
+      result
+    });
+  } catch (error) {
+    res.status(400).json({
+      success:false,
+      message:error.message
+    })
+  }
+};

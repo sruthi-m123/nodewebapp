@@ -68,6 +68,7 @@ router.get('/order-details', adminAuth, orderController.getOrder);
 router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
 // router.post('/orders/:orderId/verify-return', adminAuth, orderController.verifyReturnedRequest);
 router.get('/orders/:orderId/verify-return', adminAuth, orderController.getReturnDetails);
+router.post('/orders/:orderId/verify-return',adminAuth,orderController.verifyReturnRequest);
 // router.get('/orders/:orderId/view', adminAuth, orderController.getOrderDetails);
 
 //offer managment

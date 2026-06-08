@@ -44,30 +44,33 @@ export const userAuth= (req,res,next)=>{
     }
     next();
 }
-<<<<<<< Updated upstream
-
 export const isLoggedIn=(req,res,next)=>{
     console.log("user in isLogged middleware",req.session)
-=======
-const redirectIfLoggedIn = (req, res, next) => {
-    if (req.session && req.session.user) {
-    }
-    next();
-};
-const isLoggedIn=(req,res,next)=>{
-    console.log("req.session =", req.session);
-    console.log("req.user =", req.user);
-     // Check if session exists and has user data
->>>>>>> Stashed changes
     if (req.session && req.session.user && req.session.user.id) {
       return next();
     }
     return res.redirect('/user/login?error=not_logged_in');
 }
-export const isNotLoggedIn=(req,res,next)=>{
+export const isNotLoggedIn = (req, res, next) => {
      if (!req.session || !req.session.user) {
       return next();
     }
     res.redirect('/user/home');
   }
 
+export const checkBlocked = async (req, res, next) => {
+  if (!req.session || !req.session.user) {
+    return next();
+  }
+  try {
+    const user = await User.findById(req.session.user.id);
+    if (user && user.isBlocked) {
+      req.session.destroy(() => {});
+      return res.redirect('/user/login?error=account_blocked');
+    }
+    next();
+  } catch (error) {
+    console.error('checkBlocked middleware error:', error);
+    next();
+  }
+}

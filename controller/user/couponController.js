@@ -7,6 +7,7 @@ export const removeCoupon = async (req, res) => {
   logger.info('removing applied coupon');
 
   const orderSummary = await couponApplicationService.removeCouponService(req.userId);
+  
 
   delete req.session.appliedCoupon;
   res.status(STATUS_CODES.SUCCESS).json({

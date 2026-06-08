@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const refundSchema = new mongoose.Schema({
   order: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
@@ -9,5 +9,7 @@ const refundSchema = new mongoose.Schema({
   notes: String,
   walletTransaction: Object
 }, { timestamps: true });
-const Refund=mongoose.model('Refund', refundSchema);
-module.exports = Refund;
+
+const Refund = mongoose.model('Refund', refundSchema);
+
+export default Refund;

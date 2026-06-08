@@ -39,7 +39,7 @@ export const getWallet=async(req,res)=>{
 }
 
 export const addFunds=async(req,res)=>{
-  const userId=req.session.user._id;
+  const userId=req.session.user.id;
   const{amount}=req.body;
 
   const result=await WalletService.addFunds(userId,amount);

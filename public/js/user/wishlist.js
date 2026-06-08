@@ -103,7 +103,6 @@ Swal.fire({
       timerProgressBar: true
     });
 
-<<<<<<< Updated upstream
     if (typeof Swal !== 'undefined') {
       Swal.fire({
         toast: true,
@@ -147,76 +146,4 @@ Swal.fire({
 }
 
 // Uncomment and use if needed for addToWishlist
-// async function addToWishlist(itemId) {
-//   try {
-//     const response = await fetch(`/user/wishlist/add/${itemId}`, {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' }
-//     });
-
-//     const data = await response.json();
-//     if (!response.ok) {
-//       throw new Error(data.error || 'Failed to add to wishlist');
-//     }
-
-//     // SweetAlert2 success toast if available
-//     if (typeof Swal !== 'undefined') {
-//       Swal.fire({
-//         toast: true,
-//         position: 'top-end',
-//         icon: 'success',
-//         title: 'Added to wishlist',
-//         showConfirmButton: false,
-//         timer: 2000,
-//         timerProgressBar: true,
-//         didOpen: (toast) => {
-//           toast.addEventListener('mouseenter', Swal.stopTimer);
-//           toast.addEventListener('mouseleave', Swal.resumeTimer);
-//         }
-//       });
-//     } else {
-//       console.log('Swal not loaded - Added to wishlist');
-//     }
-
-//     return { success: true, data };
-//   } catch (error) {
-//     console.error('Error:', error);
-//     // SweetAlert2 error toast if available
-//     if (typeof Swal !== 'undefined') {
-//       Swal.fire({
-//         toast: true,
-//         position: 'top-end',
-//         icon: 'error',
-//         title: error.message,
-//         showConfirmButton: false,
-//         timer: 2500,
-//         timerProgressBar: true,
-//         didOpen: (toast) => {
-//           toast.addEventListener('mouseenter', Swal.stopTimer);
-//           toast.addEventListener('mouseleave', Swal.resumeTimer);
-//         }
-//       });
-//     } else {
-//       console.error('Swal not loaded - Error:', error.message);
-//     }
-//     return { success: false };
-//   }
-// }
-=======
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-
-  } catch (error) {
-    console.error('Error:', error);
- Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'error',
-      title: error.message,
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true
-    });  }
-}
->>>>>>> Stashed changes
+// async function addToWishlist(itemId) { ... }

@@ -119,6 +119,9 @@ if(existingItem){
    existingItem.quantity=newQty;
    existingItem.totalPrice=existingItem.quantity*price;
 }else{
+    cart.items.map((item)=>{
+        console.log("item in cart:",item);
+    })
     cart.items.push({
         productId,
         quantity,
@@ -169,6 +172,7 @@ export const removeCartItemService=async(userId,itemId)=>{
 
 export const updateCartQuantityService=async(userId,updates)=>{
     logger.debug ("cart updates",{updates});
+    console.log("userId:",userId);
 logger.debug('updating cart quantities',{userId,updatedCount:updates.length});
 const cart=await Cart.findOne({userId});
 if(!cart||!cart.items||cart.items.length===0){
@@ -176,8 +180,9 @@ if(!cart||!cart.items||cart.items.length===0){
     throw new Error('Cart is empty or not found');
 }
 const errors=[];
+console.log("updates:",updates);
 for(const update of updates){
-    const item=cart.items.find((i)=>i.itemId.toString()===update.id);
+    const item=cart.items.find((i)=>i._id.toString()===update.id);
     if(item){
         const product=await Product.findById(item.productId);
         if(!product){
