@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let serverWishlist = window.wishlist || [];
 
-  // Build filter payload from current UI state
   function getAllFilters() {
     return {
       search: searchInput.value.trim(),
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  // Unified filter applicator (debounced)
   const debouncedApplyFilters = debounce(function(filters) {
     console.log('Applying all filters:', filters);
     fetch('/user/shopall/filter', {
@@ -50,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }, 300);
 
-  // Unified event handler
+  // all event handler in one 
   function handleFilterChange() {
     const filters = getAllFilters();
     debouncedApplyFilters(filters);
@@ -116,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Update product grid
   function updateProductGrid(products, wishlist = serverWishlist) {
+    console.log("inside the updateProductGrid function ");
     const grid = document.getElementById('product-grid');
     grid.innerHTML = '';
 
@@ -126,10 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     products.forEach(product => {
       if (!product.isActive) return;
+      console.log("product.bestOffer:",product.bestOffer);
 
       let originalPrice = product.price;
       let finalPrice = originalPrice;
       let discountLabel = '';
+
       if (product.bestOffer && product.bestOffer.discountValue > 0) {
         if (product.bestOffer.type === 'percentage') {
           finalPrice = Math.round(originalPrice - (originalPrice * product.bestOffer.discountValue / 100));
@@ -244,10 +245,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Initial attach
   attachDynamicListeners();
 
-  // Debounce utility
+  // Debounce 
   function debounce(func, delay) {
     let timeout;
     return function(...args) {
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  // Toast utility
+  // Toast
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-// Global add-to-cart delegation (works for both static and dynamic cards)
+//add to cart
 document.addEventListener('click', async (e) => {
   if (e.target.closest('.add-to-cart')) {
     const button = e.target.closest('.add-to-cart');
@@ -333,4 +333,5 @@ document.addEventListener('click', async (e) => {
       });
     }
   }
+  loadAllProducts();
 });

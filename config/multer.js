@@ -7,11 +7,6 @@ import dotenv from "dotenv";
 import logger from "../utils/logger.js";
 
 dotenv.config();
-logger.info("hi inside the multer");
-logger.info(process.env.CLOUDINARY_API_KEY);
-logger.info(process.env.CLOUDINARY_CLOUD_NAME);
-logger.info(process.env.CLOUDINARY_API_SECRET);
-//Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

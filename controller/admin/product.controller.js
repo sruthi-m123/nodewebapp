@@ -12,6 +12,7 @@ export const renderProducts = async (req, res) => {
   const { search = "", page = 1 } = req.query;
   const { products, totalProducts, totalPages, skip } = await productService.getAll({ search, page });
 
+
   const categories = await Category.find();
   res.render("admin/products", {
     layout: false,
@@ -22,6 +23,7 @@ export const renderProducts = async (req, res) => {
     totalProducts,
     skip,
     search
+    
   });
 };
 

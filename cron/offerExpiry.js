@@ -8,7 +8,6 @@ export const startCronJobs = () => {
   // Then run it continuously (e.g. every 1 hour = 3600000 ms)
   setInterval(checkExpiredCoupons, 3600000);
   
-  logger.info('Coupon expiry cron job started');
 };
 
 const checkExpiredCoupons = async () => {

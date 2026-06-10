@@ -1,74 +1,74 @@
 import User from '../../models/userSchema.js';
 import Order from '../../models/orderSchema.js';
-import Address  from '../../models/addressSchema.js';
+import Address from '../../models/addressSchema.js';
 import Cart from '../../models/cartSchema.js';
 import Product from '../../models/productSchema.js';
 import Offer from '../../models/offerSchema.js';
 import Coupon from '../../models/couponSchema.js';
 import { addAddressService } from './address.service.js';
-import Razorpay  from 'razorpay';
-import {calculateOrder } from '../../helper/calculateTotal.js';
+import Razorpay from 'razorpay';
+import { calculateOrder } from '../../helper/calculateTotal.js';
 // import {debitWallet } from '../../controller/user/walletController.js';
 import { MESSAGES } from '../../utils/messages.js';
 import mongoose from 'mongoose';
-export const getCheckoutData=async(userId,session)=>{
-    const userData=await User.findById(userId);
-    let addressesDoc=await Address.findOne({userId}).lean();
-    let addresses=addressesDoc? addressesDoc.address.filter(addr=>!addr.isDeleted):[];
+export const getCheckoutData = async (userId, session) => {
+  const userData = await User.findById(userId);
+  let addressesDoc = await Address.findOne({ userId }).lean();
+  let addresses = addressesDoc ? addressesDoc.address.filter(addr => !addr.isDeleted) : [];
 
-    let cartItems=[];
-    let fromCart=true;
-    let stockValidationFailed=false;
-    let outOfStockItems=[];
+  let cartItems = [];
+  let fromCart = true;
+  let stockValidationFailed = false;
+  let outOfStockItems = [];
 
-    if(session.buyNowItem){
-        fromCart=false;
-        const product=await Product.findById(session.buyNowItem.productId);
-        if(product){
-            const requestedQty=session.buyNowItem.quantity||1;
-            if(product.stock<requestedQty){
-            stockValidationFailed=true;
+  if (session.buyNowItem) {
+    fromCart = false;
+    const product = await Product.findById(session.buyNowItem.productId);
+    if (product) {
+      const requestedQty = session.buyNowItem.quantity || 1;
+      if (product.stock < requestedQty) {
+        stockValidationFailed = true;
+        outOfStockItems.push({
+          productId: product.productId,
+          name: product.productName,
+          available: product.stock,
+          requested: requestedQty
+        })
+      }
+      cartItems = [{
+        id: product.productId,
+        name: product.productName,
+        image: product.images[0],
+        price: product.discountedPrice || product.price,
+        originalPrice: product.price,
+        discountedPrice: product.discountedPrice || null,
+        quantity: requestedQty,
+        isBuyNow: true
+
+      }]
+    }
+  } else {
+    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    if (cart) {
+      for (const item of cart.items) {
+        if (item.productId && item.productId.isActive) {
+          const product = item.productId;
+          if (product.stock < item.quantity) {
+            stockValidationFailed = true;
             outOfStockItems.push({
-                productId:product.productId,
-                name:product.productName,
-                available:product.stock,
-                requested:requestedQty
-            })
-        }
-        cartItems=[{
-            id:product.productId,
-            name:product.productName,
-            image:product.images[0],
-            price:product.discountedPrice||product.price,
-            originalPrice:product.price,
-            discountedPrice:product.discountedPrice||null,
-            quantity:requestedQty,
-            isBuyNow:true
-
-        }]
-        }
-    }else{
-        const cart=await Cart.findOne({userId}).populate('items.productId');
-        if(cart){
-            for(const item of cart.items){
-                if(item.productId&& item.productId.isActive){
-                    const product=item.productId;
-                    if(product.stock<item.quantity){
-                        stockValidationFailed=true;
-                        outOfStockItems.push({
-                            productId: product.productId,
+              productId: product.productId,
               name: product.productName,
               available: product.stock,
               requested: item.quantity
-                        })
-            
-                    }
-                }
-            }
-            cartItems=cart.items
-            .filter(item=>item.productId&& item.productId.isActive)
-            .map(item=>({
-                id: item.productId._id,
+            })
+
+          }
+        }
+      }
+      cartItems = cart.items
+        .filter(item => item.productId && item.productId.isActive)
+        .map(item => ({
+          id: item.productId._id,
           name: item.productId.productName,
           image: item.productId.images[0],
           variant: item.variant,
@@ -77,21 +77,21 @@ export const getCheckoutData=async(userId,session)=>{
           discountedPrice: item.productId.discountedPrice || null,
           quantity: item.quantity,
           isBuyNow: false
-            }))
-        }
+        }))
     }
-        const coupons =await Coupon.find({isActive:true}).lean();
-        const usedOrders=await Order.find({
-            userId,
-            'appliedCoupon.couponId':{$in:coupons.map(c=>c._id)},
-            status:{$nin:['cancelled','returned']}
-        }).lean();
-        const usedCouponIds=usedOrders.map(o=>o.appliedCoupon.couponId.toString());
-        const couponWithStatus=coupons.map(coupon=>({
-            ...coupon,
-            isUsed:usedCouponIds.includes(coupon._id.toString())
-        }));
-        const taxRate = 18;
+  }
+  const coupons = await Coupon.find({ isActive: true }).lean();
+  const usedOrders = await Order.find({
+    userId,
+    'appliedCoupon.couponId': { $in: coupons.map(c => c._id) },
+    status: { $nin: ['cancelled', 'returned'] }
+  }).lean();
+  const usedCouponIds = usedOrders.map(o => o.appliedCoupon.couponId.toString());
+  const couponWithStatus = coupons.map(coupon => ({
+    ...coupon,
+    isUsed: usedCouponIds.includes(coupon._id.toString())
+  }));
+  const taxRate = 18;
   const offers = await Offer.find({
     startDate: { $lte: new Date() },
     endDate: { $gte: new Date() },
@@ -99,31 +99,31 @@ export const getCheckoutData=async(userId,session)=>{
   }).lean();
 
   const orderSummary = calculateOrder(cartItems);
-  orderSummary.stockValidationFailed=stockValidationFailed;
-  orderSummary.outOfStockItems=outOfStockItems;
+  orderSummary.stockValidationFailed = stockValidationFailed;
+  orderSummary.outOfStockItems = outOfStockItems;
 
-const paymentMethods = [
+  const paymentMethods = [
     { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
     { id: 'wallet', title: 'Wallet', description: 'Purchase through your wallet amount' }
-  ];  
-return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus,userData };
+  ];
+  return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData };
 
 }
 
-export const getRetryCheckoutData=async(userId,orderId)=>{
-  const order=await Order.findOne({orderId}).populate('items.productId').populate('userId');
-  if(!order||order.userId._id.toString()!==userId){
-    return {success:false,message:'Order not dound or not authorized'};
+export const getRetryCheckoutData = async (userId, orderId) => {
+  const order = await Order.findOne({ orderId }).populate('items.productId').populate('userId');
+  if (!order || order.userId._id.toString() !== userId) {
+    return { success: false, message: 'Order not dound or not authorized' };
   }
-  if(order.status!=='payment_failed'){
-    return {success:false,message:'Cannot retry this order'};
+  if (order.status !== 'payment_failed') {
+    return { success: false, message: 'Cannot retry this order' };
   }
 
-  const addressesDoc=await Address.findOne({userId}).lean();
-  const addresses=addressesDoc?addressesDoc.address.filter(addr=>!addr.isDeleted):[];
-  const cartItems=order.items.map(item=>({
- id: item.productId._id,
+  const addressesDoc = await Address.findOne({ userId }).lean();
+  const addresses = addressesDoc ? addressesDoc.address.filter(addr => !addr.isDeleted) : [];
+  const cartItems = order.items.map(item => ({
+    id: item.productId._id,
     name: item.productId.productName,
     image: item.productId.images[0],
     variant: item.variant,
@@ -133,20 +133,20 @@ export const getRetryCheckoutData=async(userId,orderId)=>{
     quantity: item.quantity,
     isBuyNow: false
   }));
-  const coupons=await Coupon.find({isActive:true}).lean();
-  const usedOrders=await Order.find({
+  const coupons = await Coupon.find({ isActive: true }).lean();
+  const usedOrders = await Order.find({
     userId,
-    'appliedCoupon.couponId':{$in:coupons.map(c=>c._id)},
-    status:{$nin:['cancelled','returned','payment_failed']}
+    'appliedCoupon.couponId': { $in: coupons.map(c => c._id) },
+    status: { $nin: ['cancelled', 'returned', 'payment_failed'] }
   }).lean();
-  const userCouponIds=usedOrders.map(o=>o.appliedCoupon.couponId.toString());
-  const couponsWithStatus=coupons.map(coupon=>({
+  const userCouponIds = usedOrders.map(o => o.appliedCoupon.couponId.toString());
+  const couponsWithStatus = coupons.map(coupon => ({
     ...coupon,
-    isUsed:userCouponIds.includes(coupon._id.toString())
+    isUsed: userCouponIds.includes(coupon._id.toString())
   }));
 
-  const retryAppliedCoupon=null;
-  const orderSummary=calculateOrder(cartItems,{ coupon: retryAppliedCoupon, taxRate: 18 });
+  const retryAppliedCoupon = null;
+  const orderSummary = calculateOrder(cartItems, { coupon: retryAppliedCoupon, taxRate: 18 });
   const paymentMethods = [
     { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
@@ -168,35 +168,36 @@ export const getRetryCheckoutData=async(userId,orderId)=>{
 
 
 
-export const addAddressFromCheckout=async(userId,addressData)=>{
-   const result=await addAddressService(userId,addressData);
-   if(!result.success){
+export const addAddressFromCheckout = async (userId, addressData) => {
+  const result = await addAddressService(userId, addressData);
+  if (!result.success) {
     return result;
-   }
-   return {
-    success:true,
-    message:MESSAGES.ADDRESS.ADD_SUCCESS,
-    address:result.address
-   };
+  }
+  return {
+    success: true,
+    message: MESSAGES.ADDRESS.ADD_SUCCESS,
+    address: result.address
+  };
 }
 
-export const getAddress=async(userId,addressId)=>{
-    const userData=await Address.findOne({userId});
-    if(!userData){
-        return {success:false,message:MESSAGES.ADDRESS.NO_ADDRESSES}
-    }
-    const address=userData.address.find(addr=>addr._id.toString()===addressId);
-    if(!address){
-        return {success:false,message:MESSAGES.ADDRESS.NOT_FOUND};
-    }
+export const getAddress = async (userId, addressId) => {
+  const userData = await Address.findOne({ userId });
+  if (!userData) {
+    return { success: false, message: MESSAGES.ADDRESS.NO_ADDRESSES }
+  }
+  const address = userData.address.find(addr => addr._id.toString() === addressId);
+  if (!address) {
+    return { success: false, message: MESSAGES.ADDRESS.NOT_FOUND };
+  }
+  return { success: true, address };
 }
 
-export const applyOffer=async(userId,offerId)=>{
-    const offer=await Offer.findById(offerId);
-    if(!offer){
-        return {success:false,messages:MESSAGES.OFFER.NOT_FOUND};
-    }
-if (offer.userSpecific && offer.userSpecific.toString() !== userId.toString()) {
+export const applyOffer = async (userId, offerId) => {
+  const offer = await Offer.findById(offerId);
+  if (!offer) {
+    return { success: false, messages: MESSAGES.OFFER.NOT_FOUND };
+  }
+  if (offer.userSpecific && offer.userSpecific.toString() !== userId.toString()) {
     return { success: false, message: MESSAGES.OFFER_NOT_VALID_USER };
   }
 
@@ -217,107 +218,111 @@ if (offer.userSpecific && offer.userSpecific.toString() !== userId.toString()) {
   };
 }
 
-export const placeOrder=async (orderData)=>{
-    const {userId,addressId,paymentMethod,appliedOffers=[],isRetry=false,session}=orderData;
-    let items=[];
-    let isBuyNow=false;
-    let orderId;
-    let order;
+export const placeOrder = async (orderData) => {
+  console.log("this is inside the placeorder");
+  console.log("orderData",orderData);
+  const { userId, addressId, paymentMethod, appliedOffers = [], isRetry = false, session } = orderData;
+  let items = [];
+  let isBuyNow = false;
+  let orderId;
+  let order;
 
-    if(session.buyNowItem){
-const {productId,quantity=1,variant='Default',price}=session.buyNowItem;
-const product=await Product.findById(productId);
-if(!product||!product.isActive){
-    return {success:false,message:MESSAGES.PRODUCT.NOT_AVAILABLE}
-}
-
-if(product.stock<quantity){
-    return {success:false,message:"insuffient stock "}
-}
-const effectivePrice=price|| product.discountedPrice||product.price;
-items=[{
-    productId:product.productId,
-    name:product.productName,
-    variant,
-    quantity,
-    price:product.discountedPrice||null,
-    totalPrice:effectivePrice*quantity
-}];
-isBuyNow=true;
-
-    }else if(isRetry){
-        const failedOrder=await Order.findOne({userId,status:'payment_failed'}).populate('items.productId').sort({createdAt:-1});
-        if(!failedOrder||failedOrder.items.length===0){
-            return {success:false,message:'No failed order found for retry'};
-        }
-        items=failedOrder.items.map(item=>({
-            productId:item.productId,
-            name:item.productId.productName,
-            variant:item.variant||'Default',
-            quantity:item.quantity,
-            price:item.price,
-            discountedPrice:item.discountedPrice||null,
-            totalPrice:(item.discountedPrice||item.price)*item.quantity
-        }));
-
-        for(const item of items ){
-            const product=await Product.findById(item.productId);
-            if(!product||!product.isActive||product.stock<item.quantity){
-                return {success:false,message:`Product ${item.name} not available or insufficient stock for retry`};
-                            }
-        }
-        orderId=failedOrder.orderId;
-        order=failedOrder;
-
-    }else{
-        const cart=await Cart.findOne({userId}).populate({
-            path:'items.productId',
-            select:'productName price discountedPrice stock  isActive'
-        });
-        if(!cart ||cart.items.length===0){
-            return {success:false,message:'Cart is empty'};
-        }
-        const activeCartItems=cart.items.filter(item=>item.productId&& item.productId.isActive);
-        items=activeCartItems.map(item=>{
-            const effectivePrice=item.productId.discountedPrice|| item.productId.price;
-            return {
-                productId:item.productId._id,
-                name:item.productId.productName,
-                variant:item.variant||'Default',
-                quantity:item.quantity,
-                price:item.productId.price,
-                discountedPrice:item.productId.discountedPrice||null,
-                totalPrice:effectivePrice*item.quantity
-            }
-
-        });
-        for(const item of items){
-            const product=await Product.findById(item.productId);
-            if(product.stock<item.quantity){
-                return {success:false,message:`Product ${item.name} not available or insufficient stock for retry`};
-
-            }
-        }
+  if (session.buyNowItem) {
+    const { productId, quantity = 1, variant = 'Default', price } = session.buyNowItem;
+    const product = await Product.findById(productId);
+    if (!product || !product.isActive) {
+      return { success: false, message: MESSAGES.PRODUCT.NOT_AVAILABLE }
     }
-    console.log("userId:",userId);
-    console.log("addressId:",addressId);
-    const addresses=await Address.findOne({userId,'address._id':addressId},{address:{$elemMatch:{_id:addressId}}});
-    
-    if(!addresses||addresses.address.length===0){
-        return {success:false,message:MESSAGES.ADDRESS.NOT_FOUND};
 
+    if (product.stock < quantity) {
+      return { success: false, message: "insuffient stock " }
     }
-    const selectedAddress=addresses.address[0];
-    let appliedCoupon=session.appliedCoupon||null;
-    const cartItemsForCalculation=items.map(item=>({
-        originalPrice:item.price,
-        discountedPrice:item.discountedPrice||null,
-        quantity:item.quantity
+    const effectivePrice = price || product.discountedPrice || product.price;
+    items = [{
+      productId: product.productId,
+      name: product.productName,
+      variant,
+      quantity,
+      price: product.discountedPrice || null,
+      totalPrice: effectivePrice * quantity
+    }];
+    isBuyNow = true;
+
+  } else if (isRetry) {
+    console.log("entering isretry condition");
+    const failedOrder = await Order.findOne({ userId, status: 'payment_failed' }).populate('items.productId').sort({ createdAt: -1 });
+    console.log("failed Order:",failedOrder);
+    if (!failedOrder || failedOrder.items.length === 0) {
+      return { success: false, message: 'No failed order found for retry' };
+    }
+    items = failedOrder.items.map(item => ({
+      productId: item.productId,
+      name: item.productId.productName,
+      variant: item.variant || 'Default',
+      quantity: item.quantity,
+      price: item.price,
+      discountedPrice: item.discountedPrice || null,
+      totalPrice: (item.discountedPrice || item.price) * item.quantity
     }));
-const orderSummary=calculateOrder(cartItemsForCalculation,{coupon:appliedCoupon,taxRate:18});
-const {subtotal,delivery,discount,tax,total}=orderSummary;
-const status=paymentMethod==='cod'?'pending':(paymentMethod==='wallet'?'processing':'processing');
-if (!isRetry) {
+
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (!product || !product.isActive || product.stock < item.quantity) {
+        return { success: false, message: `Product ${item.name} not available or insufficient stock for retry` };
+      }
+    }
+    orderId = failedOrder.orderId;
+    order = failedOrder;
+
+  } else {
+    const cart = await Cart.findOne({ userId }).populate({
+      path: 'items.productId',
+      select: 'productName price discountedPrice stock  isActive'
+    });
+    if (!cart || cart.items.length === 0) {
+      return { success: false, message: 'Cart is empty' };
+    }
+    const activeCartItems = cart.items.filter(item => item.productId && item.productId.isActive);
+    items = activeCartItems.map(item => {
+      const effectivePrice = item.productId.discountedPrice || item.productId.price;
+      return {
+        productId: item.productId._id,
+        name: item.productId.productName,
+        variant: item.variant || 'Default',
+        quantity: item.quantity,
+        price: item.productId.price,
+        discountedPrice: item.productId.discountedPrice || null,
+        totalPrice: effectivePrice * item.quantity
+      }
+
+    });
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (product.stock < item.quantity) {
+        return { success: false, message: `Product ${item.name} not available or insufficient stock for retry` };
+
+      }
+    }
+  }
+  console.log("userId:", userId);
+  console.log("addressId:", addressId);
+  const addresses = await Address.findOne({ userId, 'address._id': addressId }, { address: { $elemMatch: { _id: addressId } } });
+
+  if (!addresses || addresses.address.length === 0) {
+    return { success: false, message: MESSAGES.ADDRESS.NOT_FOUND };
+
+  }
+  const selectedAddress = addresses.address[0];
+  let appliedCoupon = session.appliedCoupon || null;
+  const cartItemsForCalculation = items.map(item => ({
+    originalPrice: item.price,
+    discountedPrice: item.discountedPrice || null,
+    quantity: item.quantity
+  }));
+  const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
+  const { subtotal, delivery, discount, tax, total } = orderSummary;
+  const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'processing');
+  if (!isRetry) {
     orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     order = new Order({
       orderId,
@@ -400,7 +405,7 @@ export const getOrderForSuccess = async (orderId) => {
       quantity: item.quantity,
       price: item.price
     }))
-};
+  };
 
   return { success: true, orderData };
 };

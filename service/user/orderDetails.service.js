@@ -24,7 +24,7 @@ console.log("orderId",orderId);
 const formatItems=order.items.map(item=>({
     ...item,
     name:item.productId?.ProductName||item.name,
-    imageUrl:item.productId?.images?.[0]||'/img/admin-workshop.png',
+    imageUrl:item.productId?.images?.[0]||'/img/product-placeholder.svg',
     color:item.productId?.color||'N/A'
 }));
 
@@ -118,8 +118,9 @@ return order;
 
 export const returnOrderService=async(userId,orderId,returnData)=>{
     console.log("check inside the service :",returnData);
-    const{reason,itemIds,customReason,notes}=returnData;
-    logger.debug('processing order return',{userId,orderId,itemIds});
+    const{reason,itemIds,ItemsIds,customReason,notes}=returnData;
+    const finalItemIds = itemIds || ItemsIds;
+    logger.debug('processing order return',{userId,orderId,finalItemIds});
     const order=await Order.findById(orderId).populate("items.productId");
 
     if(!order){
@@ -144,10 +145,10 @@ export const returnOrderService=async(userId,orderId,returnData)=>{
     order.returnRequested=true;
 
    const isPartialReturn=
-   Array.isArray(itemIds)&& itemIds.length>0;
+   Array.isArray(finalItemIds)&& finalItemIds.length>0;
 
 if(isPartialReturn){
-    processPartialReturn(order,itemIds,returnReason,notes);
+    processPartialReturn(order,finalItemIds,returnReason,notes);
 }else{
     processFullReturn(order,returnReason,notes);
 }
@@ -506,7 +507,7 @@ item.status="return_requested";
                 });
             }
             order.status=
-            eligibleCount===order.items.length?"return_requested":"partialy_returned"
+            eligibleCount===order.items.length?"return_requested":"partially_returned"
 
 }
 

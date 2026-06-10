@@ -27,7 +27,7 @@ export const addressSchema = Joi.object({
 
   addressType: Joi.string()
     .lowercase()
-    .valid("home","office","other")
+    .valid("home","work","other")
     .required(),
 
   isDefault: Joi.boolean().default(false)

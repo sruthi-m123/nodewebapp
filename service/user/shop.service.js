@@ -4,8 +4,17 @@ import User from '../../models/userSchema.js';
 import Offer from '../../models/offerSchema.js';
 import Wishlist from '../../models/wishlistSchema.js';
 import logger from '../../utils/logger.js';
+import Cart from '../../models/cartSchema.js';
 
 class ShopService {
+
+static async removeAllProductsService(userId){
+    const result=await Cart.updateOne({userId},{$set:{items:[]}});
+    return result;
+}
+
+
+
   static async getCategories() {
     logger.debug('fetching categories');
 
@@ -118,6 +127,7 @@ static async applyOffersToProducts(products){
     const processedProducts=products.map(product=>{
         const applicableOffers=this.findApplicableOffers(offers,product,now);
         const bestOffer=this.calculateBestOffer(applicableOffers,product);
+        console.log("bestOffer inside appyoffertoproducts:",bestOffer);
 
         if(bestOffer.discount>0){
             product.bestOffer=bestOffer._id;

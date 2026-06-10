@@ -115,7 +115,7 @@
                 <% } %>
                 <span>(<%= product.reviews || 0 %>)</span>
               </div>
-
+<!-- 
               <% 
                 let originalPrice = product.price;
                 let finalPrice = originalPrice;
@@ -133,15 +133,28 @@
                     discountLabel = '₹' + discountValue.toLocaleString() + 'OFF';
                   }
                 }
-              %>
+              %> -->
 
-              <p class="product-pricing">
+              <!-- <p class="product-pricing">
                 <span class="offer-price">₹<%= finalPrice.toLocaleString() %></span>
                 <% if (finalPrice < originalPrice) { %>
                   <span class="mrp">₹<%= originalPrice.toLocaleString() %></span>
                   <span class="discount">(<%= discountLabel %>)</span>
                 <% } %>
-              </p>
+              </p> -->
+
+<p class="product-pricing">
+  <span class="offer-price">
+    ₹<%= product.discountedPrice || product.price %>
+  </span>
+
+  <% if ((product.discountedPrice || product.price) < product.price) { %>
+      <span class="mrp">₹<%= product.price %></span>
+  <% } %>
+</p>
+
+
+
             </div>
             <div class="product-actions">
               <button 

@@ -84,6 +84,7 @@
   <% } %>
 </div>
 <script>
+
   async function toggleUserStatus(userId, shouldBlock) {
     try {
       const response = await fetch("/admin/toggle_block", {

@@ -218,10 +218,7 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
     logger.debug('validating and applying coupon',{userId,couponIdentifier,isRetry});
 
     const coupon =await Coupon.findOne({
-        $or:[
-            {code:couponIdentifier},
-            {_id:couponIdentifier}
-        ],
+        code:couponIdentifier,
         isActive:true,
         validTill:{$gte:new Date()}
     });

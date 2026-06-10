@@ -5,22 +5,21 @@ import { MESSAGES } from '../utils/messages.js';
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: false, // TLS
+  secure: false, 
   auth: {
     user: process.env.NODEMAILER_EMAIL,
-    pass: process.env.NODEMAILER_PASSWORD, // App password
+    pass: process.env.NODEMAILER_PASSWORD, 
   },
   tls: {
-    rejectUnauthorized: false // production safe
+    rejectUnauthorized: false 
   }
 });
 
-// Verify transporter once at startup
 transporter.verify((error, success) => {
   if (error) {
-    console.error('❌ Email transporter error:', error.message);
+    console.error(' Email transporter error:', error.message);
   } else {
-    console.log('✅ Email server ready to send mails');
+    console.log(' Email server ready to send mails');
   }
 });
 
@@ -58,7 +57,7 @@ console.log("otp:",otp);
 console.log("info:",info);
     return info.accepted.length > 0;
   } catch (error) {
-    console.error('❌ Error sending verification email:', error.message);
+    console.error(' Error sending verification email:', error.message);
     return false;
   }
 };

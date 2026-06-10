@@ -44,6 +44,7 @@ export const getRetryCheckoutPage = async (req, res) => {
     return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "please login to continue" });
   }
   const orderId = req.params.orderId;
+  console.log("orderId",orderId);
   const retryData = await checkoutService.getRetryCheckoutData(userId, orderId);
   if (!retryData.success) {
     return res.status(STATUS_CODES.NOT_FOUND).send(retryData.message);

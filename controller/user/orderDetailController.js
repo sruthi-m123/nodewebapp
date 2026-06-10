@@ -56,7 +56,11 @@ export const invoice = async (req, res) => {
 export const cancelOrder = async (req, res) => {
   logger.info('processing order cancellation');
 
-  const order = await orderManagmentService.cancelOrderService(req.userId, req.orderId, req.cancelData);
+  const orderId = req.params.orderId;
+  const userId = req.session.user.id;
+  const cancelData = req.validatedData || req.body;
+
+  const order = await orderManagmentService.cancelOrderService(userId, orderId, cancelData);
 
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,

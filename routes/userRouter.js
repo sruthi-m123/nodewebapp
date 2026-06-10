@@ -118,16 +118,15 @@ router.get("/checkout", isLoggedIn, checkBlocked, checkoutController.getCheckout
 router.get("/retry-checkout/:orderId", isLoggedIn, checkBlocked, checkoutController.getRetryCheckoutPage);
 router.post("/buy-now", checkBlocked, validate({ body: V.buyNowSchema }), checkoutController.buyNow);
 router.post("/api/addresses", isLoggedIn, checkBlocked, validate({ body: V.addAddressSchema }), checkoutController.addAddress);
-router.get("/api/addresses/:id", checkoutController.getAddress);
+router.get("/api/addresses/:id", isLoggedIn, checkBlocked, validate({ params: Joi.object({ id: V.objectIdSchema.required() }) }), checkoutController.getAddress);
 
 // Coupon routes
-// router.post("/checkout/apply-coupon", checkBlocked, validate(V.applyCouponSchema), couponController.applyCoupon);
 router.post(
   "/checkout/apply-coupon",
-  (req,res,next)=>{
-      console.log("SESSION:", req.session);
-      console.log("SESSION USER:", req.session?.user);
-      next();
+  (req, res, next) => {
+    console.log("SESSION:", req.session);
+    console.log("SESSION USER:", req.session?.user);
+    next();
   },
   checkBlocked,
   validate(V.applyCouponSchema),
@@ -161,12 +160,14 @@ router.post("/orders/:orderId/cancel", isLoggedIn, checkBlocked, validate(V.canc
 // Wishlist routes
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
 router.post("/wishlist/add/:productId", isLoggedIn, validate(V.addToWishlistSchema, "params"), wishlistController.addToWishlist);
-router.post("/wishlist/add-to-cart/:itemId", isLoggedIn, validate(V.addToCartFromWishlistSchema,"params"), wishlistController.addToCartFromWishlist);
+router.post("/wishlist/add-to-cart/:itemId", isLoggedIn, validate(V.addToCartFromWishlistSchema, "params"), wishlistController.addToCartFromWishlist);
 router.delete("/wishlist/remove/:itemId", isLoggedIn, validate(V.removeWishlistSchema), wishlistController.removeFromWishlist);
 router.get("/status/:productId", validate(V.objectIdSchema), wishlistController.checkWishlistStatus);
 
 // Wallet routes
 router.get("/wallet", checkBlocked, walletController.getWallet);
 router.post("/add-funds", checkBlocked, walletController.addFunds);
+
+
 
 export default router;

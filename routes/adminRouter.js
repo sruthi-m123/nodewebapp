@@ -86,4 +86,6 @@ router.get('/coupons/:id', adminAuth, validate(V.getCategoryByIdSchema),couponCo
 router.put('/coupons/edit-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema), couponController.updateCoupon);
 router.delete('/coupons/delete-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema), couponController.deleteCoupon);
 
+
+
 export default router;

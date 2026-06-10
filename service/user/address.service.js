@@ -105,6 +105,9 @@ export const getEditAddressService= async (userId,addressId)=>{
 
 export const updateAddressService = async (userId, addressId, updates) => {
   logger.debug('Updating address', { userId, addressId, updates });
+ console.log('userId',userId);
+ console.log('addressId',addressId);
+ console.log("updates:",updates);
   
   const result = await Address.updateOne(
     { userId, "address._id": addressId, "address.isDeleted": false },

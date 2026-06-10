@@ -74,7 +74,7 @@ export const loadShopping = async (req, res) => {
         }
       });
     }
-
+console.log("products inside the loadshopcontroller :",products);
     res.render("user/shopall", {
       pageCSS: "user/shopall.css",
       pageJS: "user/shopall.js",

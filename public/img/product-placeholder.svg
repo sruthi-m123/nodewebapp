@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <pattern id="fabric" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#f5ede3"/>
+      <path d="M0 10 Q5 5 10 10 Q15 15 20 10" stroke="#e8d5c0" stroke-width="0.8" fill="none" opacity="0.5"/>
+      <path d="M0 0 Q5 5 10 0" stroke="#e8d5c0" stroke-width="0.5" fill="none" opacity="0.3"/>
+    </pattern>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#c4a882" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#fabric)"/>
+
+  <!-- Outer decorative border -->
+  <rect x="16" y="16" width="368" height="368" rx="8" ry="8"
+        fill="none" stroke="#c4a882" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Inner decorative border -->
+  <rect x="24" y="24" width="352" height="352" rx="6" ry="6"
+        fill="none" stroke="#c4a882" stroke-width="0.7" opacity="0.4"/>
+
+  <!-- Corner ornaments -->
+  <path d="M30 30 L50 30 M30 30 L30 50" stroke="#b8906a" stroke-width="2" fill="none"/>
+  <path d="M370 30 L350 30 M370 30 L370 50" stroke="#b8906a" stroke-width="2" fill="none"/>
+  <path d="M30 370 L50 370 M30 370 L30 350" stroke="#b8906a" stroke-width="2" fill="none"/>
+  <path d="M370 370 L350 370 M370 370 L370 350" stroke="#b8906a" stroke-width="2" fill="none"/>
+
+  <!-- Center image icon -->
+  <g transform="translate(200, 175)" filter="url(#shadow)">
+    <!-- Photo frame icon -->
+    <rect x="-50" y="-40" width="100" height="80" rx="6" ry="6"
+          fill="none" stroke="#b8906a" stroke-width="2.5"/>
+    <!-- Mountain/landscape icon inside frame -->
+    <path d="M-38 28 L-20 2 L-2 20 L12 4 L38 28 Z"
+          fill="#d4b896" opacity="0.6"/>
+    <!-- Sun circle -->
+    <circle cx="18" cy="-10" r="10"
+            fill="none" stroke="#b8906a" stroke-width="2"/>
+  </g>
+
+  <!-- Decorative horizontal divider -->
+  <line x1="80" y1="240" x2="320" y2="240" stroke="#c4a882" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- "No Image" text -->
+  <text x="200" y="275" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="14" fill="#b8906a" letter-spacing="3" opacity="0.8">NO IMAGE</text>
+
+  <!-- Decorative dots -->
+  <circle cx="160" cy="275" r="2" fill="#c4a882" opacity="0.5"/>
+  <circle cx="240" cy="275" r="2" fill="#c4a882" opacity="0.5"/>
+
+  <!-- Bottom brand subtle text -->
+  <text x="200" y="310" text-anchor="middle"
+        font-family="Georgia, serif"
+        font-size="10" fill="#c4a882" letter-spacing="2" opacity="0.5">CHETTINAD SAREES</text>
+</svg>

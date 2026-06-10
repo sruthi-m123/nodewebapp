@@ -35,7 +35,6 @@ function openAddressModal(addressId = null) {
     
     form.reset();
     if (addressId && addressId!=='new') {
-        // Editing an existing address
         title.textContent = 'Edit Address';
         fetch(`/user/api/addresses/${addressId}`)
             .then(response => response.json())
@@ -50,22 +49,28 @@ function openAddressModal(addressId = null) {
                     document.getElementById('state').value = address.state;
                     document.getElementById('pincode').value = address.pincode;
                     document.getElementById('phone').value = address.phone;
-                    document.getElementById('altPhone').value=address.altphone;
-                    document.getElementById('addressType').value = address.addressType || 'home';
+                    document.getElementById('altPhone').value=address.altPhone;
+                    document.getElementById('addressType').value = address.addressType || 'Home';
                     document.getElementById('setDefault').checked = address.isDefault || false;
                     
-                    // Store the address ID in the form for update
                     form.dataset.addressId = addressId;
                 }else{
-                    alert("failed to load address.")
-                }
+Swal.fire({
+    icon: 'error',
+    title: 'Oops...',
+    text: 'Failed to load address.'
+});     
+           }
             })
             .catch(error => {
                 console.error('Error fetching address:', error);
-                alert('Error loading address details');
-            });
+Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'Error loading address details'
+});      
+      });
     } else {
-        // Adding a new address
         title.textContent = 'Add New Address';
         
         delete form.dataset.addressId;
@@ -100,7 +105,15 @@ function setupFormValidation() {
         // Basic validation
         if (!formData.name ||! formData.building  ||!formData.city || 
             !formData.state || !formData.pincode|| !formData.phone||!formData.addressType) {
-            alert('Please fill in all required fields');
+Swal.fire({
+    toast:true,
+    position:'top-end',
+    icon:'error',
+    title:'Please fill in all required fields',
+    showConfirmationButton:false,
+    
+})
+
             return;
         }
         
@@ -375,7 +388,7 @@ function applyCouponByCode() {
     const applyButton = document.querySelector('.apply-coupon-input-btn');
     setButtonLoadingState(applyButton, 'Applying...');
     
-    apiCall(url, 'POST', { couponCode }, 'Coupon applied successfully')
+    apiCall(url, 'POST', { couponCode}, 'Coupon applied successfully')
         .then(data => {
             console.log("data by apply coupon code ",data);
             if (data.success) {
@@ -457,15 +470,16 @@ function removeCoupon() {
             if (data.success) {
                 appliedCoupon=null;
                 resetCouponUI();
-                updateOrderSummary(data.orderSummary);
                 resetCouponButtons();
-
-          
+                updateOrderSummary(data.orderSummary);
+               
+         
             }
         })
     
   
         .catch(() => {
+            console.log("remove coupon failed ");
             if (removeBtn) {
                 removeBtn.textContent = 'Remove';
                 removeBtn.disabled = false;
@@ -507,34 +521,24 @@ function updateCouponButtons(couponId, couponCode) {
         dropdownButton.classList.add('applied');
         dropdownButton.disabled = true;
     }
-    // const inputButton = document.querySelector('.apply-coupon-input-btn');
-    // if (inputButton) {
-    //     inputButton.textContent = 'Applied';
-    //     inputButton.classList.add('applied');
-    //     inputButton.disabled = true;
-    // }
-    // Disable all other apply buttons
-    document.querySelectorAll('.apply-coupon-dropdown-btn:not(.applied)').forEach(btn => {
-        btn.disabled = true;
-    });
+   
+    // document.querySelectorAll('.apply-coupon-dropdown-btn:not(.applied)').forEach(btn => {
+    //     btn.disabled = true;
+    // });
 }
 
-// Reset coupon buttons
-function resetCouponButtons() {
-    try{
-    console.log("inside the resetCouponbutton");
-    setTimeout(() => {
-        document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn => {
-            btn.textContent = 'Apply';
-            btn.classList.remove('applied', 'loading', 'btn-disabled');
-            btn.disabled = false;
-            console.log("After reset:", btn.className, btn.textContent);
-        });
-    }, 50); // wait 50ms to let DOM update
-}catch(error){
-    console.log("reset coupon button errpr:",error);
+
+function resetCouponbutton(){
+    console.log("reset button");
+    document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn=>{
+        btn.textContent='Apply';
+        btn.classList.remove('applied','loading','btn-disabled');
+        btn.disabled=false;
+
+    })
 }
-}
+
+
 
 // Set button to loading state
 function setButtonLoadingState(button, loadingText = 'Loading...') {
@@ -600,8 +604,7 @@ function apiCall(url, method = 'GET', data = null, successMessage = null) {
             throw error;
         });
 }
-
-// Allow pressing Enter in coupon input
+//applying coupon by input
 document.getElementById('couponCodeInput')?.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         applyCouponByCode();
@@ -649,14 +652,16 @@ function placeOrder() {
     btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
 console.log("appliedCoupon in place order",appliedCoupon);
+const isRetry=document.getElementById('isRetry')?.value==='true';
 
-const isRetry=window.isRetry||window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
 
 const payload={
     addressId:selectedAddress,
     paymentMethod,
-    appliedOffers
+    appliedOffers,
+    isRetry
 };
+console.log("payLoad in there:",payload);
 if(isRetry){
     payload.isRetry=true;
     console.log('Adding isRetry:true to payload');

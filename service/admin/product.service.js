@@ -20,8 +20,13 @@ const filter={
             .limit(limit),
             Product.countDocuments(filter)
         ]);
-        console.log("products :",products);
-        return{products,totalProducts,totalPages:Math.ceil(totalProducts/limit),skip}
+        let stockTotal=products.reduce((acc,curr)=>{
+            acc+=curr.stock
+            return acc
+        },0);
+        console.log("stockTotal:",stockTotal);
+        
+        return{products,totalProducts,totalPages:Math.ceil(totalProducts/limit),skip,stockTotal}
     },
 async create(data = {}, files = []) {
     

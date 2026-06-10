@@ -59,10 +59,11 @@ export const deleteOffer = async (req, res) => {
 };
 
 export const getEditOffer = async (req, res) => {
-  const { id } = req.validatedData; 
-  logger.info('fetching offer for edit', { id });
+  console.log("req.params:",req.params);
 
-  const offer = await offerService.getEditOfferService(id);
+  const offerId=req.params.id;
+
+  const offer = await offerService.getEditOfferService(offerId);
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,
     offer

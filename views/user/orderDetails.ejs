@@ -18,6 +18,11 @@
   
 <div class="order-info">
   <% order.items.forEach(item => { %>
+      <script>
+    console.log("item.imageUrl:", "<%= item.imageUrl %>");
+  </script>
+
+
     <div class="product-details">
       <img src="<%= item.imageUrl || '/images/default-product.jpg' %>" alt="<%= item.name %>">
 

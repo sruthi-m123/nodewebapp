@@ -104,7 +104,7 @@
 
     <% cartItems.forEach(item=> { %>
       <div class="product-item">
-        <img src="<%= item.image || 'images/placeholder.jpg' %>" alt="<%= item.name || 'Product' %>"
+        <img src="<%= item.image || '/img/product-placeholder.svg' %>" alt="<%= item.name || 'Product' %>"
           class="product-image">
         <div class="product-details">
           <div class="product-name">
@@ -285,7 +285,11 @@
 
 
 </div>
-
+<input
+  type="hidden"
+  id="isRetry"
+  value="<%= typeof isRetry !== 'undefined' ? isRetry : false %>"
+>
 <button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
 
 
@@ -301,12 +305,12 @@
     <form id="addressForm">
       <div class="form-group">
         <label class="form-label">Full Name *</label>
-        <input type="text" class="form-input" id="name" required>
+        <input type="text" class="form-input" id="name" >
       </div>
 
       <div class="form-group">
         <label class="form-label">Building / House No. *</label>
-        <input type="text" class="form-input" id="building" required>
+        <input type="text" class="form-input" id="building" >
       </div>
 
       <div class="form-group">
@@ -316,22 +320,22 @@
 
       <div class="form-group">
         <label class="form-label">City *</label>
-        <input type="text" class="form-input" id="city" required>
+        <input type="text" class="form-input" id="city" >
       </div>
 
       <div class="form-group">
         <label class="form-label">State *</label>
-        <input type="text" class="form-input" id="state" required>
+        <input type="text" class="form-input" id="state" >
       </div>
 
       <div class="form-group">
         <label class="form-label">Pincode *</label>
-        <input type="number" class="form-input" id="pincode" required>
+        <input type="number" class="form-input" id="pincode" >
       </div>
 
       <div class="form-group">
         <label class="form-label">Phone *</label>
-        <input type="tel" class="form-input" id="phone" required>
+        <input type="tel" class="form-input" id="phone" >
       </div>
 
       <div class="form-group">
@@ -341,10 +345,10 @@
 
       <div class="form-group">
         <label class="form-label">Address Type *</label>
-        <select class="form-input" id="addressType" required>
-          <option value="Home">Home</option>
-          <option value="Work">Work</option>
-          <option value="Other">Other</option>
+        <select class="form-input" id="addressType" >
+          <option value="home">Home</option>
+          <option value="work">Work</option>
+          <option value="other">Other</option>
         </select>
       </div>
 
@@ -362,25 +366,6 @@
   data-addresses='<%- JSON.stringify(addresses || []) %>' data-cart='<%- JSON.stringify(cartItems || []) %>'
   data-payment="<%= selectedPayment || '' %>">
 </div>
-<% if (typeof isRetry !=='undefined' && isRetry) { %>
-  <script>
-    // Enable retry mode flags
-    window.isRetry = true;
-    document.body.dataset.isRetry = 'true';
-
-    // Safely inject retryCartItems from server
-    window.retryCartItems = <% - JSON.stringify(retryCartItems || []) %>;
-
-    console.log('Retry mode detected');
-    console.log('Retry cart items:', window.retryCartItems);
-  </script>
-  <% } else { %>
-    <script>
-      // Default (non-retry mode)
-      window.isRetry = false;
-      document.body.dataset.isRetry = 'false';
-      window.retryCartItems = [];
-    </script>
-    <% } %>
+>
 
       </div>

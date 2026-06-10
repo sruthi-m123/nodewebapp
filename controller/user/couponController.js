@@ -5,8 +5,8 @@ import logger from '../../utils/logger.js';
 
 export const removeCoupon = async (req, res) => {
   logger.info('removing applied coupon');
-
-  const orderSummary = await couponApplicationService.removeCouponService(req.userId);
+const userId=req.session.user?.id;
+  const orderSummary = await couponApplicationService.removeCouponService(userId);
   
 
   delete req.session.appliedCoupon;
@@ -19,8 +19,9 @@ export const removeCoupon = async (req, res) => {
 
 export const applyCouponByCode = async (req, res) => {
   logger.info('applying coupon by code');
-
-  const userId = req.userId;
+  const userId = req.session.user.id;
+  console.log("userId:",userId);
+  console.log("req.query inside the applycupn:",req.query);
   const isRetry = req.query.retry === 'true';
 
   const { couponCode, couponId, retryCartItems } = req.validatedData;

@@ -123,7 +123,7 @@ export const deleteOfferService=async(offerId)=>{
 
 export const getEditOfferService=async(offerId)=>{
     logger.debug('fetching the offer for edit:',{offerId});
-
+console.log("offerId",offerId);
     const offer=await Offer.findById(offerId)
     .populate('applicableItems','name price images productName')
     .lean();

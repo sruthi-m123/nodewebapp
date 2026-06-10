@@ -1,6 +1,7 @@
 import User from "../../models/userSchema.js";
 
 export const userService={
+
     async getAllCustomers(search,page,limit){
         const filter={
             isAdmin:false,

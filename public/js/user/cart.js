@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   checkFor401Message();
 });
 
+
+
 function checkFor401Message() {
   const urlParams = new URLSearchParams(window.location.search);
   const errorMessage = urlParams.get('error');

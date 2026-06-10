@@ -27,7 +27,7 @@
  <div class="category-grid">
   <% categories.forEach(category => { 
        if (category.status === "active") { %>
-    <a href="/shopall/category/<%= category._id %>" class="category-card-link">
+    <a href="/user/shopall %>" class="category-card-link">
       <div class="category-card">
         <img src="<%= category.image %>" alt="<%= category.name %> Saree" />
         <div class="overlay">
@@ -52,7 +52,7 @@
      if (product.isNewArrival && product.isActive) { %>
   <div class="product-card">
     <a href="/user/product/<%= product._id %>" class="product-link">
-     <img src="<%= product.images[0] ? product.images[0] : '/img/placeholder.jpg' %>" />
+     <img src="<%= product.images[0] ? product.images[0] : '/img/product-placeholder.svg' %>" alt="<%= product.productName %>" />
       <!-- <img src="<%= product.images[0] ? '/' + product.images[0] : '/img/placeholder.jpg' %>" alt="<%= product.productName %>" /> -->
   <div class="product-info">                                
         <p><%= product.productName %></p>

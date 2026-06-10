@@ -265,8 +265,8 @@
 
     <div class="modal-footer">
       <div class="global-btns">
-        <button type="button" class="btn btn-danger" onclick="processReturn('reject-all', document.getElementById('returnRequestModal').dataset.orderId)">Reject Full Return</button>
-        <button type="button" class="btn btn-success" onclick="processReturn('approve-all', document.getElementById('returnRequestModal').dataset.orderId)">Approve Full Return</button>
+        <button type="button" class="btn btn-danger" onclick="processReturn('reject-all')">Reject Full Return</button>
+        <button type="button" class="btn btn-success" onclick="processReturn('approve-all')">Approve Full Return</button>
       </div>
     </div>
   </div>
@@ -554,7 +554,7 @@ function closeReturnModal() {
   }
 }
 
-function processReturn(action) {  
+function processReturn(action, itemId) {  
   const modal = document.getElementById('returnRequestModal');
     const itemIds = modal.dataset.itemIds
         ? JSON.parse(modal.dataset.itemIds)
@@ -562,7 +562,8 @@ function processReturn(action) {
   if (!modal) return;
   const orderId = modal.dataset.orderId;
 
-  const payload = { action, itemIds };
+  // Handle itemIds parameter correctly
+  const payload = { action, itemIds: itemId ? [itemId] : itemIds };
   console.log("payload:", payload);
 
   fetch(`/admin/orders/${orderId}/verify-return`, {
@@ -587,7 +588,7 @@ function processReturn(action) {
     if (!itemId) {  // Full
       const returnCell = row.querySelector('td:nth-child(6)');
       if (returnCell) {
-        returnCell.innerHTML = action === 'approve' 
+        returnCell.innerHTML = action.includes('approve') 
           ? '<span class="return-approved">Full Return Approved</span>'
           : '<span class="return-rejected">Full Return Rejected</span>';
         const verifyBtn = returnCell.querySelector('.verify-btn');
@@ -596,7 +597,7 @@ function processReturn(action) {
     } else {  // Partial
       const itemRow = document.querySelector(`li[data-item-id="${itemId}"]`);
       if (itemRow) {
-        itemRow.querySelector('.return-status').textContent = action === 'approve' ? 'Approved' : 'Rejected';
+        itemRow.querySelector('.return-status').textContent = action.includes('approve') ? 'Approved' : 'Rejected';
       }
       const statusCell = row.querySelector('td:nth-child(6)');
       if (statusCell) {
@@ -611,9 +612,6 @@ function processReturn(action) {
     alert(`Failed to ${action} return request`);
   })
   .finally(() => {
-    // console.log("itemId:",itemId);
-    // console.log("finally is running now here ")
-    // if (!itemId) closeReturnModal();  
     closeReturnModal();
   });
 }

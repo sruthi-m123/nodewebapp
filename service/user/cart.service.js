@@ -217,6 +217,7 @@ for(const update of updates ){
 }
 
 cart.markModified("items");
+await cart.save();
 logger.info('cart quantities updated successfully',{userId});
 
 return{
