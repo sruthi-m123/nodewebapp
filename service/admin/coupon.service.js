@@ -68,14 +68,14 @@ export const createCouponService=async(couponData)=>{
 }
 
 export const getCouponByIdService=async(couponId)=>{
-    logger.debug('fetching coupon by ID',{couponId});
-    const coupon=await Coupon.findById({couponId});
+    logger.debug('fetching coupon by ID',couponId);
+    const coupon=await Coupon.findById(couponId);
 
     if(!coupon){
-        logger.warn('coupon not found',{couponId});
+        logger.warn('coupon not found',couponId);
         throw new Error(MESSAGES.COUPON.NOT_FOUND)
     }
-logger.debug('coupon fetched carefully',{couponId});
+logger.debug('coupon fetched carefully',couponId);
 return coupon;
 }
 

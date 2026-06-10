@@ -1,10 +1,7 @@
 import Joi from "joi";
 
 export const cancelOrderSchema=Joi.object({
-  orderId:Joi.string().required().messages({
-    'string.empty':'order Id is required',
-    'any.required':'Order Id is required'
-  }),
+
 
  reason: Joi.string().optional(),
     itemId: Joi.string().optional(),

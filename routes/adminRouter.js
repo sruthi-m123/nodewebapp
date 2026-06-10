@@ -83,7 +83,7 @@ router.put('/offers/update-offer/:id', adminAuth, validate(V.getOfferByIdSchema)
 router.get('/coupons', adminAuth, couponController.getCouponPage);
 router.post('/coupons/add-coupon', adminAuth, validate(V.createCouponSchema),couponController.createCoupon);
 router.get('/coupons/:id', adminAuth, validate(V.getCategoryByIdSchema),couponController.getCouponById);
-router.put('/coupons/edit-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema), couponController.updateCoupon);
+router.put('/coupons/edit-coupon/:id', adminAuth,validate(V.createCouponSchema), couponController.updateCoupon);
 router.delete('/coupons/delete-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema), couponController.deleteCoupon);
 
 

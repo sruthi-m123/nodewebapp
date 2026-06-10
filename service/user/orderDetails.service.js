@@ -355,6 +355,7 @@ const processFullCancellation=async(order,reason,cancelledItems)=>{
 }
 
 const calculateFullRefund=(order,deliveryCharge,couponAmount,tax)=>{
+    
     const activeItems=order.items.filter(item=>item.status!=='cancelled');
     if(activeItems.lenght ===0) return 0;
     const activeSubtotal=activeItems.reduce((sum,item)=>sum+item.totalPrice,0);
@@ -365,53 +366,44 @@ const calculateFullRefund=(order,deliveryCharge,couponAmount,tax)=>{
 
 }
 
-const processPartialCancellation=async(order,itemId,reason,cancelledItems,deliveryCharge,couponAmount,tax)=>{
-    const item=order.items.id(itemId);
+const processPartialCancellation = async (order, itemId, reason, cancelledItems, deliveryCharge, couponAmount, tax) => {
+    const item = order.items.id(itemId);
+    
+    if (!item || item.status === 'cancelled') {
+        throw new Error('Item cannot be cancelled');
+    }
 
-    if(!item){
-        throw new Error('Item not found in order');
-            }
+    await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
 
-            if(item.status==='cancelled'){
-                throw new Error('Item already cancelled');
-            }
+    item.status = 'cancelled';
+    cancelledItems.push({
+        product: item.productId,
+        name: item.productName,
+        quantity: item.quantity,
+        reason
+    });
 
-            await Product.findByIdAndUpdate(item.productId,{$inc:{stock:item.quantity}});
+    const allCancelled = order.items.every(i => i.status === 'cancelled');
+    order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
 
-            item.status='cancelled';
-            cancelledItems.push({
-                product:item.productId,
-                name:item.productName,
-                quantity:item.quantity,
-                reason
-            });
+    const totalOriginalSubtotal = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
+    
+    const totalPaidExcludingDelivery = totalOriginalSubtotal - couponAmount + tax;
+    
+    const itemProportion = item.totalPrice / totalOriginalSubtotal;
+    const refundAmount = itemProportion * totalPaidExcludingDelivery;
 
-            const allCancelled=order.items.every(i=>i.status==='cancelled');
-            order.status=allCancelled?'cancelled':'partially_cancelled';
+    order.cancellation = {
+        reason,
+        date: new Date(),
+        initiatedBy: 'customer',
+        type: allCancelled ? 'full' : 'partial',
+        cancelledItems,
+        refundAmount: Math.max(0, refundAmount)
+    };
 
-            const activeSubtotal=order.items
-            .filter(i=>i.status!=='cancelled')
-            .reduce((sum,i)=>sum+i.totalPrice,0);
-
-            let refundAmount=0;
-            if(activeSubtotal>0){
-                const itemTotalPrice=item.totalPrice;
-                const itemShare=itemTotalPrice/activeSubtotal;
-                const netRefundable=activeSubtotal-couponAmount+tax;
-                refundAmount=itemShare*netRefundable;
-                refundAmount=Math.max(0,refundAmount);
-            }
-
-            order.cancellation={
-                reason,
-                date:new Date(),
-                initiatedBy:'customer',
-                type:allCancelled?'full':'partial',
-                cancelledItems
-            }
-
-            return refundAmount;
-}
+    return Math.max(0, refundAmount);
+};
 
 const processRefund= async(order,refundAmount)=>{
     if(refundAmount<=0) return;

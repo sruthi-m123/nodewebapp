@@ -9,7 +9,7 @@
     (sum, item) => sum + item.originalPrice * item.quantity,
     0
   );
-
+console.log("subtotoal:",subtotal);
   // Delivery charge
   const delivery = subtotal > 500 ? 0 : 50;
 

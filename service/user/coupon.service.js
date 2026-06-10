@@ -216,9 +216,11 @@ return {appliedCoupon,discountText,orderSummary};
 
 export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry=false,provideRetryItems=null)=>{
     logger.debug('validating and applying coupon',{userId,couponIdentifier,isRetry});
+    console.log("userId",userId);
+    console.log("couponIdentifier",couponIdentifier);
 
     const coupon =await Coupon.findOne({
-        code:couponIdentifier,
+        _id:couponIdentifier,
         isActive:true,
         validTill:{$gte:new Date()}
     });

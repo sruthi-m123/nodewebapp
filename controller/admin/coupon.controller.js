@@ -26,8 +26,9 @@ export const createCoupon = async (req, res) => {
 };
 
 export const getCouponById = async (req, res) => {
-  console.log("validated data:",req.validatedData);
-  const { id } = req.validatedData; 
+  console.log("req.params",req.params);
+  const { id } = req.params; 
+  console.log(id);
   logger.info('Fetching coupon by Id', { id });
 
   const coupon = await couponService.getCouponByIdService(id);
@@ -38,7 +39,7 @@ export const updateCoupon = async (req, res) => {
   const { id } = req.validatedData; 
   logger.info('updating coupon', { id });
 
-  const coupon = await couponService.updateCouponService(id, req.validatedData); 
+  const coupon = await couponService.updatedCouponService(id, req.validatedData); 
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,
     message: MESSAGES.COUPON.UPDATE_SUCCESS,
