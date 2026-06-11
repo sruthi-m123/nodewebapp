@@ -49,18 +49,7 @@ export const createCouponService=async(couponData)=>{
         logger.warn('Duplicate coupon creation attempt',description,discountType);
         throw new Error(MESSAGES.COUPON.DUPLICATE);
             }
-            // const coupon=new Coupon({
-            //     description:description.trim(),
-            //     code:code.toUpperCase(),
-            //     discountType,
-            //     discountValue:parseFloat(discountValue),
-            //     redeemAmount:parseFloat(redeemAmount),
-            //     minCartValue:parseFloat(minCartValue),
-            //     validFrom:new Date(validFrom),
-            //     validTill:new Date(validTill),
-            //     usageLimit:usageLimit?parseInt(usageLimit):null,
-            //     isActive:isActive==="on"||isActive===true||isActive==="true"
-            // });
+          
             const coupon =new Coupon(formattedData)
             await coupon.save();
             logger.info('coupon created successfully',{couponId:coupon._id,code});

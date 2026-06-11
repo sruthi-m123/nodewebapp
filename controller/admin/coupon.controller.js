@@ -5,12 +5,33 @@ import { MESSAGES } from '../../utils/messages.js';
 
 export const getCouponPage = async (req, res) => {
   logger.info('Loading coupon management page');
+  const page=parseInt(req.query.page)||1;
+  const limit=parseInt(req.query.limit)||10;
+  const search=req.query.search||'';
 
-  const coupons = await couponService.getAllCouponService();
+  let searchQuery={};
+  if(search){
+    searchQuery={
+      $or:[
+        {code:{$reqgex:search,$options:'i'}},
+        {description:{$regex:search,$options:'i'}}
+      ]
+    }
+  }
+const totalCoupons=await couponService.getTotalCouponsCount(searchQuery);
+const totalPages=Math.ceil(totalCoupons/limit);
+const skip=(page-1)*limit;
+
+  const coupons = await couponService.getAllCouponService(searchQuery,skip,limit);
 
   res.render('admin/coupons', {
     coupons,
-    layout: false
+    currentPage:page,
+    totalPages:totalPages,
+    totalCoupons:totalCoupons,
+    limit:limit,
+    search:search,
+        layout: false
   });
 };
 
@@ -37,6 +58,7 @@ export const getCouponById = async (req, res) => {
 
 export const updateCoupon = async (req, res) => {
   const { id } = req.validatedData; 
+  console.log("req.validatedData:",req.validatedData);
   logger.info('updating coupon', { id });
 
   const coupon = await couponService.updatedCouponService(id, req.validatedData); 
@@ -48,8 +70,8 @@ export const updateCoupon = async (req, res) => {
 };
 
 export const deleteCoupon = async (req, res) => {
-  const { id } = req.validatedData; 
-  logger.info('Deleting coupon', { id });
+const id=req.params.id;
+  logger.info('Deleting coupon',  id );
 
   await couponService.deleteCouponService(id);
   res.status(STATUS_CODES.SUCCESS).json({

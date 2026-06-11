@@ -11,6 +11,11 @@ export const getCheckoutPage = async (req, res) => {
   const userId = req.session.user.id;
   const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons } = await checkoutService.getCheckoutData(userId, req.session);
 
+if(!cartItems||cartItems.length===0){
+  return res.redirect('/user/cart');
+}
+
+
   if (orderSummary.stockValidationFailed) {
     req.session.outOfStickItems = orderSummary.outOfStockItems;
     return res.redirect('/user/cart?error=some items are out of stock');
@@ -118,12 +123,12 @@ export const applyOffer = async (req, res) => {
 };
 
 export const placeOrder = async (req, res) => {
-  logger.info('Placing order');
+  logger.info('inside Placing order');
+
   const userId = req.session.user.id;
   if (!userId) {
     return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "please login to continue" });
   }
-  console.log("req.body", req.body);
   const { addressId, paymentMethod, appliedOffers = [], isRetry = false } = req.body || {};
   const orderData = { userId, addressId, paymentMethod, appliedOffers, isRetry, session: req.session };
   const result = await checkoutService.placeOrder(orderData);

@@ -1,10 +1,6 @@
-console.log("checkout.js is running ");
-// const { response } = require("express");
 
-// let addressToDelete=null;
 document.addEventListener('DOMContentLoaded', function () {
     const checkoutData = document.getElementById('checkout-data');
-    console.log("checkout datas:",checkoutData);
     const offers = JSON.parse(checkoutData.dataset.offers || '[]');
     const addresses = JSON.parse(checkoutData.dataset.addresses || '[]');
     const cartItems = JSON.parse(checkoutData.dataset.cart || '[]');
@@ -50,7 +46,7 @@ function openAddressModal(addressId = null) {
                     document.getElementById('pincode').value = address.pincode;
                     document.getElementById('phone').value = address.phone;
                     document.getElementById('altPhone').value=address.altPhone;
-                    document.getElementById('addressType').value = address.addressType || 'Home';
+                    document.getElementById('addressType').value = address.addressType || 'home';
                     document.getElementById('setDefault').checked = address.isDefault || false;
                     
                     form.dataset.addressId = addressId;
@@ -88,7 +84,6 @@ function setupFormValidation() {
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const formData = {
             name: document.getElementById('name').value.trim(),
             building: document.getElementById('building').value.trim(),
@@ -344,7 +339,7 @@ function updateOrderSummary(orderSummary) {
     const formatCurrency = (value, isNegative = false) =>
         `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
 
-    // document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
+    document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
     document.getElementById("summary-delivery").textContent = formatCurrency(orderSummary.delivery);
     document.getElementById("summary-tax").textContent = formatCurrency(orderSummary.tax);
     document.getElementById("summary-couponDiscount").textContent=formatCurrency(orderSummary.couponDiscount);
@@ -377,6 +372,7 @@ document.addEventListener('click', function(event) {
 
 // Apply coupon from input field
 function applyCouponByCode() {
+    console.log("inside the apply coupon")
     const couponCode = document.getElementById('couponCodeInput').value.trim();
     
     if (!couponCode) {
@@ -384,6 +380,10 @@ function applyCouponByCode() {
         return;
     }
    const isRetry = window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+   console.log("isRetry:", isRetry);
+console.log("window.isRetry:", window.isRetry);
+console.log("search:", window.location.search);
+console.log("dataset:", document.body.dataset.isRetry);
   const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
     const applyButton = document.querySelector('.apply-coupon-input-btn');
     setButtonLoadingState(applyButton, 'Applying...');
@@ -402,6 +402,7 @@ function applyCouponByCode() {
                 updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(data.couponId, data.couponCode);
+                
             }else{
                 showToast(data.message,'error')
             }
@@ -470,7 +471,8 @@ function removeCoupon() {
             if (data.success) {
                 appliedCoupon=null;
                 resetCouponUI();
-                resetCouponButtons();
+                resetCouponbutton();
+                console.log("data.orderSummary",data.orderSummary);
                 updateOrderSummary(data.orderSummary);
                
          
@@ -478,8 +480,9 @@ function removeCoupon() {
         })
     
   
-        .catch(() => {
+        .catch((err) => {
             console.log("remove coupon failed ");
+console.log("error",err);
             if (removeBtn) {
                 removeBtn.textContent = 'Remove';
                 removeBtn.disabled = false;
@@ -495,14 +498,13 @@ function removeCoupon() {
 
       
 
-// Update UI when coupon is applied
+// updating the UI when updating the coupon 
 function updateAppliedCouponUI(couponCode, discountText, couponId) {
     document.getElementById('appliedCouponText').textContent = `Applied: ${couponCode} - ${discountText}`;
     document.getElementById('appliedCouponId').value = couponId;
     document.getElementById('appliedCouponContainer').style.display = 'block';
     document.getElementById('couponCodeInput').value = '';
     
-    // appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
 }
 
 // Reset coupon UI
@@ -512,9 +514,7 @@ function resetCouponUI() {
     appliedCoupon = null;
 }
 
-// Update coupon buttons state
 function updateCouponButtons(couponId, couponCode) {
-    // Update dropdown button
     const dropdownButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
     if (dropdownButton) {
         dropdownButton.textContent = 'Applied';
@@ -522,9 +522,6 @@ function updateCouponButtons(couponId, couponCode) {
         dropdownButton.disabled = true;
     }
    
-    // document.querySelectorAll('.apply-coupon-dropdown-btn:not(.applied)').forEach(btn => {
-    //     btn.disabled = true;
-    // });
 }
 
 

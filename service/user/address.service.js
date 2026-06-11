@@ -22,6 +22,7 @@ export const getUserAddressesService=async(userId)=>{
 }
 
 export const addAddressService=async(userId,addressData)=>{
+    console.log("reaching the address service ");
     const{
         name,
         addressType,
@@ -34,15 +35,18 @@ export const addAddressService=async(userId,addressData)=>{
         altPhone,
         setAsDefault
     }=addressData;
+    console.log("addressType:",addressType);
     logger.debug('adding new address',{userId,addressType});
     const newAddress={
-        addressType,
+        addressType:addressType,
         name,
         city,building,landmark,state,pincode,phone,altPhone,
         isDefault:!!setAsDefault
     }
 let userAddressDoc=await Address.findOne({userId});
+console.log("userAddressDoc",userAddressDoc);
 if(!userAddressDoc){
+    console.log("hi inside new addresss");
     newAddress.isDefault=true;
     await Address.create({
         userId,
@@ -53,6 +57,9 @@ if(!userAddressDoc){
     if(newAddress.isDefault){
         userAddressDoc.address.forEach(addr=>(addr.isDefault=false));
     }
+    userAddressDoc.address.forEach(addr=>{
+        addr.addressType=addr.addressType.toLowerCase();
+    })
     userAddressDoc.address.push(newAddress);
     await userAddressDoc.save();
     logger.info('New address added to existing addresses',{userId});

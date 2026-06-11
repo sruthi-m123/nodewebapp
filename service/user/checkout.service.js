@@ -20,7 +20,7 @@ export const getCheckoutData = async (userId, session) => {
   let fromCart = true;
   let stockValidationFailed = false;
   let outOfStockItems = [];
-
+  console.log("session:",session);
   if (session.buyNowItem) {
     fromCart = false;
     const product = await Product.findById(session.buyNowItem.productId);
@@ -226,9 +226,10 @@ export const placeOrder = async (orderData) => {
   let isBuyNow = false;
   let orderId;
   let order;
-
-  if (session.buyNowItem) {
-    const { productId, quantity = 1, variant = 'Default', price } = session.buyNowItem;
+let buynow=orderData.session.buyNowItem
+  if (buynow) {
+    console.log("inside the buy now controller");
+    const { productId, quantity = 1, variant = 'Default', price } = orderData.session.buyNowItem;
     const product = await Product.findById(productId);
     if (!product || !product.isActive) {
       return { success: false, message: MESSAGES.PRODUCT.NOT_AVAILABLE }
@@ -239,11 +240,11 @@ export const placeOrder = async (orderData) => {
     }
     const effectivePrice = price || product.discountedPrice || product.price;
     items = [{
-      productId: product.productId,
+      productId,
       name: product.productName,
       variant,
       quantity,
-      price: product.discountedPrice || null,
+      price: effectivePrice,
       totalPrice: effectivePrice * quantity
     }];
     isBuyNow = true;

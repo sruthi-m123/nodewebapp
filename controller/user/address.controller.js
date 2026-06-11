@@ -27,9 +27,11 @@ export const getAddressPage = async (req, res) => {
 }
 
 export const addAddress = async (req, res) => {
+  console.log("inside the address controller")
   const userId = req.session.user.id;
   logger.info('Adding new address', { userId });
   const { error, value } = addressSchema.validate(req.body, { abortEarly: false });
+  console.log("value inside the address controller:",value);
   if (error) {
     const messages = error.details.map((err) => err.message).join(", ");
     throw Object.assign(new Error(messages), { status: STATUS_CODES.BAD_REQUEST })

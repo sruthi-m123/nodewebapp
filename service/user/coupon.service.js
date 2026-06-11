@@ -17,7 +17,7 @@ export const removeCouponService=async(userId)=>{
     }
 
     const cartItems=cart.items
-    .filter(item=>({
+    .map(item=>({
         id:item.productId._id,
         name:item.productId.productName,
         price:item.productId.discountedPrice||item.productId.price,

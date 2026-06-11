@@ -290,3 +290,64 @@ stockTotal is not defined
 [2026-06-10 11:01:56] [31merror[39m: PUT /admin/coupons/edit-coupon/6a248927e79f3a1654c2e4ac-couponService.updateCouponService is not a function
 [2026-06-10 11:07:40] [31merror[39m: POST /user/checkout/apply-coupon-Invalid or expired coupon
 [2026-06-10 11:09:49] [31merror[39m: POST /user/checkout/apply-coupon-Invalid or expired coupon
+[2026-06-10 12:57:47] [31merror[39m: GET /admin/coupons/add-coupon-Cast to ObjectId failed for value "add-coupon" (type string) at path "_id" for model "Coupon"
+[2026-06-10 14:36:54] [31merror[39m: GET /admin/coupons/add-coupon-Cast to ObjectId failed for value "add-coupon" (type string) at path "_id" for model "Coupon"
+[2026-06-10 14:38:03] [31merror[39m: GET /admin/coupons/add-coupon-Cast to ObjectId failed for value "add-coupon" (type string) at path "_id" for model "Coupon"
+[2026-06-10 15:28:11] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-10 16:59:59] [31merror[39m: POST /admin/coupons/add-coupon-Coupon already exists
+[2026-06-10 17:29:27] [31merror[39m: DELETE /admin/coupons/delete-coupon/6a294aa9027404bae008a2e7-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-11 03:39:51] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-11 08:59:21] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-11 09:07:47] [31merror[39m: DELETE /admin/coupons/delete-coupon/6a2951b7027404bae008a2fe-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-11 12:12:38] [31merror[39m: DELETE /admin/coupons/delete-coupon/6a2a35e7fd43203e8ef54d44-Cannot destructure property 'id' of 'req.validatedData' as it is undefined.
+[2026-06-11 12:42:38] [31merror[39m: POST /admin/coupons/add-coupon-Coupon already exists
+[2026-06-11 12:48:29] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 12:51:53] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 13:30:45] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 13:38:59] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 13:43:58] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 13:46:23] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 13:50:31] [31merror[39m: POST /user/addresses/add-Address validation failed: address.0.addressType: `Home` is not a valid enum value for path `addressType`.
+[2026-06-11 15:04:30] [31merror[39m: POST /user/orders-placed-Cannot read properties of undefined (reading 'id')
+[2026-06-11 15:26:26] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
+[2026-06-11 15:27:38] [31merror[39m: POST /user/checkout/apply-coupon-cart is empty
+[2026-06-11 15:27:57] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:30:52] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:35:21] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:37:24] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:40:24] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:51:42] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 15:58:22] [31merror[39m: GET /user/checkout-req is not defined
+[2026-06-11 15:58:30] [31merror[39m: GET /user/checkout-req is not defined
+[2026-06-11 16:01:19] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 16:34:34] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.productId: Path `productId` is required., items.0.price: Path `price` is required.
+[2026-06-11 16:39:06] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.price: Path `price` is required.
+[2026-06-11 16:40:35] [31merror[39m: POST /user/orders-placed-Order validation failed: items.0.price: Path `price` is required.
+[2026-06-11 16:45:13] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "GUGI" (type string) at path "_id" for model "Coupon"
+[2026-06-11 16:47:48] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:08:07] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:08:42] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:10:36] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "GUGI" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:12:56] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "GUGI" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:19:36] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 17:25:49] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:04:13] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:06:00] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:20:38] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:23:31] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:25:19] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-11 18:43:38] [31merror[39m: POST /user/checkout/apply-coupon-Invalid or expired coupon
+[2026-06-11 18:43:47] [31merror[39m: POST /user/checkout/apply-coupon-Invalid or expired coupon
+[2026-06-11 18:45:09] [31merror[39m: POST /user/checkout/apply-coupon-Invalid or expired coupon
+[2026-06-11 19:30:56] [31merror[39m: GET /admin/coupons-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\coupons.ejs:71
+    69| 
+    70|   <!-- Pagination Section -->
+ >> 71|   <% if (totalPages > 1) { %>
+    72|     <div class="pagination-container">
+    73|       <div class="pagination-info">
+    74|         Showing <%= (currentPage - 1) * limit + 1 %> to <%= Math.min(currentPage * limit, totalCoupons) %> of <%= totalCoupons %> coupons
+
+totalPages is not defined
+[2026-06-11 20:48:30] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-11 21:00:54] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-11 21:01:13] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
