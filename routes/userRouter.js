@@ -165,7 +165,7 @@ router.delete("/wishlist/remove/:itemId", isLoggedIn, validate(V.removeWishlistS
 router.get("/status/:productId", validate(V.objectIdSchema), wishlistController.checkWishlistStatus);
 
 // Wallet routes
-router.get("/wallet", checkBlocked, walletController.getWallet);
+router.get("/wallet",isLoggedIn, checkBlocked, walletController.getWallet);
 router.post("/add-funds", checkBlocked, walletController.addFunds);
 
 

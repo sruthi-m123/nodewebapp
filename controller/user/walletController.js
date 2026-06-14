@@ -4,7 +4,6 @@ import logger from "../../utils/logger.js";
 
 export const getWallet=async(req,res)=>{
   logger.info("Loading wallet page");
-
   const userId=req.session.user.id;
   const page=Number(req.query.page)||1;
   const limit=6;

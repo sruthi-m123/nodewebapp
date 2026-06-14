@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupPaymentSelection();
     setupFormValidation();
 
+    
     if (window.location.hash === '#success') {
         showSuccessPage();
     }
@@ -421,6 +422,7 @@ console.log("dataset:", document.body.dataset.isRetry);
 // Apply coupon from dropdown
 function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
     const isRetry=window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+
     const retryCartItems=window.retryCartItems||[];
     console.log("retryCartItems:",retryCartItems);
     console.log("isRetry:",isRetry);
@@ -657,6 +659,7 @@ const payload={
     paymentMethod,
     appliedOffers,
     isRetry
+   
 };
 console.log("payLoad in there:",payload);
 if(isRetry){

@@ -173,6 +173,13 @@ h2 {
 .retry-payment-btn {
     background-color: var(--success-color);
     color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .action-btn:hover {

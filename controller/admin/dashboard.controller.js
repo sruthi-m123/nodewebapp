@@ -6,9 +6,13 @@ export const getDashboardStats = async (req, res) => {
   logger.info('Fetching dashboard stats');
   
   const stats = await dashboardService.getDashboardStatsService();
+  const salesReport=await dashboardService.getSalesReportService();
+  console.log("stats:",stats);
+  console.log("salesReport:",salesReport);
+
   
   logger.info('Dashboard stats delivered successfully');
-  res.json(stats);
+  res.json({stats,salesReport});
 };
 
 export const getTopProducts = async (req, res) => {

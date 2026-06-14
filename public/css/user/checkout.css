@@ -1155,3 +1155,9 @@ h1 {
     border-radius: 4px;
     border: 1px solid #d9c4b3; /* Consistent with your theme */
 }
+.payment-disabled{
+  opacity: 0.5;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+  pointer-events: none;  
+}

@@ -22,7 +22,22 @@ export const placeOrderSchema = Joi.object({
   paymentMethod: Joi.string().valid('cod', 'wallet', 'netbanking').required()
     .messages({ 'any.only': 'Valid payment method is required' }),
   appliedOffers: Joi.array().items(Joi.string()).optional(),
-  isRetry: Joi.boolean().optional()
+  isRetry: Joi.boolean().optional(),
+   cartItems:Joi.array().items(
+
+    Joi.object({
+id:Joi.string().required(),
+quantity:Joi.number().required(),
+name:Joi.string(),
+image:Joi.string(),
+price:Joi.string(),
+price: Joi.number(),
+    originalPrice: Joi.number(),
+    discountedPrice: Joi.allow(null),
+    isBuyNow: Joi.boolean()
+
+    })
+   )
 });
 
 export const applyOfferSchema = Joi.object({

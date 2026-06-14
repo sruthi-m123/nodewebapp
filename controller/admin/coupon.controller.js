@@ -13,7 +13,7 @@ export const getCouponPage = async (req, res) => {
   if(search){
     searchQuery={
       $or:[
-        {code:{$reqgex:search,$options:'i'}},
+        {code:{$regex:search,$options:'i'}},
         {description:{$regex:search,$options:'i'}}
       ]
     }

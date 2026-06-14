@@ -49,8 +49,10 @@ export const applyCoupon = async (req, res) => {
 console.log("session details:",req.session.user)
   const userId = req.session.user.id;
   const isRetry = req.query.retry === 'true';
-
+  console.log("validated data inside the controller:",req.validatedData);
   const { couponCode, couponId, retryCartItems } = req.validatedData;
+  console.log("retry cart items inside the controller:",retryCartItems);
+
   console.log("userId in the apply coupon :",userId);
 
   const result = await couponApplicationService.validateAndApplyCouponService(

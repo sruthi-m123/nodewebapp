@@ -10,7 +10,7 @@
       }
 
       try {
-        const response = await fetch('/user/wallet/add-funds', {
+        const response = await fetch('/user/add-funds', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -19,11 +19,11 @@
         });
 
         const data = await response.json();
-
+console.log("data inside the wallet:",data);
         if (data.success) {
           messageEl.textContent = `Successfully added Rs.${amount.toFixed(2)} to your wallet`;
           messageEl.style.color = 'green';
-          document.querySelector('.wallet-details h3').textContent = `Rs ${data.newBalance.toFixed(2)}`;
+          document.querySelector('.wallet-details h3').textContent = `Rs ${data.data.balance.toFixed(2)}`;
           document.getElementById('amount').value = '';
           
           // Reload transactions after 2 seconds

@@ -218,6 +218,7 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
     logger.debug('validating and applying coupon',{userId,couponIdentifier,isRetry});
     console.log("userId",userId);
     console.log("couponIdentifier",couponIdentifier);
+    console.log("provide retry items:",provideRetryItems);
 
     const coupon =await Coupon.findOne({
         _id:couponIdentifier,

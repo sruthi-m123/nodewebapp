@@ -182,7 +182,8 @@
       await Promise.all([
         loadStats(),
         loadTopProducts(),
-        loadSalesChart()
+        loadSalesChart(),
+        loadSalesReport()
       ]);
     } catch (error) {
       console.error('Error initializing dashboard:', error);

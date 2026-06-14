@@ -10,7 +10,7 @@ export const getCheckoutPage = async (req, res) => {
 
   const userId = req.session.user.id;
   const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons } = await checkoutService.getCheckoutData(userId, req.session);
-
+console.log("orderSummary",orderSummary);
 if(!cartItems||cartItems.length===0){
   return res.redirect('/user/cart');
 }
@@ -37,6 +37,7 @@ if(!cartItems||cartItems.length===0){
     selectedPaymentMethod: 'Cash on Delivery',
     appliedOffers: [],
     user: req.session.user,
+    isRetry:false,
     coupons,
     razorpayKey: process.env.RAZORPAY_KEY_ID
   });
@@ -124,14 +125,16 @@ export const applyOffer = async (req, res) => {
 
 export const placeOrder = async (req, res) => {
   logger.info('inside Placing order');
-
   const userId = req.session.user.id;
   if (!userId) {
     return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "please login to continue" });
   }
+  
   const { addressId, paymentMethod, appliedOffers = [], isRetry = false } = req.body || {};
   const orderData = { userId, addressId, paymentMethod, appliedOffers, isRetry, session: req.session };
+   
   const result = await checkoutService.placeOrder(orderData);
+  
   if (!result.success) {
     logger.warn('place order failed', { error: result.message });
     return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.message });

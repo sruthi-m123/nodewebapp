@@ -10,6 +10,7 @@ export const WalletService ={
     async addFunds(userId,amount){
         return mongoose.connection.transaction(async(session)=>{
             let wallet=await Wallet.findOne({user:userId}).session(session);
+            
             if(!wallet){
                 wallet=new Wallet({user:userId,balance:0});
             }
@@ -22,11 +23,12 @@ export const WalletService ={
                 reference,
                 description:"Wallet top-up"
             });
+            console.log("checking the transactions:",wallet.transactions);
             await wallet.save({session});
             logger.info("Wallet funded successfully",{userId,amount});
             return{
                 balance:wallet.balance,
-                transactionId:wallet.transaction.at(-1)._id
+                transactionId:wallet.transactions.at(-1)._id
             };
         });
     },

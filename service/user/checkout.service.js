@@ -101,7 +101,6 @@ export const getCheckoutData = async (userId, session) => {
   const orderSummary = calculateOrder(cartItems);
   orderSummary.stockValidationFailed = stockValidationFailed;
   orderSummary.outOfStockItems = outOfStockItems;
-
   const paymentMethods = [
     { id: 'netbanking', title: 'Net Banking', icon: '🏦', description: 'Pay via Internet Banking' },
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
@@ -322,6 +321,10 @@ let buynow=orderData.session.buyNowItem
   }));
   const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
   const { subtotal, delivery, discount, tax, total } = orderSummary;
+  if( paymentMethod==='cod'&& total>1000){
+    return {success:false,message:'cash on delivery is not possible for orders above 1000 rupees'};
+  }
+ 
   const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'processing');
   if (!isRetry) {
     orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -428,3 +431,4 @@ export const getOrderForFailure = async (orderId) => {
     goToHomeUrl: '/user/shopAll'
   };
 };
+

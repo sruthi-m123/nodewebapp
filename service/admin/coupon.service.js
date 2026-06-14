@@ -2,12 +2,21 @@ import Coupon from '../../models/couponSchema.js';
 import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
 
-export const getAllCouponService=async()=>{
-    logger.debug('fetching all coupons');
-    const coupons= await Coupon.find().sort({createdAt:-1});
+export const getAllCouponService=async(searchQuery={},skip=0,limit=10)=>{
+    logger.debug('fetching all coupons',{searchQuery,skip,limit});
+    const coupons= await Coupon.find(searchQuery)
+    .sort({createdAt:-1})
+    .skip(skip)
+    .limit(limit);
     
     logger.info('coupons fetched successfully',{count:coupons.length});
     return coupons;
+}
+export const getTotalCouponsCount=async(searchQuery={})=>{
+    logger.debug('getting total coupons count',{searchQuery});
+    const count=await Coupon.countDocuments(searchQuery);
+    logger.info('total coupons count retrieved',{count});
+    return count;
 }
 
 export const createCouponService=async(couponData)=>{
