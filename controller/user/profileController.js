@@ -40,6 +40,7 @@ export const getEditProfile = async (req, res) => {
   }
 
   const user = await ProfileService.getUserProfile(userId);
+  console.log("user inside the edit profile:",user);
 
   res.render("user/editProfile", {
     activeTab: "profile",

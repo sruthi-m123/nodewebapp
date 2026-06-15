@@ -4,7 +4,6 @@ import logger from '../../utils/logger.js';
 
 export const getProductDetailService=async(productId)=>{
     logger.debug('fetching product details',{productId});
-
     const product=await Product.findById(productId)
     .populate('bestOffer')
     .populate('category');

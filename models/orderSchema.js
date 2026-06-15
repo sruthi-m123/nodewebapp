@@ -60,6 +60,7 @@ const orderSchema = new mongoose.Schema({
           "payment_failed",
           "return_rejected",
           "return_approved",
+          "payment_pending"
         ],
         default: "pending",
       },
@@ -102,6 +103,7 @@ const orderSchema = new mongoose.Schema({
       "partially_cancelled",
       "return_requested",
       "payment_failed",
+      "payment_pending",
       "paid",
     ],
     default: "pending",

@@ -5,20 +5,22 @@
 
   if (qtyInput && minusBtn && plusBtn) {
     const maxStock = parseInt(qtyInput.getAttribute('data-stock')) || 1;
-
+const limit=parseInt(qtyInput.getAttribute('data-limit'));
+console.log("limit:",limit);
     function updateQuantity(change) {
+      console.log("inside the updateQuantity");
       let qty = parseInt(qtyInput.value);
       if (isNaN(qty)) qty = 1;
 
       qty += change;
 
       if (qty < 1) qty = 1;
-      else if (qty > maxStock) {
-        qty = maxStock;
+      else if (qty > limit) {
+        qty = limit;
         Swal.fire({
           icon: 'warning',
-          title: 'Stock limit reached',
-          text: `Only ${maxStock} item(s) available.`,
+          title: 'Stock limits reached',
+          text: `Only ${limit} items can be purachase at once .`,
         });
       }
 
@@ -36,7 +38,8 @@
     const minus = control.querySelector('.minus');
     const plus = control.querySelector('.plus');
     const maxStock = parseInt(input.getAttribute('data-stock')) || 1;
-
+const limit=parseFloat(input.getAttribute('data-limit'))||1;
+console.log("limit inside the frontend",limit);
     function update(change) {
       let qty = parseInt(input.value);
       if (isNaN(qty)) qty = 1;
@@ -44,12 +47,12 @@
       qty += change;
 
       if (qty < 1) qty = 1;
-      else if (qty > maxStock) {
-        qty = maxStock;
+      else if (qty > limit) {
+        qty = limit-1;
         Swal.fire({
           icon: 'warning',
           title: 'Stock limit reached',
-          text: `Only ${maxStock} item(s) available.`,
+          text: `Only ${limit} items are allowed in single purchase.`,
         });
       }
 

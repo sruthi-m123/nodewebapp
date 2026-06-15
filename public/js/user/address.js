@@ -27,13 +27,13 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
     e.preventDefault();
     const addressCard = e.target.closest('.address-card');
     const addressId = e.target.getAttribute('href').split('/').pop();
-    const name = addressCard.querySelector('[data-name]')?.textContent;
-    const phone = addressCard.querySelector('[data-phone]')?.textContent;
-    const city = addressCard.querySelector('[data-city]')?.textContent;
-    const state = addressCard.querySelector('[data-state]')?.textContent;
-    const pincode = addressCard.querySelector('[data-pincode]')?.textContent;
-    const landmark = addressCard.querySelector('[data-landmark]')?.textContent;
-    const building = addressCard.querySelector('[data-building]')?.textContent;
+    const name = addressCard.querySelector('[data-name]')?.textContent.trim();
+    const phone = addressCard.querySelector('[data-phone]')?.textContent.trim();
+    const city = addressCard.querySelector('[data-city]')?.textContent.trim();
+    const state = addressCard.querySelector('[data-state]')?.textContent.trim();
+    const pincode = addressCard.querySelector('[data-pincode]')?.textContent.trim();
+    const landmark = addressCard.querySelector('[data-landmark]')?.textContent.trim();
+    const building = addressCard.querySelector('[data-building]')?.textContent.trim();
 
     modalTitle.textContent = 'Edit Address';
     addressForm.querySelector('[name="building"]').value = building || '';
@@ -91,6 +91,7 @@ addressForm.addEventListener('submit', async (e) => {
       });
     }
   } catch (error) {
+    console.log(error)
     Swal.fire({
       icon: 'error',
       title: 'Error',

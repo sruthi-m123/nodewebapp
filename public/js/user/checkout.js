@@ -374,22 +374,26 @@ document.addEventListener('click', function(event) {
 // Apply coupon from input field
 function applyCouponByCode() {
     console.log("inside the apply coupon")
+    if (appliedCoupon) {
+        showToast('A coupon is already applied. Remove it first.', 'error');
+        return;
+    }
     const couponCode = document.getElementById('couponCodeInput').value.trim();
     
     if (!couponCode) {
         showToast('Please enter a coupon code', 'error');
         return;
     }
-   const isRetry = window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+   const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
    console.log("isRetry:", isRetry);
-console.log("window.isRetry:", window.isRetry);
-console.log("search:", window.location.search);
-console.log("dataset:", document.body.dataset.isRetry);
-  const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
+   const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
     const applyButton = document.querySelector('.apply-coupon-input-btn');
     setButtonLoadingState(applyButton, 'Applying...');
-    
-    apiCall(url, 'POST', { couponCode}, 'Coupon applied successfully')
+
+    const retryCartItems = window.retryCartItems || [];
+    const bodyData = isRetry ? { couponCode, retryCartItems } : { couponCode };
+
+    apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
         .then(data => {
             console.log("data by apply coupon code ",data);
             if (data.success) {
@@ -421,7 +425,11 @@ console.log("dataset:", document.body.dataset.isRetry);
 
 // Apply coupon from dropdown
 function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
-    const isRetry=window.location.search.includes('retry=true')||document.body.dataset.isRetry==='true';
+    if (appliedCoupon) {
+        showToast('A coupon is already applied. Remove it first.', 'error');
+        return;
+    }
+    const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
 
     const retryCartItems=window.retryCartItems||[];
     console.log("retryCartItems:",retryCartItems);
@@ -467,7 +475,11 @@ function removeCoupon() {
         removeBtn.disabled = true;
     }
 
-    apiCall('/user/checkout/remove-coupon', 'POST', null, 'Coupon removed successfully')
+    const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+    const retryCartItems = window.retryCartItems || [];
+    const bodyData = isRetry ? { isRetry: true, retryCartItems } : null;
+
+    apiCall('/user/checkout/remove-coupon', 'POST', bodyData, 'Coupon removed successfully')
         .then(data => {
             console.log("coupon is going to be removed ",data)
             if (data.success) {
@@ -774,49 +786,72 @@ function showToast(message, type = "success") {
   }, 3000);
 }
 
+function payWithRazorpay(order, key, dborderId) {
 
-function payWithRazorpay(order,key,dborderId) {
-   
+  function markOrderFailed() {
+    return fetch("/user/mark-payment-failed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dborderId: dborderId })
+    }).then(res => res.json()).then(data => console.log('Order marked as payment_failed:', data));
+  }
+
   var options = {
-    key: key, 
+    key: key,
     amount: order.amount,
     currency: "INR",
     name: "Chettinad Sarees",
     description: "Order Payment",
     order_id: order.id,
     handler: function (response) {
+      // Payment completed — verify with server
       fetch("/user/verifyPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-body: JSON.stringify({
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_order_id: response.razorpay_order_id,  
-        razorpay_signature: response.razorpay_signature,
-        dborderId:dborderId
-      })
+        body: JSON.stringify({
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+          dborderId: dborderId
         })
-        .then(res => res.json())
-        .then(data => {
-        if(data.success){
-  Swal.fire({
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
             icon: 'success',
             title: 'Order Placed!',
             text: 'Your order was placed successfully.',
             confirmButtonText: 'View Order'
           }).then(() => {
             window.location.href = data.redirectUrl || `/user/order-success/${order.receipt}`;
-          });        } else {
- 
+          });
+        } else {
           Swal.fire({
             icon: 'error',
-            title: 'Payment Failed',
+            title: 'Payment Verification Failed',
             text: 'Your payment could not be verified. Please try again.',
             confirmButtonText: 'Retry'
           }).then(() => {
             window.location.href = `/user/order-failure/${order.receipt}`;
           });
-}
+        }
       });
+    },
+    modal: {
+      // Fired when user closes/dismisses the Razorpay popup without paying
+      ondismiss: function () {
+        console.log('Razorpay modal dismissed by user (no payment made)');
+        markOrderFailed();
+        Swal.fire({
+          icon: 'warning',
+          title: 'Payment Cancelled',
+          text: 'You closed the payment window without completing payment. You can retry from your orders page.',
+          confirmButtonText: 'Go to Orders'
+        }).then(() => {
+          window.location.href = `/user/order-failure/${order.receipt}`;
+        });
+      }
     },
     prefill: {
       name: "Customer Name",
@@ -827,26 +862,24 @@ body: JSON.stringify({
       color: "#3399cc"
     }
   };
+
   var rzp = new Razorpay(options);
-   rzp.on('payment.failed', function(response){
-        console.log('Payment failed event:', response);
-       
-        fetch("/user/mark-payment-failed",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({dborderId:dborderId})
-        })
-        .then(res=>res.json())
-        .then(data=>console.log(data));
-        Swal.fire({
-            icon: 'error',
-            title: 'Payment Failed',
-            text: response.error.description || 'Your payment could not be processed.',
-            confirmButtonText: 'Retry'
-        }).then(() => {
-            window.location.href = `/user/order-failure/${order.receipt}`;
-        });
+
+  // Fired on hard payment failure (card declined, bank error, etc.)
+  rzp.on('payment.failed', function (response) {
+    console.log('Payment failed event:', response);
+    markOrderFailed();
+    Swal.fire({
+      icon: 'error',
+      title: 'Payment Failed',
+      text: response.error.description || 'Your payment could not be processed.',
+      confirmButtonText: 'Retry'
+    }).then(() => {
+      window.location.href = `/user/order-failure/${order.receipt}`;
     });
+  });
+
   rzp.open();
 }
+
 

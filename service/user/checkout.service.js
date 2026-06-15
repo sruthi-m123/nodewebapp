@@ -325,7 +325,7 @@ let buynow=orderData.session.buyNowItem
     return {success:false,message:'cash on delivery is not possible for orders above 1000 rupees'};
   }
  
-  const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'processing');
+  const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'payment_pending');
   if (!isRetry) {
     orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     order = new Order({
@@ -343,6 +343,18 @@ let buynow=orderData.session.buyNowItem
       appliedOffers: appliedOffers.map(o => o.id),
       appliedCoupon
     });
+    await order.save();
+  } else {
+    // Update existing order details for retry payment
+    order.shippingAddress = selectedAddress;
+    order.paymentMethod = paymentMethod;
+    order.subtotal = subtotal;
+    order.delivery = delivery;
+    order.tax = tax;
+    order.discount = discount;
+    order.total = total;
+    order.status = status;
+    order.appliedCoupon = appliedCoupon;
     await order.save();
   }
   if (paymentMethod === 'wallet') {

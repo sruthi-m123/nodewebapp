@@ -52,8 +52,8 @@ export const verifyRazorpayPayment = async ({ razorpay_order_id, razorpay_paymen
       return false;
     }
 
-    if (order.appliedCoupon) {
-      await Coupon.findByIdAndUpdate(order.appliedCoupon, { $inc: { usedCount: 1 } });
+    if (order.appliedCoupon && order.appliedCoupon.couponId) {
+      await Coupon.findByIdAndUpdate(order.appliedCoupon.couponId, { $inc: { usedCount: 1 } });
       logger.info('Coupon used count incremented');
     }
 

@@ -368,7 +368,12 @@
   data-addresses='<%- JSON.stringify(addresses || []) %>' data-cart='<%- JSON.stringify(cartItems || []) %>'
   data-payment="<%= selectedPayment || '' %>">
 </div>
->
+
+<script>
+  // Expose server-side variables to frontend JS
+  window.isRetry = <%= typeof isRetry !== 'undefined' ? isRetry : false %>;
+  window.retryCartItems = <%- JSON.stringify(typeof retryCartItems !== 'undefined' ? retryCartItems : []) %>;
+</script>
 
       </div>
   

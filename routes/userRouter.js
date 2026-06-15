@@ -123,16 +123,12 @@ router.get("/api/addresses/:id", isLoggedIn, checkBlocked, validate({ params: Jo
 // Coupon routes
 router.post(
   "/checkout/apply-coupon",
-  (req, res, next) => {
-    console.log("SESSION:", req.session);
-    console.log("SESSION USER:", req.session?.user);
-    next();
-  },
+  isLoggedIn,
   checkBlocked,
   validate(V.applyCouponSchema),
   couponController.applyCoupon
 );
-router.post("/checkout/apply-coupon-by-code", checkBlocked, validate(V.validateCouponSchema), couponController.applyCouponByCode);
+router.post("/checkout/apply-coupon-by-code", isLoggedIn, checkBlocked, validate(V.validateCouponSchema), couponController.applyCouponByCode);
 router.post("/checkout/remove-coupon", isLoggedIn, checkBlocked, couponController.removeCoupon);
 
 // Offers routes

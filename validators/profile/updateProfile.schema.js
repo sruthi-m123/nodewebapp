@@ -12,5 +12,6 @@ export const updateProfileSchema = Joi.object({
     gender: Joi.string().valid('Male', 'Female', 'Other', 'Prefer not say').default('Prefer not say').messages({
         'any.only': 'Invalid gender selection'
     })
-});
+})
+.options({ stripUnknown: true })
 

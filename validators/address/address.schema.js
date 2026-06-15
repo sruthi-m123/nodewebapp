@@ -30,5 +30,6 @@ export const addressSchema = Joi.object({
     .valid("home","work","other")
     .required(),
 
-  isDefault: Joi.boolean().default(false)
+  isDefault: Joi.boolean().default(false),
+   setAsDefault: Joi.boolean().default(false),
 });

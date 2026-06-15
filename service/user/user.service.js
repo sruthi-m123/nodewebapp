@@ -17,7 +17,6 @@ export const getHomePageData=async(userId)=>{
     const products=await Product.find({isNewArrival:true})
     .sort({createdAt:-1})
     .limit(3);
-    // const testimonials=await Testimonial.findOne({isVisible:true});
     return {user:userData,categories,products};
 };
 
@@ -45,7 +44,6 @@ export const  handleSingup=async({name,phone,email,password,referralCode})=>{
 
     }
 
-    console.log("session user data inside hanlesignup",sessionUserData);
     return {success:true,otp,sessionUserData:sessionUserData,referralInfo};
 
 }
@@ -94,7 +92,8 @@ export const verifySignupOtp=async (otp,session)=>{
   if (Date.now() > session.otpExpires) {
     return { success: false, message: 'OTP expired' };
   }
-
+console.log("session otp inside the resend :",session.userOtp);
+console.log("otp inside the resend:",otp);
   if (session.userOtp !== String(otp)) {
     return { success: false, message: 'Invalid OTP' };
   }
@@ -173,7 +172,6 @@ export const verifyForgotPassword=async(userOtp,email)=>{
         return {success:false,message:'Please enter a valid 6  digit OTP'};
     }
     // Assume sessionOTP from session in controller call
-  // For now, passing email; adjust as needed
   const user = await User.findOne({ email });
   if (!user || parseInt(userOtp) !== parseInt(/* sessionOTP from param or session */)) { // Integrate sessionOTP
     return { success: false, message: 'Invalid OTP' };

@@ -115,6 +115,8 @@
   <label for="referral">Referral Code</label>
   <i class="fa fa-tag" style="position: absolute; top: 57px; left: 10px; color: gray;"></i>
   <input type="text" name="referralCode" id="referralCode" placeholder="Optional" style="padding-left: 30px;">
+   <div id="error6" class="error-message"></div>
+
 </div>
 
           <div class="form-group">
@@ -172,11 +174,15 @@
   const phoneid = document.getElementById("phone");
   const passwordid = document.getElementById("password");
   const cpasswordid = document.getElementById("confirmPassword");
+  const referralCode=document.getElementById("referralCode");
+
+  console.log("referralCode",referralCode);
   const error1 = document.getElementById("error1");
   const error2 = document.getElementById("error2");
   const error3 = document.getElementById("error3");
   const error4 = document.getElementById("error4");
   const error5 = document.getElementById("error5");
+  const error6=document.getElementById("error6");
   const signform = document.getElementById("signform");
 
   function nameValidateChecking() {
@@ -249,11 +255,29 @@
     return isValid;
   }
 
+function referralValidateChecking(){
+  const refferal=document.getElementById("referralCode").value.trim();
+  const error=document.getElementById("error6");
+  error.textContent="";
+  if(!refferal){
+    return true;
+  }
+  const regex=/^[A-Z]{3}[0-9]{4}$/;
+  if(!regex.test(refferal.toUpperCase())){
+    error.textContent=
+    "Refferal code must be like ABC1234";
+    return false;
+  }
+  return true;
+}
+
+
   if (nameid) nameid.addEventListener("input", nameValidateChecking);
   if (emailid) emailid.addEventListener("input", emailValidateChecking);
   if (phoneid) phoneid.addEventListener("input", phoneValidateChecking);
   if (passwordid) passwordid.addEventListener("input", passwordValidateChecking);
   if (cpasswordid) cpasswordid.addEventListener("input", passwordValidateChecking);
+  if(referralCode) referralCode.addEventListener("input",referralValidateChecking);
 
   if (signform) {
     signform.addEventListener("submit", async (e) => {
@@ -265,7 +289,16 @@
       const emailValid = emailValidateChecking();
       const phoneValid = phoneValidateChecking();
       const passwordValid = passwordValidateChecking();
+      const referralValid=referralValidateChecking();
       const termsChecked = document.getElementById("agree-terms").checked;
+
+console.log({
+  nameValid,
+  emailValid,
+  phoneValid,
+  passwordValid,
+  referralValid
+});
 
       if (!termsChecked) {
         Swal.fire({
@@ -278,7 +311,7 @@
         return;
       }
 
-      if (!nameValid || !emailValid || !phoneValid || !passwordValid) {
+      if (!nameValid || !emailValid || !phoneValid || !passwordValid||!referralValid) {
         const errorMessages = document.querySelectorAll('.error-message');
         let firstError = null;
         for (let error of errorMessages) {

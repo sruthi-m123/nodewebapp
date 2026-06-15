@@ -6,13 +6,10 @@ export const getDashboardStats = async (req, res) => {
   logger.info('Fetching dashboard stats');
   
   const stats = await dashboardService.getDashboardStatsService();
-  const salesReport=await dashboardService.getSalesReportService();
-  console.log("stats:",stats);
-  console.log("salesReport:",salesReport);
-
+  const salesReport = await dashboardService.getSalesReportService();
   
   logger.info('Dashboard stats delivered successfully');
-  res.json({stats,salesReport});
+  res.json({ stats, salesReport });
 };
 
 export const getTopProducts = async (req, res) => {
@@ -28,51 +25,66 @@ export const getTopProducts = async (req, res) => {
 };
 
 export const getSalesData = async (req, res) => {
-  logger.info('Fetching sales chart data');
-  
-  const salesData = await dashboardService.getSalesDataService();
-  
-  logger.info('Sales chart data delivered successfully');
-  res.json(salesData);
+  try {
+    const period = req.query.period || 'monthly';
+    logger.info(`Fetching sales chart data for period: ${period}`);
+    const salesData = await dashboardService.getSalesDataService(period);
+    logger.info(`Sales chart data delivered successfully for period: ${period}`);
+    res.json(salesData);
+  } catch (error) {
+    logger.error('Error in getSalesData controller:', error);
+    res.status(500).json({ error: 'Failed to fetch sales data' });
+  }
 };
 
 export const getSalesReport = async (req, res) => {
-  const filters = {
-    page: req.query.page,
-    limit: req.query.limit,
-    dateRange: req.query.dateRange,
-    startDate: req.query.startDate,
-    endDate: req.query.endDate
-  };
-  
-  logger.info('Fetching sales report', { filters });
-  
-  const result = await dashboardService.getSalesReportService(filters);
-  
-  logger.info('Sales report delivered successfully');
-  res.json(result);
+  try {
+    const filters = {
+      page: req.query.page,
+      limit: req.query.limit,
+      dateRange: req.query.dateRange,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      chartPeriod: req.query.period || 'monthly'
+    };
+    
+    logger.info('Fetching sales report', { filters });
+    
+    const result = await dashboardService.getSalesReportService(filters);
+    
+    logger.info('Sales report delivered successfully');
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in getSalesReport controller:', error);
+    res.status(500).json({ error: 'Failed to fetch sales report' });
+  }
 };
 
 export const exportSalesReport = async (req, res) => {
-  const filters = {
-    dateRange: req.query.dateRange,
-    startDate: req.query.startDate,
-    endDate: req.query.endDate,
-    exportType: req.query.exportType || 'pdf'
-  };
-  
-  logger.info('Exporting sales report', { filters });
-  
-  const exportData = await dashboardService.getExportDataService(filters);
-  
-  if (filters.exportType === 'pdf') {
-    await reportService.generateSalesPDFReport(res, exportData);
-  } else if (filters.exportType === 'excel') {
-    await reportService.generateSalesExcelReport(res, exportData);
-  } else {
-    logger.error('Invalid export type requested', { exportType: filters.exportType });
-    return res.status(400).json({ error: 'Invalid export type' });
+  try {
+    const filters = {
+      dateRange: req.query.dateRange,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      exportType: req.query.exportType || 'pdf'
+    };
+    
+    logger.info('Exporting sales report', { filters });
+    
+    const exportData = await dashboardService.getExportDataService(filters);
+    
+    if (filters.exportType === 'pdf') {
+      await reportService.generateSalesPDFReport(res, exportData);
+    } else if (filters.exportType === 'excel') {
+      await reportService.generateSalesExcelReport(res, exportData);
+    } else {
+      logger.error('Invalid export type requested', { exportType: filters.exportType });
+      return res.status(400).json({ error: 'Invalid export type' });
+    }
+    
+    logger.info('Sales report export completed successfully');
+  } catch (error) {
+    logger.error('Error in exportSalesReport controller:', error);
+    res.status(500).json({ error: 'Failed to export sales report' });
   }
-  
-  logger.info('Sales report export completed successfully');
 };

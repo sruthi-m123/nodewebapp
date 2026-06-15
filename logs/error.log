@@ -388,3 +388,50 @@ totalPages is not defined
     221|           <div class="payment-info">
 
 orderSummary is not defined
+[2026-06-15 04:03:56] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cast to ObjectId failed for value "3NG8EZLA" (type string) at path "_id" for model "Coupon"
+[2026-06-15 04:05:22] [31merror[39m: POST /user/checkout/apply-coupon-by-code?retry=true-Cannot read properties of undefined (reading 'id')
+[2026-06-15 09:14:53] [31merror[39m: POST /user/cart/add/6a284c6dafdb307290a545f1-Maximum 10 items allwed per product
+[2026-06-15 09:15:03] [31merror[39m: POST /user/cart/add/6a284c6dafdb307290a545f1-Maximum 10 items allwed per product
+[2026-06-15 09:15:16] [31merror[39m: POST /user/cart/add/6a284c6dafdb307290a545f1-Maximum 10 items allwed per product
+[2026-06-15 09:15:33] [31merror[39m: POST /user/cart/add/6a284c6dafdb307290a545f1-Maximum 10 items allwed per product
+[2026-06-15 09:16:36] [31merror[39m: POST /user/cart/update-No matching document found for id "6a2f756fd64677823ef3fef9" version 4 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 09:16:36] [31merror[39m: POST /user/cart/update-No matching document found for id "6a2f756fd64677823ef3fef9" version 4 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 09:16:36] [31merror[39m: POST /user/cart/update-No matching document found for id "6a2f756fd64677823ef3fef9" version 5 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 09:26:27] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-15 09:28:18] [31merror[39m: PUT /user/addresses/edit/6a2f73c6d64677823ef3fd71-Address not found or no changes applied
+[2026-06-15 09:29:02] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 09:29:05] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 09:29:36] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 09:29:43] [31merror[39m: POST /user/orders-placed-debitWallet is not defined
+[2026-06-15 11:25:22] [31merror[39m: POST /user/addresses/add-city?.trime is not a function
+[2026-06-15 11:26:57] [31merror[39m: POST /user/addresses/add-state.trime is not a function
+[2026-06-15 13:19:43] [31merror[39m: PUT /user/addresses/edit/6a2f952d33d9f6114e6ce96c-Address not found or no changes applied
+[2026-06-15 13:42:40] [31merror[39m: GET /user/profile/edit-read ECONNRESET
+[2026-06-15 13:56:28] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 13:59:12] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 13:59:14] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 14:00:04] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 14:13:39] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 14:23:25] [31merror[39m: GET /user/profile/edit-Session lost, please login again
+[2026-06-15 17:00:59] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 47 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 17:01:00] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 47 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 17:01:00] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 48 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 17:01:00] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 48 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 17:01:00] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 49 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 17:01:07] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 51 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 17:01:07] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 52 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 17:01:07] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 52 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 17:01:08] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 53 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-15 17:02:16] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 56 modifiedPaths "items, items.2, items.2.quantity, items.2.totalPrice"
+[2026-06-15 19:53:11] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 19:54:29] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 65 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-15 19:54:48] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 19:56:43] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 19:56:58] [31merror[39m: POST /user/orders-placed-Order validation failed: status: `payment_pending` is not a valid enum value for path `status`.
+[2026-06-15 20:11:01] [31merror[39m: Error applying coupon by ID: cart is empty
+[2026-06-15 20:11:04] [31merror[39m: Error applying coupon by ID: cart is empty
+[2026-06-15 20:11:16] [31merror[39m: Error applying coupon by ID: cart is empty
+[2026-06-15 20:11:21] [31merror[39m: Error applying coupon by ID: cart is empty
+[2026-06-15 20:12:12] [31merror[39m: Error applying coupon by ID: cart is empty
+[2026-06-15 23:24:45] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-15 23:24:45] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net

@@ -7,12 +7,8 @@ export const validateCouponSchema = Joi.object({
     'string.empty': MESSAGES.COUPON.CODE_REQUIRED,
     'any.required': MESSAGES.COUPON.CODE_REQUIRED
   }),
-//  cartValue: Joi.number().min(0).required().messages({
-//   'number.base': 'Cart value must be a number',
-//   'number.min': 'Cart value must be at least 0',
-//   'any.required': 'Cart value is required'
-// })
-
+  // Included for retry payment flow — frontend sends cart items since there is no active cart
+  retryCartItems: Joi.array().optional()
 }).messages({
   'object.unknown': 'Invalid fields provided'
 });

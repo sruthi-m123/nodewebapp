@@ -38,9 +38,15 @@ export const addAddressService=async(userId,addressData)=>{
     console.log("addressType:",addressType);
     logger.debug('adding new address',{userId,addressType});
     const newAddress={
-        addressType:addressType,
-        name,
-        city,building,landmark,state,pincode,phone,altPhone,
+        addressType:addressType?.trim(),
+        name:name?.trim(),
+        city:city?.trim(),
+        building:building?.trim(),
+        landmark:landmark?.trim(),
+        state:state.trim(),
+        pincode:pincode.trim(),
+        phone:phone.trim(),
+        altPhone:altPhone?.trim(),
         isDefault:!!setAsDefault
     }
 let userAddressDoc=await Address.findOne({userId});
@@ -132,6 +138,7 @@ export const updateAddressService = async (userId, addressId, updates) => {
       },
     }
   );
+  console.log("result inside the save address:")
 
   if (result.modifiedCount === 0) {
     logger.warn('Address not found or no changes applied during update', { userId, addressId });

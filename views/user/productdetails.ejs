@@ -72,14 +72,14 @@
 <% if (isProductDetail) { %>
   <!-- Product Detail Page -->
   <button id="minus-btn">-</button>
-  <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>">
+  <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
   <button id="plus-btn">+</button>
 <% } else { %>
   <!-- All Products Page (inside loop) -->
   <% products.forEach((product) => { %>
     <div class="qty-control">
       <button class="qty-btn minus">-</button>
-      <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>">
+      <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
       <button class="qty-btn plus">+</button>
     </div>
   <% }) %>

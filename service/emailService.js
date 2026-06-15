@@ -54,7 +54,6 @@ export const sendVerificationEmail = async (email, otp) => {
       html: `<b>Your OTP: ${otp}</b>`
     });
 console.log("otp:",otp);
-console.log("info:",info);
     return info.accepted.length > 0;
   } catch (error) {
     console.error(' Error sending verification email:', error.message);

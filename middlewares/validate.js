@@ -41,7 +41,7 @@ export const validate = (schema, property = "body") => {
         logger.warn("Payload: " + JSON.stringify(req[property], null, 2));
 
         return res.status(STATUS_CODES.BAD_REQUEST).json({
-          message: "Invalid request data"
+          message: messages[0]
         });
       }
 
@@ -54,7 +54,7 @@ export const validate = (schema, property = "body") => {
       logger.warn("Errors: " + JSON.stringify(messages, null, 2));
 
       return res.status(STATUS_CODES.BAD_REQUEST).json({
-        message: "Invalid request data"
+        message: messages[0]
       });
     }
   };

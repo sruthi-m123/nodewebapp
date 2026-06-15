@@ -83,6 +83,11 @@ const userSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Category"
     },
+    authProvider: {
+  type: String,
+  enum: ["local", "google"],
+  default: "local"
+},
     searchOn: {
       type: Date,
       default: Date.now

@@ -14,8 +14,8 @@ class ProfileService{
     static async getUserProfile(userId){
         logger.debug('fetching user profile',{userId});
 
-        const user =await User.findById(userId).select("-password -googleId -isBlocked -isAdmin");
-
+        const user =await User.findById(userId).select("-password  -isBlocked -isAdmin");
+console.log("user inside the getuserprofie: ",user)
         if(!user){
             logger.warn('User not found for profile',{userId});
             const error=new Error(MESSAGES.USER.NOT_FOUND);

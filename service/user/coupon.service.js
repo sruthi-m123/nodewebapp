@@ -6,27 +6,64 @@ import {calculateOrder} from '../../helper/calculateTotal.js';
 import logger from '../../utils/logger.js';
 // import items from 'razorpay/dist/types/items';
 
-export const removeCouponService=async(userId)=>{
-    logger.debug('Removing applied coupon',{userId});
+export const removeCouponService=async(userId, isRetry = false, retryCartItems = null)=>{
+    logger.debug('Removing applied coupon',{userId, isRetry});
 
-    const cart=await Cart.findOne({userId}).populate('items.productId');
+    let cartItems;
 
-    if(!cart){
-        logger.warn('cart not found for coupon removal ',{userId});
-        throw new Error('Cart not found');
+    if (isRetry) {
+        // In retry mode, use the provided cart items from the frontend
+        if (retryCartItems && retryCartItems.length > 0) {
+            cartItems = retryCartItems.map(item => ({
+                id: item.id || item.productId,
+                name: item.name,
+                price: item.price,
+                originalPrice: item.originalPrice || item.price,
+                discountedPrice: item.discountedPrice || null,
+                quantity: item.quantity
+            }));
+        } else {
+            // Fallback: fetch from the most recent failed order
+            const failedOrder = await Order.findOne({
+                userId,
+                status: { $in: ['payment_failed', 'payment_pending'] }
+            }).populate('items.productId').sort({ createdAt: -1 });
+
+            if (!failedOrder) {
+                logger.warn('No failed order found for retry coupon removal', { userId });
+                throw new Error('No order found for retry');
+            }
+
+            cartItems = failedOrder.items.map(item => ({
+                id: item.productId._id,
+                name: item.productId.productName,
+                price: item.discountedPrice || item.price,
+                originalPrice: item.price,
+                discountedPrice: item.discountedPrice || null,
+                quantity: item.quantity
+            }));
+        }
+    } else {
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+
+        if (!cart) {
+            logger.warn('cart not found for coupon removal ', { userId });
+            throw new Error('Cart not found');
+        }
+
+        cartItems = cart.items.map(item => ({
+            id: item.productId._id,
+            name: item.productId.productName,
+            price: item.productId.discountedPrice || item.productId.price,
+            originalPrice: item.productId.price,
+            discountedPrice: item.productId.discountedPrice || null,
+            quantity: item.quantity
+        }));
     }
 
-    const cartItems=cart.items
-    .map(item=>({
-        id:item.productId._id,
-        name:item.productId.productName,
-        price:item.productId.discountedPrice||item.productId.price,
-        originalPrice:item.productId.price,
-        discountedPrice:item.productId.discountedPrice||null,
-        quantity:item.quantity
-    }));
-    const orderSummary=calculateOrder(cartItems,{});
-    logger.info('coupon removed successfully',{userId});
+    // Recalculate without any coupon
+    const orderSummary = calculateOrder(cartItems, {});
+    logger.info('coupon removed successfully', { userId });
     return orderSummary;
     
 };
@@ -133,7 +170,7 @@ export const getRetryCartItemsService=async(userId)=>{
     const retryCartItems=failedOrder.items.map(item=>({
         id:item.productId._id,
         name:item.productId.productName,
-        Price:item.discountedPrice||item.price,
+        price:item.discountedPrice||item.price,
         originalPrice:item.price,
         discountedPrice:item.discountedPrice||null,
         quantity:item.quantity
@@ -154,16 +191,21 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
             logger.warn('Empty cart during coupon application',{userId});
             throw new Error('cart is empty');
         }
-    
 
-    cartItems=userCart.items.map(item=>({
-        id:item.productId._id,
-        name:item.productId.productName,
-        originalPrice:item.price,
-        discountedPrice:item.discountedPrice||null,
-        quantity:item.quantity
-    }))
-};
+        cartItems=userCart.items.map(item=>({
+            id:item.productId._id,
+            name:item.productId.productName,
+            originalPrice:item.productId.price,
+            discountedPrice:item.productId.discountedPrice||null,
+            quantity:item.quantity
+        }))
+    } else {
+        // Normalise items coming from frontend: ensure originalPrice is always present
+        cartItems = retryCartItems.map(item => ({
+            ...item,
+            originalPrice: item.originalPrice || item.price,
+        }));
+    }
 const subtotal=checkMinCartValueService(cartItems,coupon);
 
 var orderSummary=calculateOrder(cartItems,{coupon});
@@ -190,10 +232,13 @@ console.log("finalPrice inside the applycoupon service logic:",finalPrice);
 // const finalPrice=total;
 const discountText=getDiscountTextService(coupon);
 const appliedCoupon={
+    couponId:coupon._id,
     id:coupon._id,
     code:coupon.code,
     discountType:coupon.discountType,
+    type:coupon.discountType,
     discountValue:coupon.discountValue,
+    value:coupon.discountValue,
     discountApplied:discountToApply
 }
  orderSummary={
@@ -220,11 +265,14 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
     console.log("couponIdentifier",couponIdentifier);
     console.log("provide retry items:",provideRetryItems);
 
-    const coupon =await Coupon.findOne({
-        _id:couponIdentifier,
-        isActive:true,
-        validTill:{$gte:new Date()}
-    });
+    // Determine if couponIdentifier is a MongoDB ObjectId or a coupon code string
+    const isObjectId = /^[a-f\d]{24}$/i.test(String(couponIdentifier));
+
+    const query = isObjectId
+        ? { _id: couponIdentifier, isActive: true, validTill: { $gte: new Date() } }
+        : { code: String(couponIdentifier).toUpperCase(), isActive: true, validTill: { $gte: new Date() } };
+
+    const coupon = await Coupon.findOne(query);
     if(!coupon){
         logger.warn('coupon not found or expired',{couponIdentifier});
         throw new Error('Invalid or expired coupon');
@@ -233,7 +281,6 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
     let retryCartItems=provideRetryItems;
     if(isRetry&&!retryCartItems){
         retryCartItems=await getRetryCartItemsService(userId);
-
     }
     await checkCouponUsageService(userId,coupon);
     console.log("userId inside the apply coupon :",userId);

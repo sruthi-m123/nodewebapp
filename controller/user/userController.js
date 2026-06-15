@@ -152,6 +152,10 @@ export const resendOtp = async (req, res) => {
     logger.warn('OTP resend failed', { error: result.message });
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: result.message });
   }
+  req.session.userOtp=result.otp;
+  req.session.otpExpires=Date.now()+60*1000;
+
+  await req.session.save();
   res.json({ success: true, message: MESSAGES.OTP_RESENT_SUCCESS });
 };
 
