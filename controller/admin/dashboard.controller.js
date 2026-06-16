@@ -88,3 +88,19 @@ export const exportSalesReport = async (req, res) => {
     res.status(500).json({ error: 'Failed to export sales report' });
   }
 };
+
+export const getTopCategories=async(req,res)=>{
+  const page=parseInt(req.query.page)||1;
+  const limit=parseInt(req.query.limit)||4;
+
+  logger.info('fetching top categories',{page,limit});
+  try {
+    const result=await dashboardService.getTopCategoriesService(page,limit);
+    logger.info('Top categories delivered successfully');
+    res.json(result);
+  } catch (error) {
+    console.log("error form controller",error);
+    logger.error('Error in getTopCategories controller:',error);
+    res.status(500).json({error:'Failed to fetch top categories'});
+  }
+}

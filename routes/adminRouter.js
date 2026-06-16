@@ -35,6 +35,7 @@ router.get('/api/top-products', adminAuth, dashboardController.getTopProducts);
 router.get('/api/sales-data', adminAuth, dashboardController.getSalesData);
 router.get('/api/sales-report', adminAuth, dashboardController.getSalesReport);
 router.get('/api/export-sales-report', adminAuth, dashboardController.exportSalesReport);
+router.get('/top-categories', adminAuth,dashboardController.getTopCategories);
 
 //user managment
 router.get('/users', adminAuth, customerController.customerInfo);

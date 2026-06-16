@@ -445,3 +445,17 @@ orderSummary is not defined
 [2026-06-16 13:07:01] [31merror[39m: shopping page not loading: price is not defined
 [2026-06-16 13:07:01] [31merror[39m: shopping page not loading: price is not defined
 [2026-06-16 15:02:39] [31merror[39m: POST /user/orders-placed-Cannot read properties of undefined (reading 'id')
+[2026-06-16 15:36:03] [31merror[39m: Error in getTopCategoriesService: pool is not defined
+[2026-06-16 15:36:03] [31merror[39m: Error in getTopCategories controller: pool is not defined
+[2026-06-16 15:42:57] [31merror[39m: Error in getTopCategoriesService: pool is not defined
+[2026-06-16 15:42:57] [31merror[39m: Error in getTopCategories controller: pool is not defined
+[2026-06-16 15:43:05] [31merror[39m: Error in getTopCategoriesService: pool is not defined
+[2026-06-16 15:43:05] [31merror[39m: Error in getTopCategories controller: pool is not defined
+[2026-06-16 15:43:31] [31merror[39m: Error in getTopCategoriesService: pool is not defined
+[2026-06-16 15:43:31] [31merror[39m: Error in getTopCategories controller: pool is not defined
+[2026-06-16 15:49:43] [31merror[39m: Error in getTopCategoriesService: Category is not defined
+[2026-06-16 15:49:43] [31merror[39m: Error in getTopCategories controller: Category is not defined
+[2026-06-16 16:26:02] [31merror[39m: Error in getTopCategoriesService: Category is not defined
+[2026-06-16 16:26:02] [31merror[39m: Error in getTopCategories controller: Category is not defined
+[2026-06-16 16:27:38] [31merror[39m: Error in getTopCategoriesService: Product is not defined
+[2026-06-16 16:27:38] [31merror[39m: Error in getTopCategories controller: Product is not defined

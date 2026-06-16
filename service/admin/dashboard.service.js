@@ -2,6 +2,8 @@ import Order from '../../models/orderSchema.js';
 // import Product from '../../models/productSchema.js';
 import User from '../../models/userSchema.js';
 import logger from '../../utils/logger.js';
+import Category from '../../models/categorySchema.js';
+import Product  from '../../models/productSchema.js';
 
 export const getDashboardStatsService = async () => {
   const totalUsers = await User.countDocuments();
@@ -439,139 +441,6 @@ async function getSalesByYear(year) {
 
 
 
-// export const getSalesReportService = async (filters = {}) => {
-//   const {
-//     page = 1,
-//     limit = 10,
-//     dateRange,
-//     startDate,
-//     endDate
-//   } = filters;
-  
-//   let dateFilter = {};
-//   const now = new Date();
-  
-//   switch (dateRange) {
-//     case '1d': {
-//       const todayStart = new Date();
-//       todayStart.setHours(0, 0, 0, 0);
-//       const todayEnd = new Date();
-//       todayEnd.setHours(23, 59, 59, 999);
-//       dateFilter = { createdAt: { $gte: todayStart, $lte: todayEnd } };
-//       break;
-//     }
-      
-//     case '1w': {
-//       const startOfWeek = new Date();
-//       startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-//       startOfWeek.setHours(0, 0, 0, 0);
-//       dateFilter = { createdAt: { $gte: startOfWeek } };
-//       break;
-//     }
-      
-//     case '1m': {
-//       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-//       dateFilter = { createdAt: { $gte: startOfMonth } };
-//       break;
-//     }
-      
-//     case '1y': {
-//       const startOfYear = new Date(now.getFullYear(), 0, 1);
-//       dateFilter = { createdAt: { $gte: startOfYear } };
-//       break;
-//     }
-      
-//     case 'custom': {
-//       if (startDate && endDate) {
-//         const customStart = new Date(startDate);
-//         const customEnd = new Date(endDate);
-//         customEnd.setHours(23, 59, 59, 999);
-//         dateFilter = { createdAt: { $gte: customStart, $lte: customEnd } };
-//       }
-//       break;
-//     }
-      
-//     default: {
-//       const defaultStart = new Date();
-//       defaultStart.setHours(0, 0, 0, 0);
-//       const defaultEnd = new Date();
-//       defaultEnd.setHours(23, 59, 59, 999);
-//       dateFilter = { createdAt: { $gte: defaultStart, $lte: defaultEnd } };
-//       break;
-//     }
-//   }
-  
-//   dateFilter.status = { $ne: 'cancelled' };
-  
-//   const skip = (parseInt(page) - 1) * parseInt(limit);
-  
-//   logger.debug('Fetching sales report with filters', { 
-//     dateFilter, 
-//     page, 
-//     limit, 
-//     skip 
-//   });
-  
-//   const orders = await Order.find(dateFilter)
-//     .sort({ createdAt: -1 })
-//     .skip(skip)
-//     .limit(parseInt(limit))
-//     .populate('userId', 'name email')
-//     .populate('items.productId', 'productName');
-  
-//   const totalOrders = await Order.countDocuments(dateFilter);
-  
-//   const summaryData = await Order.aggregate([
-//     { $match: dateFilter },
-//     {
-//       $group: {
-//         _id: null,
-//         totalSales: { $sum: '$subtotal' },
-//         totalDiscount: { $sum: '$discount' },
-//         netRevenue: { $sum: { $subtract: ["$subtotal", "$discount"] } },
-//         totalTax: { $sum: { $subtract: ["$total", { $subtract: ["$subtotal", "$discount"] }] } }
-//       }
-//     }
-//   ]);
-  
-//   const summary = summaryData[0] || {
-//     totalSales: 0,
-//     totalDiscount: 0,
-//     netRevenue: 0,
-//     totalTax: 0
-//   };
-  
-//   const formattedOrders = orders.map(order => ({
-//     date: order.createdAt,
-//     orderId: order.orderId,
-//     customerName: order.userId?.name || 'Guest',
-//     itemsCount: order.items.reduce((total, item) => total + item.quantity, 0),
-//     amount: order.subtotal,
-//     discount: order.discount || 0,
-//     coupons: order.appliedCoupon?.code || 'None',
-//     paymentMethod: order.paymentMethod || 'N/A',
-//     netAmount: order.subtotal - (order.discount || 0) - (order.appliedCoupon?.value || 0)
-//   }));
-  
-//   logger.info('Sales report generated successfully', {
-//     orderCount: formattedOrders.length,
-//     totalOrders,
-//     totalPages: Math.ceil(totalOrders / parseInt(limit))
-//   });
-  
-//   return {
-//     orders: formattedOrders,
-//     summary: {
-//       totalOrders,
-//       totalSales: summary.totalSales,
-//       totalDiscount: summary.totalDiscount,
-//       netRevenue: summary.netRevenue,
-//       totalTax: summary.totalTax
-//     },
-//     totalPages: Math.ceil(totalOrders / parseInt(limit)),
-//     currentPage: parseInt(page)
-//   };
-// };
 
 export const getExportDataService = async (filters = {}) => {
   const { dateRange, startDate, endDate } = filters;
@@ -665,4 +534,141 @@ export const getExportDataService = async (filters = {}) => {
     startDate,
     endDate
   };
+};
+
+
+export const getTopCategoriesService = async (page = 1, limit = 4) => {
+  const offset = (page - 1) * limit;
+  console.log("Fetching top categories with offset:", offset);
+  
+  try {
+    const deliveredOrdersCount = await Order.countDocuments({ status: 'delivered' });
+
+    const allCategories = await Category.find().lean();
+
+    if (!allCategories || allCategories.length === 0) {
+      return {
+        categories: [],
+        currentPage: page,
+        totalPages: 1,
+        totalItems: 0,
+        limit: limit
+      };
+    }
+
+    if (deliveredOrdersCount === 0) {
+      
+      const categoriesWithProductCount = await Promise.all(
+        allCategories.map(async (category) => {
+          const productCount = await Product.countDocuments({
+            category: category._id
+          });
+          
+          return {
+            id: category._id,
+            name: category.name,
+            image: category.image || '/images/default-category.png',
+            total_products: productCount || 0,
+            revenue: 0,
+            quantity_sold: 0
+          };
+        })
+      );
+      
+      categoriesWithProductCount.sort((a, b) => b.total_products - a.total_products);
+      
+      const total = categoriesWithProductCount.length;
+      const paginatedCategories = categoriesWithProductCount.slice(offset, offset + limit);
+      
+      return {
+        categories: paginatedCategories,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit) || 1,
+        totalItems: total,
+        limit: limit
+      };
+    }
+
+    // FIXED AGGREGATION PIPELINE
+    const result = await Order.aggregate([
+      // Match only delivered orders
+      { $match: { status: 'delivered' } },
+      
+      // Unwind items array
+      { $unwind: '$items' },
+      
+      // Lookup product details - using correct field name 'productId'
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.productId',  
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      
+      { $unwind: '$product' },
+      
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'product.category_id',  
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: false } },
+      
+      {
+        $group: {
+          _id: '$category._id',
+          name: { $first: '$category.name' },
+          image: { $first: '$category.image' },
+          revenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } },
+          quantity_sold: { $sum: '$items.quantity' },
+          total_products: { $addToSet: '$product._id' }
+        }
+      },
+      
+      {
+        $addFields: {
+          total_products: { $size: '$total_products' }
+        }
+      },
+      
+      { $sort: { revenue: -1 } },
+      
+      { $facet: {
+        metadata: [{ $count: 'total' }],
+        data: [{ $skip: offset }, { $limit: limit }]
+      }}
+    ]);
+
+    
+    const total = result[0]?.metadata[0]?.total || 0;
+    const categories = result[0]?.data || [];
+    
+    const formattedCategories = categories.map(cat => ({
+      id: cat._id,
+      name: cat.name,
+      image: cat.image || '/images/default-category.png',
+      total_products: cat.total_products || 0,
+      revenue: cat.revenue || 0,
+      quantity_sold: cat.quantity_sold || 0
+    }));
+    
+    
+    return {
+      categories: formattedCategories,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit) || 1,
+      totalItems: total,
+      limit: limit
+    };
+  } catch (error) {
+    console.log("Error stack:", error.stack);
+    logger.error('Error in getTopCategoriesService:', error);
+    throw error;
+  }
 };

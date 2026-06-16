@@ -147,12 +147,35 @@
       </div>
     </div>
 
-    <!-- Sales Chart
-  <div class="dashboard-chart">
-    <h2>Sales Overview</h2>
-    <canvas id="salesChart"></canvas>
+   <!-- Top Selling Categories Table -->
+<div class="dashboard-table">
+  <h2>Top Selling Categories</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Category Image</th>
+        <th>Category Name</th>
+        <th>Total Products</th>
+        <th>Revenue</th>
+        <th>Qty Sold</th>
+      </tr>
+    </thead>
+    <tbody id="top-categories-body">
+      <tr>
+        <td colspan="6" class="loading-text">Loading categories...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination" id="categories-pagination">
+    <span class="page-prev">
+      &lt;&lt;
+    </span>
+    <span class="page-number active">1</span>
+    <span class="page-next">&gt;</span>
   </div>
-</div> -->
+</div>
 
 
     <div class="dashboard-chart">
@@ -375,73 +398,7 @@
         loadTopProducts(currentPage);
       }
 
-      // async function loadSalesChart() {
-      //   try {
-      //     const response = await fetch('/admin/api/sales-data');
-
-      //     if (!response.ok) {
-      //       throw new Error(`HTTP error! status: ${response.status}`);
-      //     }
-
-      //     const data = await response.json();
-
-      //     // Get canvas context
-      //     const ctx = document.getElementById('salesChart').getContext('2d');
-
-      //     // Destroy previous chart if it exists
-      //     if (salesChart) {
-      //       salesChart.destroy();
-      //     }
-
-      //     // Create new chart
-      //     salesChart = new Chart(ctx, {
-      //       type: 'line',
-      //       data: {
-      //         labels: data.labels || [],
-      //         datasets: [{
-      //           label: 'Monthly Sales (₹)',
-      //           data: data.values || [],
-      //           backgroundColor: 'rgba(54, 162, 235, 0.2)',
-      //           borderColor: 'rgba(54, 162, 235, 1)',
-      //           borderWidth: 2,
-      //           tension: 0.3,
-      //           fill: true
-      //         }]
-      //       },
-      //       options: {
-      //         responsive: true,
-      //         plugins: {
-      //           legend: {
-      //             position: 'top',
-      //           },
-      //           tooltip: {
-      //             callbacks: {
-      //               label: function(context) {
-      //                 return `₹${context.raw.toLocaleString()}`;
-      //               }
-      //             }
-      //           }
-      //         },
-      //         scales: {
-      //           y: {
-      //             beginAtZero: true,
-      //             ticks: {
-      //               callback: function(value) {
-      //                 return '₹' + value.toLocaleString();
-      //               }
-      //             }
-      //           }
-      //         }
-      //       }
-      //     });
-      //   } catch (error) {
-      //     console.error('Error loading sales chart:', error);
-      //     const chartContainer = document.getElementById('salesChart').parentElement;
-      //     chartContainer.innerHTML += '<p class="error-text">Failed to load sales chart</p>';
-      //     showNotification('Failed to load sales data', 'error');
-      //   }
-      // }
-
+     
       let currentPeriod = 'monthly';
       async function loadSalesChart(period = currentPeriod) {
         try {
@@ -917,6 +874,149 @@
           }
         }, 5000);
       }
+      // Top Selling Categories functionality
+let currentCategoryPage = 1;
+const CATEGORY_LIMIT = 4;
+
+// Fetch top categories
+async function fetchTopCategories(page = 1) {
+  try {
+    const response = await fetch(`/admin/top-categories?page=${page}&limit=${CATEGORY_LIMIT}`);
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    
+    const data = await response.json();
+    console.log("data is being recieved",data)
+    renderCategories(data);
+    renderCategoryPagination(data);
+  } catch (error) {
+    console.error('Error fetching top categories:', error);
+    document.getElementById('top-categories-body').innerHTML = `
+      <tr>
+        <td colspan="6" class="error-text">Failed to load categories</td>
+      </tr>
+    `;
+  }
+}
+
+// Render categories in table
+function renderCategories(data) {
+   
+  const tbody = document.getElementById('top-categories-body');
+  
+  if (!data.categories || data.categories.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-text">No categories found</td>
+      </tr>
+    `;
+    return;
+  }
+   data.categories.forEach((cat, index) => {
+    console.log(`Category ${index}:`, cat);
+    console.log(`Category ID: ${cat.id}, Name: ${cat.name}`);
+    console.log(`Keys in category: ${Object.keys(cat).join(', ')}`);
+  });
+
+  tbody.innerHTML = data.categories.map(category => `
+    <tr>
+      <td>${category.id}</td>
+      <td>
+        <img src="${category.image || '/images/default-category.png'}" 
+             alt="${category.name}" 
+             class="category-image"
+             onerror="this.src='/images/default-category.png'">
+      </td>
+      <td>${category.name}</td>
+      <td>${category.total_products || 0}</td>
+      <td>$${formatPrice(category.revenue || 0)}</td>
+      <td>${category.quantity_sold || 0}</td>
+    </tr>
+  `).join('');
+  console.log("HTML generated:", tbody.innerHTML);
+}
+
+// Render pagination
+// Render pagination
+function renderCategoryPagination(data) {
+  const pagination = document.getElementById('categories-pagination');
+  
+  // Safety checks
+  if (!pagination) {
+    console.error("Pagination element not found");
+    return;
+  }
+  
+  // Check if data exists and has categories
+  if (!data || !data.categories || data.categories.length === 0) {
+    pagination.innerHTML = '';
+    return;
+  }
+  
+  const totalPages = data.totalPages || 1;
+  const currentPage = data.currentPage || 1;
+
+  // If only one page, don't show pagination
+  if (totalPages <= 1) {
+    pagination.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  
+  // Previous button
+  if (currentPage > 1) {
+    html += `<span class="page-prev" onclick="changeCategoryPage(${currentPage - 1})">
+      &lt;&lt;
+    </span>`;
+  } else {
+    html += `<span class="page-prev disabled">
+      &lt;&lt;
+    </span>`;
+  }
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    // Show limited page numbers (e.g., show 5 pages at a time)
+    if (i <= 5 || i > totalPages - 2 || Math.abs(i - currentPage) <= 2) {
+      html += `<span class="page-number ${i === currentPage ? 'active' : ''}" 
+                     onclick="changeCategoryPage(${i})">
+        ${i}
+      </span>`;
+    } else if (i === 6 || i === totalPages - 2) {
+      html += `<span class="page-dots">...</span>`;
+    }
+  }
+
+  // Next button
+  if (currentPage < totalPages) {
+    html += `<span class="page-next" onclick="changeCategoryPage(${currentPage + 1})">
+      &gt;
+    </span>`;
+  } else {
+    html += `<span class="page-next disabled">
+      &gt;
+    </span>`;
+  }
+
+  pagination.innerHTML = html;
+}
+
+// Change category page
+function changeCategoryPage(page) {
+  if (page < 1) return;
+  currentCategoryPage = page;
+  fetchTopCategories(page);
+}
+
+// Helper function to format price
+function formatPrice(amount) {
+  return Number(amount).toFixed(2);
+}
+
+// Initialize top categories on page load
+document.addEventListener('DOMContentLoaded', () => {
+  fetchTopCategories(1);
+});
     </script>
 
     <style>
