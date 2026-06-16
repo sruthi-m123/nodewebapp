@@ -210,12 +210,12 @@
 
     <div class="payment-methods">
       <% paymentMethods.forEach(method=> { %>
-        <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %>"
+        <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %> <%= (method.id === 'cod' && netAmount > 1000) ? 'disabled' : '' %>"
           data-payment="<%= method.id %>">
           <div class="payment-radio">
             <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>"
-              <%=method.id===selectedPayment ? 'checked' : '' %>>
-            <label for="<%= method.id %>"></label>
+              <%= (method.id === 'cod' && netAmount > 1000) ? 'disabled' : '' %> <%=method.id===selectedPayment ? 'checked' : '' %>>
+            <label for="<%= method.id %>" <%= (method.id === 'cod' && netAmount > 1000) ? 'title="COD not available for orders > ₹1000"' : '' %>></label>
           </div>
 
 

@@ -23,7 +23,6 @@ export const loadShopping = async (req, res) => {
     } = req.query;
 
     const filters = { isDeleted: false };
-
     // Availability filter
     if (availability === 'In Stock' || availability === 'Instock') {
       filters.stock = { $gt: 0 };

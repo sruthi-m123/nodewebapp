@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
 function checkFor401Message() {
   const urlParams = new URLSearchParams(window.location.search);
   const errorMessage = urlParams.get('error');

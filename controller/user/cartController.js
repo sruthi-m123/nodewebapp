@@ -2,6 +2,7 @@ import * as cartService from '../../service/user/cart.service.js';
 import { STATUS_CODES } from '../../utils/statusCodes.js';
 import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
+import Cart from '../../models/cartSchema.js';
 
 export const getCart=async(req,res)=>{
   logger.info('loading cart page');
@@ -171,5 +172,7 @@ export const removeInvalidCartItems = async (req, res) => {
         newCartTotal: result.newCartTotal
     });
 };
+
+
 
 

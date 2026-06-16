@@ -1,6 +1,9 @@
 
 <div class="cart-container">
   <h2 class="cart-title">CART</h2>
+
+ 
+  </div>
   <div class="cart-table">
        <!-- <pre><%= JSON.stringify(cartItems) %></pre> -->
     <% if (cartItems && cartItems.length > 0) { %>
@@ -9,8 +12,7 @@
           <tr>
             <th></th>
             <th>PRODUCT</th>
-                        <th>NAME</th>
-
+            <th>NAME</th>
             <th>PRICE</th>
             <th>QUANTITY</th>
             <th>TOTAL</th>
@@ -18,8 +20,6 @@
         </thead>
       <tbody id="cart-items">
   <% cartItems.forEach(item => { %>
-    <!-- <pre><%= JSON.stringify(item.productId.price) %></pre> -->
-        <!-- <pre><%= JSON.stringify(item.productId.discountedPrice) %></pre> -->
 
 
     <tr data-id="<%= item._id %>">

@@ -8,13 +8,15 @@ export const userService={
             $or:[
                 {name:{$regex:search,$options:"i"}},
                 {email:{$regex:search,$options:"i"}}
-            ]
+            ],
         }
 const users=await User.find(filter)
 .sort({createdAt:-1})
 .skip((page-1)*limit)
 .limit(limit)
 .exec();
+
+
 
 const count=await User.countDocuments(filter);
 const totalPages=Math.ceil(count/limit);
