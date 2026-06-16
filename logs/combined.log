@@ -53696,3 +53696,139 @@ orderSummary is not defined
 [2026-06-16 10:18:02] [32minfo[39m: Applying coupon by Id
 [2026-06-16 10:18:02] [32minfo[39m: coupon applied suucessfully
 [2026-06-16 10:18:02] [32minfo[39m: POST /user/checkout/apply-coupon 200 520 - 414.171 ms
+[2026-06-16 11:10:58] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:10:58] [32minfo[39m: GET /admin/products 302 41 - 530.775 ms
+[2026-06-16 11:10:58] [32minfo[39m: GET /admin/login 200 3335 - 4.946 ms
+[2026-06-16 11:10:58] [32minfo[39m: GET /css/admin/login.css 200 4353 - 3.123 ms
+[2026-06-16 11:10:58] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 2.869 ms
+[2026-06-16 11:11:06] [32minfo[39m: Admin logged in successfully.
+[2026-06-16 11:11:06] [32minfo[39m: POST /admin/login 302 45 - 181.509 ms
+[2026-06-16 11:11:06] [32minfo[39m: GET /admin/dashboard 200 46583 - 69.887 ms
+[2026-06-16 11:11:06] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 1.288 ms
+[2026-06-16 11:11:06] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 9.509 ms
+[2026-06-16 11:11:06] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 11.024 ms
+[2026-06-16 11:11:06] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 12.817 ms
+[2026-06-16 11:11:07] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: Fetching dashboard stats
+[2026-06-16 11:11:07] [32minfo[39m: Fetching top products
+[2026-06-16 11:11:07] [32minfo[39m: Fetching sales report
+[2026-06-16 11:11:07] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: Top products delivered successfully
+[2026-06-16 11:11:07] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 792 - 334.289 ms
+[2026-06-16 11:11:07] [32minfo[39m: Dashboard stats calculated
+[2026-06-16 11:11:07] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 202 - 842.793 ms
+[2026-06-16 11:11:07] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-16 11:11:07] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:11:08] [32minfo[39m: Sales report generated successfully
+[2026-06-16 11:11:08] [32minfo[39m: Sales report delivered successfully
+[2026-06-16 11:11:08] [32minfo[39m: GET /admin/api/sales-report?page=1&limit=10&dateRange=1d 200 764 - 1087.257 ms
+[2026-06-16 11:11:08] [32minfo[39m: Sales report generated successfully
+[2026-06-16 11:11:08] [32minfo[39m: Dashboard stats delivered successfully
+[2026-06-16 11:11:08] [32minfo[39m: GET /admin/api/stats 200 857 - 1253.772 ms
+[2026-06-16 11:11:08] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-16 11:11:08] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 202 - 674.964 ms
+[2026-06-16 11:11:13] [32minfo[39m: GET /admin/products 200 42760 - 272.743 ms
+[2026-06-16 11:11:13] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 1.484 ms
+[2026-06-16 11:11:13] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 6.393 ms
+[2026-06-16 11:11:13] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 7.424 ms
+[2026-06-16 11:11:13] [32minfo[39m: GET /css/admin/category.css 200 12433 - 10.003 ms
+[2026-06-16 11:11:42] [32minfo[39m: GET /admin/products 200 42762 - 223.383 ms
+[2026-06-16 11:11:42] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 1.039 ms
+[2026-06-16 11:11:42] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 4.149 ms
+[2026-06-16 11:11:42] [32minfo[39m: GET /css/admin/category.css 200 12433 - 5.760 ms
+[2026-06-16 11:11:42] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 6.111 ms
+[2026-06-16 11:12:47] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:12:47] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:12:56] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:12:56] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:02] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:02] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:08] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:08] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:10] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:10] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:12] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:22:12] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:00] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:00] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:06] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:06] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:13] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:23:13] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:23] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:23] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:47] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:47] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:56] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:24:56] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:03] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:03] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:09] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:09] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:11] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:11] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:14] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:14] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:19] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:19] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:21] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:21] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:30] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:25:30] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:27:54] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:27:54] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:28:52] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:28:52] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:28:55] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:28:55] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:29:04] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:29:04] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 11:32:36] [32minfo[39m: GET /admin/products 302 41 - 63.130 ms
+[2026-06-16 11:32:36] [32minfo[39m: GET /admin/login 200 3335 - 5.190 ms
+[2026-06-16 11:32:36] [32minfo[39m: GET /css/admin/login.css 200 4353 - 1.416 ms
+[2026-06-16 11:32:36] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 2.293 ms
+[2026-06-16 11:32:47] [32minfo[39m: Admin logged in successfully.
+[2026-06-16 11:32:47] [32minfo[39m: POST /admin/login 302 45 - 105.763 ms
+[2026-06-16 11:32:47] [32minfo[39m: GET /admin/dashboard 200 46583 - 55.580 ms
+[2026-06-16 11:32:47] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 0.888 ms
+[2026-06-16 11:32:47] [32minfo[39m: GET /css/admin/dashboard.css 200 2698 - 0.959 ms
+[2026-06-16 11:32:47] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 0.741 ms
+[2026-06-16 11:32:47] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 0.798 ms
+[2026-06-16 11:32:47] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-16 11:32:47] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:32:47] [32minfo[39m: Fetching dashboard stats
+[2026-06-16 11:32:47] [32minfo[39m: Fetching top products
+[2026-06-16 11:32:47] [32minfo[39m: Fetching sales report
+[2026-06-16 11:32:47] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:32:47] [32minfo[39m: Top products delivered successfully
+[2026-06-16 11:32:47] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 792 - 161.705 ms
+[2026-06-16 11:32:48] [32minfo[39m: Dashboard stats calculated
+[2026-06-16 11:32:48] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:32:48] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-16 11:32:48] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 202 - 667.387 ms
+[2026-06-16 11:32:48] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-16 11:32:48] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-16 11:32:48] [32minfo[39m: Sales report generated successfully
+[2026-06-16 11:32:48] [32minfo[39m: Sales report delivered successfully
+[2026-06-16 11:32:48] [32minfo[39m: GET /admin/api/sales-report?page=1&limit=10&dateRange=1d 200 764 - 872.191 ms
+[2026-06-16 11:32:48] [32minfo[39m: Sales report generated successfully
+[2026-06-16 11:32:48] [32minfo[39m: Dashboard stats delivered successfully
+[2026-06-16 11:32:48] [32minfo[39m: GET /admin/api/stats 200 857 - 1058.413 ms
+[2026-06-16 11:32:49] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-16 11:32:49] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 202 - 640.713 ms
+[2026-06-16 11:32:58] [32minfo[39m: GET /admin/products 200 42748 - 262.843 ms
+[2026-06-16 11:32:58] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 1.268 ms
+[2026-06-16 11:32:58] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 4.819 ms
+[2026-06-16 11:32:58] [32minfo[39m: GET /css/admin/category.css 200 12433 - 3.719 ms
+[2026-06-16 11:32:58] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 4.635 ms
+[2026-06-16 12:08:30] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:08:30] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:08:39] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:08:39] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:09:08] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:09:08] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:09:18] [32minfo[39m: connected to mongodb atlas
+[2026-06-16 12:09:18] [32minfo[39m: connected to mongodb atlas

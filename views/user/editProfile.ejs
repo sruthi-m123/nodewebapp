@@ -489,7 +489,16 @@ document.addEventListener('DOMContentLoaded', function() {
       if (response.ok) {
         const successMsg = document.getElementById('profile-success-msg');
         console.log("successMsg",successMsg);
-        successMsg.style.display = 'flex';
+         successMsg.style.display = 'flex';
+         Swal.fire({
+           title: 'Success!',
+           text: 'Profile updated successfully.',
+           icon: 'success',
+           timer: 2000,
+           showConfirmButton: false,
+           toast: true,
+           position: 'top-end'
+         });
         console.log(successMsg.style.display);
         
         setTimeout(() => {
