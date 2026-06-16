@@ -8,7 +8,7 @@ export const categorySchema = Joi.object({
   name: Joi.string().trim().required().messages({
     'string.empty': 'Category name is required'
   }),
-  description: Joi.string().allow('', null),
+  description: Joi.string().allow('', null).max(500).messages({ 'string.max': 'Description cannot exceed 500 characters.' }),
 
   isActive:Joi.boolean()
   .truthy("true")
@@ -16,10 +16,10 @@ export const categorySchema = Joi.object({
   .default(true)
 });
 
+
 export const categoryStatusSchema = Joi.object({
- isActive: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
+  status: Joi.string()
+    .valid('active', 'inactive')
     .required()
 });
 

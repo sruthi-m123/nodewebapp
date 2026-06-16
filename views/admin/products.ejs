@@ -1,247 +1,267 @@
 <%- include('../partials/admin/admin-header') %>
-<link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet"/>
-<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+  <link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
-<link rel="stylesheet" href="/css/admin/category.css">
-<div class="product-page">
-  <div class="product-header">
-    <h2>Products</h2>
-    <div class="search-bar">
-      <form action="/admin/products" method="GET">
-        <input type="text" name="search" id="searchBox" placeholder="Search for products" value="<%= search || '' %>">
-      </form>
-      <button type="submit" id="searchBtn">Search</button>
-      <button type="button" id="resetBtn">Reset</button>
-      <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
+  <link rel="stylesheet" href="/css/admin/category.css">
+  <div class="product-page">
+    <div class="product-header">
+      <h2>Products</h2>
+      <div class="search-bar">
+        <form action="/admin/products" method="GET">
+          <input type="text" name="search" id="searchBox" placeholder="Search for products" value="<%= search || '' %>">
+        </form>
+        <button type="submit" id="searchBtn">Search</button>
+        <button type="button" id="resetBtn">Reset</button>
+        <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
+      </div>
     </div>
-  </div>
 
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Product Image</th>
-          <th>Product Name</th>
-          <th>SKU</th>
-          <th>Category</th>
-          <th>Color</th>
-          <th>Stock</th>
-          <th>Price</th>
-          <th>New Arrival</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="productTable">
-        <% if (products && products.length > 0) { %>
-          <% products.forEach((product, index) => { %>
-            <tr>
-              <td><%= product._id.toString().slice(-6) %></td>
-              <td>
-                <% if (product.images && product.images.length > 0) { %>
-                  <img src="<%= product.images[0] %>" alt="<%= product.productName %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                <% } else { %>
-                  <div style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                    📷
-                  </div>
-                <% } %>
-              </td>
-              <td><%= product.productName %></td>
-               <td><%= product.sku || 'N/A' %></td>
-              <td><%= product.category.name %></td>
-              <td><%= product.color %></td>
-              <td><%= product.stock %></td>
-              <td>₹<%= product.price %></td>
-              <td>
-                <% if (product.isNewArrival) { %>
-                  <span class="new-arrival-badge">New</span>
-                <% } else { %>
-                  <span>-</span>
-                <% } %>
-              </td>
-              <td>
-                <button class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>" 
-                        onclick="toggleProductStatus('<%= product._id %>', <%= !product.isActive %>)">
-                  <%= product.isActive ? 'Active' : 'Inactive' %>
-                </button>
-              </td>
-              <td>
-                <button class="action-btn edit-btn" onclick="editProduct('<%= product._id %>')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteProduct('<%= product._id %>')">Delete</button>
-                <button class="action-btn view-btn" onclick="viewProduct('<%= product._id %>')">View</button>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
+    <div class="table-responsive">
+      <table>
+        <thead>
           <tr>
-            <td colspan="10" style="text-align: center; padding: 40px;">No products found</td>
+            <th>ID</th>
+            <th>Product Image</th>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Category</th>
+            <th>Color</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>New Arrival</th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody id="productTable">
+          <% if (products && products.length> 0) { %>
+            <% products.forEach((product, index)=> { %>
+              <tr>
+                <td>
+                  <%= product._id.toString().slice(-6) %>
+                </td>
+                <td>
+                  <% if (product.images && product.images.length> 0) { %>
+                    <img src="<%= product.images[0] %>" alt="<%= product.productName %>"
+                      style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                    <% } else { %>
+                      <div
+                        style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        📷
+                      </div>
+                      <% } %>
+                </td>
+                <td>
+                  <%= product.productName %>
+                </td>
+                <td>
+                  <%= product.sku || 'N/A' %>
+                </td>
+                <td>
+                  <%= product.category.name %>
+                </td>
+                <td>
+                  <%= product.color %>
+                </td>
+                <td>
+                  <%= product.stock %>
+                </td>
+                <td>₹<%= product.price %>
+                </td>
+                <td>
+                  <% if (product.isNewArrival) { %>
+                    <span class="new-arrival-badge">New</span>
+                    <% } else { %>
+                      <span>-</span>
+                      <% } %>
+                </td>
+                <td>
+                  <button class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>"
+                    onclick="toggleProductStatus('<%= product._id %>', <%= !product.isActive %>)">
+                    <%= product.isActive ? 'Active' : 'Inactive' %>
+                  </button>
+                </td>
+                <td>
+                  <button class="action-btn edit-btn" onclick="editProduct('<%= product._id %>')">Edit</button>
+                  <button class="action-btn delete-btn" onclick="deleteProduct('<%= product._id %>')">Delete</button>
+                  <button class="action-btn view-btn" onclick="viewProduct('<%= product._id %>')">View</button>
+                </td>
+              </tr>
+              <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="10" style="text-align: center; padding: 40px;">No products found</td>
+                  </tr>
+                  <% } %>
+        </tbody>
+      </table>
+    </div>
 
-  <div class="pagination">
-    <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined' && totalPages > 0) { %>
-<button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? disabled="disabled" : '' %>>&laquo;</button>
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage('<%- i %>')"><%= i %></button>
-      <% } %>
-      <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? disabled="disabled" : '' %>>&raquo;</button>
-    <% } else { %>
-      <button disabled>&laquo;</button>
-      <button class="active">1</button>
-      <button disabled>&raquo;</button>
-    <% } %>
-  </div>
+    <div class="pagination">
+      <% if (typeof currentPage !=='undefined' && typeof totalPages !=='undefined' && totalPages> 0) { %>
+        <button id="prevPage" onclick="goToPrevPage()" <%=currentPage <=1 ? disabled="disabled" : '' %>>&laquo;</button>
+        <% for (let i=1; i <=totalPages; i++) { %>
+          <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage('<%- i %>')">
+            <%= i %>
+          </button>
+          <% } %>
+            <button id="nextPage" onclick="goToNextPage()" <%=currentPage>= totalPages ? disabled="disabled" : ''
+              %>>&raquo;</button>
+            <% } else { %>
+              <button disabled>&laquo;</button>
+              <button class="active">1</button>
+              <button disabled>&raquo;</button>
+              <% } %>
+    </div>
 
-  <!-- Enhanced Modal -->
-  <div class="modal-overlay" id="productModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Add Product</h3>
-        <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
-      </div>
-      <form id="productForm" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="productName">Product Name *</label>
-              <input type="text" id="productName" name="productName" required>
-            </div>
-             <div class="form-group">
-              <label for="sku">SKU *</label>
-              <input type="text" id="sku" name="sku" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="category">Category *</label>
-              <select id="category" name="category" required>
-                <option value="">Select Category</option>
-                <% if (category && category.length > 0) { %>
-                  <% category.forEach(category => { %>
-                    <option value="<%= category._id %>"><%= category.name %></option>
-                  <% }) %>
-                <% } %>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="color">Color</label>
-              <input type="text" id="color" name="color">
-            </div>
-            </div>
-            
-          
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="price">Price *</label>
-              <input type="number" id="price" name="price" min="0" step="0.01" required>
-            </div>
-            <div class="form-group">
-              <label for="stock">Stock *</label>
-              <input type="number" id="stock" name="stock" min="0" required>
-            </div>
-          </div>
-          
-          
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4"></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="cropImageInput">Product Images (Crop & Upload Multiple)</label>
-            <input type="file" id="cropImageInput" name="images" accept="image/*" multiple>
-            <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
-            <div style="margin-top: 10px;">
-              <img id="cropPreview" style="display: none;" />
-            </div>
-            <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop & Add</button>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <h4>Cropped Images:</h4>
-            <div id="croppedImageList" style="display: flex; flex-wrap: wrap;"></div>
-          </div>
-          
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="isNewArrival" name="isNewArrival" value="true">
-              <span class="checkmark"></span>
-              Mark as New Arrival
-            </label>
-          </div>
-          
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="isActive" name="isActive" value="true" checked>
-              <span class="checkmark"></span>
-              Active Product
-            </label>
-          </div>
+    <!-- Enhanced Modal -->
+    <div class="modal-overlay" id="productModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Add Product</h3>
+          <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
         </div>
-        
+        <form id="productForm" enctype="multipart/form-data">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="productName">Product Name *</label>
+                <input type="text" id="productName" name="productName">
+              </div>
+              <div class="form-group">
+                <label for="sku">SKU *</label>
+                <input type="text" id="sku" name="sku">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" name="category">
+                  <option value="">Select Category</option>
+                  <% if (category && category.length> 0) { %>
+                    <% category.forEach(category=> { %>
+                      <option value="<%= category._id %>">
+                        <%= category.name %>
+                      </option>
+                      <% }) %>
+                        <% } %>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color">
+              </div>
+            </div>
+
+
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="price">Price *</label>
+                <input type="number" id="price" name="price" min="0" step="0.01">
+              </div>
+              <div class="form-group">
+                <label for="stock">Stock *</label>
+                <input type="number" id="stock" name="stock" min="0">
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="cropImageInput">Product Images (Crop & Upload Multiple)</label>
+              <input type="file" id="cropImageInput" name="images" accept="image/*" multiple>
+              <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
+              <div style="margin-top: 10px;">
+                <img id="cropPreview" style="display: none;" />
+              </div>
+              <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop & Add</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <h4>Cropped Images:</h4>
+              <div id="croppedImageList" style="display: flex; flex-wrap: wrap;"></div>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="isNewArrival" name="isNewArrival" value="true">
+                <span class="checkmark"></span>
+                Mark as New Arrival
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="isActive" name="isActive" value="true" checked>
+                <span class="checkmark"></span>
+                Active Product
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- View Product Modal -->
+    <div class="modal-overlay" id="viewProductModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Product Details</h3>
+          <button type="button" class="close-btn" onclick="closeViewModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="viewProductContent">
+          <!-- Product details will be loaded here -->
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Product</button>
+          <button type="button" class="btn btn-secondary" onclick="closeViewModal()">Close</button>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- View Product Modal -->
-  <div class="modal-overlay" id="viewProductModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Product Details</h3>
-        <button type="button" class="close-btn" onclick="closeViewModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="viewProductContent">
-        <!-- Product details will be loaded here -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeViewModal()">Close</button>
       </div>
     </div>
-  </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal-content small-modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Confirm Delete</h3>
-        <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this product? This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal-content small-modal">
+        <div class="modal-header">
+          <h3 class="modal-title">Confirm Delete</h3>
+          <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+        </div>
       </div>
     </div>
-  </div>
-<script>
-  let currentProductId = null;
-  let deleteProductId = null;
-  let filesQueue = [];
-  let currentFileIndex = 0;
-  let cropper;
-  let croppedImages = [];
-  let removedImages = [];
+    <script>
+      let currentProductId = null;
+      let deleteProductId = null;
+      let filesQueue = [];
+      let currentFileIndex = 0;
+      let cropper;
+      let croppedImages = [];
+      let removedImages = [];
 
-  // Toast Notification Function
-  function showToast(message, type = 'success') {
-    const existingToasts = document.querySelectorAll('.toast');
-    existingToasts.forEach(toast => toast.remove());
+      // Toast Notification Function
+      function showToast(message, type = 'success') {
+        const existingToasts = document.querySelectorAll('.toast');
+        existingToasts.forEach(toast => toast.remove());
 
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    toast.style.cssText = `
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
       position: fixed;
       top: 20px;
       right: 20px;
@@ -256,130 +276,156 @@
       transition: opacity 0.3s ease, transform 0.3s ease;
     `;
 
-    document.body.appendChild(toast);
+        document.body.appendChild(toast);
 
-    setTimeout(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(0)';
-    }, 100);
+        setTimeout(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateX(0)';
+        }, 100);
 
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(100%)';
-      setTimeout(() => toast.remove(), 300);
-    }, 4000);
-  }
-
-  // Modal Functions
-  function openModal() {
-    document.getElementById('productModal').style.display = 'flex';
-    document.querySelector('.modal-title').textContent = 'Add Product';
-    document.getElementById('productForm').reset();
-    document.getElementById('croppedImageList').innerHTML = '';
-    document.getElementById('previewArea').innerHTML = '';
-    removedImages = [];
-    currentProductId = null;
-  }
-
-  function closeModal() {
-    document.getElementById('productModal').style.display = 'none';
-  }
-
-  function closeViewModal() {
-    document.getElementById('viewProductModal').style.display = 'none';
-  }
-
-  function closeDeleteModal() {
-    document.getElementById('deleteModal').style.display = 'none';
-    deleteProductId = null;
-  }
-
-  // Product 
- function editProduct(productId) {
-  currentProductId = productId;
-  document.getElementById('productForm').reset();
-  document.getElementById('croppedImageList').innerHTML = '';
-  document.getElementById('previewArea').innerHTML = '';
-  removedImages = [];
-
-  fetch(`/admin/products/${productId}/details`)
-    .then(response => response.json())
-    .then(data => {
-      console.log("data",data);
-      if (!data.success || !data.product) {
-        throw new Error("Invalid product response");
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
       }
 
-      const product = data.product; 
-
-      document.getElementById('productName').value = product.productName || '';
-      document.getElementById('sku').value = product.sku || '';
-      document.getElementById('category').value = product.category?._id || '';
-      document.getElementById('price').value = product.price || '';
-      document.getElementById('stock').value = product.stock || '';
-      document.getElementById('color').value = product.color || '';
-      document.getElementById('description').value = product.description || '';
-      document.getElementById('isNewArrival').checked = !!product.isNewArrival;
-      document.getElementById('isActive').checked = product.isActive !== false;
-
-      // Show existing images
-      if (Array.isArray(product.images) && product.images.length > 0) {
-        product.images.forEach((imgPath) => {
-          const wrapper = document.createElement("div");
-          wrapper.classList.add("existing-image");
-          wrapper.style.position = "relative";
-
-          const img = document.createElement("img");
-          img.src = imgPath;   
-          img.style.width = "60px";
-          img.style.height = "60px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "4px";
-          img.style.marginRight = "10px";
-
-          const removeBtn = document.createElement("button");
-          removeBtn.innerHTML = "&times;";
-          removeBtn.classList.add("remove-existing-btn");
-          removeBtn.style.position = "absolute";
-          removeBtn.style.top = "-6px";
-          removeBtn.style.right = "-6px";
-
-          removeBtn.addEventListener("click", () => {
-            wrapper.remove();
-            removedImages.push(imgPath);
-          });
-
-          wrapper.appendChild(img);
-          wrapper.appendChild(removeBtn);
-          document.getElementById('previewArea').appendChild(wrapper);
-        });
-      }
-
-      document.querySelector('.modal-title').textContent = 'Edit Product';
-      document.getElementById('productModal').style.display = 'flex';
-    })
-    .catch(error => {
-      console.error('Error fetching product:', error);
-      showToast('Error loading product data', 'error');
-    });
-}
-
-
-  function viewProduct(productId) {
-    fetch(`/admin/products/${productId}/details`)
-      .then(response => response.json())
-      .then(data => {
-        if(!data.success){
-          throw new Error("Invalid product response");
+      // Reset all image-related states
+      function resetImageState() {
+        filesQueue = [];
+        currentFileIndex = 0;
+        croppedImages = [];
+        removedImages = [];
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
         }
-        const product=data.product;
-        const content = `
+        const cropPreview = document.getElementById('cropPreview');
+        if (cropPreview) {
+          cropPreview.src = '';
+          cropPreview.style.display = 'none';
+        }
+        const cropButton = document.getElementById('cropButton');
+        if (cropButton) {
+          cropButton.style.display = 'none';
+        }
+        const fileInput = document.getElementById('cropImageInput');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+      }
+
+      // Modal Functions
+      function openModal() {
+        resetImageState();
+        document.getElementById('productModal').style.display = 'flex';
+        document.querySelector('.modal-title').textContent = 'Add Product';
+        document.getElementById('productForm').reset();
+        document.getElementById('croppedImageList').innerHTML = '';
+        document.getElementById('previewArea').innerHTML = '';
+        currentProductId = null;
+      }
+
+      function closeModal() {
+        document.getElementById('productModal').style.display = 'none';
+        resetImageState();
+      }
+
+      function closeViewModal() {
+        document.getElementById('viewProductModal').style.display = 'none';
+      }
+
+      function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        deleteProductId = null;
+      }
+
+      // Product 
+      function editProduct(productId) {
+        resetImageState();
+        currentProductId = productId;
+        document.getElementById('productForm').reset();
+        document.getElementById('croppedImageList').innerHTML = '';
+        document.getElementById('previewArea').innerHTML = '';
+
+        fetch(`/admin/products/${productId}/details`)
+          .then(response => response.json())
+          .then(data => {
+            console.log("data", data);
+            if (!data.success || !data.product) {
+              throw new Error("Invalid product response");
+            }
+
+            const product = data.product;
+
+            document.getElementById('productName').value = product.productName || '';
+            document.getElementById('sku').value = product.sku || '';
+            document.getElementById('category').value = product.category?._id || '';
+            document.getElementById('price').value = product.price || '';
+            document.getElementById('stock').value = product.stock || '';
+            document.getElementById('color').value = product.color || '';
+            document.getElementById('description').value = product.description || '';
+            document.getElementById('isNewArrival').checked = !!product.isNewArrival;
+            document.getElementById('isActive').checked = product.isActive !== false;
+
+            // Show existing images
+            if (Array.isArray(product.images) && product.images.length > 0) {
+              product.images.forEach((imgPath) => {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("existing-image");
+                wrapper.style.position = "relative";
+
+                const img = document.createElement("img");
+                img.src = imgPath;
+                img.style.width = "60px";
+                img.style.height = "60px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "4px";
+                img.style.marginRight = "10px";
+
+                const removeBtn = document.createElement("button");
+                removeBtn.innerHTML = "&times;";
+                removeBtn.classList.add("remove-existing-btn");
+                removeBtn.style.position = "absolute";
+                removeBtn.style.top = "-6px";
+                removeBtn.style.right = "-6px";
+
+                removeBtn.addEventListener("click", () => {
+                  wrapper.remove();
+                  removedImages.push(imgPath);
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                document.getElementById('previewArea').appendChild(wrapper);
+              });
+            }
+
+            document.querySelector('.modal-title').textContent = 'Edit Product';
+            document.getElementById('productModal').style.display = 'flex';
+          })
+          .catch(error => {
+            console.error('Error fetching product:', error);
+            showToast('Error loading product data', 'error');
+          });
+      }
+
+
+      function viewProduct(productId) {
+        fetch(`/admin/products/${productId}/details`)
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              throw new Error("Invalid product response");
+            }
+            const product = data.product;
+            const content = `
           <div class="product-view">
             <div class="product-images">
               ${product.images && product.images.length > 0
                 ? product.images.map(
-                    img => `<img src="${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
-                  ).join('')
+                  img => `<img src="${img}" alt="${product.productName}" style="width: 100px; height: 100px; object-fit: cover; margin: 5px; border-radius: 4px;">`
+                ).join('')
                 : '<div style="width: 100px; height: 100px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">📷</div>'
               }
             </div>
@@ -399,322 +445,322 @@
           </div>
         `;
 
-        document.getElementById('viewProductContent').innerHTML = content;
-        document.getElementById('viewProductModal').style.display = 'flex';
-      })
-      .catch(error => {
-        console.error('Error fetching product:', error);
-        showToast('Error loading product details', 'error');
-      });
-  }
-
-  function deleteProduct(productId) {
-    deleteProductId = productId;
-    document.getElementById('deleteModal').style.display = 'flex';
-  }
-
-  function confirmDelete() {
-    if (!deleteProductId) return;
-    
-    fetch(`/admin/products/${deleteProductId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+            document.getElementById('viewProductContent').innerHTML = content;
+            document.getElementById('viewProductModal').style.display = 'flex';
+          })
+          .catch(error => {
+            console.error('Error fetching product:', error);
+            showToast('Error loading product details', 'error');
+          });
       }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        showToast('Product deleted successfully', 'success');
-        setTimeout(() => location.reload(), 2000);
-      } else {
-        showToast(data.message || 'Error deleting product', 'error');
+
+      function deleteProduct(productId) {
+        deleteProductId = productId;
+        document.getElementById('deleteModal').style.display = 'flex';
       }
-    })
-    .catch(error => {
-      console.error('Error deleting product:', error);
-      showToast('Error deleting product', 'error');
-    })
-    .finally(() => {
-      closeDeleteModal();
-    });
-  }
 
-  // Form Submission
-  document.getElementById('productForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+      function confirmDelete() {
+        if (!deleteProductId) return;
 
-    const formData = new FormData();
-    formData.append('productName', document.getElementById('productName').value);
-    formData.append('sku', document.getElementById('sku').value);
-    formData.append('category', document.getElementById('category').value);
-    formData.append('price', document.getElementById('price').value);
-    formData.append('stock', document.getElementById('stock').value);
-    formData.append('color', document.getElementById('color').value);
-    formData.append('description', document.getElementById('description').value);
-    formData.append('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
-    formData.append('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
-
-    if (currentProductId) {
-      formData.append('id', currentProductId);
-      formData.append('removedImages', JSON.stringify(removedImages));
-    }
-    
-    croppedImages.forEach((blob, index) => {
-      formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
-    });
-    
-    if (!currentProductId && croppedImages.length === 0) {
-      showToast('Please upload at least one product image', 'error');
-      return;
-    }
-
-    const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
-    const method = currentProductId ? 'PUT' : 'POST';
-
-    fetch(url, {
-      method,
-      body: formData
-    })
-    .then(res=>res.json())
-    .then(data => {
-      if (data.success) {
-        croppedImages = [];
-        filesQueue = [];
-        currentFileIndex = 0;
-        showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully', 'success');
-        setTimeout(() => location.reload(), 2000);
-      } else {
-        showToast(data.message || 'Error saving product', 'error');
+        fetch(`/admin/products/${deleteProductId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('Product deleted successfully', 'success');
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              showToast(data.message || 'Error deleting product', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error deleting product:', error);
+            showToast('Error deleting product', 'error');
+          })
+          .finally(() => {
+            closeDeleteModal();
+          });
       }
-    })
-    .catch(error => {
-      console.error('Error saving product:', error);
-      croppedImages = [];
-      filesQueue = [];
-      currentFileIndex = 0;
-      showToast('Error saving product', 'error');
-    });
-  });
 
-  // Image Cropping Functionality
-  document.getElementById('cropImageInput').addEventListener('change', function(e) {
-    filesQueue = Array.from(e.target.files);
-    currentFileIndex = 0;
-    if (filesQueue.length > 0) {
-      croppedImages = [];
-    }
-    
-    document.getElementById('previewArea').innerHTML = '';
-    filesQueue.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const wrapper = document.createElement("div");
-        wrapper.style.position = "relative";
-        wrapper.style.display = "inline-block";
+      // Form Submission
+      document.getElementById('productForm').addEventListener('submit', function (e) {
+        e.preventDefault();
 
-        const img = document.createElement("img");
-        img.src = event.target.result;
-        img.style.width = "60px";
-        img.style.height = "60px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "4px";
-        img.style.marginRight = "10px";
+        const formData = new FormData();
+        formData.append('productName', document.getElementById('productName').value);
+        formData.append('sku', document.getElementById('sku').value);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('price', document.getElementById('price').value);
+        formData.append('stock', document.getElementById('stock').value);
+        formData.append('color', document.getElementById('color').value);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('isNewArrival', document.getElementById('isNewArrival').checked ? 'true' : 'false');
+        formData.append('isActive', document.getElementById('isActive').checked ? 'true' : 'false');
 
-        const removeBtn = document.createElement("button");
-        removeBtn.innerHTML = "&times;";
-        removeBtn.style.position = "absolute";
-        removeBtn.style.top = "-6px";
-        removeBtn.style.right = "-6px";
-        removeBtn.style.background = "transparent";
-        removeBtn.style.color = "#000";
-        removeBtn.style.border = "1px solid #fff";
-        removeBtn.style.borderRadius = "50%";
-        removeBtn.style.cursor = "pointer";
-        removeBtn.style.width = "20px";
-        removeBtn.style.height = "20px";
-        removeBtn.style.fontSize = "14px";
-        removeBtn.style.lineHeight = "16px";
-        removeBtn.style.padding = "0";
+        if (currentProductId) {
+          formData.append('id', currentProductId);
+          formData.append('removedImages', JSON.stringify(removedImages));
+        }
 
-        removeBtn.addEventListener("click", () => {
-          filesQueue.splice(index, 1); 
-          wrapper.remove(); 
+        croppedImages.forEach((blob, index) => {
+          formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
         });
 
-        wrapper.appendChild(img);
-        wrapper.appendChild(removeBtn);
-        document.getElementById('previewArea').appendChild(wrapper);
-      };
-      reader.readAsDataURL(file);
-    });
+        if (!currentProductId && croppedImages.length === 0) {
+          showToast('Please upload at least one product image', 'error');
+          return;
+        }
 
-    loadNextImage();
-  });
+        const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
+        const method = currentProductId ? 'PUT' : 'POST';
 
-  function loadNextImage() {
-    if (currentFileIndex >= filesQueue.length) {
-      document.getElementById('cropButton').style.display = "none";
-      document.getElementById('cropPreview').style.display = "none";
-      return;
-    }
-    
-    const file = filesQueue[currentFileIndex];
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      document.getElementById('cropPreview').src = event.target.result;
-      document.getElementById('cropPreview').style.display = "block";
-      document.getElementById('cropButton').style.display = "inline-block";
-      
-      if (cropper) cropper.destroy();
-      cropper = new Cropper(document.getElementById('cropPreview'), {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-        responsive: true,
-        scalable: true,
-        zoomable: true
+        fetch(url, {
+          method,
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              croppedImages = [];
+              filesQueue = [];
+              currentFileIndex = 0;
+              showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully', 'success');
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              showToast(data.message || 'Error saving product', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error saving product:', error);
+            croppedImages = [];
+            filesQueue = [];
+            currentFileIndex = 0;
+            showToast('Error saving product', 'error');
+          });
       });
-    };
-    reader.readAsDataURL(file);
-  }
 
-  document.getElementById('cropButton').addEventListener('click', function() {
-    const canvas = cropper.getCroppedCanvas();
-    canvas.toBlob(function(blob) {
-      const imageUrl = URL.createObjectURL(blob);
-      
-      const container = document.createElement("div");
-      container.style.border = "1px solid #ccc";
-      container.style.borderRadius = "8px";
-      container.style.padding = "8px";
-      container.style.background = "#f9f9f9";
-      container.style.width = "120px";
-      container.style.textAlign = "center";
+      // Image Cropping Functionality
+      document.getElementById('cropImageInput').addEventListener('change', function (e) {
+        filesQueue = Array.from(e.target.files);
+        currentFileIndex = 0;
+        if (filesQueue.length > 0) {
+          croppedImages = [];
+        }
 
-      const img = document.createElement("img");
-      img.src = imageUrl;
-      img.style.width = "100%";
-      img.style.height = "100px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "4px";
+        document.getElementById('previewArea').innerHTML = '';
+        filesQueue.forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const wrapper = document.createElement("div");
+            wrapper.style.position = "relative";
+            wrapper.style.display = "inline-block";
 
-      const indexLabel = document.createElement("div");
-      indexLabel.textContent = `Image ${croppedImages.length + 1}`;
-      indexLabel.style.marginTop = "5px";
-      indexLabel.style.fontSize = "12px";
-      indexLabel.style.color = "#333";
+            const img = document.createElement("img");
+            img.src = event.target.result;
+            img.style.width = "60px";
+            img.style.height = "60px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "4px";
+            img.style.marginRight = "10px";
 
-      container.appendChild(img);
-      container.appendChild(indexLabel);
-      document.getElementById('croppedImageList').appendChild(container);
+            const removeBtn = document.createElement("button");
+            removeBtn.innerHTML = "&times;";
+            removeBtn.style.position = "absolute";
+            removeBtn.style.top = "-6px";
+            removeBtn.style.right = "-6px";
+            removeBtn.style.background = "transparent";
+            removeBtn.style.color = "#000";
+            removeBtn.style.border = "1px solid #fff";
+            removeBtn.style.borderRadius = "50%";
+            removeBtn.style.cursor = "pointer";
+            removeBtn.style.width = "20px";
+            removeBtn.style.height = "20px";
+            removeBtn.style.fontSize = "14px";
+            removeBtn.style.lineHeight = "16px";
+            removeBtn.style.padding = "0";
 
-      croppedImages.push(blob);
-      
-      cropper.destroy();
-      document.getElementById('cropPreview').style.display = "none";
-      document.getElementById('cropButton').style.display = "none";
+            removeBtn.addEventListener("click", () => {
+              filesQueue.splice(index, 1);
+              wrapper.remove();
+            });
 
-      currentFileIndex++;
-      loadNextImage();
-    });
-  });
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            document.getElementById('previewArea').appendChild(wrapper);
+          };
+          reader.readAsDataURL(file);
+        });
 
-  // Pagination
-  function goToPage(page) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('page', page);
-    window.location.href = `/admin/products?${urlParams.toString()}`;
-  }
+        loadNextImage();
+      });
 
-  function goToPrevPage() {
-    if (currentPage > 1) {
-      goToPage(currentPage - 1);
-    }
-  }
+      function loadNextImage() {
+        if (currentFileIndex >= filesQueue.length) {
+          document.getElementById('cropButton').style.display = "none";
+          document.getElementById('cropPreview').style.display = "none";
+          return;
+        }
 
-  function goToNextPage() {
-    if (currentPage < totalPages) {
-      goToPage(currentPage + 1);
-    }
-  }
+        const file = filesQueue[currentFileIndex];
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          document.getElementById('cropPreview').src = event.target.result;
+          document.getElementById('cropPreview').style.display = "block";
+          document.getElementById('cropButton').style.display = "inline-block";
 
-  // Toggle Product Status
-  function toggleProductStatus(productId, newStatus) {
-    fetch(`/admin/products/status/${productId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ isActive: newStatus })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        showToast('Product status updated successfully', 'success');
-        setTimeout(() => location.reload(), 2000);
-      } else {
-        showToast('Failed to update status', 'error');
-      }
-    })
-    .catch(err => {
-      console.error('Error updating product status:', err);
-      showToast('Error occurred while updating the status', 'error');
-    });
-  }
-
-  // Search Functionality
-  document.getElementById('searchBtn').addEventListener('click', function() {
-    const searchTerm = document.getElementById('searchBox').value;
-    if (searchTerm.trim()) {
-      window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
-    }
-  });
-
-  document.getElementById('resetBtn').addEventListener('click', function() {
-    document.getElementById('searchBox').value = '';
-    window.location.href = '/admin/products';
-  });
-
-  document.getElementById('searchBox').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      document.getElementById('searchBtn').click();
-    }
-  });
-
-  // Close modals when clicking outside
-  window.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal-overlay')) {
-      if (e.target.id === 'productModal') closeModal();
-      if (e.target.id === 'viewProductModal') closeViewModal();
-      if (e.target.id === 'deleteModal') closeDeleteModal();
-    }
-  });
-
-  // Initialize pagination variables
-  var currentPage = parseInt('<%= currentPage || 1 %>');
-  var totalPages = parseInt('<%= totalPages || 1 %>');
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const productNameInput = document.getElementById('productName');
-    const skuInput = document.getElementById('sku');
-
-    productNameInput.addEventListener('input', function () {
-      const name = productNameInput.value.trim().toUpperCase();
-
-      if (!name) {
-        skuInput.value = '';
-        return;
+          if (cropper) cropper.destroy();
+          cropper = new Cropper(document.getElementById('cropPreview'), {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 1,
+            responsive: true,
+            scalable: true,
+            zoomable: true
+          });
+        };
+        reader.readAsDataURL(file);
       }
 
-      const formatted = name.replace(/\s+/g, '-').replace(/[^A-Z0-9\-]/g, '');
+      document.getElementById('cropButton').addEventListener('click', function () {
+        const canvas = cropper.getCroppedCanvas();
+        canvas.toBlob(function (blob) {
+          const imageUrl = URL.createObjectURL(blob);
 
-      const skuPrefix = 'SKU-'; 
-      const sku = `${skuPrefix}${formatted}`;
+          const container = document.createElement("div");
+          container.style.border = "1px solid #ccc";
+          container.style.borderRadius = "8px";
+          container.style.padding = "8px";
+          container.style.background = "#f9f9f9";
+          container.style.width = "120px";
+          container.style.textAlign = "center";
 
-      skuInput.value = sku;
-    });
-  });
-</script>
-  <%- include('../partials/admin/admin-footer') %>
+          const img = document.createElement("img");
+          img.src = imageUrl;
+          img.style.width = "100%";
+          img.style.height = "100px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "4px";
+
+          const indexLabel = document.createElement("div");
+          indexLabel.textContent = `Image ${croppedImages.length + 1}`;
+          indexLabel.style.marginTop = "5px";
+          indexLabel.style.fontSize = "12px";
+          indexLabel.style.color = "#333";
+
+          container.appendChild(img);
+          container.appendChild(indexLabel);
+          document.getElementById('croppedImageList').appendChild(container);
+
+          croppedImages.push(blob);
+
+          cropper.destroy();
+          document.getElementById('cropPreview').style.display = "none";
+          document.getElementById('cropButton').style.display = "none";
+
+          currentFileIndex++;
+          loadNextImage();
+        });
+      });
+
+      // Pagination
+      function goToPage(page) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', page);
+        window.location.href = `/admin/products?${urlParams.toString()}`;
+      }
+
+      function goToPrevPage() {
+        if (currentPage > 1) {
+          goToPage(currentPage - 1);
+        }
+      }
+
+      function goToNextPage() {
+        if (currentPage < totalPages) {
+          goToPage(currentPage + 1);
+        }
+      }
+
+      // Toggle Product Status
+      function toggleProductStatus(productId, newStatus) {
+        fetch(`/admin/products/status/${productId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isActive: newStatus })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('Product status updated successfully', 'success');
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              showToast('Failed to update status', 'error');
+            }
+          })
+          .catch(err => {
+            console.error('Error updating product status:', err);
+            showToast('Error occurred while updating the status', 'error');
+          });
+      }
+
+      // Search Functionality
+      document.getElementById('searchBtn').addEventListener('click', function () {
+        const searchTerm = document.getElementById('searchBox').value;
+        if (searchTerm.trim()) {
+          window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
+        }
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', function () {
+        document.getElementById('searchBox').value = '';
+        window.location.href = '/admin/products';
+      });
+
+      document.getElementById('searchBox').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          document.getElementById('searchBtn').click();
+        }
+      });
+
+      // Close modals when clicking outside
+      window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('modal-overlay')) {
+          if (e.target.id === 'productModal') closeModal();
+          if (e.target.id === 'viewProductModal') closeViewModal();
+          if (e.target.id === 'deleteModal') closeDeleteModal();
+        }
+      });
+
+      // Initialize pagination variables
+      var currentPage = parseInt('<%= currentPage || 1 %>');
+      var totalPages = parseInt('<%= totalPages || 1 %>');
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const productNameInput = document.getElementById('productName');
+        const skuInput = document.getElementById('sku');
+
+        productNameInput.addEventListener('input', function () {
+          const name = productNameInput.value.trim().toUpperCase();
+
+          if (!name) {
+            skuInput.value = '';
+            return;
+          }
+
+          const formatted = name.replace(/\s+/g, '-').replace(/[^A-Z0-9\-]/g, '');
+
+          const skuPrefix = 'SKU-';
+          const sku = `${skuPrefix}${formatted}`;
+
+          skuInput.value = sku;
+        });
+      });
+    </script>
+    <%- include('../partials/admin/admin-footer') %>

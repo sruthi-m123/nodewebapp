@@ -7,6 +7,39 @@
   --status-shipped: #008CBA;
   --status-delivered: #9e6d4e;
   --action-btn: #ff9800;
+
+  /* Modern soft status badge colors */
+  --status-pending-bg: #fffbeb;
+  --status-pending-text: #b45309;
+  --status-pending-border: #fde68a;
+  
+  --status-processing-bg: #eef2ff;
+  --status-processing-text: #4338ca;
+  --status-processing-border: #c7d2fe;
+  
+  --status-shipped-bg: #f0f9ff;
+  --status-shipped-text: #0369a1;
+  --status-shipped-border: #bae6fd;
+  
+  --status-delivered-bg: #ecfdf5;
+  --status-delivered-text: #047857;
+  --status-delivered-border: #a7f3d0;
+  
+  --status-cancelled-bg: #fef2f2;
+  --status-cancelled-text: #b91c1c;
+  --status-cancelled-border: #fca5a5;
+
+  --status-returned-bg: #f3f4f6;
+  --status-returned-text: #374151;
+  --status-returned-border: #d1d5db;
+
+  --status-return-requested-bg: #faf5ff;
+  --status-return-requested-text: #6d28d9;
+  --status-return-requested-border: #e9d5ff;
+
+  --status-partially-returned-bg: #fff7ed;
+  --status-partially-returned-text: #c2410c;
+  --status-partially-returned-border: #ffedd5;
 }
 
 body {
@@ -133,27 +166,145 @@ body {
 }
 
 .status-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: white;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: default;
-  min-width: 90px;
+  min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.status-btn::before {
+  content: '';
   display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
+/* Pending & Payment Pending (Warm Amber) */
+.status-pending,
+.status-payment_pending,
+.status-payment-pending {
+  background-color: var(--status-pending-bg);
+  color: var(--status-pending-text);
+  border-color: var(--status-pending-border);
+}
+.status-pending::before,
+.status-payment_pending::before,
+.status-payment-pending::before {
+  background-color: var(--status-pending-text);
+  box-shadow: 0 0 6px var(--status-pending-text);
+}
+
+/* Processing (Elegant Indigo) */
+.status-processing {
+  background-color: var(--status-processing-bg);
+  color: var(--status-processing-text);
+  border-color: var(--status-processing-border);
+}
+.status-processing::before {
+  background-color: var(--status-processing-text);
+  box-shadow: 0 0 6px var(--status-processing-text);
+}
+
+/* Ordered status fallback */
 .status-ordered {
-  background-color: var(--status-ordered);
+  background-color: var(--status-processing-bg);
+  color: var(--status-processing-text);
+  border-color: var(--status-processing-border);
+}
+.status-ordered::before {
+  background-color: var(--status-processing-text);
+  box-shadow: 0 0 6px var(--status-processing-text);
 }
 
+/* Shipped (Sky Blue) */
 .status-shipped {
-  background-color: var(--status-shipped);
+  background-color: var(--status-shipped-bg);
+  color: var(--status-shipped-text);
+  border-color: var(--status-shipped-border);
+}
+.status-shipped::before {
+  background-color: var(--status-shipped-text);
+  box-shadow: 0 0 6px var(--status-shipped-text);
 }
 
-.status-delivered {
-  background-color: var(--status-delivered);
+/* Delivered & Paid (Emerald Green) */
+.status-delivered,
+.status-paid {
+  background-color: var(--status-delivered-bg);
+  color: var(--status-delivered-text);
+  border-color: var(--status-delivered-border);
+}
+.status-delivered::before,
+.status-paid::before {
+  background-color: var(--status-delivered-text);
+  box-shadow: 0 0 6px var(--status-delivered-text);
+}
+
+/* Cancelled & Payment Failed (Crimson Red) */
+.status-cancelled,
+.status-payment_failed,
+.status-payment-failed {
+  background-color: var(--status-cancelled-bg);
+  color: var(--status-cancelled-text);
+  border-color: var(--status-cancelled-border);
+}
+.status-cancelled::before,
+.status-payment_failed::before,
+.status-payment-failed::before {
+  background-color: var(--status-cancelled-text);
+  box-shadow: 0 0 6px var(--status-cancelled-text);
+}
+
+/* Return Requested / Return Approved / Return Rejected / Returned (Amethyst Purple / Cool Gray) */
+.status-return_requested,
+.status-return-requested {
+  background-color: var(--status-return-requested-bg);
+  color: var(--status-return-requested-text);
+  border-color: var(--status-return-requested-border);
+}
+.status-return_requested::before,
+.status-return-requested::before {
+  background-color: var(--status-return-requested-text);
+  box-shadow: 0 0 6px var(--status-return-requested-text);
+}
+
+.status-returned {
+  background-color: var(--status-returned-bg);
+  color: var(--status-returned-text);
+  border-color: var(--status-returned-border);
+}
+.status-returned::before {
+  background-color: var(--status-returned-text);
+  box-shadow: 0 0 6px var(--status-returned-text);
+}
+
+.status-partially_returned,
+.status-partially-returned,
+.status-partially_cancelled,
+.status-partially-cancelled {
+  background-color: var(--status-partially-returned-bg);
+  color: var(--status-partially-returned-text);
+  border-color: var(--status-partially-returned-border);
+}
+.status-partially_returned::before,
+.status-partially-returned::before,
+.status-partially_cancelled::before,
+.status-partially-cancelled::before {
+  background-color: var(--status-partially-returned-text);
+  box-shadow: 0 0 6px var(--status-partially-returned-text);
 }
 
 .action-btn {

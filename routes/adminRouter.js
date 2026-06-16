@@ -33,7 +33,6 @@ router.get('/logout', adminController.logout);
 router.get('/api/stats', adminAuth, dashboardController.getDashboardStats);
 router.get('/api/top-products', adminAuth, dashboardController.getTopProducts);
 router.get('/api/sales-data', adminAuth, dashboardController.getSalesData);
-// router.post('/api/generate-pdf-report', adminAuth, dashboardController.generatePDFReport);
 router.get('/api/sales-report', adminAuth, dashboardController.getSalesReport);
 router.get('/api/export-sales-report', adminAuth, dashboardController.exportSalesReport);
 
@@ -46,7 +45,7 @@ router.post('/toggle_block', adminAuth, customerController.toggleBlockStatus);
 router.get('/categories', adminAuth, categoryController.getAllCategories);
 router.post('/addCategory', adminAuth,upload.category, handleMulterError,validate(V.categorySchema), categoryController.addCategory);
 router.delete('/categories/:id/delete', adminAuth,validate(V.getCategoryByIdSchema), categoryController.deleteCategory);
-router.put('/categories/status/:categoryId', adminAuth,validate(V.updateCategoryStatus), categoryController.updateCategoryStatus);
+router.put('/categories/status/:categoryId', adminAuth,validate(V.categoryStatusSchema), categoryController.updateCategoryStatus);
 router.put('/categories/:id/update', adminAuth, upload.category,handleMulterError,validate(V.getCategoryByIdSchema,"params"),validate(V.updateCategorySchema), categoryController.updateCategory);
 router.get('/categories/:id/details', adminAuth,validate(V.getCategoryByIdSchema), categoryController.getCategory);
 

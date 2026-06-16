@@ -8,7 +8,7 @@ import Coupon from '../../models/couponSchema.js';
 import { addAddressService } from './address.service.js';
 import Razorpay from 'razorpay';
 import { calculateOrder } from '../../helper/calculateTotal.js';
-// import {debitWallet } from '../../controller/user/walletController.js';
+import { WalletService } from './wallet.sevice.js';
 import { MESSAGES } from '../../utils/messages.js';
 import mongoose from 'mongoose';
 export const getCheckoutData = async (userId, session) => {
@@ -358,7 +358,7 @@ let buynow=orderData.session.buyNowItem
     await order.save();
   }
   if (paymentMethod === 'wallet') {
-    const debitSuccess = await debitWallet(userId, total, order._id, 'order');
+    const debitSuccess = await WalletService.debitWallet(userId, total, order._id, 'order');
     if (!debitSuccess) {
       if (!isRetry) await Order.findByIdAndDelete(order._id);
       return { success: false, message: "insufficient balance" };

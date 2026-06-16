@@ -487,9 +487,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const result = await response.json();
 
       if (response.ok) {
-        // Show success message
         const successMsg = document.getElementById('profile-success-msg');
+        console.log("successMsg",successMsg);
         successMsg.style.display = 'flex';
+        console.log(successMsg.style.display);
         
         setTimeout(() => {
           successMsg.style.display = 'none';

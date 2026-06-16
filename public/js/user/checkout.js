@@ -359,6 +359,7 @@ function toggleCouponDropdown() {
     dropdown.classList.toggle('show');
     arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
+window.toggleCouponDropdown = toggleCouponDropdown;
 
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('couponDropdown');
