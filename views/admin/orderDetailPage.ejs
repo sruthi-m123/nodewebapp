@@ -23,20 +23,39 @@
         </div>
 
         <div class="status-actions">
-<div class="dropdown">
-  <button class="dropdown-btn">Select Status </button>
-  <ul class="dropdown-list">
-    <li data-value="pending">Pending</li>
-    <li data-value="shipped">Shipped</li>
-    <li data-value="delivered">Delivered</li>
-    <li data-value="cancelled">Cancelled</li>
-  </ul>
-</div>
+          <%
+            const currentStatus = order.status || 'pending';
+            let forwardStatuses = [];
+            const statusLower = currentStatus.toLowerCase();
+            if (statusLower === 'pending') {
+              forwardStatuses = ['processing', 'shipped', 'delivered'];
+            } else if (statusLower === 'processing') {
+              forwardStatuses = ['shipped', 'delivered'];
+            } else if (statusLower === 'shipped') {
+              forwardStatuses = ['delivered'];
+            } else if (statusLower === 'delivered') {
+              forwardStatuses = [];
+            }
+          %>
+          <div class="dropdown">
+            <button class="dropdown-btn" type="button" <%= forwardStatuses.length === 0 ? 'disabled' : '' %>>
+              <%= currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1) %>
+              <% if (forwardStatuses.length > 0) { %>
+                <i class="fas fa-chevron-down" style="margin-left: 8px;"></i>
+              <% } %>
+            </button>
+            <% if (forwardStatuses.length > 0) { %>
+              <ul class="dropdown-list">
+                <% forwardStatuses.forEach(status => { %>
+                  <li data-value="<%= status %>"><%= status.charAt(0).toUpperCase() + status.slice(1) %></li>
+                <% }); %>
+              </ul>
+            <% } %>
+          </div>
 
-<p id="selected-status">Selected: None</p>
+          <p id="selected-status" style="margin: 0; font-size: 13px; font-weight: bold; color: #555;">Selected: None</p>
 
-
-          <button class="update-btn" data-order-id="<%= order._id %>">
+          <button class="update-btn" data-order-id="<%= order._id %>" <%= forwardStatuses.length === 0 ? 'disabled' : '' %>>
             Update Status
           </button>
         </div>
@@ -107,33 +126,38 @@
 
 <style>
 /* Dropdown container */
-.update-btn {
-  background: #007bff; 
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;  
-  transition: background 0.3s ease;
-}
-
-.update-btn:hover {
-  background: #0056b3; 
-}
-
 .dropdown {
   position: relative;
   display: inline-block;
-  font-family: Arial, sans-serif;
 }
 
 .dropdown-btn {
-  background: #4CAF50;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #ced4da;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 130px;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.dropdown-btn:hover:not([disabled]) {
+  background: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.dropdown-btn[disabled] {
+  background: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.8;
+  border-color: #dee2e6;
 }
 
 .dropdown-list {
@@ -142,55 +166,14 @@
   top: 100%;
   left: 0;
   background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
   margin-top: 4px;
   list-style: none;
   padding: 0;
-  width: 160px;
+  width: 140px;
   box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
   z-index: 100;
-}
-
-/* List items */
-.dropdown-list li {
-  padding: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.dropdown-list li:hover {
-  background: #f2f2f2;
-}
-
-.dropdown.show .dropdown-list {
-  display: block;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-btn {
-  padding: 6px 12px;
-  cursor: pointer;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-}
-
-.dropdown-list {
-  display: none;
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  margin-top: 4px;
-  list-style: none;
-  padding: 0;
-  width: 120px;
-  z-index: 10;
 }
 
 .dropdown-list.show {
@@ -198,20 +181,42 @@
 }
 
 .dropdown-list li {
-  padding: 6px 10px;
+  padding: 8px 12px;
   cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  transition: background 0.2s;
 }
 
 .dropdown-list li:hover {
-  background-color: #f0f0f0;
+  background: #f1f3f5;
+}
+
+.update-btn {
+  background: #007bff; 
+  color: white;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;  
+  transition: background 0.3s ease;
+}
+
+.update-btn:hover:not([disabled]) {
+  background: #0056b3; 
+}
+
+.update-btn[disabled] {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.75;
 }
 
 #selected-status {
-  margin-top: 8px;
+  margin-top: 0;
   font-weight: bold;
 }
-
-
 </style>
 
 <script>
@@ -225,47 +230,69 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedStatus = null;
 
     // Toggle dropdown
-    dropdownBtn.addEventListener("click", () => {
-      dropdownList.classList.toggle("show");
-    });
+    if (dropdownBtn && dropdownList) {
+      dropdownBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdownList.classList.toggle("show");
+      });
+    }
 
     // Select status
-    dropdownList.querySelectorAll("li").forEach((li) => {
-      li.addEventListener("click", () => {
-        selectedStatus = li.dataset.value;
-        selectedText.textContent = "Selected: " + selectedStatus;
-        dropdownList.classList.remove("show");
+    if (dropdownList) {
+      dropdownList.querySelectorAll("li").forEach((li) => {
+        li.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectedStatus = li.dataset.value;
+          const statusText = selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1);
+          if (selectedText) {
+            selectedText.textContent = "Selected: " + statusText;
+          }
+          if (dropdownBtn) {
+            dropdownBtn.innerHTML = statusText + ' <i class="fas fa-chevron-down" style="margin-left: 8px;"></i>';
+          }
+          dropdownList.classList.remove("show");
+        });
       });
-    });
+    }
 
     // Update status POST
-    updateBtn.addEventListener("click", async () => {
-      if (!selectedStatus) {
-        alert("Please select a status first!");
-        return;
-      }
-
-      const orderId = updateBtn.dataset.orderId;
-
-      try {
-        const res = await fetch("/admin/update-status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, status: selectedStatus }),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          alert(" Status updated to " + selectedStatus);
-        } else {
-          alert(" Error: " + (data.message || "Failed"));
+    if (updateBtn) {
+      updateBtn.addEventListener("click", async () => {
+        if (!selectedStatus) {
+          alert("Please select a status first!");
+          return;
         }
-      } catch (err) {
-        console.error(err);
-        alert("Something went wrong");
-      }
-    });
+
+        const orderId = updateBtn.dataset.orderId;
+
+        try {
+          updateBtn.disabled = true;
+          updateBtn.textContent = "Updating...";
+
+          const res = await fetch("/admin/orders/" + orderId + "/status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: selectedStatus }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            alert("Status updated to " + selectedStatus);
+            window.location.reload();
+          } else {
+            alert("Error: " + (data.message || data.error || "Failed to update"));
+            updateBtn.disabled = false;
+            updateBtn.textContent = "Update Status";
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Something went wrong");
+          updateBtn.disabled = false;
+          updateBtn.textContent = "Update Status";
+        }
+      });
+    }
   });
 
   // Close dropdown if clicked outside

@@ -385,3 +385,14 @@ body {
   font-size: 1.1rem;
   z-index: 2;
 }
+
+/* Hide custom show-password eye icon when input is empty */
+.form-group input[type="password"]:placeholder-shown ~ .show-password {
+  display: none;
+}
+
+/* Hide native browser password reveal eye icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

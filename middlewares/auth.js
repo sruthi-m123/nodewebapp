@@ -45,11 +45,10 @@ export const userAuth= (req,res,next)=>{
     next();
 }
 export const isLoggedIn=(req,res,next)=>{
-    console.log("user in isLogged middleware",req.session)
     if (req.session && req.session.user && req.session.user.id) {
       return next();
     }
-    return res.redirect('/user/login?error=not_logged_in');
+    return res.redirect('/user/login')
 }
 export const isNotLoggedIn = (req, res, next) => {
      if (!req.session || !req.session.user) {
@@ -66,7 +65,8 @@ export const checkBlocked = async (req, res, next) => {
     const user = await User.findById(req.session.user.id);
     if (user && user.isBlocked) {
       req.session.destroy(() => {});
-      return res.redirect('/user/login?error=account_blocked');
+    //   return res.redirect('/user/login?error=account_blocked');
+    return res.redirect('/user/login?message="account blocked');
     }
     next();
   } catch (error) {

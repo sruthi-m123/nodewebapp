@@ -200,7 +200,6 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
             quantity:item.quantity
         }))
     } else {
-        // Normalise items coming from frontend: ensure originalPrice is always present
         cartItems = retryCartItems.map(item => ({
             ...item,
             originalPrice: item.originalPrice || item.price,
@@ -226,10 +225,8 @@ if(discountToApply>subtotal){
 }
 console.log("dicount to apply here :",discountToApply);
 console.log("total:",total);
-// const finalPrice=total-discountToApply;
 const finalPrice=total;
 console.log("finalPrice inside the applycoupon service logic:",finalPrice);
-// const finalPrice=total;
 const discountText=getDiscountTextService(coupon);
 const appliedCoupon={
     couponId:coupon._id,

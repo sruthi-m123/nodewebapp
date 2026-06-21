@@ -219,8 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
           });
 
           const data = await response.json();
+          console.log(" wishlist data inside the shopall page:",data);
+
 
           if (response.ok) {
+
             this.classList.toggle('active');
             if (this.classList.contains('active')) {
               icon.classList.replace('far', 'fas');
@@ -235,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
           } else if (response.status === 400 && data.error === 'product already in wishlist') {
             showToast('Already in the wishlist', 'info');
           } else {
+            console.log("error inside the wishlist shopall js",error);
             showToast('Failed to add to wishlist', 'error');
           }
         } catch (error) {
@@ -333,5 +337,5 @@ document.addEventListener('click', async (e) => {
       });
     }
   }
-  loadAllProducts();
+  // loadAllProducts();
 });

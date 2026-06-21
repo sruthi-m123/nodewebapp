@@ -24,6 +24,7 @@ const skip=(page-1)*limit;
 
   const coupons = await couponService.getAllCouponService(searchQuery,skip,limit);
 
+
   res.render('admin/coupons', {
     coupons,
     currentPage:page,
@@ -57,8 +58,10 @@ export const getCouponById = async (req, res) => {
 };
 
 export const updateCoupon = async (req, res) => {
+  console.log("inside the update coupon");
   const { id } = req.validatedData; 
   console.log("req.validatedData:",req.validatedData);
+  console.log("req.params.id",req.params.id);
   logger.info('updating coupon', { id });
 
   const coupon = await couponService.updatedCouponService(id, req.validatedData); 

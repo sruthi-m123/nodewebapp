@@ -124,15 +124,16 @@ body {
   align-items: center;
 }
 
-.input-wrapper i {
+.input-wrapper > i:first-child {
   position: absolute;
   left: 15px;
   color: var(--accent-color);
+  z-index: 1;
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 12px 15px 12px 45px;
+  padding: 12px 42px 12px 45px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
@@ -148,8 +149,22 @@ body {
 .show-password {
   position: absolute;
   right: 15px;
+  left: auto;
   cursor: pointer;
   color: var(--accent-color);
+  font-size: 14px;
+  z-index: 1;
+}
+
+/* Hide custom show-password eye icon when input is empty */
+.input-wrapper input[type="password"]:placeholder-shown ~ .show-password {
+  display: none;
+}
+
+/* Hide native browser password reveal eye icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
 
 .form-options {

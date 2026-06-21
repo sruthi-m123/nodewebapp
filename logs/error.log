@@ -459,3 +459,99 @@ orderSummary is not defined
 [2026-06-16 16:26:02] [31merror[39m: Error in getTopCategories controller: Category is not defined
 [2026-06-16 16:27:38] [31merror[39m: Error in getTopCategoriesService: Product is not defined
 [2026-06-16 16:27:38] [31merror[39m: Error in getTopCategories controller: Product is not defined
+[2026-06-16 18:09:43] [31merror[39m: POST /admin/addCategory-Category validation failed: description: Path `description` is required.
+[2026-06-16 18:09:56] [31merror[39m: POST /admin/addCategory-category already exists
+[2026-06-16 18:10:00] [31merror[39m: POST /admin/addCategory-Category validation failed: description: Path `description` is required.
+[2026-06-16 18:10:14] [31merror[39m: PUT /admin/categories/6a314425a760fbd98ee0963d/update-category name already exists
+[2026-06-16 18:18:35] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:18:59] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:08] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:20] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:25] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:33] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:42] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:19:47] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-16 18:20:00] [31merror[39m: POST /admin/offers/add-offer-Cannot populate path `products` because it is not in your schema. Set the `strictPopulate` option to false to override.
+[2026-06-16 18:46:21] [31merror[39m: GET /user/cart-Could not find matching close tag for "<%".
+[2026-06-17 00:50:17] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-17 00:50:48] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-17 08:56:01] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-17 10:35:21] [31merror[39m: GET /user/cart-productId is not defined
+[2026-06-17 10:36:33] [31merror[39m: GET /user/cart-items is not defined
+[2026-06-17 10:40:21] [31merror[39m: GET /user/cart-cartService.getCartService(...).populate is not a function
+[2026-06-17 13:34:47] [31merror[39m: PUT /admin/products/6a314506a760fbd98ee0967d-updatesImages is not defined
+[2026-06-17 13:34:55] [31merror[39m: PUT /admin/products/6a314506a760fbd98ee0967d-updatesImages is not defined
+[2026-06-17 14:18:40] [31merror[39m: GET /admin/coupons-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\coupons.ejs:119
+    117|     <h2 id="modalTitle">Add New Coupon</h2>
+    118|     <form id="couponForm">
+ >> 119| <pre><%= JSON.stringify(couponId, null, 2) %></pre>
+    120|       <input type="hidden" id="couponId" name="id">
+    121|       
+    122|       <div class="form-group">
+
+couponId is not defined
+[2026-06-17 15:19:52] [31merror[39m: PUT /admin/coupons/edit-coupon/6a3145f6a760fbd98ee096bb-Coupon discount value cant be greater than minimum Cart Vale
+[2026-06-17 16:49:52] [31merror[39m: POST /admin/offers/add-offer-E11000 duplicate key error collection: test.offers index: code_1 dup key: { code: null }
+[2026-06-17 18:19:25] [31merror[39m: GET /admin/orders/ORD-1781597566017-830/view-Failed to lookup view "admin/error" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-17 18:20:39] [31merror[39m: GET /admin/orders/ORD-1781597566017-830/view-Failed to lookup view "/admin/error" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-17 18:22:10] [31merror[39m: GET /admin/orders/ORD-1781570215597-129/view-Failed to lookup view "/admin-error" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-17 20:38:55] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-17 20:39:25] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-18 00:13:39] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-18 06:53:21] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-18 09:45:26] [31merror[39m: GET /admin/orders/ORD-1781615136661-769/view-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\orderDetailPage.ejs:51
+    49|           <div class="product-card">
+    50|             <div class="product-image">
+ >> 51|               <img src="<%= item.productId.images[0] %>" alt="Product Image">
+    52|             </div>
+    53|             <div class="product-details">
+    54|               <div class="detail-row">
+
+Cannot read properties of undefined (reading '0')
+[2026-06-18 09:48:59] [31merror[39m: GET /admin/orders/ORD-1781615136661-769/view-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\orderDetailPage.ejs:52
+    50|           <div class="product-card">
+    51|             <div class="product-image">
+ >> 52|               <img src="<%= item.productId.images[0] %>" alt="Product Image">
+    53|             </div>
+    54|             <div class="product-details">
+    55|               <div class="detail-row">
+
+Cannot read properties of undefined (reading '0')
+[2026-06-18 09:49:06] [31merror[39m: GET /admin/orders/ORD-1781615136661-769/view-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\orderDetailPage.ejs:52
+    50|           <div class="product-card">
+    51|             <div class="product-image">
+ >> 52|               <img src="<%= item.productId.images[0] %>" alt="Product Image">
+    53|             </div>
+    54|             <div class="product-details">
+    55|               <div class="detail-row">
+
+Cannot read properties of undefined (reading '0')
+[2026-06-18 11:32:29] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-18 17:42:47] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-19 00:06:43] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-19 09:59:14] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-19 10:37:20] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 102 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-19 10:37:23] [31merror[39m: POST /user/cart/update-No matching document found for id "698e8da9da5dfa69fba69a72" version 103 modifiedPaths "items"
+[2026-06-19 18:42:25] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-19 18:42:26] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-20 05:21:30] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-20 08:12:30] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-20 08:13:00] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 04:05:24] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 04:05:24] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 05:21:17] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 05:21:17] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 14:40:29] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 14:40:29] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 14:40:59] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 14:40:59] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 18:18:03] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 18:18:33] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 23:13:50] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-21 23:13:50] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 00:13:20] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-02.9d7kbbi.mongodb.net
+[2026-06-22 00:13:20] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-02.9d7kbbi.mongodb.net
+[2026-06-22 01:54:22] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 01:54:22] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 02:42:19] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 02:42:19] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net

@@ -34,6 +34,8 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  transition: transform 0.2s ease-out;
+  cursor: zoom-in;
 }
 
 .thumbnail-images {
@@ -443,15 +445,6 @@
   .products-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .main-image img {
-  transition: transform 0.3s ease;
-  cursor: zoom-in;
-}
-
-.main-image img:hover {
-  transform: scale(1.5);
-}
-
 }
 .out-of-stock {
   color: red;

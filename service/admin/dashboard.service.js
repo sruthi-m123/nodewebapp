@@ -589,61 +589,71 @@ export const getTopCategoriesService = async (page = 1, limit = 4) => {
       };
     }
 
-    // FIXED AGGREGATION PIPELINE
-    const result = await Order.aggregate([
-      // Match only delivered orders
-      { $match: { status: 'delivered' } },
-      
-      // Unwind items array
-      { $unwind: '$items' },
-      
-      // Lookup product details - using correct field name 'productId'
-      {
+   const result = await Order.aggregate([
+    { $match: { status: 'delivered' } },
+    { $unwind: '$items' },
+    {
         $lookup: {
-          from: 'products',
-          localField: 'items.productId',  
-          foreignField: '_id',
-          as: 'product'
+            from: 'products',
+            localField: 'items.productId',
+            foreignField: '_id',
+            as: 'product'
         }
-      },
-      
-      { $unwind: '$product' },
-      
-      {
+    },
+    { $unwind: '$product' },
+    {
         $lookup: {
-          from: 'categories',
-          localField: 'product.category_id',  
-          foreignField: '_id',
-          as: 'category'
+            from: 'categories',
+            localField: 'product.category',  // ✅ Fixed
+            foreignField: '_id',
+            as: 'category'
         }
-      },
-      
-      { $unwind: { path: '$category', preserveNullAndEmptyArrays: false } },
-      
-      {
-        $group: {
-          _id: '$category._id',
-          name: { $first: '$category.name' },
-          image: { $first: '$category.image' },
-          revenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } },
-          quantity_sold: { $sum: '$items.quantity' },
-          total_products: { $addToSet: '$product._id' }
-        }
-      },
-      
-      {
+    },
+    { $unwind: { path: '$category', preserveNullAndEmptyArrays: false } },
+    
+    // Add a field to calculate the actual price per item (with discounts)
+    {
         $addFields: {
-          total_products: { $size: '$total_products' }
+            effectivePrice: {
+                $cond: [
+                    { $gt: ['$product.discountedPrice', 0] },
+                    '$product.discountedPrice',
+                    { 
+                        $cond: [
+                            { $gt: ['$product.discount', 0] },
+                            { $multiply: ['$items.price', { $subtract: [1, { $divide: ['$product.discount', 100] }] }] },
+                            '$items.price'
+                        ]
+                    }
+                ]
+            }
         }
-      },
-      
-      { $sort: { revenue: -1 } },
-      
-      { $facet: {
+    },
+    
+    {
+        $group: {
+            _id: '$category._id',
+            name: { $first: '$category.name' },
+            image: { $first: '$category.image' },
+            revenue: { $sum: { $multiply: ['$items.quantity', '$effectivePrice'] } },
+            quantity_sold: { $sum: '$items.quantity' },
+            total_products: { $addToSet: '$product._id' }
+        }
+    },
+    
+    {
+        $addFields: {
+            total_products: { $size: '$total_products' }
+        }
+    },
+    
+    { $sort: { revenue: -1 } },
+    
+    { $facet: {
         metadata: [{ $count: 'total' }],
         data: [{ $skip: offset }, { $limit: limit }]
-      }}
-    ]);
+    }}
+]);
 
     
     const total = result[0]?.metadata[0]?.total || 0;

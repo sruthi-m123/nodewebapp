@@ -13,6 +13,7 @@ console.log("req.validateData",req.validatedData);
   const offerType = type;
 
   const { offers, totalPages } = await offerService.getOffersService(currentPage, 6, offerType);
+  console.log("offers:",offers);
 
   const products = await Product.find({});
   const categories = await Category.find({ status: 'active' }).sort({ name: 1 });

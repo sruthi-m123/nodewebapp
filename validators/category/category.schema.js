@@ -8,7 +8,15 @@ export const categorySchema = Joi.object({
   name: Joi.string().trim().required().messages({
     'string.empty': 'Category name is required'
   }),
-  description: Joi.string().allow('', null).max(500).messages({ 'string.max': 'Description cannot exceed 500 characters.' }),
+  image:Joi.string()
+  .uri()
+  .required()
+  .messages({
+    'string.empty': 'Category image is required.',
+    'any.required': 'Category image is required.',
+    'string.uri': 'Please provide a valid image URL.'
+  }),
+  description: Joi.string().allow('', null).max(200).messages({ 'string.max': 'Description cannot exceed 200 characters.' }),
 
   isActive:Joi.boolean()
   .truthy("true")
@@ -43,8 +51,16 @@ export const validateCategoryStatusBody = (req, res, next) => {
 
 export const updateCategorySchema = Joi.object({
   name: Joi.string().trim().min(2).optional(),
+  image:Joi.string()
+  .uri()
+  .allow('',null)
+  .messages({
+    'string.uri':'Please provide a valid image URL'
+  }),
 
-  description: Joi.string().allow("", null).optional(),
+  description: Joi.string().allow("", null).max(200).messages({
+    'string.max':'Description cannot exceed 200 characters.'
+  }).optional(),
 
   isActive: Joi.boolean()
     .truthy("true")

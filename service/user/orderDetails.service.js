@@ -99,13 +99,15 @@ export const cancelOrderService=async(userId,orderId,cancellationData)=>{
 let refundAmount=0;
 
 if(!itemId){
+    console.log("inside the full cancellation block");
     //full order cancellation
     await processFullCancellation(order,cancellationReason,cancelledItems);
     refundAmount=calculateFullRefund(order,deliveryCharge,couponAmount,tax);
+    console.log("refund amount in the full order:",refundAmount);
 }else{
     //partial cancellation
     refundAmount=await processPartialCancellation(order,itemId,cancellationReason,cancelledItems,deliveryCharge,couponAmount,tax);
-
+console.log("refund amount inside the partial cancellation:",refundAmount);
 }
 await order.save();
 
@@ -200,40 +202,88 @@ const buildStatusHistory=(order)=>{
         }
     ];
 
-    if(order.status==='processing'&&order.processingAt){
+    if(order.processingAt){
         statusHistory.push({
             date:order.processingAt,
-            message:'your order is being processed.'
+            message:'Your order is being processed.'
         });
     }
 
-    if(order.status==='shipped'&&order.shippedAt){
+    if(order.shippedAt){
         statusHistory.push({
             date:order.shippedAt,
             message:'Your order has been shipped.'
         })
     }
 
-    if(order.status==='delivered'&&order.deliveredAt){
+    if(order.deliveredAt){
         statusHistory.push({
             date:order.deliveredAt,
             message:'Your order has been delivered.'
         })
     }
 
-    if(order.status==='cancelled'&&order.cancelledAt){
+    // Handle cancellations (both full and partial)
+    if (order.cancellation && order.cancellation.date) {
+        if (order.cancellation.type === 'partial') {
+            let itemNames = '';
+            if (order.cancellation.cancelledItems && order.cancellation.cancelledItems.length > 0) {
+                const names = order.cancellation.cancelledItems
+                    .map(item => item.name)
+                    .filter(name => name);
+                if (names.length > 0) {
+                    itemNames = names.join(', ');
+                }
+            }
+            if (!itemNames) {
+                const cancelled = order.items.filter(item => item.status === 'cancelled');
+                if (cancelled.length > 0) {
+                    itemNames = cancelled.map(item => item.name).join(', ');
+                }
+            }
+            if (!itemNames) {
+                itemNames = 'item';
+            }
+            statusHistory.push({
+                date: order.cancellation.date,
+                message: `Your ${itemNames} has been cancelled.`
+            });
+        } else {
+            statusHistory.push({
+                date: order.cancellation.date,
+                message: 'Your order has been cancelled.'
+            });
+        }
+    } else if (order.cancelledAt) {
         statusHistory.push({
-            date:order.cancelledAt,
-            message:'Your order has beed cancelled'
-        })
-    }
-     if (order.status === 'returned' && order.returnedAt) {
-        statusHistory.push({
-            date: order.returnedAt,
-            message: 'Your order has been returned.'
+            date: order.cancelledAt,
+            message: 'Your order has been cancelled.'
         });
     }
-return statusHistory;
+
+    // Handle return requests
+    if (order.returnDetails && order.returnDetails.requestDate) {
+        statusHistory.push({
+            date: order.returnDetails.requestDate,
+            message: order.returnDetails.type === 'partial' 
+                ? 'Return requested for some items.' 
+                : 'Return requested for the order.'
+        });
+    }
+
+    // Handle completed returns
+    const returnDate = order.returnedAt || order.returnProcessedAt;
+    if (returnDate) {
+        statusHistory.push({
+            date: returnDate,
+            message: order.status === 'partially_returned' 
+                ? 'Some items have been successfully returned.' 
+                : 'Your order has been returned.'
+        });
+    }
+
+    statusHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+    return statusHistory;
 }
 
 const getStatusMessage=(status)=>{
@@ -243,7 +293,10 @@ const getStatusMessage=(status)=>{
         shipped: 'Your item has been shipped and is on its way.',
         delivered: 'Your item has been delivered.',
         cancelled: 'Your order has been cancelled.',
-        returned: 'The returned product has been received.'
+        returned: 'The returned product has been received.',
+        partially_cancelled: 'Some items in your order have been cancelled.',
+        partially_returned: 'Some items in your order have been returned.',
+        return_requested: 'Return request has been initiated.'
     };
     return messages[status.toLowerCase()]||'Your order is being processed'; 
 }
@@ -325,6 +378,7 @@ const generateInvoiceContent = (doc, order) => {
 };
 
 const processFullCancellation=async(order,reason,cancelledItems)=>{
+    console.log("check inside the full cancellation process");
     const activeItems=order.items.filter(item=>item.status!=='cancelled');
     if(activeItems.length===0){
         return;
@@ -355,12 +409,15 @@ const processFullCancellation=async(order,reason,cancelledItems)=>{
 }
 
 const calculateFullRefund=(order,deliveryCharge,couponAmount,tax)=>{
+    console.log("order",order);
+    console.log("couponAmount",couponAmount);
     
-    const activeItems=order.items.filter(item=>item.status!=='cancelled');
+    const activeItems=order.items.filter(item=>item.status =='cancelled');
     if(activeItems.lenght ===0) return 0;
     const activeSubtotal=activeItems.reduce((sum,item)=>sum+item.totalPrice,0);
     const netRefundable=activeSubtotal-couponAmount+tax;
     const refundAmount=Math.max(0,netRefundable-deliveryCharge);
+    console.log("refund amount:",refundAmount);
      
     return refundAmount;
 
@@ -368,6 +425,8 @@ const calculateFullRefund=(order,deliveryCharge,couponAmount,tax)=>{
 
 const processPartialCancellation = async (order, itemId, reason, cancelledItems, deliveryCharge, couponAmount, tax) => {
     const item = order.items.id(itemId);
+    console.log("item inside the partial order cancellation :",item);
+    console.log("item status:",item.status);
     
     if (!item || item.status === 'cancelled') {
         throw new Error('Item cannot be cancelled');
@@ -378,11 +437,11 @@ const processPartialCancellation = async (order, itemId, reason, cancelledItems,
     item.status = 'cancelled';
     cancelledItems.push({
         product: item.productId,
-        name: item.productName,
+        name: item.name || item.productName,
         quantity: item.quantity,
         reason
     });
-
+console.log("order here after pushing the items :",order);
     const allCancelled = order.items.every(i => i.status === 'cancelled');
     order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
 
@@ -406,6 +465,7 @@ const processPartialCancellation = async (order, itemId, reason, cancelledItems,
 };
 
 const processRefund= async(order,refundAmount)=>{
+    console.log("inside the refund process:",refundAmount);
     if(refundAmount<=0) return;
 
     order.refund={
@@ -417,25 +477,32 @@ const processRefund= async(order,refundAmount)=>{
         if(order.paymentMethod&&order.paymentMethod.toLowerCase()==='cod'){
             logger.debug('cod order,no refund needed');
             return;
+            
         }
+console.log("order.userId",order.userId);
+        let wallet=await Wallet.findOne({user:order.userId});
+        console.log("wallet found: ",wallet);
+        if(!wallet){
+            wallet=await Wallet.create({
+                user:order.userId,
+                balance:0
+            })
 
-        const wallet=await Wallet.findOne({user:order.userId});
-        if(wallet){
+        }
+       
             wallet.balance+=refundAmount;
             wallet.transactions.push({
                 amount:refundAmount,
                 type:'refund',
                 order:order._id,
                 description:`Refund for order ${order.orderId}`,
-                status:'completed'
+                status:'pending'
             });
 
             await wallet.save();
+            order.refund.status="completed";
             logger.info(`wallet refunded: ${refundAmount}`);
-        }else{
-            logger.warn('wallet not found for refund',{userId:order.userId});
-            order.refund.status='failed';
-        }
+        
     }
 
     const processFullReturn=(order,reason,notes)=>{

@@ -236,6 +236,17 @@ body {
   opacity: 0.7;
 }
 
+/* Hide custom show-password eye icon when input is empty */
+.form-group input[type="password"]:placeholder-shown ~ .show-password {
+  display: none;
+}
+
+/* Hide native browser password reveal eye icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 .form-options {
   display: flex;
   justify-content: space-between;

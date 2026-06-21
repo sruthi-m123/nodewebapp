@@ -20,6 +20,7 @@ if(!cartItems||cartItems.length===0){
     req.session.outOfStickItems = orderSummary.outOfStockItems;
     return res.redirect('/user/cart?error=some items are out of stock');
   }
+  
 
   res.render('user/checkout', {
     orderPlaced: false,

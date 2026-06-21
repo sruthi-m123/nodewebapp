@@ -94,7 +94,10 @@ export const createOfferService=async(offerData)=>{
         usedCount:0
     })
 
+
+
 await newOffer.save();
+
 
 await updateProductsOffer(newOffer);
 logger.info('offer created successfullly',{offerId:newOffer._id,title});
@@ -113,10 +116,15 @@ export const deleteOfferService=async(offerId)=>{
 
     await Product.updateMany(
         {bestOffer:offer._id},
-        {$unset:{bestOffer:"",discountedPrice:""}}
-    )
+        {$unset:{bestOffer:"",discountedPrice:"",discount:""}}
+    );
+    console.log("offer",offer);
 
-    await Offer.findByIdAndDelete(offerId);
+    // await Offer.findByIdAndDelete(offerId);
+    await Offer.updateOne({_id:offerId},{$set:{
+        isActive:false,
+        isDeleted:true
+    }});
     logger.info('offer deleted successfully',{offerId});
     return offer;
 }

@@ -33,15 +33,8 @@ const productSchema= new Schema({
         type:Number,
         default:0
     },
-   productOffer: {
-  value: { type: Number,
-     default: 0 
-    }, 
-  type: { type: String,
-     enum: ['percentage', 'flat'],
-      default: 'flat' 
-    }
-},
+   
+
  bestOffer: {
     type: Schema.Types.ObjectId,
     ref: "Offer"

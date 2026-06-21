@@ -24,12 +24,10 @@
             <th>NO</th>
             <th>ICON</th>
             <th>TITLE</th>
-            <th>CODE</th>
             <th>TYPE</th>
             <th>APPLICABLE TO</th>
             <th>DISCOUNT</th>
             <th>VALIDITY</th>
-            <th>USAGE</th>
             <th>STATUS</th>
             <th>ACTIONS</th>
           </tr>
@@ -40,7 +38,6 @@
               <td><%= index + 1 %></td>
               <td><i class="fas fa-tag"></i></td>
               <td><%= offer.title %></td>
-              <td><code><%= offer.code %></code></td>
               <td>
                 <span class="badge <%= (offer.type === 'percentage') ? 'bg-info' : 'bg-warning' %>">
                   <%= offer.type.toUpperCase() %>
@@ -70,10 +67,7 @@
                   <br><span class="badge bg-danger">EXPIRED</span>
                 <% } %>
               </td>
-              <td>
-                <%= offer.usedCount %> / 
-                <%= offer.usageLimit ? offer.usageLimit : '∞' %>
-              </td>
+             
               <td>
                 <span class="badge <%= (offer.isActive) ? 'bg-success' : 'bg-secondary' %>">
                   <%= (offer.isActive) ? 'ACTIVE' : 'INACTIVE' %>
@@ -217,7 +211,7 @@
                   <% products.forEach(product => { %>
                    <option 
   value="<%= product._id %>" 
-  data-img="/<%= product.images[0] || '' %>" 
+  data-img="<%= product.images[0] || '' %>" 
   data-name="<%= product.productName %>" 
   data-price="<%= product.price %>"
 >
@@ -290,7 +284,6 @@ $(document).ready(function() {
     }
   }
 
-  // Helper function to initialize Select2 for categories
   function initializeCategorySelect2() {
     destroySelect2('#categorySelect');
     $('#categorySelect').select2({
@@ -301,7 +294,6 @@ $(document).ready(function() {
     });
   }
 
-  // Helper function to initialize Select2 for products
   function initializeProductSelect2() {
     destroySelect2('#productSelect');
     $('#productSelect').select2({
@@ -313,7 +305,7 @@ $(document).ready(function() {
         if (!option.id) return option.text;
         const $option = $(option.element);
         const img = $option.data('img');
-        const imgSrc = img && !img.startsWith('/') ? '/' + img : img;
+        const imgSrc = img ;
 
         const price = $option.data('price');
         const name = $option.data('name');
@@ -339,7 +331,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     $('#productSelect').on('change', calculateTotal);
   }
 
-  // Populate selects ONCE when page loads
   function populateSelects() {
     const $categorySelect = $('#categorySelect');
     const $productSelect = $('#productSelect');
@@ -423,15 +414,12 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     }
   }
 
-  // Handle applicableTo change
   $('#applicableToSelect').change(function() {
     destroySelect2('#categorySelect');
     destroySelect2('#productSelect');
     
-    // Hide all containers
     $('#categorySelectionContainer, #productSelectionContainer').hide();
     
-    // Show and initialize appropriate container
     if (this.value === 'category') {
       $('#categorySelectionContainer').show();
       setTimeout(() => initializeCategorySelect2(), 100);
@@ -439,7 +427,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       $('#productSelectionContainer').show();
       setTimeout(() => {
         initializeProductSelect2();
-        calculateTotal(); // Calculate total when switching to products
+        calculateTotal(); 
       }, 100);
     }
     
@@ -486,7 +474,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     const offerId = $(this).data('id');
     
     try {
-      // Fetch the existing offer data
       const response = await fetch(`/admin/offers/get-offer/${offerId}`);
       const data = await response.json();
       const offer = data.offer;
@@ -543,7 +530,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
           $('#categorySelect').val(offer.applicableItems);
           initializeCategorySelect2();
         } else if (offer.applicableTo === 'product') {
-          // Set selected values BEFORE initializing Select2
           $('#productSelect').val(offer.applicableItems);
           initializeProductSelect2();
           // Calculate total for selected products
@@ -576,7 +562,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     // Prepare data
     const data = {
       title: $('input[name="title"]').val(),
-      // code: $('input[name="code"]').val().toUpperCase(),
       type: $('select[name="type"]').val(),
       discountValue: Number($('input[name="discountValue"]').val()),
       applicableTo: $('select[name="applicableTo"]').val(),
@@ -627,6 +612,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       });
       
       const result = await response.json();
+      console.log("result :",result)
       
       if (response.ok) {
         $modal.modal('hide');

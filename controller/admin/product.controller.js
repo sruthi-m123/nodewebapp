@@ -62,8 +62,9 @@ console.log("type of rmoved images:",typeof(req.validatedData.removedImages))
   if (!existingProduct) {
     throw Object.assign(new Error("product not found"), { status: STATUS_CODES.NOT_FOUND });
   }
-
+console.log("existing Image Products:",existingProduct.images);
   let updatedImages = [...existingProduct.images];
+  console.log("removedImagesStr:",removedImagesStr);
   if (removedImagesStr) {
     const removed = JSON.parse(removedImagesStr); 
     updatedImages = updatedImages.filter((img) => !removed.includes(img));
@@ -74,7 +75,9 @@ console.log("type of rmoved images:",typeof(req.validatedData.removedImages))
 console.log("updated images:",updatedImages);
   if (req.files && req.files.length > 0) {
     const newImages = req.files.map((file) => file.path);
+    console.log("newImages",newImages);
     updatedImages = [...updatedImages, ...newImages];
+    console.log("updated Images after spread:",updatedImages);
   }
 
   const data = {

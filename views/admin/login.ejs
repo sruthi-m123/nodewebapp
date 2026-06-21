@@ -48,12 +48,7 @@
                   required
                   placeholder="Enter your password"
                 />
-                <span
-                  class="show-password"
-                  onclick="togglePassword('password')"
-                >
-                  <i class="fas fa-eye-slash"></i>
-                </span>
+                <i class="fas fa-eye-slash show-password" id="togglePassword"></i>
               </div>
             </div>
            
@@ -82,22 +77,6 @@
       </div>
     </div>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-  function togglePassword(fieldId) {
-    const passwordInput = document.getElementById(fieldId);
-    const eyeIcon = passwordInput.nextElementSibling.querySelector("i");
-
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
-    } else {
-      passwordInput.type = "password";
-      eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
-    }
-  }
-
-</script>
 <% if (error) { %>
   <script>
     Swal.fire({
@@ -108,7 +87,17 @@
   </script>
 <% } %>
 
+<script>
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
 
+  togglePassword.addEventListener('click', () => {
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+    togglePassword.classList.toggle('fa-eye', isHidden);
+    togglePassword.classList.toggle('fa-eye-slash', !isHidden);
+  });
+</script>
 
   </body>
 </html>

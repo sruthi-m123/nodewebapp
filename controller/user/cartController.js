@@ -14,7 +14,11 @@ export const getCart=async(req,res)=>{
  
   }
   const userId=req.session.user.id;
+  console.log("userId",userId);
   const cart=await cartService.getCartService(userId);
+  console.log("cart inside the cart controller",cart);
+  
+  
   const{validItems,outOfStockItems}=await cartService.processCartItemsService(cart);
 
   if(outOfStockItems.length>0){

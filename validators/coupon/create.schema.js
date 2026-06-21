@@ -18,9 +18,10 @@ export const createCouponSchema = Joi.object({
     'any.required': MESSAGES.COUPON.DISCOUNT_TYPE_REQUIRED
   }),
 
-  discountValue: Joi.number().min(0).required().messages({
+  discountValue: Joi.number().min(0).max(Joi.ref('minCartValue')).required().messages({
     'number.base': 'Discount value must be a number',
     'number.min': 'Discount value must be at least 0',
+      'number.max': 'Discount value cannot be greater than minimum cart value',
     'any.required': MESSAGES.COUPON.DISCOUNT_VALUE_REQUIRED
   }),
 

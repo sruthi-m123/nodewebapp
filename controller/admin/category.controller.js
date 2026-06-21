@@ -47,9 +47,10 @@ export const addCategory = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
+  console.log("inside the update category controler ");
   const { id } = req.params;
-  const { name, description } = req.validatedData; // Destructure from validated body
-
+  const { name, description,removeExistingImage } = req.validatedData; 
+  console.log("removeExistingImage",removeExistingImage);
   const duplicate = await categoryService.existsByName(name, id);
   if (duplicate) throw Object.assign(new Error("category name already exists"), { status: STATUS_CODES.CONFLICT });
 
@@ -71,7 +72,7 @@ export const updateCategory = async (req, res) => {
 
 export const updateCategoryStatus = async (req, res) => {
   const { categoryId } = req.params;
-  const { status } = req.validatedData; // Destructure from validated body
+  const { status } = req.validatedData; 
   const validStatus = status === true || status === 'active' ? "active" : "inactive";
 
   const category = await categoryService.updateStatus(categoryId, validStatus);

@@ -128,9 +128,7 @@
               placeholder="Create a password"
             />
             <i class="fas fa-lock"></i>
-            <span class="show-password" onclick="togglePassword()">
-              <i class="fas fa-eye"></i>
-            </span>
+            <i class="fas fa-eye show-password" id="togglePassword" style="pointer-events: auto; left: auto; right: 15px;"></i>
                    <div id="error4" class="error-message"></div>
 
           </div>
@@ -144,9 +142,7 @@
               placeholder="Confirm your password"
             />
             <i class="fas fa-lock"></i>
-            <span class="show-password" onclick="toggleConfirmPassword()">
-              <i class="fas fa-eye"></i>
-            </span>
+            <i class="fas fa-eye show-password" id="toggleConfirmPassword" style="pointer-events: auto; left: auto; right: 15px;"></i>
                    <div id="error5" class="error-message"></div>
 
           </div>
@@ -175,6 +171,8 @@
   const passwordid = document.getElementById("password");
   const cpasswordid = document.getElementById("confirmPassword");
   const referralCode=document.getElementById("referralCode");
+  const togglePassword = document.getElementById("togglePassword");
+  const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
   console.log("referralCode",referralCode);
   const error1 = document.getElementById("error1");
@@ -279,6 +277,24 @@ function referralValidateChecking(){
   if (cpasswordid) cpasswordid.addEventListener("input", passwordValidateChecking);
   if(referralCode) referralCode.addEventListener("input",referralValidateChecking);
 
+  if (togglePassword) {
+    togglePassword.addEventListener("click", function () {
+      const type = passwordid.getAttribute("type") === "password" ? "text" : "password";
+      passwordid.setAttribute("type", type);
+      this.classList.toggle("fa-eye");
+      this.classList.toggle("fa-eye-slash");
+    });
+  }
+
+  if (toggleConfirmPassword) {
+    toggleConfirmPassword.addEventListener("click", function () {
+      const type = cpasswordid.getAttribute("type") === "password" ? "text" : "password";
+      cpasswordid.setAttribute("type", type);
+      this.classList.toggle("fa-eye");
+      this.classList.toggle("fa-eye-slash");
+    });
+  }
+
   if (signform) {
     signform.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -353,29 +369,7 @@ console.log({
     });
   }
 
-  function togglePassword() {
-    const passwordInput = document.getElementById("password");
-    const eyeIcon = document.querySelector(".show-password i");
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
-    } else {
-      passwordInput.type = "password";
-      eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
-    }
-  }
 
-  function toggleConfirmPassword() {
-    const confirmInput = document.getElementById("confirmPassword");
-    const icon = document.querySelectorAll(".show-password i")[1];
-    if (confirmInput.type === "password") {
-      confirmInput.type = "text";
-      icon.classList.replace("fa-eye", "fa-eye-slash");
-    } else {
-      confirmInput.type = "password";
-      icon.classList.replace("fa-eye-slash", "fa-eye");
-    }
-  }
 </script>
 
   </body>

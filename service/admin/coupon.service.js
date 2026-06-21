@@ -97,6 +97,12 @@ if(code){
         code:code.toUpperCase(),
         _id:{$ne:couponId}
     });
+if(discountValue>minCartValue){
+    throw new Error("Coupon discount value cant be greater than minimum Cart Vale");
+}
+
+
+
 
     if(existingCoupon){
         logger.warn('duplicated coupon code during update',{code,couponId});

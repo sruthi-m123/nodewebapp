@@ -12,7 +12,7 @@
         <div class="search-box">
           <input type="text" name="search" placeholder="Search by Order ID/User" class="search-input" 
                  value="<%= searchQuery %>" />
-          <button type="submit" class="search-btn">
+          <button type="submit" class="order-search-btn">
             <i class="fas fa-search"></i> Search
           </button>
         </div>
@@ -123,34 +123,6 @@
   <i class="fas fa-edit"></i> Change
 </button>
 
-<!-- <select  -->
-  <!-- class="status-select" 
-  data-order-id="<%= order._id %>"
-  <% if (order.status === 'cancelled' || order.status === 'returned') { %>
-    disabled
-  <% } %>
->
-  <% const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned']; %>
-  
-  <% statuses.forEach(status => { %>
-    <% 
-      let disableOption = false;
-      
-      // disable based on current status progression
-      if (order.status === 'processing' && ['pending'].includes(status)) disableOption = true;
-      if (order.status === 'shipped' && ['pending','processing'].includes(status)) disableOption = true;
-      if (order.status === 'delivered' && ['pending','processing','shipped'].includes(status)) disableOption = true;
-    %>
-    
-    <option 
-      value="<%= status %>" 
-      <%= order.status === status ? 'selected' : '' %>
-      <%= disableOption ? 'disabled' : '' %>
-    >
-      <%= status.charAt(0).toUpperCase() + status.slice(1) %>
-    </option>
-  <% }) %>
-</select> -->
 
 </td>
               </tr>
@@ -257,7 +229,7 @@
         </div>
         <div class="partial-items">
           <ul id="returnItemsListPartial" class="return-items-list">
-            <!-- Items will be dynamically appended here via JS for partial returns -->
+            <!--Items will be dynamically added here -->
           </ul>
         </div>
       </div>
@@ -343,10 +315,25 @@ document.addEventListener('DOMContentLoaded', function() {
       const select = document.createElement('select');
       select.className = 'status-dropdown';
       statusOptions.forEach(status => {
+        let isDisabled = false;
+        const currentLower = currentStatus.toLowerCase();
+        const targetLower = status.toLowerCase();
+
+        if (currentLower === 'pending') {
+          isDisabled = (targetLower === 'cancelled' || targetLower === 'returned');
+        } else if (currentLower === 'processing') {
+          isDisabled = (targetLower === 'pending');
+        } else if (currentLower === 'shipped') {
+          isDisabled = (targetLower === 'pending' || targetLower === 'processing');
+        } else if (currentLower === 'delivered') {
+          isDisabled = (targetLower === 'pending' || targetLower === 'processing' || targetLower === 'shipped');
+        }
+
         const option = document.createElement('option');
         option.value = status;
         option.textContent = status;
-        if (status.toLowerCase() === currentStatus.toLowerCase()) option.selected = true;   
+        if (targetLower === currentLower) option.selected = true;   
+        if (isDisabled) option.disabled = true;
         select.appendChild(option);
       });
 
@@ -447,17 +434,25 @@ if (globalBtns) {
     if (data.items?.length > 0) {
       data.items.forEach(item => {
         const li = document.createElement('li');
+        li.className = 'return-item';
         const itemId = item._id || item.product;
         li.dataset.itemId = itemId;
         li.innerHTML = `
-          <strong>${item.name}</strong> - Qty: ${item.quantity}, 
-          Price: ₹${item.price || 'N/A'}, 
-          Reason: ${item.reason || 'not specified'}
-          <div class="item-actions">
-            <button class="btn btn-success btn-sm" onclick="processReturn('approve', '${itemId}')">Approve Item</button>
-            <button class="btn btn-danger btn-sm" onclick="processReturn('reject', '${itemId}')">Reject Item</button>
+          <div class="item-details">
+            <div class="item-name">${item.name}</div>
+            <div class="item-info">
+              <span><strong>Qty:</strong> ${item.quantity}</span> | 
+              <span><strong>Price:</strong> ₹${item.price || 'N/A'}</span> <br>
+              <span><strong>Reason:</strong> ${item.reason || 'Not specified'}</span>
+            </div>
           </div>
-          <span class="return-status">Pending</span>
+          <div class="item-controls">
+            <span class="return-status badge-warning">Pending</span>
+            <div class="item-actions">
+              <button class="btn btn-success btn-sm" onclick="processReturn('approve', '${itemId}')">Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="processReturn('reject', '${itemId}')">Reject</button>
+            </div>
+          </div>
         `;
         partialList.appendChild(li);  
       });
@@ -629,5 +624,7 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+
 </script>
 <%- include('../partials/admin/admin-footer') %>

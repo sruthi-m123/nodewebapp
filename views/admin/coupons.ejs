@@ -268,14 +268,12 @@ document.addEventListener('DOMContentLoaded', function() {
           row.style.display = match || term === '' ? '' : 'none';
         });
 
-        // Optional: Show/hide no-coupons message based on visible rows
         const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
         const noCouponsMessage = document.querySelector('.no-coupons-message');
         if (noCouponsMessage) {
-          noCouponsMessage.style.display = 'none'; // Hide if it exists
+          noCouponsMessage.style.display = 'none'; 
         }
         if (visibleRows.length === 0 && term !== '') {
-          // Optionally add a "No results" message here if desired
           console.log('No matching coupons found.');
         }
       });
@@ -422,29 +420,18 @@ let method;
       });
 const result= await response.json();
 console.log("result inside the saving coupon:",result);
-
 if(!response.ok){
-
-return {
-  success:false,
-  message:result.message
+  throw new Error(result.message);
 }
-
-}
-return{
-  success:true,
-  message:result.message,
-  data:result
-}
-
-
-}
-     catch (error) {
-     console.error('Network error:', error);
+return result;
+} catch (error) {
+     console.log('Network error:', error);
    showAlert("something went wrong with saving the coupon");
-
+throw error
     }
   }
+    
+  
 
   async function deleteCoupon(couponId) {
     try {
@@ -539,7 +526,7 @@ return{
         }
       }
 const couponId=document.getElementById('couponId').value;
-const isEditing=couponId&&coupounId.trim()!=='';
+const isEditing=couponId&&couponId.trim()!=='';
 
       const data=await saveCoupon(cleanedData,isEditing);
       if(data &&data.success){

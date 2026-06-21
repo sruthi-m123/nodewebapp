@@ -71,7 +71,7 @@ h1 i {
 
 .search-box {
   flex: 1;
-  min-width: 300px;
+  min-width: 200px;
   display: flex;
   gap: 0.5rem;
 }
@@ -92,7 +92,7 @@ h1 i {
   box-shadow: 0 0 0 3px rgba(158, 109, 78, 0.1);
 }
 
-.search-btn {
+.order-search-btn {
   padding: 0 1.5rem;
   background-color: var(--primary-color);
   color: var(--white);
@@ -106,7 +106,7 @@ h1 i {
   gap: 0.5rem;
 }
 
-.search-btn:hover {
+.order-search-btn:hover {
   background-color: var(--primary-dark);
 }
 
@@ -419,7 +419,7 @@ th {
   color: var(--text-light);
 }
 
-/* Brown-themed Modal Styles */
+/* Modal Styles */
 #returnRequestModal {
   position: fixed;
   top: 0;
@@ -427,6 +427,7 @@ th {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: none;
   justify-content: center;
   align-items: center;
@@ -445,19 +446,19 @@ th {
   width: 90%;
   max-width: 700px;
   max-height: 90vh;
-  background: #f5f1e6;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  border: 1px solid #d4b483;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
 .modal-header {
-  background: #6d4c41;
-  color: #fff;
-  padding: 15px 20px;
+  background: var(--white);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -466,26 +467,35 @@ th {
 
 .modal-title {
   margin: 0;
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-dark);
 }
 
 .close-btn {
-  background: transparent;
+  background: var(--primary-light);
   border: none;
-  color: #fff;
-  font-size: 1.8rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--primary-dark);
+  font-size: 1.5rem;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
 .close-btn:hover {
+  background: var(--primary-color);
+  color: var(--white);
   transform: scale(1.1);
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
 }
@@ -498,7 +508,7 @@ th {
 
 .detail-row {
   display: flex;
-  border-bottom: 1px solid #d4b483;
+  border-bottom: 1px solid var(--border-color);
   padding: 10px 0;
 }
 
@@ -508,13 +518,13 @@ th {
 
 .detail-label {
   font-weight: 600;
-  color: #5d4037;
+  color: var(--primary-dark);
   width: 150px;
   flex-shrink: 0;
 }
 
 .detail-value {
-  color: #3e2723;
+  color: var(--text-dark);
   flex: 1;
 }
 
@@ -526,10 +536,10 @@ th {
 .return-items-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #5d4037;
+  color: var(--primary-dark);
   margin-bottom: 15px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #d4b483;
+  border-bottom: 2px solid var(--border-color);
 }
 
 #returnItemsList {
@@ -543,10 +553,10 @@ th {
   justify-content: space-between;
   align-items: flex-start;
   padding: 15px;
-  border: 1px solid #d4b483;
-  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
   margin-bottom: 12px;
-  background: #fffaf0;
+  background: var(--white);
   gap: 15px;
 }
 
@@ -556,14 +566,14 @@ th {
 
 .item-name {
   font-weight: 600;
-  color: #5d4037;
+  color: var(--primary-dark);
   margin-bottom: 5px;
   font-size: 1rem;
 }
 
 .item-info {
   font-size: 0.9rem;
-  color: #7d6e63;
+  color: var(--text-light);
   line-height: 1.4;
 }
 
@@ -591,21 +601,21 @@ th {
 }
 
 .item-actions .btn-success {
-  background-color: #8d6e63;
-  color: white;
+  background-color: var(--success-color);
+  color: var(--white);
 }
 
 .item-actions .btn-success:hover {
-  background-color: #6d4c41;
+  background-color: #3e8e41;
 }
 
 .item-actions .btn-danger {
-  background-color: #a1887f;
-  color: white;
+  background-color: var(--danger-color);
+  color: var(--white);
 }
 
 .item-actions .btn-danger:hover {
-  background-color: #8d6e63;
+  background-color: #c0392b;
 }
 
 .item-actions .btn:disabled {
@@ -656,15 +666,15 @@ th {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
-  padding: 15px 20px;
-  background: #efebe9;
-  border-top: 1px solid #d4b483;
+  padding: 1.5rem;
+  background: var(--light-color);
+  border-top: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
 .btn {
   padding: 10px 20px;
-  border-radius: 4px;
+  border-radius: var(--radius);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -673,21 +683,21 @@ th {
 }
 
 .btn-danger {
-  background-color: #8d6e63;
-  color: white;
+  background-color: var(--danger-color);
+  color: var(--white);
 }
 
 .btn-danger:hover {
-  background-color: #6d4c41;
+  background-color: #c0392b;
 }
 
 .btn-success {
-  background-color: #a1887f;
-  color: white;
+  background-color: var(--success-color);
+  color: var(--white);
 }
 
 .btn-success:hover {
-  background-color: #8d6e63;
+  background-color: #3e8e41;
 }
 
 .btn:disabled {

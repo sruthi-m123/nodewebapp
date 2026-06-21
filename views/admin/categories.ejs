@@ -60,8 +60,8 @@
 
               </td>
               <td>
-                <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
+                <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">✏️</button>
+                <button class="action-btn delete-btn" onclick="deleteCategory('<%= category._id %>')">🗑</button>
               </td>
             </tr>
           <% }) %>
@@ -275,10 +275,11 @@
             removeBtn.style.position = "absolute";
             removeBtn.style.top = "-6px";
             removeBtn.style.right = "-6px";
-
+let removeExistingImage=false;
             removeBtn.addEventListener("click", () => {
               wrapper.remove();
               croppedImage = null;
+              removeExistingImage=true;
             });
             
             wrapper.appendChild(img);
@@ -373,7 +374,7 @@ document.getElementById('categoryForm').addEventListener('submit', function(e) {
         const file = new File([blob], fileName, { type: blob.type });
         formData.append('categoryImage', file);
     }
-
+formData.set('removeExistingImage',removeExistingImage);
     const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
     const method = currentCategoryId ? 'PUT' : 'POST';
 

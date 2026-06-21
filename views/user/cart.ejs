@@ -5,7 +5,6 @@
  
   </div>
   <div class="cart-table">
-       <!-- <pre><%= JSON.stringify(cartItems) %></pre> -->
     <% if (cartItems && cartItems.length > 0) { %>
       <table>
         <thead>
@@ -40,6 +39,8 @@
           <span class ="item-name"><%=item.productId.productName%></span>
         </td>
 
+        
+
       <% if (item.productId.isActive) { %>
         <!-- <td>Rs. <span class="item-price"><%= (item.productId.discountedPrice && item.productId.discountedPrice>0)?item.productId.discountedPrice:item.productId.price%></span></td> -->
        <td>Rs. <span class="item-price"><%= item.unitPrice %></span></td>
@@ -51,7 +52,7 @@
             <button onclick="updateQuantity('<%= item._id %>', 1)">+</button>
           </div>
         </td>
-        <!-- <td>Rs. <span class="item-total"><%= (item.productId.discountedPrice && item.productId.discountedPrice>0)?item.productId.discountedPrice:item.productId.price%></span></td> -->
+
     <td>Rs. <span class="item-total"><%= item.totalPrice %></span></td>
         <% } else { %>
         <td colspan="3" style="color: gray;">Unavailable</td>

@@ -6,6 +6,7 @@ export const getCartService =async(userId)=>{
     logger.debug('Fetching user cart',{userId});
 
     let cart =await Cart.findOne({userId}).populate('items.productId');
+    console.log("cart items inside the cart page:",cart);
     if(!cart){
         logger.info('no cart found user,creating emprty cart',{userId});
         cart={items:[],totalPrice:0}
@@ -78,6 +79,7 @@ const product=await Product.findOne({
     stock:{$gte:quantity},
     isActive:true
 }).populate("bestOffer");
+console.log("product inside the add to cart",product);
 
 if(!product){
     const current=await Product.findById(productId);

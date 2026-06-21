@@ -66,6 +66,7 @@ export const updateProductsOffer = async (offer) => {
 
     for (const product of products) {
       const best = calculateBestOffer(product, activeOffers);
+      console.log("best inside the offer:",best);
 
       product.bestOffer = best?.bestOffer || null;
       product.discount = best?.discount || 0;

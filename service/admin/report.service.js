@@ -7,7 +7,11 @@ export const generateSalesPDFReport = async (res, exportData) => {
   
   logger.debug('Generating PDF sales report');
   
-  const doc = new PDFDocument({ margin: 50 });
+  const doc = new PDFDocument({ 
+    margin: 30, 
+    size: 'A4', 
+    layout: 'landscape'
+  });
   
   res.setHeader('Content-Type', 'application/pdf');
   
@@ -21,9 +25,9 @@ export const generateSalesPDFReport = async (res, exportData) => {
   
   doc.pipe(res);
   
-  doc.fontSize(20).text('SALES REPORT', { align: 'center' });
-  doc.moveDown();
-  
+  // ============ COMPACT HEADER ============
+  doc.fontSize(16).text('SALES REPORT', { align: 'center' });
+  doc.fontSize(9);
   let dateRangeText = '';
   switch (dateRange) {
     case '1d': dateRangeText = 'Today'; break;
@@ -33,64 +37,105 @@ export const generateSalesPDFReport = async (res, exportData) => {
     case 'custom': dateRangeText = `${startDate} to ${endDate}`; break;
     default: dateRangeText = 'Today';
   }
-  
-  doc.fontSize(12).text(`Date Range: ${dateRangeText}`);
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`);
-  doc.moveDown();
-  
-  doc.fontSize(14).text('SUMMARY', { underline: true });
-  doc.fontSize(12);
-  doc.text(`Total Orders: ${orders.length}`);
-  doc.text(`Total Sales: ₹${summary.totalSales.toLocaleString()}`);
-  doc.text(`Total Discount: ₹${summary.totalDiscount.toLocaleString()}`);
-  doc.text(`Total Tax: ₹${summary.totalTax.toLocaleString()}`);
-  doc.text(`Net Revenue: ₹${summary.netRevenue.toLocaleString()}`);
-  doc.moveDown();
-  
-  doc.fontSize(12).text('DETAILED ORDERS', { underline: true });
+  doc.text(`Range: ${dateRangeText} | Generated: ${new Date().toLocaleString()}`, { align: 'center' });
   doc.moveDown(0.5);
   
-  const headers = ['Date', 'Order ID', 'Customer', 'Items', 'Amount (₹)', 'Discount (₹)', 'Coupons', 'Payment Method', 'Net Amount (₹)'];
-  const columnWidths = [70, 70, 90, 40, 60, 60, 60, 70, 70];
+  // ============ COMPACT SUMMARY ============
+  doc.fontSize(9);
+  const summaryY = doc.y;
+  const summaryItems = [
+    ['Orders:', orders.length],
+    ['Sales:', `₹${summary.totalSales.toLocaleString()}`],
+    ['Discount:', `₹${summary.totalDiscount.toLocaleString()}`],
+    ['Tax:', `₹${summary.totalTax.toLocaleString()}`],
+    ['Revenue:', `₹${summary.netRevenue.toLocaleString()}`]
+  ];
+  
+  let xPos = 30;
+  summaryItems.forEach(([label, value]) => {
+    doc.text(label, xPos, summaryY, { width: 50, align: 'left' });
+    doc.text(value, xPos + 35, summaryY, { width: 60, align: 'left' });
+    xPos += 95;
+  });
+  doc.moveDown(1.5);
+  
+  // ============ COMPACT TABLE ============
+  // SHORTER HEADERS to save space
+  const headers = ['Date', 'Order', 'Customer', 'Qty', 'Amount', 'Disc.', 'Coupon', 'Payment', 'Net'];
+  const columnWidths = [50, 55, 65, 30, 55, 50, 55, 65, 60];
   
   let currentY = doc.y;
-  let xPosition = 50;
+  let xPosition = 30;
+  
+  doc.fontSize(7.5).font('Helvetica-Bold');
   headers.forEach((header, i) => {
-    doc.text(header, xPosition, currentY, { width: columnWidths[i], align: 'left' });
+    doc.text(header, xPosition, currentY, { 
+      width: columnWidths[i], 
+      align: 'center' 
+    });
     xPosition += columnWidths[i];
   });
   
-  doc.moveTo(50, currentY + 15).lineTo(590, currentY + 15).stroke();
-  currentY += 20;
+  doc.moveTo(30, currentY + 10).lineTo(565, currentY + 10).stroke();
+  currentY += 14;
   doc.y = currentY;
   
-  orders.forEach(order => {
-    if (doc.y > 700) {
+  doc.fontSize(7).font('Helvetica');
+  
+  orders.forEach((order, index) => {
+    if (doc.y > 730) {
       doc.addPage();
-      currentY = 100;
+      currentY = 40;
+      doc.y = currentY;
+      
+      doc.fontSize(7.5).font('Helvetica-Bold');
+      xPosition = 30;
+      headers.forEach((header, i) => {
+        doc.text(header, xPosition, currentY, { 
+          width: columnWidths[i], 
+          align: 'center' 
+        });
+        xPosition += columnWidths[i];
+      });
+      doc.moveTo(30, currentY + 10).lineTo(565, currentY + 10).stroke();
+      currentY += 14;
+      doc.y = currentY;
+      doc.fontSize(7).font('Helvetica');
     }
     
-    xPosition = 50;
+    xPosition = 30;
     const preTaxNet = (order.subtotal || 0) - (order.discount || 0) - (order.appliedCoupon?.value || 0);
+    
+    // Truncate long text
+    const customerName = order.userId?.name || 'Guest';
+    const truncatedCustomer = customerName.length > 12 ? customerName.substring(0, 10) + '..' : customerName;
+    const couponName = order.appliedCoupon?.title || 'None';
+    const truncatedCoupon = couponName.length > 10 ? couponName.substring(0, 8) + '..' : couponName;
+    const paymentMethod = order.paymentMethod || 'N/A';
+    const truncatedPayment = paymentMethod.length > 10 ? paymentMethod.substring(0, 8) + '..' : paymentMethod;
+    
     const rowData = [
       new Date(order.createdAt).toLocaleDateString(),
-      order._id.toString().slice(-8).toUpperCase(),
-      order.userId?.name || 'Guest',
+      order._id.toString().slice(-6).toUpperCase(),
+      truncatedCustomer,
       order.items.reduce((total, item) => total + item.quantity, 0).toString(),
       `₹${(order.subtotal || 0).toLocaleString()}`,
       `₹${(order.discount || 0).toLocaleString()}`,
-      order.appliedCoupon?.title || 'None',
-      order.paymentMethod || 'N/A',
+      truncatedCoupon,
+      truncatedPayment,
       `₹${preTaxNet.toLocaleString()}`
     ];
     
     rowData.forEach((data, i) => {
-      doc.text(data, xPosition, currentY, { width: columnWidths[i], align: 'left' });
+      doc.text(data, xPosition, currentY, { 
+        width: columnWidths[i], 
+        align: 'center',
+        ellipsis: true 
+      });
       xPosition += columnWidths[i];
     });
     
-    doc.moveTo(50, currentY + 15).lineTo(590, currentY + 15).stroke();
-    currentY += 20;
+    currentY += 13;
     doc.y = currentY;
   });
   
@@ -98,7 +143,6 @@ export const generateSalesPDFReport = async (res, exportData) => {
   
   logger.info('PDF sales report generated successfully');
 };
-
 export const generateSalesExcelReport = async (res, exportData) => {
   const { orders, summary, dateRange, startDate, endDate } = exportData;
   

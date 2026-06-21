@@ -1,5 +1,7 @@
 
+import Order from "../../models/orderSchema.js";
 import OrderService  from "../../service/admin/order.service.js";
+import { getOrderDetailsService } from "../../service/user/orderDetails.service.js";
 export const getOrderAdmin=async(req,res)=>{
     const {
     page = 1,
@@ -94,3 +96,25 @@ export const verifyReturnRequest=async(req,res)=>{
     })
   }
 };
+export const getOrderDetails=async(req,res)=>{
+  try{
+  const userId=req.session.user?.id;
+  const {orderId}=req.params;
+  console.log("userId",userId);
+const result=await OrderService.getOrderDetails(orderId);
+console.log("orders inside the getOrderDetails",result);
+
+  res.render('admin/orderDetailPage',{
+    order:result,
+    layout:false
+  }
+  )
+}catch(error){
+  console.log('error fetching order details:',error);
+  res.status(500).render('admin/admin-error',{
+    message:'Internal Server Error',
+    layout:false
+  })
+}
+
+}

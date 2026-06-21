@@ -110,7 +110,7 @@ return order;
 static async updateOrderStatus(orderId,status){
     logger.info('Updating order status',{orderId,status});
 
-    const validStatuses=['pending','shipped','delivered','cancelled','returned','processing'];
+    const validStatuses=['pending','shipped','delivered','processing'];
 
     if(!validStatuses.includes(status)){
         const error=new Error('invaid status');
@@ -118,24 +118,67 @@ static async updateOrderStatus(orderId,status){
         throw error;
     }
 
-    const updatedOrder=await Order.findByIdAndUpdate(
-        orderId,
-        {status},
-        {new:true},
-            ).populate('userId','name email');
+    // const updatedOrder=await Order.findByIdAndUpdate(
+    //     orderId,
+    //     {status},
+    //     {new:true},
+    //         ).populate('userId','name email');
 
-              if (!updatedOrder) {
-      const error = new Error('Order not found');
-      error.code = 'ORDER_NOT_FOUND';
-      throw error;
+    //           if (!updatedOrder) {
+    //   const error = new Error('Order not found');
+    //   error.code = 'ORDER_NOT_FOUND';
+    //   throw error;
+    // }
+
+    // logger.info('Order status updated successfully', { orderId, newStatus: status });
+
+    //   return {
+    //   status: updatedOrder.status,
+    //   statusClass: updatedOrder.status.toLowerCase().replace(/\s+/g, '-')
+    
+    console.log("orderId",orderId);
+    const order=await Order.findById(orderId);
+    if(!order){
+        const error=new Error('Order not found');
+        error.code='ORDER_NOT_fOUND';
+        throw error;
+    }
+    const statusFlow=[
+        'pending',
+        'processing',
+        'shipped',
+        'delivered'
+    ];
+    const currentIndex=statusFlow.indexOf(order.status);
+    const newIndex=statusFlow.indexOf(status);
+    if(currentIndex!==-1 &&
+        newIndex!==-1&&
+        newIndex<currentIndex
+    ){
+const error=new Error(
+    `Cannot change status from ${order.status}to ${status}`
+);
+error.code='INVALID_STATUS_TRANSITION';
+throw error;
     }
 
-    logger.info('Order status updated successfully', { orderId, newStatus: status });
-
-      return {
-      status: updatedOrder.status,
-      statusClass: updatedOrder.status.toLowerCase().replace(/\s+/g, '-')
-    };
+    order.status=status;
+    order.items.forEach(item => {
+        if (!['cancelled', 'returned', 'return_requested', 'return_rejected', 'partially_cancelled', 'partially_returned'].includes(item.status)) {
+            item.status = status;
+        }
+    });
+    if (status === 'processing') {
+        order.processingAt = order.processingAt || new Date();
+    } else if (status === 'shipped') {
+        order.shippedAt = order.shippedAt || new Date();
+    } else if (status === 'delivered') {
+        order.deliveredAt = order.deliveredAt || new Date();
+    }
+    await order.save();
+    return {
+        status:order.status,
+        statusClass: order.status.toLowerCase().replace(/\s+/g, '-')    }
 }
 
 static async getReturnDetails(orderId){
@@ -311,6 +354,7 @@ static async _processApprovedReturn(order,refundItems,wallet,refundAmount,adminN
 
     order.returnRequested =false;
     order.returnProcessedAt=new Date();
+    order.returnedAt=new Date();
     order.adminNotes=adminNotes||'Returned approved by administrator';
     order.returnDetails.status='completed';
 
@@ -367,6 +411,16 @@ static async _updateOrderStatus(order,refundItems){
             orderId:order.orderId,
             newStatus:order.status
         })
+}
+static async getOrderDetails(orderId){
+    console.log("getOrder detail controller ")
+    let order=await Order.findOne({orderId}).populate('items.productId');
+    console.log("order inside the getOrder details:",order);
+    if(!order){
+        throw new Error('no order avilable for this Id');
+    }
+    return order;
+
 }
 }
 

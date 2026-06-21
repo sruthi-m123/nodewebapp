@@ -186,9 +186,10 @@ const activeCount = activeItems.length;
         <ul>
             <% order.statusHistory.forEach(history => { %>
                 <li>
-                    <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
-                    <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+                    <strong><%= history.message %></strong>
                     <br>
+                    <small style="color: #777;"><%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></small>
+                    <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
                 </li>
             <% }) %>
         </ul>

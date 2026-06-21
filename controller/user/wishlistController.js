@@ -22,6 +22,9 @@ export const getWishlistPage=async(req,res)=>{
 
 export const addToWishlist=async (req,res)=>{
   const userId=req.session.user.id;
+  if(!userId){
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({success:false,message:"Please login to continue"});
+  }
   const {productId}=req.params;
 
   const count=

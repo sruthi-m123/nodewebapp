@@ -182,6 +182,29 @@ th {
   margin-bottom: 1.5rem;
   font-weight: 500;
 }
+
+.empty-cart .continue-btn {
+  padding: 0.8rem 1.5rem;
+  background-color: #9e6d4e; /* Main brown */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.empty-cart .continue-btn:hover {
+  background-color: #7d573e; /* Darker brown */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(158, 109, 78, 0.2);
+}
 .stock-alert {
     background: #f9f5f0;
     border-left: 4px solid #8B4513;

@@ -60,24 +60,12 @@ await product.save();
 return {type:"CREATED",product};
 },
 
-async update(id,data={},files=[],removedImages=[]){
+async update(id,data={}){
+    console.log("data inside service update:",data);
     const product=await Product.findById(id);
     if(!product)return null;
     let updatedImages=[...product.images];
-    if(removedImages?.length){
-        for(const img of removedImages){
-            await deleteFromCloudinary(img);
-            updatedImages=updatedImages.filter((i)=>i!==img);
-        }
-    }
-
-if(files?.length){
-    for(const file of files){
-        updatedImages.push(file.path)
-    }
-}
-data.images=updatedImages;
-return Product.findByIdAndUpdate(id,data,{new:true});
+      return Product.findByIdAndUpdate(id,data,{new:true});
 },
 
 async delete(id){
