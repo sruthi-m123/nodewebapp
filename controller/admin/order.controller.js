@@ -73,7 +73,9 @@ export const getReturnDetails = async (req, res) => {
 
 export const verifyReturnRequest=async(req,res)=>{
   try {
+    console.log("inside the verify returned ")
     const {orderId}=req.params;
+    console.log("orderId:",orderId);
     const{action,adminNotes,itemIds,rejectReason}=req.body;
 
     const result=await OrderService.processReturnRequest(

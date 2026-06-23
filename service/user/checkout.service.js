@@ -155,6 +155,7 @@ export const getRetryCheckoutData = async (userId, orderId) => {
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
     { id: 'wallet', title: 'Wallet', description: 'Pay via Wallet' }
   ];
+    const wallet=await walletAmount(userId);
   return {
     success: true,
     addresses,
@@ -162,7 +163,8 @@ export const getRetryCheckoutData = async (userId, orderId) => {
     orderSummary,
     coupons: couponsWithStatus,
     paymentMethods,
-    order
+    order,
+    wallet
   };
 }
 

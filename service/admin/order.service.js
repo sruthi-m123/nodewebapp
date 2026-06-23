@@ -198,28 +198,25 @@ static async getReturnDetails(orderId){
     const returnType =
   returnDetails.type ||
   (returnDetails.items?.length > 0 ? 'partial' : 'full');
-    logger.debug(`Return details for order ${orderId}`,{returnType,itemsCount:returnDetails.items?.length||0});
-   let items=[];
-  
-    items=returnDetails.items.map(returnItem=>{
-        const matchedItem=order.items.map(returnItem=>{
-           const matchedItem = order.items.find(i => 
-          i.productId.toString() === returnItem.product.toString()
-           );
-              return {
-          _id: returnItem._id,
-          name: matchedItem?.name || returnItem.name || 'Unknown Item',
-          quantity: matchedItem?.quantity || returnItem.quantity || 0,
-          price: matchedItem?.totalPrice || returnItem.price || 'N/A',
-          reason: returnItem.reason || 'Not specified',
-          status: returnItem.status || matchedItem?.status || 'Pending',
-        }; 
 
+let items = returnDetails.items.map(returnItem => {
 
-        
-        })
-    })
-   
+  const matchedItem = order.items.find(i =>
+    i.productId &&
+    i.productId._id &&
+    returnItem.product &&
+    i.productId._id.toString() === returnItem.product.toString()
+  );
+
+  return {
+    _id: returnItem._id,
+    name: matchedItem?.name || returnItem.name || 'Unknown Item',
+    quantity: matchedItem?.quantity || returnItem.quantity || 0,
+    price: matchedItem?.totalPrice || returnItem.price || 'N/A',
+    reason: returnItem.reason || 'Not specified',
+    status: returnItem.status || matchedItem?.status || 'Pending',
+  };
+});   
     const globalReason = returnDetails.reason || 
       (returnType === 'partial' ? items[0]?.reason : 'Not specified');
 

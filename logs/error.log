@@ -784,3 +784,17 @@ currentPage is not defined
 [2026-06-23 00:27:13] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
 [2026-06-23 02:30:18] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-23 02:30:18] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-23 08:47:45] [31merror[39m: GET /user/order-success/ORD-1782180317766-693-Failed to lookup view "error" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-23 08:51:06] [31merror[39m: GET /user/retry-checkout/ORD-1782184825196-645-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:215
+    213| 
+    214|       <% const isCodDisabled = method.id === 'cod' && netAmount > 1000; %>
+ >> 215|       <% const isWalletDisabled = method.id === 'wallet' && wallet.balance < netAmount; %>
+    216| 
+    217|       <div class="payment-option
+    218|           <%= method.id === selectedPayment ? 'selected' : '' %>
+
+wallet is not defined
+[2026-06-23 08:57:32] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-23 09:01:22] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-23 09:04:06] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-23 09:08:02] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')

@@ -76,7 +76,8 @@ export const getRetryCheckoutPage = async (req, res) => {
     coupons: retryData.coupons,
     retryOrderId: retryData.order._id,
     isRetry: true,
-    retryCartItems: retryData.cartItems
+    retryCartItems: retryData.cartItems,
+    wallet:retryData.wallet
   });
 };
 
