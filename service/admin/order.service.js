@@ -273,18 +273,18 @@ if(!order){
 //refund amount
 
 const couponDiscount=order.appliedCoupon?.value||0;
-const deliveryCharge=order.deliveryCharge||0;
 const totalPaid=order.total;
 let refundAmount=0;
+
+const orderSubtotal = order.items.reduce((sum, i) => sum + ((i.discountedPrice ?? i.price) * i.quantity), 0);
 
 if(totalPaid>0){
     refundItems.forEach(item=>{
         const itemPrice=item.discountedPrice??item.price;
         const itemTotal=itemPrice*item.quantity;
-        const itemCouponShare=(itemTotal / totalPaid) * couponDiscount;
-         const itemDeliveryShare = (itemTotal / totalPaid) * deliveryCharge;
+        const itemCouponShare= orderSubtotal > 0 ? (itemTotal / orderSubtotal) * couponDiscount : 0;
 
-          refundAmount += itemTotal - itemCouponShare - itemDeliveryShare;
+        refundAmount += itemTotal - itemCouponShare;
     })
 }
     refundAmount = Math.max(refundAmount, 0);

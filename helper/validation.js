@@ -16,7 +16,11 @@ function validateAddress({ name, building, city, state, pincode, phone, altPhone
     return "Phone number cannot have all digits the same.";
   }
 
-  
+  if (!/^[6-9]/.test(phone)) {
+    
+    return "Indian mobile numbers must start with 6, 7, 8, or 9.";
+  }
+
   if (altPhone) {
     if (!/^\d{10}$/.test(altPhone)) {
       return "Alternate phone must be exactly 10 digits.";

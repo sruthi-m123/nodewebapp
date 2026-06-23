@@ -6,7 +6,11 @@ import { objectIdSchema } from '../common/objectId.schema.js'; // Reuse for IDs
 export const updateOfferSchema = Joi.object({
   title: Joi.string().trim().optional(),
   type: Joi.string().valid('percentage', 'fixed', 'flat').optional(),
-  discountValue: Joi.number().min(0).optional(),
+  discountValue: Joi.when('type', {
+  is: 'percentage',
+  then: Joi.number().min(1).max(99).required(),
+  otherwise: Joi.number().min(1).required()
+}),
   applicableTo: Joi.string().valid('all', 'category', 'product').optional(),
   applicableItems: Joi.when('applicableTo', {
     is: Joi.valid('category', 'product'),

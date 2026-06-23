@@ -10,7 +10,14 @@ export const addressSchema = Joi.object({
 
   pincode: Joi.string().pattern(/^\d{6}$/).required(),
 
-  phone: phoneSchema.required(),
+  phone: Joi.string()
+  .pattern(/^[6-9]\d{9}$/)
+  .required()
+  .messages({
+    'string.pattern.base': 'Enter a valid Indian mobile number.',
+    'string.empty': 'Phone number is required.',
+    'any.required': 'Phone number is required.'
+  }),
 
   altPhone: phoneSchema
     .allow("", null)

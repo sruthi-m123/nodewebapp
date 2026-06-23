@@ -573,31 +573,41 @@ table tbody tr:hover {
 }
 
 /* Active state */
-#categoryTable button[id^="status-btn-"][data-status="active"] {
-  background-color: var(--success-color);
-  color: var(--white);
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+#categoryTable button[id^="status-btn-"][data-status="active"],
+button.action-btn.unblock-btn {
+  background-color: #6d9e8e;
+  color: #ffffff;
+  border-color: #6d9e8e;
+  box-shadow: 0 2px 4px rgba(109, 158, 142, 0.3);
 }
 
 /* Inactive state */
-#categoryTable button[id^="status-btn-"][data-status="inactive"] {
-  background-color: var(--danger-color);
-  color: var(--white);
-  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+#categoryTable button[id^="status-btn-"][data-status="inactive"],
+button.action-btn.block-btn {
+  background-color: #d9c4b3;
+  color: #333333;
+  border-color: #d9c4b3;
+  box-shadow: 0 2px 4px rgba(217, 196, 179, 0.3);
 }
 
 /* Hover states */
-#categoryTable button[id^="status-btn-"]:hover {
+#categoryTable button[id^="status-btn-"]:hover,
+button.action-btn.unblock-btn:hover,
+button.action-btn.block-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-#categoryTable button[id^="status-btn-"][data-status="active"]:hover {
-  background-color: #43a047;
+#categoryTable button[id^="status-btn-"][data-status="active"]:hover,
+button.action-btn.unblock-btn:hover {
+  background-color: #5b8778;
+  border-color: #5b8778;
 }
 
-#categoryTable button[id^="status-btn-"][data-status="inactive"]:hover {
-  background-color: #d32f2f;
+#categoryTable button[id^="status-btn-"][data-status="inactive"]:hover,
+button.action-btn.block-btn:hover {
+  background-color: #c4b0a0;
+  border-color: #c4b0a0;
 }
 
 /* Active state for pagination buttons */
@@ -613,4 +623,244 @@ input[type="button"]:active,
 input[type="submit"]:active {
   transform: translateY(1px);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================
+   MODAL BUTTON SYSTEM (shared: category & product)
+   ============================================= */
+
+/* Modal Footer Layout */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: #faf8f6;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Base .btn */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease,
+              box-shadow 0.2s ease, opacity 0.2s ease;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:active {
+  transform: translateY(1px) !important;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Primary — Earthy brown (save/confirm) */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(158, 109, 78, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #6a4835 100%);
+  box-shadow: 0 5px 14px rgba(158, 109, 78, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Secondary — neutral (cancel/close) */
+.btn-secondary {
+  background: #fff;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-dark);
+  box-shadow: 0 4px 10px rgba(158, 109, 78, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Danger — red (delete/destructive) */
+.btn-danger {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(231, 76, 60, 0.35);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  box-shadow: 0 5px 14px rgba(231, 76, 60, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Close (×) button in modal header */
+.close-btn {
+  background: var(--primary-light);
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--primary-dark);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.close-btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Inline crop button (inside form body) */
+#cropButton.btn.btn-primary {
+  margin-top: 0.6rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+}
+
+/* =============================================
+   IMAGE THUMBNAIL REMOVE BUTTON (×)
+   Applies to both new-image preview and existing-image remove buttons
+   ============================================= */
+
+/* Wrapper that holds each image thumbnail — must be position:relative */
+#previewArea > div,
+.existing-image {
+  position: relative;
+  display: inline-block;
+  margin: 4px;
+}
+
+/* Shared style for both remove button classes */
+.remove-img-btn,
+.remove-existing-btn {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: #fff;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.45);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  z-index: 5;
+}
+
+.remove-img-btn:hover,
+.remove-existing-btn:hover {
+  background: #c0392b;
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.55);
+}
+
+.remove-img-btn:active,
+.remove-existing-btn:active {
+  transform: scale(0.95);
+}
+
+/* =============================================
+   MODAL CHECKBOX ALIGNMENT & STYLE
+   ============================================= */
+
+.checkbox-group {
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  user-select: none;
+  line-height: 1.4;
+}
+
+/* Hide native checkbox */
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom checkbox box */
+.checkmark {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Checked state */
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 6px rgba(158, 109, 78, 0.35);
+}
+
+/* Tick mark via pseudo-element */
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
+}
+
+/* Focus ring for accessibility */
+.checkbox-label input[type="checkbox"]:focus + .checkmark {
+  box-shadow: 0 0 0 3px rgba(158, 109, 78, 0.2);
+  border-color: var(--primary-color);
+}
+
+.checkbox-label:hover .checkmark {
+  border-color: var(--primary-color);
 }

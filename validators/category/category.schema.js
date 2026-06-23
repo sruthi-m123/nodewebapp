@@ -65,6 +65,11 @@ export const updateCategorySchema = Joi.object({
   isActive: Joi.boolean()
     .truthy("true")
     .falsy("false")
+    .optional(),
+
+  removeExistingImage: Joi.boolean()
+    .truthy("true")
+    .falsy("false")
     .optional()
 });
 

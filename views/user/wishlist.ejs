@@ -5,7 +5,7 @@
       <tr>
         <th>Product</th>
         <th>Price</th>
-        <th>Total</th>
+        <th>Availability</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -19,9 +19,16 @@
             </div>
           </td>
           <td class="price">Rs.<%= item.price %></td>
-          <td class="total">Rs.<%= item.price %></td>
+       
+              <td class="availability">
+          <% if(item.stock>0) { %>
+              <span class="badge in-stock">✓ In Stock</span>
+            <% } else { %>
+              <span class="badge out-of-stock">✗ Out of Stock</span>
+            <% } %>
+          </td>
           <td class="action-buttons">
-            <button class="add-btn" data-id="<%= item.id %>">Add to Cart</button>
+            <button class="add-btn" data-id="<%= item.id %>" <%= item.stock <= 0 ? 'disabled' : '' %>>Add to Cart</button>
             <button class="remove-btn" data-id="<%= item.id %>">Remove</button>
           </td>
         </tr>
@@ -31,6 +38,10 @@
       <tr>
         <td colspan="4" class="wishlist-summary">
           <span><%= wishlistItems.length %> items in wishlist</span>
+          <span class="stock-summary">
+            (<%= wishlistItems.filter(item => item.inStock).length %> in stock, 
+            <%= wishlistItems.filter(item => !item.inStock).length %> out of stock)
+          </span>
         </td>
       </tr>
     </tfoot>

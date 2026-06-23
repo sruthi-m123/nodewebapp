@@ -29,6 +29,9 @@ export const getAddressPage = async (req, res) => {
 export const addAddress = async (req, res) => {
   console.log("inside the address controller")
   const userId = req.session.user.id;
+  if(!userId){
+    return res.status(404).json({success:false,message:"please login to continue ."})
+  }
   logger.info('Adding new address', { userId });
   const { error, value } = addressSchema.validate(req.body, { abortEarly: false });
   console.log("value inside the address controller:",value);

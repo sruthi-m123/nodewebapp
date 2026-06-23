@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       const currentStatus = row.querySelector('.status').textContent.trim();
-      const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];  // Capitalized to match EJS
+      const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered'];  // Capitalized to match EJS
 
       const select = document.createElement('select');
       select.className = 'status-dropdown';

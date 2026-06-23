@@ -111,6 +111,7 @@ console.log("refund amount inside the partial cancellation:",refundAmount);
 }
 await order.save();
 
+
 if(refundAmount>0){
     await processRefund(order,refundAmount);
 }
@@ -496,7 +497,7 @@ console.log("order.userId",order.userId);
                 type:'refund',
                 order:order._id,
                 description:`Refund for order ${order.orderId}`,
-                status:'pending'
+                status:'completed'
             });
 
             await wallet.save();

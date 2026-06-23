@@ -127,7 +127,7 @@
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Offer Title*</label>
-                <input type="text" class="form-control" name="title" required>
+                <input type="text" class="form-control" name="title">
               </div>
             </div>
             <!-- <div class="col-md-6">
@@ -144,7 +144,7 @@
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Discount Type*</label>
-                <select class="form-select" name="type" id="discountType" required>
+                <select class="form-select" name="type" id="discountType">
                   <option value="percentage">Percentage</option>
                   <option value="flat">Fixed Amount</option>
                 </select>
@@ -155,7 +155,7 @@
                 <label class="form-label">Discount Value*</label>
                 <div class="input-group">
                   <span class="input-group-text discount-prefix">%</span>
-                  <input type="number" class="form-control" name="discountValue" min="1" required>
+                  <input type="number" class="form-control" name="discountValue">
                 </div>
                 <!-- <div id="maxDiscountContainer" class="mt-2" style="display: none;">
                   <label class="form-label">Maximum Discount Amount (₹)</label>
@@ -170,13 +170,13 @@
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Start Date*</label>
-                <input type="date" class="form-control" name="startDate" required>
+                <input type="date" class="form-control" name="startDate">
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">End Date*</label>
-                <input type="date" class="form-control" name="endDate" required>
+                <input type="date" class="form-control" name="endDate">
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@
             <div class="col-md-4">
               <div class="mb-3">
                 <label class="form-label">Applicable To*</label>
-                <select class="form-select" name="applicableTo" id="applicableToSelect" required>
+                <select class="form-select" name="applicableTo" id="applicableToSelect">
                   <option value="all">All Products</option>
                   <option value="category">Specific Categories</option>
                   <option value="product">Specific Products</option>
@@ -459,15 +459,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     $('#maxDiscountContainer').toggle($(this).val() === 'percentage');
   });
 
-  // Date Validation
-  const today = new Date().toISOString().split('T')[0];
-  $('input[name="startDate"]').attr('min', today).change(function() {
-    const endDate = $('input[name="endDate"]');
-    endDate.attr('min', this.value);
-    if (endDate.val() && endDate.val() < this.value) {
-      endDate.val(this.value);
-    }
-  });
+  // Date Validation removed
 
   // Edit Button Handler
   $('.btn-edit').click(async function() {
@@ -553,11 +545,6 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     const $form = $('#offerForm');
     const $modal = $('#addOfferModal');
     const isEditMode = $modal.data('offerId') !== undefined;
-    
-    if (!$form[0].checkValidity()) {
-      $form[0].reportValidity();
-      return;
-    }
 
     // Prepare data
     const data = {
@@ -578,17 +565,7 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
     if (data.applicableTo !== 'all') {
       const selectId = data.applicableTo === 'category' ? '#categorySelect' : '#productSelect';
       const selectedItems = $(selectId).val();
-      
-      if (!selectedItems || selectedItems.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Selection Required',
-          text: `Please select at least one ${data.applicableTo}`
-        });
-        return;
-      }
-      
-      data.applicableItems = selectedItems;
+      data.applicableItems = selectedItems || [];
     }
 
     try {

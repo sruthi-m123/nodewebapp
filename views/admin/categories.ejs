@@ -171,6 +171,7 @@
   let deleteCategoryId = null;
   let cropper;
   let croppedImage = null;
+  let removeExistingImage = false;
 
   // Toast Notification Function
   function showToast(message, type = 'success') {
@@ -225,6 +226,7 @@
     document.getElementById('previewArea').innerHTML = '';
     currentCategoryId = null;
     croppedImage = null;
+    removeExistingImage = false;
   }
 
   function closeModal() {
@@ -243,6 +245,7 @@
     document.getElementById('croppedImageList').innerHTML = '';
     document.getElementById('previewArea').innerHTML = '';
     croppedImage = null;
+    removeExistingImage = false;
 
     fetch(`/admin/categories/${categoryId}/details`)
       .then(response => response.json())
@@ -275,7 +278,7 @@
             removeBtn.style.position = "absolute";
             removeBtn.style.top = "-6px";
             removeBtn.style.right = "-6px";
-let removeExistingImage=false;
+
             removeBtn.addEventListener("click", () => {
               wrapper.remove();
               croppedImage = null;
@@ -486,9 +489,10 @@ formData.set('removeExistingImage',removeExistingImage);
         const button = document.getElementById(`status-btn-${categoryId}`);
         const updatedStatus = data.category.status;
 
-        // Update button text and onclick
+        // Update button text, attribute and onclick
         if (button) {
           button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
+          button.setAttribute('data-status', updatedStatus);
           button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
         }
         showToast(`Category status updated to ${updatedStatus}!`, 'success');

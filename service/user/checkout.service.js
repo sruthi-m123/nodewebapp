@@ -5,6 +5,7 @@ import Cart from '../../models/cartSchema.js';
 import Product from '../../models/productSchema.js';
 import Offer from '../../models/offerSchema.js';
 import Coupon from '../../models/couponSchema.js';
+import Wallet  from '../../models/walletSchema.js';
 import { addAddressService } from './address.service.js';
 import Razorpay from 'razorpay';
 import { calculateOrder } from '../../helper/calculateTotal.js';
@@ -106,7 +107,10 @@ export const getCheckoutData = async (userId, session) => {
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
     { id: 'wallet', title: 'Wallet', description: 'Purchase through your wallet amount' }
   ];
-  return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData };
+    const wallet=await walletAmount(userId);
+    console.log("wallet inside the checkout service ",wallet);
+  
+  return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData ,wallet};
 
 }
 
@@ -443,4 +447,9 @@ export const getOrderForFailure = async (orderId) => {
     goToHomeUrl: '/user/shopAll'
   };
 };
+export const walletAmount=async(userId)=>{
+  const walletBalance= await Wallet.findOne({user:userId}).populate('balance');
+  console.log(walletBalance);
+  return walletBalance;
+}
 

@@ -107,6 +107,7 @@ export const deleteProduct = async (req, res) => {
 
 export const updateProductStatus = async (req, res) => {
   const { productId } = req.params;
+  console.log("producId inside the update status:",productId);
   const { isActive } = req.validatedData; 
 
   const updated = await productService.updateProductStatus(productId, isActive);

@@ -14,6 +14,7 @@ console.log("userId:",userId);
        
 
         const wishlist=await Wishlist.findOne({user:userId}).populate("items.productId");
+        console.log("wislist items:",wishlist);
 console.log("wishlist :",wishlist);
         const validItems=wishlist?.items?.filter(i=>i.productId)||[];
       
@@ -26,7 +27,8 @@ console.log("wishlist :",wishlist);
             :item.productId.price,
             originalPrice:item.productId.price,
             image:item.productId.images[0],
-            color:item.productId.color
+            color:item.productId.color,
+            stock:item.productId.stock
 
         }));
         console.log("formated items inside the wishlist controller :",formattedItems);

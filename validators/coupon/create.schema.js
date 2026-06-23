@@ -17,13 +17,17 @@ export const createCouponSchema = Joi.object({
     'any.only': 'Discount type must be percentage or fixed',
     'any.required': MESSAGES.COUPON.DISCOUNT_TYPE_REQUIRED
   }),
+discountType: Joi.string()
+  .valid('fixed', 'percentage')
+  .required(),
 
-  discountValue: Joi.number().min(0).max(Joi.ref('minCartValue')).required().messages({
-    'number.base': 'Discount value must be a number',
-    'number.min': 'Discount value must be at least 0',
-      'number.max': 'Discount value cannot be greater than minimum cart value',
-    'any.required': MESSAGES.COUPON.DISCOUNT_VALUE_REQUIRED
-  }),
+discountValue: Joi.when('discountType', {
+  is: 'percentage',
+  then: Joi.number().min(1).max(99).required(),
+  otherwise: Joi.number().min(1).required()
+}),
+
+  
 
   minCartValue: Joi.number().min(0).default(0).messages({
     'number.base': 'Minimum cart value must be a number',

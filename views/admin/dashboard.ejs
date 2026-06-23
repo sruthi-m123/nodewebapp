@@ -32,7 +32,6 @@
         <h4><i class="fas fa-clock"></i> Pending Orders</h4>
         <p id="pending-orders">Loading...</p>
       </div>
-      <!-- <button class="pdf-btn" id="generate-report">Generate Report <i class="fas fa-chart-bar"></i></button> -->
       <button class="sales-report-btn" id="open-sales-report-modal">Sales Report <i class="fas fa-file-invoice"></i></button>
     </div>
 
@@ -115,10 +114,9 @@
             </table>
 
             <div class="pagination" id="modal-report-pagination">
-              <span class="page-prev">
-                << /span>
-                  <span class="page-number active">1</span>
-                  <span class="page-next">></span>
+              <span class="page-prev">&lt;</span>
+              <span class="page-number active">1</span>
+              <span class="page-next">&gt;</span>
             </div>
           </div>
         </div>
@@ -147,42 +145,34 @@
       </table>
 
       <div class="pagination" id="products-pagination">
-        <span class="page-prev">
-          << /span>
-            <span class="page-number active">1</span>
-            <span class="page-next">></span>
+        <span class="page-prev">&lt;</span>
+        <span class="page-number active">1</span>
+        <span class="page-next">&gt;</span>
       </div>
     </div>
 
-   <!-- Top Selling Categories Table -->
-<div class="dashboard-table">
-  <h2>Top Selling Categories</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Category Image</th>
-        <th>Category Name</th>
-        <th>Total Products</th>
-        <th>Revenue</th>
-        <th>Qty Sold</th>
-      </tr>
-    </thead>
-    <tbody id="top-categories-body">
-      <tr>
-        <td colspan="6" class="loading-text">Loading categories...</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="pagination" id="categories-pagination">
-    <span class="page-prev">
-      &lt;&lt;
-    </span>
-    <span class="page-number active">1</span>
-    <span class="page-next">&gt;</span>
-  </div>
-</div>
+    <!-- Top Selling Categories Table -->
+    <div class="dashboard-table">
+      <h2>Top Selling Categories</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category Image</th>
+            <th>Category Name</th>
+            <th>Total Products</th>
+            <th>Revenue</th>
+            <th>Qty Sold</th>
+          </tr>
+        </thead>
+        <tbody id="top-categories-body">
+          <tr>
+            <td colspan="6" class="loading-text">Loading categories...</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination" id="categories-pagination"></div>
+    </div>
 
     <div class="dashboard-chart">
       <div class="chart-header">
@@ -199,7 +189,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      console.log(" dashboard.js loaded");
+      console.log("dashboard.js loaded");
 
       document.addEventListener('DOMContentLoaded', function () {
         initDashboard();
@@ -223,13 +213,16 @@
         // Setup generate report button to scroll to report section
         const generateBtn = document.getElementById('generate-report');
         if (generateBtn) {
-          generateBtn.addEventListener('click', () => {
+          generateBtn.addEventListener('click', function() {
             document.querySelector('.sales-report-section').scrollIntoView({ behavior: 'smooth' });
           });
         }
         
         // Initialize modal with default filters
         initializeModalDefaults();
+
+        // Initialize top categories
+        fetchTopCategories(1);
       });
 
       function showNotification(message, type = 'info') {
@@ -248,7 +241,7 @@
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
         });
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(function() { toast.remove(); }, 3000);
       }
 
       let currentPage = 1;
@@ -272,18 +265,15 @@
       let modalReportTotalPages = 1;
 
       function initializeModalDefaults() {
-        // Set default date range to '1m' (This Month)
         document.getElementById('modal-date-range').value = '1m';
         toggleModalCustomDateRange();
         loadModalSalesReport(1);
       }
 
-      // Modal Open/Close Functions
       function openSalesReportModal() {
         const modal = document.getElementById('salesReportModal');
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-        // Load data when modal opens
         loadModalSalesReport(modalReportCurrentPage);
       }
 
@@ -293,7 +283,6 @@
         document.body.style.overflow = 'auto';
       }
 
-      // Modal Custom Date Range Toggle
       function toggleModalCustomDateRange() {
         const dateRange = document.getElementById('modal-date-range').value;
         const customDateRange = document.getElementById('modal-custom-date-range');
@@ -327,9 +316,9 @@
         }
 
         modalCurrentFilters = {
-          dateRange,
-          startDate,
-          endDate
+          dateRange: dateRange,
+          startDate: startDate,
+          endDate: endDate
         };
 
         await loadModalSalesReport(1);
@@ -356,37 +345,36 @@
             params.append('endDate', modalCurrentFilters.endDate);
           }
 
-          const response = await fetch(`/admin/api/sales-report?${params}`);
+          const response = await fetch('/admin/api/sales-report?' + params.toString());
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
 
           const data = await response.json();
           tbody.innerHTML = '';
 
           if (data.orders && data.orders.length > 0) {
-            data.orders.forEach(order => {
+            data.orders.forEach(function(order) {
               const row = document.createElement('tr');
-              row.innerHTML = `
-            <td>${new Date(order.date).toLocaleDateString()}</td>
-            <td>#${order.orderId}</td>
-            <td>${order.customerName}</td>
-            <td>${order.itemsCount}</td>
-            <td>₹${(order.amount || 0).toLocaleString()}</td>
-            <td>₹${(order.discount || 0).toLocaleString()}</td>
-            <td>${order.coupons || 'None'}</td>
-            <td>${order.paymentMethod || 'N/A'}</td>
-            <td>₹${(order.netAmount || 0).toLocaleString()}</td>
-          `;
+              row.innerHTML = 
+                '<td>' + new Date(order.date).toLocaleDateString() + '</td>' +
+                '<td>#' + order.orderId + '</td>' +
+                '<td>' + order.customerName + '</td>' +
+                '<td>' + order.itemsCount + '</td>' +
+                '<td>₹' + (order.amount || 0).toLocaleString() + '</td>' +
+                '<td>₹' + (order.discount || 0).toLocaleString() + '</td>' +
+                '<td>' + (order.coupons || 'None') + '</td>' +
+                '<td>' + (order.paymentMethod || 'N/A') + '</td>' +
+                '<td>₹' + (order.netAmount || 0).toLocaleString() + '</td>';
               tbody.appendChild(row);
             });
 
             // Update summary cards
             document.getElementById('modal-report-orders-count').textContent = data.summary.totalOrders || 0;
-            document.getElementById('modal-report-sales-amount').textContent = `₹ ${(data.summary.totalSales || 0).toLocaleString()}`;
-            document.getElementById('modal-report-discount-amount').textContent = `₹ ${(data.summary.totalDiscount || 0).toLocaleString()}`;
-            document.getElementById('modal-report-net-revenue').textContent = `₹ ${(data.summary.netRevenue || 0).toLocaleString()}`;
+            document.getElementById('modal-report-sales-amount').textContent = '₹ ' + (data.summary.totalSales || 0).toLocaleString();
+            document.getElementById('modal-report-discount-amount').textContent = '₹ ' + (data.summary.totalDiscount || 0).toLocaleString();
+            document.getElementById('modal-report-net-revenue').textContent = '₹ ' + (data.summary.netRevenue || 0).toLocaleString();
           } else {
             tbody.innerHTML = '<tr><td colspan="9" class="loading-text">No sales data found for the selected period</td></tr>';
 
@@ -414,9 +402,9 @@
 
         const prevButton = document.createElement('span');
         prevButton.className = 'page-prev';
-        prevButton.innerHTML = '<';
+        prevButton.innerHTML = '&lt;';
         prevButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
-        prevButton.addEventListener('click', () => changeModalReportPage('prev'));
+        prevButton.addEventListener('click', function() { changeModalReportPage('prev'); });
         pagination.appendChild(prevButton);
 
         const pageNumbersContainer = document.createElement('div');
@@ -424,9 +412,9 @@
 
         for (let i = 1; i <= modalReportTotalPages; i++) {
           const pageSpan = document.createElement('span');
-          pageSpan.className = `page-number ${i === currentPage ? 'active' : ''}`;
+          pageSpan.className = 'page-number ' + (i === currentPage ? 'active' : '');
           pageSpan.textContent = i;
-          pageSpan.addEventListener('click', () => changeModalReportPage(i));
+          pageSpan.addEventListener('click', function() { changeModalReportPage(i); });
           pageNumbersContainer.appendChild(pageSpan);
         }
 
@@ -434,9 +422,9 @@
 
         const nextButton = document.createElement('span');
         nextButton.className = 'page-next';
-        nextButton.innerHTML = '>';
+        nextButton.innerHTML = '&gt;';
         nextButton.style.visibility = currentPage === modalReportTotalPages ? 'hidden' : 'visible';
-        nextButton.addEventListener('click', () => changeModalReportPage('next'));
+        nextButton.addEventListener('click', function() { changeModalReportPage('next'); });
         pagination.appendChild(nextButton);
       }
 
@@ -477,10 +465,10 @@
             params.append('endDate', modalCurrentFilters.endDate);
           }
 
-          const response = await fetch(`/admin/api/export-sales-report?${params}`);
+          const response = await fetch('/admin/api/export-sales-report?' + params.toString());
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
 
           const blob = await response.blob();
@@ -491,11 +479,11 @@
 
           let filename = 'sales-report';
           if (modalCurrentFilters.dateRange === 'custom' && modalCurrentFilters.startDate && modalCurrentFilters.endDate) {
-            filename = `sales-report-${modalCurrentFilters.startDate}-to-${modalCurrentFilters.endDate}`;
+            filename = 'sales-report-' + modalCurrentFilters.startDate + '-to-' + modalCurrentFilters.endDate;
           } else {
-            filename = `sales-report-${modalCurrentFilters.dateRange}`;
+            filename = 'sales-report-' + modalCurrentFilters.dateRange;
           }
-          a.download = `${filename}.pdf`;
+          a.download = filename + '.pdf';
 
           document.body.appendChild(a);
           a.click();
@@ -531,10 +519,10 @@
             params.append('endDate', modalCurrentFilters.endDate);
           }
 
-          const response = await fetch(`/admin/api/export-sales-report?${params}`);
+          const response = await fetch('/admin/api/export-sales-report?' + params.toString());
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
 
           const blob = await response.blob();
@@ -545,11 +533,11 @@
 
           let filename = 'sales-report';
           if (modalCurrentFilters.dateRange === 'custom' && modalCurrentFilters.startDate && modalCurrentFilters.endDate) {
-            filename = `sales-report-${modalCurrentFilters.startDate}-to-${modalCurrentFilters.endDate}`;
+            filename = 'sales-report-' + modalCurrentFilters.startDate + '-to-' + modalCurrentFilters.endDate;
           } else {
-            filename = `sales-report-${modalCurrentFilters.dateRange}`;
+            filename = 'sales-report-' + modalCurrentFilters.dateRange;
           }
-          a.download = `${filename}.xlsx`;
+          a.download = filename + '.xlsx';
 
           document.body.appendChild(a);
           a.click();
@@ -584,14 +572,14 @@
           const response = await fetch('/admin/api/stats');
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
 
           const data = await response.json();
 
           document.getElementById('total-users').textContent = data.stats.totalUsers || 0;
           document.getElementById('items-sold').textContent = data.stats.itemsSold || 0;
-          document.getElementById('total-sales').textContent = `₹ ${(data.stats.totalSales || 0).toLocaleString()}`;
+          document.getElementById('total-sales').textContent = '₹ ' + (data.stats.totalSales || 0).toLocaleString();
           document.getElementById('pending-orders').textContent = data.stats.pendingOrders || 0;
         } catch (error) {
           console.error('Error loading stats:', error);
@@ -608,30 +596,25 @@
           const tbody = document.getElementById('top-products-body');
           tbody.innerHTML = '<tr><td colspan="6" class="loading-text">Loading products...</td></tr>';
 
-          const response = await fetch(`/admin/api/top-products?page=${page}&limit=4`);
+          const response = await fetch('/admin/api/top-products?page=' + page + '&limit=4');
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
 
           const data = await response.json();
           tbody.innerHTML = '';
 
           if (data.products && data.products.length > 0) {
-            data.products.forEach(product => {
+            data.products.forEach(function(product) {
               const row = document.createElement('tr');
-              row.innerHTML = `
-            <td>#${product.id.toString().slice(-4)}</td>
-            <td>
-              <img src="${product.image}" 
-                   alt="${product.name || 'Product'}" 
-                   onerror="this.src='/images/placeholder.jpg'">
-            </td>
-            <td>${product.name || 'Unnamed Product'}</td>
-            <td>₹${(product.price || 0).toLocaleString()}</td>
-            <td>₹${(product.revenue || 0).toLocaleString()}</td>
-            <td>${product.quantity || 0}</td>
-          `;
+              row.innerHTML = 
+                '<td>#' + product.id.toString().slice(-4) + '</td>' +
+                '<td><img src="' + product.image + '" alt="' + (product.name || 'Product') + '" onerror="this.src=\'/images/placeholder.jpg\'"></td>' +
+                '<td>' + (product.name || 'Unnamed Product') + '</td>' +
+                '<td>₹' + (product.price || 0).toLocaleString() + '</td>' +
+                '<td>₹' + (product.revenue || 0).toLocaleString() + '</td>' +
+                '<td>' + (product.quantity || 0) + '</td>';
               tbody.appendChild(row);
             });
           } else {
@@ -655,9 +638,9 @@
 
         const prevButton = document.createElement('span');
         prevButton.className = 'page-prev';
-        prevButton.innerHTML = '<';
+        prevButton.innerHTML = '&lt;';
         prevButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
-        prevButton.addEventListener('click', () => changePage('prev'));
+        prevButton.addEventListener('click', function() { changePage('prev'); });
         pagination.appendChild(prevButton);
 
         const pageNumbersContainer = document.createElement('div');
@@ -665,9 +648,9 @@
 
         for (let i = 1; i <= totalPages; i++) {
           const pageSpan = document.createElement('span');
-          pageSpan.className = `page-number ${i === currentPage ? 'active' : ''}`;
+          pageSpan.className = 'page-number ' + (i === currentPage ? 'active' : '');
           pageSpan.textContent = i;
-          pageSpan.addEventListener('click', () => changePage(i));
+          pageSpan.addEventListener('click', function() { changePage(i); });
           pageNumbersContainer.appendChild(pageSpan);
         }
 
@@ -675,9 +658,9 @@
 
         const nextButton = document.createElement('span');
         nextButton.className = 'page-next';
-        nextButton.innerHTML = '>';
+        nextButton.innerHTML = '&gt;';
         nextButton.style.visibility = currentPage === totalPages ? 'hidden' : 'visible';
-        nextButton.addEventListener('click', () => changePage('next'));
+        nextButton.addEventListener('click', function() { changePage('next'); });
         pagination.appendChild(nextButton);
       }
 
@@ -698,7 +681,9 @@
       }
 
       let currentPeriod = 'monthly';
-      async function loadSalesChart(period = currentPeriod) {
+      
+      async function loadSalesChart(period) {
+        if (!period) period = currentPeriod;
         try {
           currentPeriod = period;
           const canvas = document.getElementById('salesChart');
@@ -708,11 +693,11 @@
             existingError.remove();
           }
           canvas.style.opacity = '0.5';
-          const response = await fetch(`/admin/api/sales-data?period=${period}`);
-          console.log("period inside the fetch sales chart",period);
-          console.log("response inside the fetch sales chart",response);
+          const response = await fetch('/admin/api/sales-data?period=' + period);
+          console.log("period inside the fetch sales chart", period);
+          console.log("response inside the fetch sales chart", response);
           if (!response.ok) {
-            throw new Error(`HTTP error! status:${response.status}`);
+            throw new Error('HTTP error! status:' + response.status);
           }
           const data = await response.json();
 
@@ -765,8 +750,8 @@
                 },
                 tooltip: {
                   callbacks: {
-                    label: function (context) {
-                      return `₹${context.raw.toLocaleString()}`;
+                    label: function(context) {
+                      return '₹' + context.raw.toLocaleString();
                     }
                   }
                 }
@@ -779,7 +764,7 @@
                     text: 'Sales Amount (₹)'
                   },
                   ticks: {
-                    callback: function (value) {
+                    callback: function(value) {
                       return '₹' + value.toLocaleString();
                     }
                   }
@@ -801,48 +786,40 @@
           const chartContainer = document.getElementById('salesChart').parentElement;
           const existingError = chartContainer.querySelector('.error-text');
           if (!existingError) {
-            chartContainer.innerHTML += `<p class="error-text">Failed to load sales chart: ${error.message}</p>`;
+            chartContainer.innerHTML += '<p class="error-text">Failed to load sales chart: ' + error.message + '</p>';
           }
           showNotification('Failed to load sales data', 'error');
         }
       }
 
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('DOM loaded-intializing chart...');
+      function setupPeriodButtons() {
+        console.log('Setting up period buttons');
+        const periodButtons = document.querySelectorAll('.period-btn');
+        console.log('Found period buttons:', periodButtons.length);
+        
+        periodButtons.forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const period = this.dataset.period;
+            console.log('Period button clicked:', period);
+            
+            document.querySelectorAll('.period-btn').forEach(function(b) {
+              b.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            
+            loadSalesChart(period);
+          });
+        });
+      }
 
-  loadSalesChart(currentPeriod);
-  setupPeriodButtons();
-});
-
-function setupPeriodButtons() {
-  console.log('Setting up period buttons');
-  const periodButtons = document.querySelectorAll('.period-btn');
-  console.log('Found period buttons:', periodButtons.length);
-  
-  // Remove old listeners by cloning
-  periodButtons.forEach(btn => {
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
-    
-    // Add click event listener
-    newBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const period = this.dataset.period;
-      console.log('Period button clicked:', period);
-      
-      // Remove active class from all buttons - query fresh
-      document.querySelectorAll('.period-btn').forEach(b => {
-        b.classList.remove('active');
+      // Initialize chart and period buttons
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded - initializing chart...');
+        loadSalesChart(currentPeriod);
+        setupPeriodButtons();
       });
-      
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Load chart with selected period
-      loadSalesChart(period);
-    });
-  });
-}
 
       // Top Selling Categories functionality
       let currentCategoryPage = 1;
@@ -850,19 +827,18 @@ function setupPeriodButtons() {
 
       async function fetchTopCategories(page = 1) {
         try {
-          const response = await fetch(`/admin/top-categories?page=${page}&limit=${CATEGORY_LIMIT}`);
+          const response = await fetch('/admin/top-categories?page=' + page + '&limit=' + CATEGORY_LIMIT);
           if (!response.ok) throw new Error('Failed to fetch categories');
           
           const data = await response.json();
+          console.log(data.currentPage);
+          console.log(data.totalPages);
           renderCategories(data);
           renderCategoryPagination(data);
         } catch (error) {
           console.error('Error fetching top categories:', error);
-          document.getElementById('top-categories-body').innerHTML = `
-            <tr>
-              <td colspan="6" class="error-text">Failed to load categories</td>
-            </tr>
-          `;
+          document.getElementById('top-categories-body').innerHTML = 
+            '<tr><td colspan="6" class="error-text">Failed to load categories</td></tr>';
         }
       }
 
@@ -870,29 +846,21 @@ function setupPeriodButtons() {
         const tbody = document.getElementById('top-categories-body');
         
         if (!data.categories || data.categories.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" class="empty-text">No categories found</td>
-            </tr>
-          `;
+          tbody.innerHTML = 
+            '<tr><td colspan="6" class="empty-text">No categories found</td></tr>';
           return;
         }
 
-        tbody.innerHTML = data.categories.map(category => `
-          <tr>
-            <td>${category.id}</td>
-            <td>
-              <img src="${category.image || '/images/default-category.png'}" 
-                   alt="${category.name}" 
-                   class="category-image"
-                   onerror="this.src='/images/default-category.png'">
-            </td>
-            <td>${category.name}</td>
-            <td>${category.total_products || 0}</td>
-            <td>₹${formatPrice(category.revenue || 0)}</td>
-            <td>${category.quantity_sold || 0}</td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = data.categories.map(function(category) {
+          return '<tr>' +
+            '<td>' + category.id + '</td>' +
+            '<td><img src="' + (category.image || '/images/default-category.png') + '" alt="' + category.name + '" class="category-image" onerror="this.src=\'/images/default-category.png\'"></td>' +
+            '<td>' + category.name + '</td>' +
+            '<td>' + (category.total_products || 0) + '</td>' +
+            '<td>₹' + formatPrice(category.revenue || 0) + '</td>' +
+            '<td>' + (category.quantity_sold || 0) + '</td>' +
+            '</tr>';
+        }).join('');
       }
 
       function renderCategoryPagination(data) {
@@ -900,20 +868,23 @@ function setupPeriodButtons() {
         const totalPages = data.totalPages || 1;
         const currentPage = data.currentPage || 1;
 
-        let html = `<span class="page-prev" onclick="changeCategoryPage(${currentPage - 1})">
-          &lt;&lt;
-        </span>`;
+        let html = '';
 
-        for (let i = 1; i <= totalPages; i++) {
-          html += `<span class="page-number ${i === currentPage ? 'active' : ''}" 
-                         onclick="changeCategoryPage(${i})">
-            ${i}
-          </span>`;
+        if (currentPage > 1) {
+          html += '<span class="page-prev" onclick="changeCategoryPage(' + (currentPage - 1) + ')">&lt;&lt;</span>';
+        } else {
+          html += '<span class="page-prev disabled">&lt;&lt;</span>';
         }
 
-        html += `<span class="page-next" onclick="changeCategoryPage(${currentPage + 1})">
-          &gt;
-        </span>`;
+        for (let i = 1; i <= totalPages; i++) {
+          html += '<span class="page-number ' + (i === currentPage ? 'active' : '') + '" onclick="changeCategoryPage(' + i + ')">' + i + '</span>';
+        }
+
+        if (currentPage < totalPages) {
+          html += '<span class="page-next" onclick="changeCategoryPage(' + (currentPage + 1) + ')">&gt;&gt;</span>';
+        } else {
+          html += '<span class="page-next disabled">&gt;&gt;</span>';
+        }
 
         pagination.innerHTML = html;
       }
@@ -927,12 +898,6 @@ function setupPeriodButtons() {
       function formatPrice(amount) {
         return Number(amount).toFixed(2);
       }
-
-      // Initialize top categories on page load
-      document.addEventListener('DOMContentLoaded', () => {
-        fetchTopCategories(1);
-      });
     </script>
 
-   
     <%- include('../partials/admin/admin-footer') %>

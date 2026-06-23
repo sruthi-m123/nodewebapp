@@ -555,3 +555,232 @@ Cannot read properties of undefined (reading '0')
 [2026-06-22 01:54:22] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-22 02:42:19] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-22 02:42:19] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 09:11:53] [31merror[39m: POST /user/cart/update-No matching document found for id "6a38ae3c6a5afe78dcf339e1" version 8 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-22 09:11:53] [31merror[39m: POST /user/cart/update-No matching document found for id "6a38ae3c6a5afe78dcf339e1" version 9 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-22 09:11:53] [31merror[39m: POST /user/cart/update-No matching document found for id "6a38ae3c6a5afe78dcf339e1" version 10 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-22 09:11:55] [31merror[39m: POST /user/cart/update-No matching document found for id "6a38ae3c6a5afe78dcf339e1" version 13 modifiedPaths "items, items.0, items.0.quantity, items.0.totalPrice"
+[2026-06-22 09:12:03] [31merror[39m: POST /user/cart/update-No matching document found for id "6a38ae3c6a5afe78dcf339e1" version 20 modifiedPaths "items, items.1, items.1.quantity, items.1.totalPrice"
+[2026-06-22 09:18:00] [31merror[39m: POST /user/orders/6a38afb96a5afe78dcf33d92/cancel-order cannot be cancelled at this stage
+[2026-06-22 09:19:20] [31merror[39m: GET /admin/orders/ORD-1782099897202-62/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-22 09:19:32] [31merror[39m: GET /admin/orders/ORD-1782099897202-62/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-22 09:19:37] [31merror[39m: GET /admin/orders/ORD-1782099897202-62/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-22 11:45:31] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 12:46:11] [31merror[39m: POST /user/verify-otp-Wallet validation failed: user: Path `user` is required.
+[2026-06-22 13:00:15] [31merror[39m: POST /user/verify-otp-Wallet validation failed: user: Path `user` is required.
+[2026-06-22 13:33:23] [31merror[39m: POST /user/signup-Cannot destructure property 'name' of 'req.body' as it is undefined.
+[2026-06-22 13:35:08] [31merror[39m: POST /user/signup-Cannot destructure property 'name' of 'req.body' as it is undefined.
+[2026-06-22 13:36:25] [31merror[39m: POST /user/signup-Cannot destructure property 'name' of 'req.body' as it is undefined.
+[2026-06-22 13:38:24] [31merror[39m: POST /user/signup-Cannot destructure property 'name' of 'req.body' as it is undefined.
+[2026-06-22 13:41:06] [31merror[39m: POST /user/signup-Cannot destructure property 'name' of 'req.body' as it is undefined.
+[2026-06-22 14:09:17] [31merror[39m: POST /user/signup-confirmPassword is not defined
+[2026-06-22 14:19:52] [31merror[39m: GET /user/generateotp-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\generateotp.ejs:89
+    87|   const inputs = document.querySelectorAll('.otp-inputs input');
+    88|   const verifyBtn = document.querySelector('.verify-btn');
+ >> 89|   const userEmail = sessionStorage.getItem('otpEmail') || '<%= email %>';
+    90|   document.getElementById('user-email').value = userEmail;
+    91| 
+    92|   // Redirect to signup if no email is found
+
+email is not defined
+[2026-06-22 14:22:04] [31merror[39m: GET /user/generateotp-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\generateotp.ejs:89
+    87|   const inputs = document.querySelectorAll('.otp-inputs input');
+    88|   const verifyBtn = document.querySelector('.verify-btn');
+ >> 89|   const userEmail = sessionStorage.getItem('otpEmail') || '<%= email %>';
+    90|   document.getElementById('user-email').value = userEmail;
+    91| 
+    92|   // Redirect to signup if no email is found
+
+email is not defined
+[2026-06-22 14:37:04] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-22 14:37:07] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f-product already in wishlist
+[2026-06-22 14:37:11] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f-product already in wishlist
+[2026-06-22 14:37:18] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-22 14:43:11] [31merror[39m: POST /user/wishlist/add-to-cart/6a38fb5f243484e8ebc64fa1-product out of stock
+[2026-06-22 14:43:20] [31merror[39m: POST /user/wishlist/add-to-cart/6a38fb5f243484e8ebc64fa1-product out of stock
+[2026-06-22 14:56:51] [31merror[39m: GET /user/wishlist-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\wishlist.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-22 14:56:54] [31merror[39m: GET /user/wishlist-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\wishlist.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-22 14:57:04] [31merror[39m: GET /user/wishlist-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\wishlist.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-22 15:28:21] [31merror[39m: PUT /user/addresses/edit/6a30c9d77f8000cb4051bff0-Address not found or no changes applied
+[2026-06-22 15:46:07] [31merror[39m: GET /user/checkout-checkoutService is not defined
+[2026-06-22 15:46:51] [31merror[39m: GET /user/checkout-Wallet is not defined
+[2026-06-22 15:55:35] [31merror[39m: GET /user/checkout-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:220
+    218|             <label for="<%= method.id %>" <%= (method.id === 'cod' && netAmount > 1000) ? 'title="COD not available for orders > ₹1000"' : '' %>>
+    219| 
+ >> 220|                <%= method.id === 'wallet' && wallet.balance < netAmount
+    221|       ? 'title="Insufficient wallet balance"'
+    222|       : '' %>>
+    223|             </label>
+
+wallet is not defined
+[2026-06-22 16:03:58] [31merror[39m: GET /user/checkout-wallet is not defined
+[2026-06-22 16:12:20] [31merror[39m: GET /user/checkout-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:206
+    204|   </div>
+    205| 
+ >> 206| <pre><%=JSON.Strigify(wallet.balance)%></pre>
+    207|   <!-- Payment Options -->
+    208|   <div class="payment-section">
+    209|     <div class="section-title">PAYMENT OPTIONS</div>
+
+JSON.Strigify is not a function
+[2026-06-22 16:13:27] [31merror[39m: GET /user/checkout-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:206
+    204|   </div>
+    205| 
+ >> 206| <pre><%=JSON.Strigify(wallet,null,2)%></pre>
+    207|   <!-- Payment Options -->
+    208|   <div class="payment-section">
+    209|     <div class="section-title">PAYMENT OPTIONS</div>
+
+JSON.Strigify is not a function
+[2026-06-22 16:13:32] [31merror[39m: GET /user/checkout-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:206
+    204|   </div>
+    205| 
+ >> 206| <pre><%=JSON.Strigify(wallet,null,2)%></pre>
+    207|   <!-- Payment Options -->
+    208|   <div class="payment-section">
+    209|     <div class="section-title">PAYMENT OPTIONS</div>
+
+JSON.Strigify is not a function
+[2026-06-22 16:31:10] [31merror[39m: GET /user/checkout-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\checkout.ejs:207
+    205| 
+    206| <pre>
+ >> 207| wallet.balance: <%= wallet[0].balance %>
+    208| netAmount: <%= netAmount %>
+    209| 
+    210| wallet[0].balance < netAmount:
+
+Cannot read properties of undefined (reading 'balance')
+[2026-06-22 17:20:43] [31merror[39m: POST /admin/addProducts-At least 3 product images are required
+[2026-06-22 17:20:44] [31merror[39m: POST /admin/addProducts-At least 3 product images are required
+[2026-06-22 17:20:45] [31merror[39m: POST /admin/addProducts-At least 3 product images are required
+[2026-06-22 17:23:57] [31merror[39m: POST /admin/addProducts-At least 3 product images are required
+[2026-06-22 18:14:19] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:150
+    148| 
+    149|       <div class="pagination" id="products-pagination">
+ >> 150|         <span class="page-prev<%=currentPage<=1?'disabled':''%>">
+    151|           &lt;
+    152|           < /span>
+    153|             <span class="page-number active"><%=currentPage%></span>
+
+currentPage is not defined
+[2026-06-22 18:14:59] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 18:43:11] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:46:45] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:48:13] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:48:52] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:53:44] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:53:46] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:53:47] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:53:47] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 19:53:48] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 20:01:42] [31merror[39m: GET /admin/dashboard-C:\Users\LENOVO\Desktop\first project\nodewebapp\views\admin\dashboard.ejs:151
+    149|       <!-- <div class="pagination" id="products-pagination">
+    150| 
+ >> 151|   <span class="page-prev <%= currentPage <= 1 ? 'disabled' : '' %>">
+    152|     &lt;
+    153|   </span>
+    154| 
+
+currentPage is not defined
+[2026-06-22 20:24:54] [31merror[39m: POST /admin/orders/6a38b5326a5afe78dcf3447b/status-invaid status
+[2026-06-22 21:49:58] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-22 21:49:58] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-23 00:26:34] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-23 00:26:34] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-23 00:26:54] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-23 00:26:54] [31merror[39m: mongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+[2026-06-23 00:27:13] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-23 00:27:13] [31merror[39m: Error in checkExpiredCoupons cron job: Operation `coupons.updateMany()` buffering timed out after 10000ms
+[2026-06-23 02:30:18] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-23 02:30:18] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net

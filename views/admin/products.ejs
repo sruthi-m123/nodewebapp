@@ -76,7 +76,7 @@
                       <% } %>
                 </td>
                 <td>
-                  <button class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>"
+                  <button id="product-status-btn-<%= product._id %>" class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>"
                     onclick="toggleProductStatus('<%= product._id %>', <%= !product.isActive %>)">
                     <%= product.isActive ? 'Active' : 'Inactive' %>
                   </button>
@@ -570,19 +570,9 @@
 
             const removeBtn = document.createElement("button");
             removeBtn.innerHTML = "&times;";
-            removeBtn.style.position = "absolute";
-            removeBtn.style.top = "-6px";
-            removeBtn.style.right = "-6px";
-            removeBtn.style.background = "transparent";
-            removeBtn.style.color = "#000";
-            removeBtn.style.border = "1px solid #fff";
-            removeBtn.style.borderRadius = "50%";
-            removeBtn.style.cursor = "pointer";
-            removeBtn.style.width = "20px";
-            removeBtn.style.height = "20px";
-            removeBtn.style.fontSize = "14px";
-            removeBtn.style.lineHeight = "16px";
-            removeBtn.style.padding = "0";
+            removeBtn.type = "button";
+            removeBtn.classList.add("remove-img-btn");
+
 
             removeBtn.addEventListener("click", () => {
               filesQueue.splice(index, 1);
@@ -699,7 +689,12 @@
           .then(data => {
             if (data.success) {
               showToast('Product status updated successfully', 'success');
-              setTimeout(() => location.reload(), 2000);
+              const button = document.getElementById(`product-status-btn-${productId}`);
+              if (button) {
+                button.textContent = newStatus ? 'Active' : 'Inactive';
+                button.className = `action-btn ${newStatus ? 'unblock-btn' : 'block-btn'}`;
+                button.setAttribute('onclick', `toggleProductStatus('${productId}', ${!newStatus})`);
+              }
             } else {
               showToast('Failed to update status', 'error');
             }

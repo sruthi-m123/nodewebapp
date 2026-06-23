@@ -88,6 +88,7 @@ export const loadSignup = async (req, res) => {
 
 export const signup = async (req, res) => {
   logger.info('Processing signUp');
+  console.log("req body inside the signup:",req.body)
   const { name, phone, email, password, confirmPassword, referralCode } = req.body;
   
   if (password !== confirmPassword) {
@@ -141,7 +142,7 @@ export const verifyOtp = async (req, res) => {
   delete req.session.userData;
   delete req.session.otpExpires;
 
-  res.json({ success: true, message: MESSAGES.SIGNUP_SUCCESS });
+  res.json({ success: true, message: "logged in successfully" });
 };
 
 export const resendOtp = async (req, res) => {

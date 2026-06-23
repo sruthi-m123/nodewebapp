@@ -7,9 +7,9 @@ export const getCheckoutPage = async (req, res) => {
   if (!req.session.user) {
     return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "please login to continue" });
   }
-
   const userId = req.session.user.id;
-  const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons } = await checkoutService.getCheckoutData(userId, req.session);
+
+  const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons,wallet } = await checkoutService.getCheckoutData(userId, req.session);
 console.log("orderSummary",orderSummary);
 if(!cartItems||cartItems.length===0){
   return res.redirect('/user/cart');
@@ -40,6 +40,7 @@ if(!cartItems||cartItems.length===0){
     user: req.session.user,
     isRetry:false,
     coupons,
+    wallet,
     razorpayKey: process.env.RAZORPAY_KEY_ID
   });
 };

@@ -28,6 +28,7 @@ async create(data = {}, files = []) {
     
 console.log("data being here :",data );
 let imageUrls = [];
+
 if (Array.isArray(files) && files.length) {
 for (const file of files) {
 if (file?.path) imageUrls.push(file.path);
@@ -36,6 +37,9 @@ if (file?.path) imageUrls.push(file.path);
  if (!imageUrls.length && Array.isArray(data.images)) {
     imageUrls = data.images;
   }
+  if (imageUrls.length < 3) {
+  throw new Error("At least 3 product images are required");
+}
 const {sku}=data;
 const existing=await Product.findOne({sku});
 
@@ -65,6 +69,9 @@ async update(id,data={}){
     const product=await Product.findById(id);
     if(!product)return null;
     let updatedImages=[...product.images];
+    if(updatedImages<3){
+        throw new Error('Atleast minimum 3 images is required ')
+    }
       return Product.findByIdAndUpdate(id,data,{new:true});
 },
 

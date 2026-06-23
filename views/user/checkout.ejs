@@ -204,39 +204,72 @@
   </div>
 
 
-  <!-- Payment Options -->
-  <div class="payment-section">
-    <div class="section-title">PAYMENT OPTIONS</div>
 
-    <div class="payment-methods">
-      <% paymentMethods.forEach(method=> { %>
-        <div class="payment-option <%= method.id === selectedPayment ? 'selected' : '' %> <%= (method.id === 'cod' && netAmount > 1000) ? 'disabled' : '' %>"
+<div class="payment-section">
+  <div class="section-title">PAYMENT OPTIONS</div>
+
+  <div class="payment-methods">
+    <% paymentMethods.forEach(method => { %>
+
+      <% const isCodDisabled = method.id === 'cod' && netAmount > 1000; %>
+      <% const isWalletDisabled = method.id === 'wallet' && wallet.balance < netAmount; %>
+
+      <div class="payment-option
+          <%= method.id === selectedPayment ? 'selected' : '' %>
+          <%= (isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>"
           data-payment="<%= method.id %>">
-          <div class="payment-radio">
-            <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>"
-              <%= (method.id === 'cod' && netAmount > 1000) ? 'disabled' : '' %> <%=method.id===selectedPayment ? 'checked' : '' %>>
-            <label for="<%= method.id %>" <%= (method.id === 'cod' && netAmount > 1000) ? 'title="COD not available for orders > ₹1000"' : '' %>></label>
+
+        <div class="payment-radio">
+
+          <input
+            type="radio"
+            name="paymentMethod"
+            id="<%= method.id %>"
+            value="<%= method.id %>"
+            <%= (isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>
+            <%= method.id === selectedPayment ? 'checked' : '' %>
+          >
+
+          <label
+            for="<%= method.id %>"
+            <%= isCodDisabled
+                ? 'title="COD not available for orders above ₹1000"'
+                : '' %>
+            <%= isWalletDisabled
+                ? 'title="Insufficient wallet balance"'
+                : '' %>>
+          </label>
+
+        </div>
+
+        <div class="payment-info">
+          <div class="payment-icon">
+            <%= method.icon || '💳' %>
           </div>
 
+          <div class="payment-details">
+            <div class="payment-title">
+              <%= method.title || 'Payment Method' %>
+            </div>
 
-          <div class="payment-info">
-            <div class="payment-icon">
-              <%= method.icon || '💳' %>
+            <div class="payment-description">
+              <%= method.description || 'No description' %>
             </div>
-            <div class="payment-details">
-              <div class="payment-title">
-                <%= method.title || 'Payment Method' %>
-              </div>
-              <div class="payment-description">
-                <%= method.description || 'No description' %>
-              </div>
-            </div>
+
+            <% if (isWalletDisabled) { %>
+              <small style="color:red;">
+                Insufficient wallet balance
+              </small>
+            <% } %>
           </div>
         </div>
-        <% }); %>
-    </div>
-    <input type="hidden" id="selectedPaymentId" name="paymentMethod">
+
+      </div>
+
+    <% }) %>
   </div>
+
+  <input type="hidden" id="selectedPaymentId" name="paymentMethod">
 </div>
 
 

@@ -33,7 +33,6 @@ export const  handleSingup=async({name,phone,email,password,referralCode})=>{
         const referringUser=await User.findOne({referralCode:referralCode.toUpperCase()});
         if(referringUser){
             referralInfo={referrerId:referringUser._id,amount:100};
-            await updateReferralWallet(referringUser._id,email);
         }
     }
     const otp=generateOtp();
@@ -49,6 +48,7 @@ export const  handleSingup=async({name,phone,email,password,referralCode})=>{
 }
 
 const updateReferralWallet=async(referrerId,referredEmail)=>{
+    console.log("inside the update refferal");
     const referralAmount=100;
     let wallet=await Wallet.findOne({user:referrerId});
     const referralRef=`REF-${Date.now()}-${Math.floor(Math.random()*1000)}`;
@@ -116,6 +116,20 @@ if(existingUser){
       reference: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`
     }]
   });
+  const refferalInfo=session.referralInfo;
+  console.log("refferalInfo:",refferalInfo);
+  if(refferalInfo){
+    //refferer reward
+    await updateReferralWallet(
+        refferalInfo.referrerId,
+        newUser.email
+    );
+    //new user reward
+    await updateReferralWallet(
+        newUser._id,
+        "signup referral bonus"
+    )
+  }
   return{success:true};
 }
 
