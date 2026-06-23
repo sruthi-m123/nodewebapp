@@ -327,7 +327,7 @@ let buynow=orderData.session.buyNowItem
   }));
   const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
   const { subtotal, delivery, discount, tax, total } = orderSummary;
-  if( paymentMethod==='cod'&& total>1000){
+  if( paymentMethod==='cod'&& total>5000){
     return {success:false,message:'cash on delivery is not possible for orders above 1000 rupees'};
   }
  

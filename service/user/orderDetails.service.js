@@ -4,6 +4,7 @@ import Wallet from '../../models/walletSchema.js';
 import PDFDocument from 'pdfkit';
 import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
+// import { width } from 'pdfkit/js/page';
 
 export const getOrderDetailsService=async(userId,orderId)=>{
     logger.debug('fetching order details',{userId,orderId});
@@ -46,6 +47,7 @@ export const generateInvoiceService=async(orderId)=>{
     logger.debug('Generating invoice',{orderId});
 
     const order=await Order.findOne({orderId}).populate('items.productId');
+    console.log("order inside the generate invoice",order);
 
     if(!order){
         logger.warn('order not found for invoice',{orderId});
@@ -354,6 +356,7 @@ const generateInvoiceContent = (doc, order) => {
     const delivery = validateNumber(order.delivery);
     const discount = validateNumber(order.discount);
     const total = validateNumber(order.total);
+    const tax=validateNumber(order.tax)
 
     doc.moveTo(colPositions[2], summaryTop - 10).lineTo(colPositions[3] + colWidths[3], summaryTop - 10).stroke();
 
@@ -362,6 +365,11 @@ const generateInvoiceContent = (doc, order) => {
 
     doc.text('Delivery:', colPositions[2], summaryTop + 20, { width: colWidths[2], align: 'right' });
     doc.text(`₹${delivery.toFixed(2)}`, colPositions[3], summaryTop + 20, { width: colWidths[3], align: 'right' });
+
+    doc.text('Tax:',colPositions[2],summaryTop+40,{width:colWidths[2],align:'right'});
+        doc.text(`₹${tax.toFixed(2)}`, colPositions[3], summaryTop+40, { width: colWidths[3], align: 'right' });
+
+
 
     if (discount > 0) {
         doc.text('Discount:', colPositions[2], summaryTop + 40, { width: colWidths[2], align: 'right' });

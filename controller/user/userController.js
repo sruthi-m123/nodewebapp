@@ -15,6 +15,9 @@ function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+
+
+
 async function sendVerificationEmail(email, otp) {
   try {
     const transporter = nodemailer.createTransport({
@@ -302,4 +305,9 @@ export const logout = async (req, res) => {
     res.clearCookie('connect.sid');
     res.redirect('/user/login');
   });
+
 };
+export const about = async(req,res)=>{
+  res.render('/user/aboutus')
+  console.log('Success')
+}

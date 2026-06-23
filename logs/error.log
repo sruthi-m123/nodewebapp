@@ -798,3 +798,9 @@ wallet is not defined
 [2026-06-23 09:01:22] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
 [2026-06-23 09:04:06] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
 [2026-06-23 09:08:02] [31merror[39m: GET /admin/orders/ORD-1782184825196-645/verify-return-Cannot read properties of undefined (reading 'toString')
+[2026-06-23 10:10:34] [31merror[39m: GET /user/product/6a30cf8d7f8000cb4051c1e1-Product not found
+[2026-06-23 10:33:05] [31merror[39m: PUT /admin/coupons/edit-coupon/6a3a136d91a26e8484da4d99-Coupon discount value cant be greater than minimum Cart Vale
+[2026-06-23 11:14:27] [31merror[39m: GET /user/aboutus-Failed to lookup view "/user/aboutus" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-23 11:14:35] [31merror[39m: GET /user/aboutus-Failed to lookup view "/user/aboutus" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-23 12:10:57] [31merror[39m: GET /user/aboutus-Failed to lookup view "/user/aboutus" in views directory "C:\Users\LENOVO\Desktop\first project\nodewebapp\views"
+[2026-06-23 16:07:02] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net

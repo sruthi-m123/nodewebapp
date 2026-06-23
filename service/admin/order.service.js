@@ -118,23 +118,6 @@ static async updateOrderStatus(orderId,status){
         throw error;
     }
 
-    // const updatedOrder=await Order.findByIdAndUpdate(
-    //     orderId,
-    //     {status},
-    //     {new:true},
-    //         ).populate('userId','name email');
-
-    //           if (!updatedOrder) {
-    //   const error = new Error('Order not found');
-    //   error.code = 'ORDER_NOT_FOUND';
-    //   throw error;
-    // }
-
-    // logger.info('Order status updated successfully', { orderId, newStatus: status });
-
-    //   return {
-    //   status: updatedOrder.status,
-    //   statusClass: updatedOrder.status.toLowerCase().replace(/\s+/g, '-')
     
     console.log("orderId",orderId);
     const order=await Order.findById(orderId);

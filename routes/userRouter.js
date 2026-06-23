@@ -163,7 +163,7 @@ router.get("/status/:productId", validate(V.objectIdSchema), wishlistController.
 // Wallet routes
 router.get("/wallet",isLoggedIn, checkBlocked, walletController.getWallet);
 router.post("/add-funds", checkBlocked, walletController.addFunds);
-
+router.get('/aboutus',userController.about)
 
 
 export default router;

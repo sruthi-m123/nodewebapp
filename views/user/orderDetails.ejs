@@ -3,7 +3,9 @@
     <div class="order-header">
       
         <p><strong>Order #</strong> <%= order.orderId %></p>
-            <% if (order.paymentMethod==='cod'||order.status == 'delivered'||order.paymentMethod==='netbanking') { %>
+            <% if (order.paymentMethod==='cod'||
+                   order.paymentMethod==='netbanking'||
+                   (order.status!=='pending'&&order.status!=='processing')) { %>
 
         <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
