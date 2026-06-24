@@ -53,6 +53,16 @@ export const generateInvoiceService=async(orderId)=>{
         logger.warn('order not found for invoice',{orderId});
         throw new Error('order not found');
     }
+//first time invoice generation
+if(!order.invoice?.invoiceNumber){
+    order.invoice={
+        invoiceNumber:`INV-${Date.now()}`,
+        generatedAt:new Date()
+    }
+    await order.save();
+}
+
+
 
     return new Promise((resolve,reject)=>{
          const doc = new PDFDocument({ size: 'A4', margin: 50, rightMargin: 70 });
@@ -111,12 +121,24 @@ if(!itemId){
     refundAmount=await processPartialCancellation(order,itemId,cancellationReason,cancelledItems,deliveryCharge,couponAmount,tax);
 console.log("refund amount inside the partial cancellation:",refundAmount);
 }
-await order.save();
+
 
 
 if(refundAmount>0){
     await processRefund(order,refundAmount);
+    order.creditNotes.push({
+    creditNoteNumber: `CN-${Date.now()}`,
+    itemId: itemId || null,
+    refundAmount,
+    reason: itemId
+        ? 'Partial Order Cancellation'
+        : 'Full Order Cancellation',
+    generatedAt: new Date()
+});
+
 }
+await order.save();
+
 logger.info('order cancelled successfully',{orderId,refundAmount});
 return order;
 }
@@ -372,13 +394,13 @@ const generateInvoiceContent = (doc, order) => {
 
 
     if (discount > 0) {
-        doc.text('Discount:', colPositions[2], summaryTop + 40, { width: colWidths[2], align: 'right' });
-        doc.text(`-₹${discount.toFixed(2)}`, colPositions[3], summaryTop + 40, { width: colWidths[3], align: 'right' });
+        doc.text('Discount:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });
+        doc.text(`-₹${discount.toFixed(2)}`, colPositions[3], summaryTop + 60, { width: colWidths[3], align: 'right' });
     }
 
     doc.font('Helvetica-Bold');
-    doc.text('Total:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });
-    doc.text(`₹${total.toFixed(2)}`, colPositions[3], summaryTop + 60, { width: colWidths[3], align: 'right' });
+    doc.text('Total:', colPositions[2], summaryTop + 80, { width: colWidths[2], align: 'right' });
+    doc.text(`₹${total.toFixed(2)}`, colPositions[3], summaryTop + 80, { width: colWidths[3], align: 'right' });
     doc.font('Helvetica');
 
     doc.moveDown(4);
@@ -619,3 +641,95 @@ item.status="return_requested";
             return order.returnDetails?.items?.length>0?'partial':'full';
         }
     }
+
+
+    export const generateCreditNoteService = async (
+  orderId
+  ) => {
+console.log("inside the generatig credit service")
+  const order = await Order.findOne({ orderId })
+    .populate('items.productId');
+
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+if(!order.creditNotes||order.creditNotes.length===0){
+    throw new Error('No credit notes found');
+}
+
+  
+  return new Promise((resolve, reject) => {
+
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 50
+    });
+
+    const chunks = [];
+
+    doc.on('data', chunk => chunks.push(chunk));
+
+    doc.on('end', () => {
+      resolve(Buffer.concat(chunks));
+    });
+
+    doc.on('error', reject);
+
+    generateCreditNoteContent(
+      doc,
+      order,
+      order.creditNotes
+    );
+
+    doc.end();
+
+  });
+
+};
+function generateCreditNoteContent(
+  doc,
+  order,
+  creditNotes
+) {
+
+  doc.fontSize(20).text('Credit Notes');
+
+  creditNotes.forEach((note, index) => {
+
+    doc.moveDown();
+
+    doc.fontSize(14)
+       .text(`Credit Note: ${note.creditNoteNumber}`);
+
+    doc.text(`Reason: ${note.reason}`);
+
+    doc.text(
+      `Refund Amount: ₹${note.refundAmount.toFixed(2)}`
+    );
+
+    doc.text(
+      `Generated At: ${note.generatedAt.toLocaleDateString()}`
+    );
+
+    doc.moveDown();
+
+    // show affected items
+    const affectedItems = order.items.filter(item =>
+      note.itemIds.some(
+        id => id.toString() === item._id.toString()
+      )
+    );
+
+    affectedItems.forEach(item => {
+      doc.text(
+        `${item.name} x ${item.quantity}`
+      );
+    });
+
+    if (index < creditNotes.length - 1) {
+      doc.moveDown();
+      doc.text('--------------------------------');
+    }
+  });
+}

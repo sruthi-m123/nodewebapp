@@ -150,76 +150,6 @@ function openModal(type, orderId, itemId = null) {
             closeModal();
         }
 
-        // function submitReturn(event) {
-        //     const reason = document.getElementById('returnReason').value;
-        //     const orderId = event.target.getAttribute('data-order-id');
-        //       const itemId=event.target.getAttribute('data-item-id');          
-        //     console.log("orderId", orderId);
-        //     console.log("reason", reason);
-        //     if (!reason) {
-        //         alert('Please provide a reason for return');
-        //         return;
-        //     }
-            
-        //     const status = 'delivered';
-            
-        //     fetch(`/user/orders/${orderId}/return`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ 
-        //             reason,
-        //             status: status.toLowerCase().trim(),
-        //             ItemsIds: [itemId] ,
-        //             returnRequest: true
-        //         })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log("data inside the return after submitting the modal:",data)
-        //         if (data.success) {
-        //             Swal.fire({
-        //                 icon: 'success',
-        //                 title: 'Return request submitted',
-        //                 timer: 2000,
-        //                 showConfirmButton: false,
-        //                 toast: true,
-        //                 position: 'top-end'
-        //             });
-                    
-        //             const returnButton = document.querySelector(`button[data-order-id="${orderId}"]`);
-        
-        //             if (returnButton) {
-        //                 returnButton.textContent = 'Requested';   
-        //                 returnButton.disabled = true;             
-        //                 returnButton.classList.add('disabled');   
-        //             }
-        //         } else {
-        //             Swal.fire({
-        //                 icon: 'error',
-        //                 title: data.message || 'Return request failed',
-        //                 timer: 2500,
-        //                 showConfirmButton: false,
-        //                 toast: true,
-        //                 position: 'top-end'
-        //             });                
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'Something went wrong',
-        //             timer: 2500,
-        //             showConfirmButton: false,
-        //             toast: true,
-        //             position: 'top-end'
-        //         });
-        //     });
-            
-        //     closeModal();
-        // }
 function submitReturn(event) {
     const reason = document.getElementById('returnReason').value;
     const target = event.currentTarget; 
@@ -353,45 +283,61 @@ function submitReturn(event) {
             });
         }
 
+// Function to download credit note
+function downloadCreditNote(orderId) {
+    console.log("orderId inside the frotend js :",orderId);
+    const button = event?.target?.closest('.download-credit-note');
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Downloading...';
+    }
 
-//         function downloadInvoice(orderId){
-//             const button=document.querySelector('.download-invoice');
-//             const originalText=button.innerHTML;
-//             button.innerHTML='<span>Generating Invoice...</span>';
-//             button.disabled=true;
-
-//             fetch(`/user/orders/${orderId}/invoice`,{
-//                 method:'GET',
-//                 headers:{
-//                     'Content-Type':'application/json',
-//                 }
-//             })
-//             .then(response=>{
-//                 if(!response.ok){
-// throw new Error('failed to generate invoice');
-//                 }
-//                 return response.blob();
-//             })
-// .then(blob=>{
-//     const url=window.URL.createObjectURL(blob);
-//     const a =document.createElement('a');
-//     a.href=url;
-//     a.download='Invoice_${orderId}.pdf';
-//      document.body.appendChild(a);
-//             a.click();
-//             window.URL.revokeObjectURL(url);
-//             a.remove();
-// })
-//  .catch(error => {
-//             console.error('Error:', error);
-// Swal.fire({
-//   icon: 'error',
-//   title: 'Download Failed',
-//   text: 'Failed to download invoice. Please try again.',
-//   confirmButtonText: 'OK'
-// });        })
-//         .finally(() => {
-//             button.innerHTML = originalText;
-//             button.disabled = false;
-//         });
-//         }
+    fetch(`/user/orders/${orderId}/credit-note`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.blob(); 
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `credit-note-${orderId}.pdf`; // Set filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download Credit Note
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error downloading credit note:', error);
+        alert('Failed to download credit note. Please try again later.');
+        
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download Credit Note
+            `;
+        }
+    });
+}

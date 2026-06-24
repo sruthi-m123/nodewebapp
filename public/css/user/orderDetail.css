@@ -588,3 +588,75 @@ button.disabled:hover {
   background-color: #d4edda;  /* Light green */
   color: #155724;
 }
+/* Credit Note Button Styles */
+.download-credit-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #6c757d; /* Grey color to differentiate from invoice */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.download-credit-note:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.download-credit-note svg {
+    margin-right: 0.3rem;
+}
+
+/* Alternative styling with accent color */
+.download-credit-note.primary {
+    background-color: #9e6d4e; /* Matches your primary color */
+}
+
+.download-credit-note.primary:hover {
+    background-color: #7d573e;
+}
+
+/* If you want to style it like a warning/info button */
+.download-credit-note.warning {
+    background-color: #ff9800;
+}
+
+.download-credit-note.warning:hover {
+    background-color: #e68900;
+}
+
+/* Responsive adjustments for credit note button */
+@media (max-width: 768px) {
+    .download-credit-note {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .download-credit-note {
+        align-self: stretch;
+        justify-content: center;
+    }
+}
+
+/* If you want to group invoice and credit note buttons together */
+.order-header .download-invoice,
+.order-header .download-credit-note {
+    margin-left: 0.5rem;
+}
+
+.order-header .download-credit-note:first-child {
+    margin-left: 0;
+}
+
+/* Optional: Add an icon styling for credit note */
+.download-credit-note .credit-icon {
+    font-size: 1.1rem;
+}

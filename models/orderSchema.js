@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 
@@ -204,6 +205,22 @@ const orderSchema = new mongoose.Schema({
     },
     processedAt: Date,
   },
+  invoice:{
+    invoiceNumber:String,
+    generatedAt:Date
+  },
+  creditNotes:[
+    {
+      creditNoteNumber:String,
+      itemIds:[{
+        type:mongoose.Schema.Types.ObjectId
+      }],
+      refundAmount:Number,
+      reason:String,
+      generatedAt:Date
+
+    }
+  ]
 });
 
 const Order = mongoose.model("Order", orderSchema);

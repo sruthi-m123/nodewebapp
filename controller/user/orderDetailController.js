@@ -82,10 +82,31 @@ export const returnOrder = async (req, res) => {
   });
 };
 
-export const getReturnDetails = async (req, res) => {
-  logger.info('fetching return details');
+export const creditNote = async (req, res) => {
+  const { orderId } = req.params;
 
-  const returnDetails = await orderManagmentService.getReturnDetailsService(req.userId, req.orderId);
+  logger.info('Generating credit note', { orderId });
 
-  res.status(STATUS_CODES.SUCCESS).json(returnDetails);
+  try {
+    const pdfBuffer =
+      await orderManagmentService.generateCreditNoteService(orderId);
+
+    res.setHeader('Content-Type', 'application/pdf');
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=CreditNotes_${orderId}.pdf`
+    );
+
+    res.send(pdfBuffer);
+
+  } catch (error) {
+
+    logger.error('Error generating credit note', error);
+
+    return res.status(404).json({
+      success: false,
+      message: error.message
+    });
+  }
 };

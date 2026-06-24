@@ -152,7 +152,7 @@ router.get("/orders-details/:orderId", isLoggedIn, checkBlocked, validate(V.getO
 router.post("/orders/:orderId/return", isLoggedIn, checkBlocked, validate(V.returnOrderSchema), orderdetailController.returnOrder);
 router.get("/orders/:orderId/invoice", validate(V.getOrderDetailsSchema), orderdetailController.invoice);
 router.post("/orders/:orderId/cancel", isLoggedIn, checkBlocked, validate(V.cancelOrderSchema), orderdetailController.cancelOrder);
-
+router.get("/orders/:orderId/credit-note",orderdetailController.creditNote);
 // Wishlist routes
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
 router.post("/wishlist/add/:productId", isLoggedIn, validate(V.addToWishlistSchema, "params"), wishlistController.addToWishlist);
@@ -163,7 +163,7 @@ router.get("/status/:productId", validate(V.objectIdSchema), wishlistController.
 // Wallet routes
 router.get("/wallet",isLoggedIn, checkBlocked, walletController.getWallet);
 router.post("/add-funds", checkBlocked, walletController.addFunds);
-router.get('/aboutus',userController.about)
+
 
 
 export default router;

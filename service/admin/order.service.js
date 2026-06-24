@@ -283,6 +283,16 @@ await OrderService._updateOrderStatus(order,refundItems);
    order.returnDetails.type = refundItems.length === order.items.length ? 'full' : 'partial';
 
     logger.info('Saving order updates', { orderId, status: order.status });
+
+order.creditNotes.push({
+    creditNoteNumber:`CN-${Date.now()}`,
+    itemsIds:refundItems.map(item=>item._id),
+    refundAmount,
+    reason:'Return Approved',
+    generatedAt:new Date()
+})
+
+
 await order.save();
 
     if (action.includes('approve')) {
