@@ -19,7 +19,7 @@ function calculateBestOffer(product, offers) {
       if (offer.maxDiscount) {
         discount = Math.min(discount, offer.maxDiscount);
       }
-    } else if (offer.type === "flat") {
+    } else if (offer.type === "fixed") {
       discount = offer.discountValue;
     }
 
@@ -61,7 +61,7 @@ export const updateProductsOffer = async (offer) => {
       };
     }
 
-    const activeOffers = await Offer.find({ isActive: true });
+    const activeOffers = await Offer.find({ isActive: true,endDate:{$gte:new Date()} });
     const products = await Product.find(filter);
 
     for (const product of products) {
@@ -69,8 +69,10 @@ export const updateProductsOffer = async (offer) => {
       console.log("best inside the offer:",best);
 
       product.bestOffer = best?.bestOffer || null;
+      console.log("best offer inside the product:",product.bestOffer);
       product.discount = best?.discount || 0;
-      product.discountedPrice = best?.discountedPrice || product.price;
+      // Only set a discountedPrice when there is a real discount; 0 means "no offer applied"
+      product.discountedPrice = (best && best.discount > 0) ? best.discountedPrice : 0;
     }
 
     await Promise.all(products.map((p) => p.save()));

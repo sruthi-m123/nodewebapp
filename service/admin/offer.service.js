@@ -106,6 +106,7 @@ return newOffer;
 
 export const deleteOfferService=async(offerId)=>{
     logger.debug('Deleting offer',{offerId});
+    console.log("offerId inisde the delete offersrvice :",offerId);
 
     const offer=await Offer.findById(offerId);
     if(!offer){
@@ -113,11 +114,15 @@ export const deleteOfferService=async(offerId)=>{
         throw new Error(MESSAGES.OFFER.NOT_FOUND);
 
     }
+    console.log("offer to delete:",offer);
 
     await Product.updateMany(
         {bestOffer:offer._id},
         {$unset:{bestOffer:"",discountedPrice:"",discount:""}}
     );
+    const affectedProducts=await Product.find({_id:{$in:offer.applicableItems}});
+    await updateProductsOffer({applicableTo:'all',applicableItems:[]});
+    console.log("result of the updated product:",result);
     console.log("offer",offer);
 
     // await Offer.findByIdAndDelete(offerId);

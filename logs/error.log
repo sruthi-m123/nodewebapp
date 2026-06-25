@@ -828,3 +828,35 @@ creditNote is not defined
 [2026-06-24 22:11:23] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-25 00:11:23] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-25 01:11:27] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-25 15:00:33] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-25 15:00:33] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-25 15:17:44] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-25 15:17:46] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-25 15:17:47] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-25 15:17:59] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-25 15:20:39] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-25 15:44:35] [31merror[39m: GET /user/cart-missing ) after argument list in C:\Users\LENOVO\Desktop\first project\nodewebapp\views\user\cart.ejs while compiling ejs
+
+If the above error is not helpful, you may want to try EJS-Lint:
+https://github.com/RyanZim/EJS-Lint
+Or, if you meant to create an async function, pass `async: true` as an option.

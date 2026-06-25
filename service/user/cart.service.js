@@ -110,7 +110,8 @@ if(!cart){
 const existingItem=cart.items.find(
     item=>item.productId.toString()===productId
 );
-const price=product.bestOffer?.price||product.price;
+// const price=product.bestOffer?.price||product.price;
+const price=product.discountedPrice&&product.discountedPrice>0?product.discountedPrice:product.price;
 
 if(existingItem){
    const newQty=existingItem.quantity+quantity;
@@ -214,7 +215,12 @@ for(const update of updates ){
     const item =cart.items.find((i)=>i._id.toString()===update.id);
     if(item){
         item.quantity=update.quantity;
-        item.totalPrice=item.quantity*item.price;
+
+        const freshProduct=await Product.findById(item.productId,'price discountedPrice');
+        const freshPrice=(freshProduct?.discountedPrice>0)?
+            freshProduct.discountedPrice:freshProduct?.price||item.price;
+        item.price=freshPrice;
+        item.totalPrice=item.quantity*freshPrice;
     }
 }
 

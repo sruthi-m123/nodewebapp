@@ -10,7 +10,7 @@ export const getCheckoutPage = async (req, res) => {
   const userId = req.session.user.id;
 
   const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons,wallet } = await checkoutService.getCheckoutData(userId, req.session);
-console.log("orderSummary",orderSummary);
+  console.log("items inside the cart :",cartItems);
 if(!cartItems||cartItems.length===0){
   return res.redirect('/user/cart');
 }

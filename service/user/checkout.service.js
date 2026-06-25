@@ -81,6 +81,7 @@ export const getCheckoutData = async (userId, session) => {
         }))
     }
   }
+  console.log("cart items inside the checkout service:",cartItems);
   const coupons = await Coupon.find({ isActive: true }).lean();
   const usedOrders = await Order.find({
     userId,
@@ -108,7 +109,6 @@ export const getCheckoutData = async (userId, session) => {
     { id: 'wallet', title: 'Wallet', description: 'Purchase through your wallet amount' }
   ];
     const wallet=await walletAmount(userId);
-    console.log("wallet inside the checkout service ",wallet);
   
   return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData ,wallet};
 
@@ -249,8 +249,10 @@ let buynow=orderData.session.buyNowItem
       name: product.productName,
       variant,
       quantity,
-      price: effectivePrice,
-      totalPrice: effectivePrice * quantity
+      // price: effectivePrice,
+      price:product.price,
+      discountedPrice:product.discountedPrice||null,
+       totalPrice: effectivePrice * quantity
     }];
     isBuyNow = true;
 
@@ -327,7 +329,7 @@ let buynow=orderData.session.buyNowItem
   }));
   const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
   const { subtotal, delivery, discount, tax, total } = orderSummary;
-  if( paymentMethod==='cod'&& total>5000){
+  if( paymentMethod==='cod'&& total>1000){
     return {success:false,message:'cash on delivery is not possible for orders above 1000 rupees'};
   }
  

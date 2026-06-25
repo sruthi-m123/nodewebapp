@@ -18,8 +18,12 @@ console.log("subtotoal:",subtotal);
   for (const item of cartItems) {
    
     if (item.discountedPrice) {
-      const itemDiscount =
-        (item.originalPrice - item.discountedPrice) * item.quantity;
+      // const itemDiscount =
+      //   (item.originalPrice - item.discountedPrice) * item.quantity;
+
+      const itemDiscount=item.discountedPrice!=null
+      ?(item.originalPrice-item.discountedPrice)*item.quantity
+      :0;
 
       offerDiscount += itemDiscount;
     }
