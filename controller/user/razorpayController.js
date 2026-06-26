@@ -10,6 +10,7 @@ export const createOrder = async (req, res) => {
     });
     
     const { order } = await razorpayService.createRazorpayOrder(req.body.amount);
+    console.log("order inside the razorpay controellr",order);
     
     res.status(STATUS_CODES.SUCCESS).json({
         success: true,

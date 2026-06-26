@@ -860,3 +860,8 @@ Or, if you meant to create an async function, pass `async: true` as an option.
 If the above error is not helpful, you may want to try EJS-Lint:
 https://github.com/RyanZim/EJS-Lint
 Or, if you meant to create an async function, pass `async: true` as an option.
+[2026-06-26 15:30:08] [31merror[39m: DELETE /admin/offers/delete-offer/6a3cba7a300ed2c994851e71-result is not defined
+[2026-06-26 15:36:56] [31merror[39m: DELETE /admin/offers/delete-offer/6a3cba7a300ed2c994851e71-result is not defined
+[2026-06-26 18:06:31] [31merror[39m: POST /user/wallet/verify-payment-Payment verification failed
+[2026-06-26 18:09:15] [31merror[39m: POST /user/wallet/verify-payment-crypto.createHmac is not a function
+[2026-06-26 18:15:39] [31merror[39m: POST /user/wallet/verify-payment-crypto.createHmac is not a function

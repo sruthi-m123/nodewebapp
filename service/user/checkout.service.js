@@ -249,7 +249,6 @@ let buynow=orderData.session.buyNowItem
       name: product.productName,
       variant,
       quantity,
-      // price: effectivePrice,
       price:product.price,
       discountedPrice:product.discountedPrice||null,
        totalPrice: effectivePrice * quantity

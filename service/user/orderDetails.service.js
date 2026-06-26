@@ -447,14 +447,19 @@ const calculateFullRefund=(order, newlyCancelledItems, deliveryCharge,couponAmou
     console.log("couponAmount",couponAmount);
     
     if(!newlyCancelledItems || newlyCancelledItems.length === 0) return 0;
+    console.log(newlyCancelledItems)
     
     const totalOriginalSubtotal = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
     const totalPaidExcludingDelivery = totalOriginalSubtotal - couponAmount + tax;
+    console.log(totalOriginalSubtotal,totalPaidExcludingDelivery,'------------------')
     
     let refundAmount = 0;
     newlyCancelledItems.forEach(item => {
         const itemProportion = item.totalPrice / totalOriginalSubtotal;
         refundAmount += itemProportion * totalPaidExcludingDelivery;
+console.log("refund amount",refundAmount);
+console.log("itempropotion",itemProportion);
+console.log("excluding delivey:",totalPaidExcludingDelivery);
     });
     
     console.log("refund amount:",refundAmount);

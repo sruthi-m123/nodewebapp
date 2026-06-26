@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Wallet from '../../models/walletSchema.js';
 import logger from '../../utils/logger.js';
+import crypto from 'crypto';
 
 export const WalletService ={
     async getWallet(userId){
@@ -32,6 +33,12 @@ export const WalletService ={
             };
         });
     },
+
+
+
+
+
+
 
     async creditWallet(userId,amount,orderId,referenceType){
         return mongoose.connection.transaction(async(session)=>{
@@ -81,6 +88,34 @@ await wallet.save({session});
 logger.info("wallet debited",{userId,amount,orderId});
 return true;
     })
+},
+async verifyWalletPayment({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature
+}) {
+
+    const hmac = crypto.createHmac(
+        "sha256",
+        process.env.RAZORPAY_KEY_SECRET
+    );
+
+    hmac.update(
+        `${razorpay_order_id}|${razorpay_payment_id}`
+    );
+
+    const generatedSignature = hmac.digest("hex");
+
+    if (generatedSignature === razorpay_signature) {
+
+        logger.info("Wallet payment verified");
+
+        return true;
+    }
+
+    logger.warn("Wallet payment signature mismatch");
+
+    return false;
 }
 
 }

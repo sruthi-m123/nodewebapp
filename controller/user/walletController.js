@@ -1,4 +1,5 @@
 import { WalletService } from "../../service/user/wallet.sevice.js";
+import * as razorpayservice from "../../service/user/razorpayService.js";
 import{STATUS_CODES} from "../../utils/statusCodes.js";
 import logger from "../../utils/logger.js";
 
@@ -37,15 +38,47 @@ export const getWallet=async(req,res)=>{
   });
 }
 
-export const addFunds=async(req,res)=>{
-  const userId=req.session.user.id;
-  const{amount}=req.body;
+// export const addFunds=async(req,res)=>{
+//   const userId=req.session.user.id;
+//   const{amount}=req.body;
 
-  const result=await WalletService.addFunds(userId,amount);
+//   const result=await WalletService.addFunds(userId,amount);
 
-  res.status(STATUS_CODES.SUCCESS).json({
+//   res.status(STATUS_CODES.SUCCESS).json({
+//     success:true,
+//     message:"successfully added the fund",
+//     data:result
+//   });
+// }
+
+export const createWalletOrder=async(req,res)=>{
+  const {amount}=req.body;
+  const {order}=await razorpayservice.createRazorpayOrder (amount);
+  res.json({
     success:true,
-    message:"successfully added the fund",
-    data:result
-  });
+    order,
+    key:process.env.RAZORPAY_KEY_ID
+  })
+}
+
+export const verifyWalletPayment=async(req,res)=>{
+  const userId=req.session.user.id;
+  const{
+    amount,
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature
+  }=req.body;
+
+  const verified=await WalletService.verifyWalletPayment(req.body);
+  if(!verified){
+    return res.status(400).json({
+      success:false
+    })
+  }
+  const wallet=await WalletService.addFunds(userId,Number(amount));
+  res.json({
+    success:true,
+    data:wallet
+  })
 }

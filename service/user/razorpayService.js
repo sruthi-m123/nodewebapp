@@ -19,6 +19,7 @@ export const createRazorpayOrder = async (amount) => {
     receipt: `receipt_${Date.now()}`,
   };
   const order = await razorpay.orders.create(options);
+  console.log("razor pay order created:",order);
   logger.info('Razorpay order created:', order);
   return { order };
 };

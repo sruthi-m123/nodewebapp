@@ -114,7 +114,14 @@
             <%= item.variant || 'Default' %>
           </div>
           <div class="product-price-info">
-            <div class="quantity-price">Qty: <%= item.quantity || 1 %> × ₹<%= item.price || 0 %>
+            <div class="quantity-price">
+              Qty: <%= item.quantity || 1 %> ×
+              <% if (item.discountedPrice && item.discountedPrice > 0 && item.discountedPrice < item.originalPrice) { %>
+                <span style="text-decoration:line-through; color:#999; font-size:13px;">₹<%= item.originalPrice %></span>
+                <span style="color:#28a745; font-weight:600;"> ₹<%= item.discountedPrice %></span>
+              <% } else { %>
+                ₹<%= item.price || 0 %>
+              <% } %>
             </div>
             <div class="item-total">₹<%= (item.quantity || 1) * (item.price || 0) %>
             </div>

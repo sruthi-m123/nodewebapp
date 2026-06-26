@@ -124,20 +124,43 @@ static async applyOffersToProducts(products){
     logger.debug('Applying offers to products',{productCount:products.length});
     const now=new Date();
     const offers=await Offer.find({isActive:true}).lean();
+    const bulkOps=[];
+
     const processedProducts=products.map(product=>{
         const applicableOffers=this.findApplicableOffers(offers,product,now);
         const bestOffer=this.calculateBestOffer(applicableOffers,product);
-        console.log("bestOffer inside appyoffertoproducts:",bestOffer);
 
+        let newDiscountedPrice;
         if(bestOffer.discount>0){
             product.bestOffer=bestOffer._id;
-            product.discountedPrice=product.price-bestOffer.discount;
+            newDiscountedPrice=Math.round((product.price-bestOffer.discount)*100)/100;
+            product.discountedPrice=newDiscountedPrice;
         }else{
             product.bestOffer=null;
+            newDiscountedPrice=0;
             product.discountedPrice=product.price;
         }
+
+        // Queue a DB update so cart/checkout pages see the offer price too
+        bulkOps.push({
+            updateOne:{
+                filter:{_id:product._id},
+                update:{$set:{
+                    discountedPrice:newDiscountedPrice,
+                    bestOffer:product.bestOffer||null
+                }}
+            }
+        });
+
         return product;
     });
+
+    // Persist offer prices to DB in one batch
+    if(bulkOps.length>0){
+        await Product.bulkWrite(bulkOps,{ordered:false});
+        logger.debug('Offer prices persisted to DB',{count:bulkOps.length});
+    }
+
     logger.debug('Offers applied to products');
     return processedProducts;
 }

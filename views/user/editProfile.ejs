@@ -1,5 +1,82 @@
 <link rel="stylesheet" href="/css/user/editProfile.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+<!-- Cropper Modal Styles -->
+<style>
+  .cropper-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .cropper-modal-overlay.active { display: flex; }
+  .cropper-modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    width: min(520px, 96vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .cropper-modal-box h3 {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    color: #4d2e2e;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .cropper-image-wrap {
+    width: 100%;
+    max-height: 340px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f0ebe3;
+  }
+  .cropper-image-wrap img {
+    display: block;
+    max-width: 100%;
+  }
+  .cropper-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  .cropper-save-btn {
+    background: #e3c67e;
+    color: #4d2e2e;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .cropper-save-btn:hover { background: #d8b865; }
+  .cropper-cancel-btn {
+    background: #f0ebe3;
+    color: #8a7b6d;
+    border: 1px solid #e0d6c2;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .cropper-cancel-btn:hover { background: #e6ddd1; }
+  .cropper-hint {
+    font-size: 12px;
+    color: #8a7b6d;
+    text-align: center;
+    margin: 0;
+  }
+</style>
 
 <section class="profile-container">
   <!-- Sidebar Navigation -->
@@ -66,7 +143,10 @@
             <i class="fas fa-camera"></i>
             <span>Change</span>
           </label>
-          <input type="file" id="avatar-upload" name="avatar" accept="image/*" style="display: none;">
+          <!-- hidden file input — no name so it won't be submitted; cropped blob replaces it -->
+          <input type="file" id="avatar-upload" accept="image/jpeg,image/png" style="display: none;">
+          <!-- This hidden input carries the cropped image as a base64 data URL -->
+          <input type="hidden" id="cropped-avatar-data" name="croppedAvatar">
         </div>
       </div>
 
@@ -142,6 +222,23 @@
   </div>
   </section>
 
+<!-- ===== CROPPER MODAL ===== -->
+<div id="cropperModalOverlay" class="cropper-modal-overlay" role="dialog" aria-modal="true" aria-label="Crop Profile Image">
+  <div class="cropper-modal-box">
+    <h3><i class="fas fa-crop-alt" style="margin-right:8px;"></i>Crop Profile Image</h3>
+    <div class="cropper-image-wrap">
+      <img id="cropper-source" src="" alt="Image to crop">
+    </div>
+    <p class="cropper-hint">Drag to reposition · Scroll to zoom · Pinch on touch screens</p>
+    <div class="cropper-modal-actions">
+      <button type="button" class="cropper-cancel-btn" id="cropperCancelBtn">Cancel</button>
+      <button type="button" class="cropper-save-btn" id="cropperSaveBtn">
+        <i class="fas fa-check"></i> Save Crop
+      </button>
+    </div>
+  </div>
+</div>
+
   <!-- Password Change Modal -->
   <div id="passwordModal" class="modal">
     <div class="modal-content">
@@ -204,6 +301,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
@@ -220,25 +318,77 @@ document.addEventListener('DOMContentLoaded', function() {
   const newPasswordInput = document.getElementById('newPassword');
   const passwordStrengthBar = document.querySelector('.password-strength-bar');
 
-  // Image Upload Handling
+  // ===== CROPPER SETUP =====
+  const cropperOverlay  = document.getElementById('cropperModalOverlay');
+  const cropperSource   = document.getElementById('cropper-source');
+  const cropperSaveBtn  = document.getElementById('cropperSaveBtn');
+  const cropperCancelBtn = document.getElementById('cropperCancelBtn');
+  const croppedAvatarData = document.getElementById('cropped-avatar-data');
+  let cropperInstance = null;
+
+  function openCropper(dataUrl) {
+    cropperSource.src = dataUrl;
+    cropperOverlay.classList.add('active');
+    // Destroy any existing instance first
+    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    cropperInstance = new Cropper(cropperSource, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 0.85,
+      movable: true,
+      zoomable: true,
+      rotatable: false,
+      scalable: false,
+      preview: '',
+      background: false,
+      modal: true,
+    });
+  }
+
+  function closeCropper() {
+    cropperOverlay.classList.remove('active');
+    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    fileInput.value = '';
+  }
+
+  // Image Upload — open cropper instead of direct preview
   fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     const allowedTypes = ['image/jpeg', 'image/png'];
-    
-    if (file) {
-      if (!allowedTypes.includes(file.type)) {
-        errorMsg.textContent = 'Only JPG and PNG image files are allowed.';
-        fileInput.value = '';
-        return;
-      }
-      
-      errorMsg.textContent = '';
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        previewImg.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!allowedTypes.includes(file.type)) {
+      errorMsg.textContent = 'Only JPG and PNG image files are allowed.';
+      fileInput.value = '';
+      return;
     }
+    errorMsg.textContent = '';
+    const reader = new FileReader();
+    reader.onload = (event) => openCropper(event.target.result);
+    reader.readAsDataURL(file);
+  });
+
+  // Save Crop
+  cropperSaveBtn.addEventListener('click', function() {
+    if (!cropperInstance) return;
+    const canvas = cropperInstance.getCroppedCanvas({ width: 400, height: 400, imageSmoothingQuality: 'high' });
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+    // Update the visible preview
+    previewImg.src = dataUrl;
+    // Store the base64 value in the hidden input so the form carries it
+    croppedAvatarData.value = dataUrl;
+    closeCropper();
+    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Image cropped!', showConfirmButton: false, timer: 1800 });
+  });
+
+  // Cancel Crop
+  cropperCancelBtn.addEventListener('click', closeCropper);
+  // Close on overlay click
+  cropperOverlay.addEventListener('click', function(e) {
+    if (e.target === cropperOverlay) closeCropper();
+  });
+  // ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && cropperOverlay.classList.contains('active')) closeCropper();
   });
 
   // Password Strength Indicator
@@ -477,6 +627,15 @@ document.addEventListener('DOMContentLoaded', function() {
     errorElement.textContent = '';
 
     const formData = new FormData(form);
+
+    // If the user cropped an image, convert the base64 data URL back to a Blob
+    // and attach it as 'avatar' so multer picks it up on the server
+    const croppedData = document.getElementById('cropped-avatar-data').value;
+    if (croppedData) {
+      const res = await fetch(croppedData);
+      const blob = await res.blob();
+      formData.set('avatar', blob, 'profile.jpg');
+    }
 
     try {
       const response = await fetch("/user/profile/update", {
