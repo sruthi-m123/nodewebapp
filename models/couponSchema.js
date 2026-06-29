@@ -101,6 +101,7 @@ couponSchema.statics.validateCoupon = async function (code, cartValue) {
   const coupon = await this.findOne({
     code,
     isActive: true,
+    validFrom: { $lte: new Date() },
     validTill: { $gte: new Date() },
     $or: [{ usageLimit: null }, { usageLimit: { $gt: 0 } }]
   });

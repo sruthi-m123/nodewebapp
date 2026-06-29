@@ -1,3 +1,119 @@
+/* Search and Filter Styles */
+.search-filter-container {
+  background: #F5F5DC;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #D2B48C;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #A0522D;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #FFF8DC;
+}
+
+.search-btn {
+  padding: 10px 20px;
+  background: #A0522D;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.search-btn:hover {
+  background: #8B4513;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  color: #5C4033;
+  font-size: 14px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #A0522D;
+  border-radius: 5px;
+  background-color: #FFF8DC;
+  color: #5C4033;
+  font-size: 14px;
+  min-width: 130px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #8B4513;
+  box-shadow: 0 0 5px rgba(160, 82, 45, 0.3);
+}
+
+.clear-filters-btn {
+  padding: 8px 16px;
+  background: #DEB887;
+  color: #5C4033;
+  border: 1px solid #A0522D;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+  align-self: flex-end;
+}
+
+.clear-filters-btn:hover {
+  background: #D2B48C;
+}
+
+/* Responsive design for filters */
+@media (max-width: 768px) {
+  .filter-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+  
+  .search-box {
+    flex-direction: column;
+  }
+  
+  .clear-filters-btn {
+    width: 100%;
+  }
+}
+
+/* Existing styles remain the same */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -41,11 +157,11 @@
 }
 
 .add-amount-form {
-  background: #F5F5DC; /* Beige background */
+  background: #F5F5DC;
   padding: 20px;
   border-radius: 10px;
   margin: 30px 0;
-  border: 1px solid #D2B48C; /* Tan border */
+  border: 1px solid #D2B48C;
 }
 
 .form-group {
@@ -56,20 +172,20 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #5C4033; /* Dark brown */
+  color: #5C4033;
 }
 
 .form-group input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #A0522D; /* Sienna brown */
+  border: 1px solid #A0522D;
   border-radius: 5px;
   font-size: 16px;
-  background-color: #FFF8DC; /* Cornsilk */
+  background-color: #FFF8DC;
 }
 
 .add-button {
-  background: #A0522D; /* Sienna */
+  background: #A0522D;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -80,13 +196,13 @@
 }
 
 .add-button:hover {
-  background: #8B4513; /* Saddle brown */
+  background: #8B4513;
 }
 
 .message {
   margin-top: 10px;
   font-size: 14px;
-  color: #5C4033; /* Dark brown */
+  color: #5C4033;
 }
 
 .transaction-history {
@@ -102,39 +218,39 @@ table {
 th, td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #D2B48C; /* Tan */
+  border-bottom: 1px solid #D2B48C;
 }
 
 th {
-  background-color: #DEB887; /* Burlywood */
-  color: #5C4033; /* Dark brown */
+  background-color: #DEB887;
+  color: #5C4033;
 }
 
 .deposit {
-  color: #556B2F; /* Dark olive green */
+  color: #556B2F;
   font-weight: bold;
 }
 
 .withdrawal {
-  color: #8B0000; /* Dark red */
+  color: #8B0000;
   font-weight: bold;
 }
 
 .refund {
-  color: #6B8E23; /* Olive drab */
+  color: #6B8E23;
   font-weight: bold;
 }
 
 .status-completed {
-  color: #556B2F; /* Dark olive green */
+  color: #556B2F;
 }
 
 .status-pending {
-  color: #CD853F; /* Peru */
+  color: #CD853F;
 }
 
 .status-failed {
-  color: #8B0000; /* Dark red */
+  color: #8B0000;
 }
 
 .pagination {
@@ -147,23 +263,23 @@ th {
 .pagination a {
   padding: 8px 16px;
   text-decoration: none;
-  border: 1px solid #A0522D; /* Sienna */
+  border: 1px solid #A0522D;
   border-radius: 5px;
-  color: #5C4033; /* Dark brown */
+  color: #5C4033;
 }
 
 .pagination a.active {
-  background-color: #A0522D; /* Sienna */
+  background-color: #A0522D;
   color: white;
   border-color: #A0522D;
 }
 
 .pagination a:hover:not(.active) {
-  background-color: #D2B48C; /* Tan */
+  background-color: #D2B48C;
 }
 
 .no-transactions {
   text-align: center;
   padding: 20px;
-  color: #5C4033; /* Dark brown */
+  color: #5C4033;
 }

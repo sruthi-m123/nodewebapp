@@ -32,7 +32,7 @@
 }
 
 .breadcrumb a:hover {
-  color: #4a6cf7;
+  color: var(--primary-color);
 }
 
 .divider {
@@ -60,15 +60,16 @@
 
 .search-container button {
   padding: 0 15px;
-  background: #4a6cf7;
+  background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .search-container button:hover {
-  background: #3a5bd9;
+  background: var(--primary-dark);
 }
 
 /* Table Styles */
@@ -175,9 +176,9 @@
 }
 
 .pagination-btn.active {
-  background: #4a6cf7;
+  background: var(--primary-color);
   color: white;
-  border-color: #4a6cf7;
+  border-color: var(--primary-color);
 }
 
 .pagination-btn.disabled {

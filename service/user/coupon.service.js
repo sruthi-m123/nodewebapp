@@ -266,8 +266,8 @@ export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry
     const isObjectId = /^[a-f\d]{24}$/i.test(String(couponIdentifier));
 
     const query = isObjectId
-        ? { _id: couponIdentifier, isActive: true, validTill: { $gte: new Date() } }
-        : { code: String(couponIdentifier).toUpperCase(), isActive: true, validTill: { $gte: new Date() } };
+        ? { _id: couponIdentifier, isActive: true, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } }
+        : { code: String(couponIdentifier).toUpperCase(), isActive: true, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } };
 
     const coupon = await Coupon.findOne(query);
     if(!coupon){

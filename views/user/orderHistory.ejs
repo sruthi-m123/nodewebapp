@@ -1,7 +1,7 @@
 <div class="orders-container">
   <!-- Search Bar -->
   <div class="search-container">
-    <form action="/orders" method="GET" class="search-form">
+    <form action="/user/orders" method="GET" class="search-form">
       <input 
         type="text" 
         name="search" 
@@ -15,7 +15,7 @@
         </svg>
       </button>
       <% if (searchQuery) { %>
-        <a href="/orders" class="clear-search">Clear</a>
+        <a href="/user/orders" class="clear-search">Clear</a>
       <% } %>
     </form>
   </div>

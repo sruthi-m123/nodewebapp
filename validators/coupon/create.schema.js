@@ -36,9 +36,9 @@ discountValue: Joi.when('discountType', {
 
   validFrom: Joi.date().required(),
 
-  validTill: Joi.date().min(Joi.ref('validFrom')).required().messages({
+  validTill: Joi.date().greater(Joi.ref('validFrom')).required().messages({
     'date.base': MESSAGES.COUPON.INVALID_DATE_FORMAT,
-    'date.min': 'Expiry date cannot be before start date',
+    'date.greater': 'Expiry date must be after start date',
     'any.required': 'Expiry date is required'
   }),
 

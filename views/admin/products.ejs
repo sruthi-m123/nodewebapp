@@ -3,7 +3,7 @@
   <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
   <link rel="stylesheet" href="/css/admin/category.css">
-  <div class="product-page">
+  <div class="category-page">
     <div class="product-header">
       <h2>Products</h2>
       <div class="search-bar">
@@ -11,7 +11,9 @@
           <input type="text" name="search" id="searchBox" placeholder="Search for products" value="<%= search || '' %>">
         </form>
         <button type="submit" id="searchBtn">Search</button>
-        <button type="button" id="resetBtn">Reset</button>
+        <% if (search) { %>
+          <a href="/admin/products" class="reset-btn" id="resetBtn">Reset</a>
+        <% } %>
         <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
       </div>
     </div>
@@ -247,10 +249,9 @@
     <script>
       let currentProductId = null;
       let deleteProductId = null;
-      let filesQueue = [];
-      let currentFileIndex = 0;
-      let cropper;
-      let croppedImages = [];
+      let imageItems = []; // Array of { id, file, croppedBlob, croppedUrl, previewUrl, name }
+      let cropper = null;
+      let activeImageId = null;
       let removedImages = [];
 
       // Toast Notification Function
@@ -292,10 +293,9 @@
 
       // Reset all image-related states
       function resetImageState() {
-        filesQueue = [];
-        currentFileIndex = 0;
-        croppedImages = [];
+        imageItems = [];
         removedImages = [];
+        activeImageId = null;
         if (cropper) {
           cropper.destroy();
           cropper = null;
@@ -313,6 +313,8 @@
         if (fileInput) {
           fileInput.value = '';
         }
+        document.getElementById('previewArea').innerHTML = '';
+        document.getElementById('croppedImageList').innerHTML = '';
       }
 
       // Modal Functions
@@ -487,9 +489,132 @@
           });
       }
 
+      // Render Image List
+      function renderImageList() {
+        const croppedImageList = document.getElementById('croppedImageList');
+        croppedImageList.innerHTML = '';
+
+        imageItems.forEach((item, index) => {
+          const container = document.createElement("div");
+          container.style.border = "1px solid #ccc";
+          container.style.borderRadius = "8px";
+          container.style.padding = "8px";
+          container.style.background = "#f9f9f9";
+          container.style.width = "120px";
+          container.style.textAlign = "center";
+          container.style.position = "relative";
+          container.style.margin = "5px";
+
+          const img = document.createElement("img");
+          img.src = item.croppedUrl || item.previewUrl;
+          img.style.width = "100%";
+          img.style.height = "100px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "4px";
+
+          const label = document.createElement("div");
+          label.textContent = item.croppedBlob ? `Cropped` : `Uncropped`;
+          label.style.marginTop = "5px";
+          label.style.fontSize = "11px";
+          label.style.fontWeight = "600";
+          label.style.color = item.croppedBlob ? "#28a745" : "#666";
+
+          const actionRow = document.createElement("div");
+          actionRow.style.display = "flex";
+          actionRow.style.gap = "4px";
+          actionRow.style.marginTop = "8px";
+
+          const cropBtn = document.createElement("button");
+          cropBtn.type = "button";
+          cropBtn.textContent = "Crop";
+          cropBtn.className = "action-btn edit-btn";
+          cropBtn.style.padding = "4px 8px";
+          cropBtn.style.fontSize = "11px";
+          cropBtn.style.flex = "1";
+          cropBtn.style.margin = "0";
+          cropBtn.addEventListener("click", () => startCropping(item.id));
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.textContent = "Remove";
+          removeBtn.className = "action-btn delete-btn";
+          removeBtn.style.padding = "4px 8px";
+          removeBtn.style.fontSize = "11px";
+          removeBtn.style.flex = "1";
+          removeBtn.style.margin = "0";
+          removeBtn.addEventListener("click", () => removeImageItem(item.id));
+
+          actionRow.appendChild(cropBtn);
+          actionRow.appendChild(removeBtn);
+
+          container.appendChild(img);
+          container.appendChild(label);
+          container.appendChild(actionRow);
+          croppedImageList.appendChild(container);
+        });
+      }
+
+      function startCropping(id) {
+        const item = imageItems.find(i => i.id === id);
+        if (!item) return;
+
+        activeImageId = id;
+
+        const cropPreview = document.getElementById('cropPreview');
+        const cropButton = document.getElementById('cropButton');
+
+        cropPreview.src = item.previewUrl;
+        cropPreview.style.display = "block";
+        cropButton.style.display = "inline-block";
+
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(cropPreview, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true,
+          scalable: true,
+          zoomable: true
+        });
+      }
+
+      function removeImageItem(id) {
+        const item = imageItems.find(i => i.id === id);
+        if (item) {
+          if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+          if (item.croppedUrl) URL.revokeObjectURL(item.croppedUrl);
+        }
+        imageItems = imageItems.filter(i => i.id !== id);
+
+        if (activeImageId === id) {
+          activeImageId = null;
+          if (cropper) {
+            cropper.destroy();
+            cropper = null;
+          }
+          document.getElementById('cropPreview').style.display = "none";
+          document.getElementById('cropButton').style.display = "none";
+        }
+        renderImageList();
+      }
+
       // Form Submission
       document.getElementById('productForm').addEventListener('submit', function (e) {
         e.preventDefault();
+
+        // Calculate the total number of images (existing + new)
+        let totalImagesCount = 0;
+        if (currentProductId) {
+          const existingImagesCount = document.querySelectorAll('#previewArea .existing-image').length;
+          totalImagesCount = existingImagesCount + imageItems.length;
+        } else {
+          totalImagesCount = imageItems.length;
+        }
+
+        if (totalImagesCount < 3) {
+          showToast('At least 3 product images are required', 'error');
+          return;
+        }
 
         const formData = new FormData();
         formData.append('productName', document.getElementById('productName').value);
@@ -507,14 +632,13 @@
           formData.append('removedImages', JSON.stringify(removedImages));
         }
 
-        croppedImages.forEach((blob, index) => {
-          formData.append('images', blob, `image${Date.now()}_${index}.jpg`);
+        imageItems.forEach((item, index) => {
+          if (item.croppedBlob) {
+            formData.append('images', item.croppedBlob, `image_${Date.now()}_${index}.jpg`);
+          } else {
+            formData.append('images', item.file, item.name);
+          }
         });
-
-        if (!currentProductId && croppedImages.length === 0) {
-          showToast('Please upload at least one product image', 'error');
-          return;
-        }
 
         const url = currentProductId ? `/admin/products/${currentProductId}` : '/admin/addProducts';
         const method = currentProductId ? 'PUT' : 'POST';
@@ -526,9 +650,7 @@
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              croppedImages = [];
-              filesQueue = [];
-              currentFileIndex = 0;
+              resetImageState();
               showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully', 'success');
               setTimeout(() => location.reload(), 2000);
             } else {
@@ -537,124 +659,52 @@
           })
           .catch(error => {
             console.error('Error saving product:', error);
-            croppedImages = [];
-            filesQueue = [];
-            currentFileIndex = 0;
+            resetImageState();
             showToast('Error saving product', 'error');
           });
       });
 
-      // Image Cropping Functionality
+      // Image selection listener
       document.getElementById('cropImageInput').addEventListener('change', function (e) {
-        filesQueue = Array.from(e.target.files);
-        currentFileIndex = 0;
-        if (filesQueue.length > 0) {
-          croppedImages = [];
-        }
-
-        document.getElementById('previewArea').innerHTML = '';
-        filesQueue.forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = function (event) {
-            const wrapper = document.createElement("div");
-            wrapper.style.position = "relative";
-            wrapper.style.display = "inline-block";
-
-            const img = document.createElement("img");
-            img.src = event.target.result;
-            img.style.width = "60px";
-            img.style.height = "60px";
-            img.style.objectFit = "cover";
-            img.style.borderRadius = "4px";
-            img.style.marginRight = "10px";
-
-            const removeBtn = document.createElement("button");
-            removeBtn.innerHTML = "&times;";
-            removeBtn.type = "button";
-            removeBtn.classList.add("remove-img-btn");
-
-
-            removeBtn.addEventListener("click", () => {
-              filesQueue.splice(index, 1);
-              wrapper.remove();
-            });
-
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            document.getElementById('previewArea').appendChild(wrapper);
-          };
-          reader.readAsDataURL(file);
+        const newFiles = Array.from(e.target.files);
+        newFiles.forEach(file => {
+          const id = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          imageItems.push({
+            id,
+            file,
+            croppedBlob: null,
+            croppedUrl: null,
+            previewUrl: URL.createObjectURL(file),
+            name: file.name
+          });
         });
 
-        loadNextImage();
+        e.target.value = '';
+        renderImageList();
       });
 
-      function loadNextImage() {
-        if (currentFileIndex >= filesQueue.length) {
-          document.getElementById('cropButton').style.display = "none";
-          document.getElementById('cropPreview').style.display = "none";
-          return;
-        }
-
-        const file = filesQueue[currentFileIndex];
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          document.getElementById('cropPreview').src = event.target.result;
-          document.getElementById('cropPreview').style.display = "block";
-          document.getElementById('cropButton').style.display = "inline-block";
-
-          if (cropper) cropper.destroy();
-          cropper = new Cropper(document.getElementById('cropPreview'), {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 1,
-            responsive: true,
-            scalable: true,
-            zoomable: true
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-
+      // Crop button action
       document.getElementById('cropButton').addEventListener('click', function () {
+        if (!activeImageId || !cropper) return;
+
         const canvas = cropper.getCroppedCanvas();
         canvas.toBlob(function (blob) {
-          const imageUrl = URL.createObjectURL(blob);
-
-          const container = document.createElement("div");
-          container.style.border = "1px solid #ccc";
-          container.style.borderRadius = "8px";
-          container.style.padding = "8px";
-          container.style.background = "#f9f9f9";
-          container.style.width = "120px";
-          container.style.textAlign = "center";
-
-          const img = document.createElement("img");
-          img.src = imageUrl;
-          img.style.width = "100%";
-          img.style.height = "100px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "4px";
-
-          const indexLabel = document.createElement("div");
-          indexLabel.textContent = `Image ${croppedImages.length + 1}`;
-          indexLabel.style.marginTop = "5px";
-          indexLabel.style.fontSize = "12px";
-          indexLabel.style.color = "#333";
-
-          container.appendChild(img);
-          container.appendChild(indexLabel);
-          document.getElementById('croppedImageList').appendChild(container);
-
-          croppedImages.push(blob);
+          const item = imageItems.find(i => i.id === activeImageId);
+          if (item) {
+            if (item.croppedUrl) URL.revokeObjectURL(item.croppedUrl);
+            item.croppedBlob = blob;
+            item.croppedUrl = URL.createObjectURL(blob);
+          }
 
           cropper.destroy();
+          cropper = null;
+          activeImageId = null;
+
           document.getElementById('cropPreview').style.display = "none";
           document.getElementById('cropButton').style.display = "none";
 
-          currentFileIndex++;
-          loadNextImage();
-        });
+          renderImageList();
+        }, 'image/jpeg');
       });
 
       // Pagination
@@ -713,10 +763,13 @@
         }
       });
 
-      document.getElementById('resetBtn').addEventListener('click', function () {
-        document.getElementById('searchBox').value = '';
-        window.location.href = '/admin/products';
-      });
+      const resetBtn = document.getElementById('resetBtn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+          document.getElementById('searchBox').value = '';
+          window.location.href = '/admin/products';
+        });
+      }
 
       document.getElementById('searchBox').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {

@@ -361,6 +361,8 @@ const generateInvoiceContent = (doc, order) => {
     doc.font('Helvetica');
     let y = tableTop + 20;
     
+    // Show ALL items as they were at order creation, regardless of current status.
+    // Cancellations / returns are reflected in a separate Credit Note document.
     order.items.forEach(item => {
         const price = validateNumber(item.price);
         const quantity = validateNumber(item.quantity);
@@ -374,11 +376,15 @@ const generateInvoiceContent = (doc, order) => {
     });
 
     const summaryTop = y + 20;
-    const subtotal = validateNumber(order.subtotal);
-    const delivery = validateNumber(order.delivery);
-    const discount = validateNumber(order.discount);
-    const total = validateNumber(order.total);
-    const tax=validateNumber(order.tax)
+
+    // Use the original totals captured at order creation time.
+    // For legacy orders that don't have originalSubtotal/originalTotal yet,
+    // fall back to the current subtotal/total.
+    const subtotal  = validateNumber(order.originalSubtotal ?? order.subtotal);
+    const delivery  = validateNumber(order.delivery);
+    const discount  = validateNumber(order.discount);
+    const total     = validateNumber(order.originalTotal  ?? order.total);
+    const tax       = validateNumber(order.tax);
 
     doc.moveTo(colPositions[2], summaryTop - 10).lineTo(colPositions[3] + colWidths[3], summaryTop - 10).stroke();
 
@@ -388,10 +394,8 @@ const generateInvoiceContent = (doc, order) => {
     doc.text('Delivery:', colPositions[2], summaryTop + 20, { width: colWidths[2], align: 'right' });
     doc.text(`₹${delivery.toFixed(2)}`, colPositions[3], summaryTop + 20, { width: colWidths[3], align: 'right' });
 
-    doc.text('Tax:',colPositions[2],summaryTop+40,{width:colWidths[2],align:'right'});
-        doc.text(`₹${tax.toFixed(2)}`, colPositions[3], summaryTop+40, { width: colWidths[3], align: 'right' });
-
-
+    doc.text('Tax:', colPositions[2], summaryTop + 40, { width: colWidths[2], align: 'right' });
+    doc.text(`₹${tax.toFixed(2)}`, colPositions[3], summaryTop + 40, { width: colWidths[3], align: 'right' });
 
     if (discount > 0) {
         doc.text('Discount:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });

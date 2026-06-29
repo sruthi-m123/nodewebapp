@@ -284,3 +284,37 @@
   background: #5a6268;
   color: white;
 }
+
+/* Toggle Group Styles */
+.toggle-group {
+  display: flex;
+  gap: 5px;
+  background-color: #f5ebe6;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e0d6cc;
+  width: fit-content;
+}
+
+.toggle-btn {
+  background-color: transparent;
+  color: #7d573e;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.toggle-btn:hover {
+  background-color: rgba(158, 109, 78, 0.08);
+  color: #7d573e;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #9e6d4e 0%, #7d573e 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(158, 109, 78, 0.25);
+}

@@ -537,12 +537,162 @@ export const getExportDataService = async (filters = {}) => {
 };
 
 
-export const getTopCategoriesService = async (page = 1, limit = 4) => {
-  const offset = (page - 1) * limit;
-  console.log("Fetching top categories with offset:", offset);
+// export const getTopCategoriesService = async (page = 1, limit = 4) => {
+//   const offset = (page - 1) * limit;
+//   console.log("Fetching top categories with offset:", offset);
   
+//   try {
+//     const deliveredOrdersCount = await Order.countDocuments({ status: 'delivered','return_rejected' });
+
+//     const allCategories = await Category.find().lean();
+
+//     if (!allCategories || allCategories.length === 0) {
+//       return {
+//         categories: [],
+//         currentPage: page,
+//         totalPages: 1,
+//         totalItems: 0,
+//         limit: limit
+//       };
+//     }
+
+//     if (deliveredOrdersCount === 0) {
+      
+//       const categoriesWithProductCount = await Promise.all(
+//         allCategories.map(async (category) => {
+//           const productCount = await Product.countDocuments({
+//             category: category._id
+//           });
+          
+//           return {
+//             id: category._id,
+//             name: category.name,
+//             image: category.image || '/images/default-category.png',
+//             total_products: productCount || 0,
+//             revenue: 0,
+//             quantity_sold: 0
+//           };
+//         })
+//       );
+      
+//       categoriesWithProductCount.sort((a, b) => b.total_products - a.total_products);
+      
+//       const total = categoriesWithProductCount.length;
+//       const paginatedCategories = categoriesWithProductCount.slice(offset, offset + limit);
+      
+//       return {
+//         categories: paginatedCategories,
+//         currentPage: page,
+//         totalPages: Math.ceil(total / limit) || 1,
+//         totalItems: total,
+//         limit: limit
+//       };
+//     }
+
+//    const result = await Order.aggregate([
+//     { $match: { status: 'delivered' } },
+//     { $unwind: '$items' },
+//     {
+//         $lookup: {
+//             from: 'products',
+//             localField: 'items.productId',
+//             foreignField: '_id',
+//             as: 'product'
+//         }
+//     },
+//     { $unwind: '$product' },
+//     {
+//         $lookup: {
+//             from: 'categories',
+//             localField: 'product.category',  // ✅ Fixed
+//             foreignField: '_id',
+//             as: 'category'
+//         }
+//     },
+//     { $unwind: { path: '$category', preserveNullAndEmptyArrays: false } },
+    
+//     // Add a field to calculate the actual price per item (with discounts)
+//     {
+//         $addFields: {
+//             effectivePrice: {
+//                 $cond: [
+//                     { $gt: ['$product.discountedPrice', 0] },
+//                     '$product.discountedPrice',
+//                     { 
+//                         $cond: [
+//                             { $gt: ['$product.discount', 0] },
+//                             { $multiply: ['$items.price', { $subtract: [1, { $divide: ['$product.discount', 100] }] }] },
+//                             '$items.price'
+//                         ]
+//                     }
+//                 ]
+//             }
+//         }
+//     },
+    
+//     {
+//         $group: {
+//             _id: '$category._id',
+//             name: { $first: '$category.name' },
+//             image: { $first: '$category.image' },
+//             revenue: { $sum: { $multiply: ['$items.quantity', '$effectivePrice'] } },
+//             quantity_sold: { $sum: '$items.quantity' },
+//             total_products: { $addToSet: '$product._id' }
+//         }
+//     },
+    
+//     {
+//         $addFields: {
+//             total_products: { $size: '$total_products' }
+//         }
+//     },
+    
+//     { $sort: { revenue: -1 } },
+    
+//     { $facet: {
+//         metadata: [{ $count: 'total' }],
+//         data: [{ $skip: offset }, { $limit: limit }]
+//     }}
+// ]);
+
+    
+//     const total = result[0]?.metadata[0]?.total || 0;
+//     const categories = result[0]?.data || [];
+    
+//     const formattedCategories = categories.map(cat => ({
+//       id: cat._id,
+//       name: cat.name,
+//       image: cat.image || '/images/default-category.png',
+//       total_products: cat.total_products || 0,
+//       revenue: cat.revenue || 0,
+//       quantity_sold: cat.quantity_sold || 0
+//     }));
+    
+    
+//     return {
+//       categories: formattedCategories,
+//       currentPage: page,
+//       totalPages: Math.ceil(total / limit) || 1,
+//       totalItems: total,
+//       limit: limit
+//     };
+//   } catch (error) {
+//     console.log("Error stack:", error.stack);
+//     logger.error('Error in getTopCategoriesService:', error);
+//     throw error;
+//   }
+// };
+
+export const getTopCategoriesService = async (page = 1, limit = 4) => {
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const offset = (page - 1) * limit;
+
   try {
-    const deliveredOrdersCount = await Order.countDocuments({ status: 'delivered' });
+    const soldItemStatuses = ['delivered', 'return_rejected'];
+    const hasSoldItems = await Order.exists({
+      'items.status': { $in: soldItemStatuses }
+    });
 
     const allCategories = await Category.find().lean();
 
@@ -552,18 +702,17 @@ export const getTopCategoriesService = async (page = 1, limit = 4) => {
         currentPage: page,
         totalPages: 1,
         totalItems: 0,
-        limit: limit
+        limit
       };
     }
 
-    if (deliveredOrdersCount === 0) {
-      
+    if (!hasSoldItems) {
       const categoriesWithProductCount = await Promise.all(
         allCategories.map(async (category) => {
           const productCount = await Product.countDocuments({
             category: category._id
           });
-          
+
           return {
             id: category._id,
             name: category.name,
@@ -574,91 +723,98 @@ export const getTopCategoriesService = async (page = 1, limit = 4) => {
           };
         })
       );
-      
+
       categoriesWithProductCount.sort((a, b) => b.total_products - a.total_products);
-      
+
       const total = categoriesWithProductCount.length;
       const paginatedCategories = categoriesWithProductCount.slice(offset, offset + limit);
-      
+
       return {
         categories: paginatedCategories,
         currentPage: page,
         totalPages: Math.ceil(total / limit) || 1,
         totalItems: total,
-        limit: limit
+        limit
       };
     }
 
-   const result = await Order.aggregate([
-    { $match: { status: 'delivered' } },
-    { $unwind: '$items' },
-    {
-        $lookup: {
-            from: 'products',
-            localField: 'items.productId',
-            foreignField: '_id',
-            as: 'product'
+    const result = await Order.aggregate([
+      {
+        $match: {
+          'items.status': { $in: soldItemStatuses }
         }
-    },
-    { $unwind: '$product' },
-    {
-        $lookup: {
-            from: 'categories',
-            localField: 'product.category',  // ✅ Fixed
-            foreignField: '_id',
-            as: 'category'
+      },
+      { $unwind: '$items' },
+      {
+        $match: {
+          'items.status': { $in: soldItemStatuses }
         }
-    },
-    { $unwind: { path: '$category', preserveNullAndEmptyArrays: false } },
-    
-    // Add a field to calculate the actual price per item (with discounts)
-    {
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.productId',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'product.category',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      {
+        $unwind: {
+          path: '$category',
+          preserveNullAndEmptyArrays: false
+        }
+      },
+      {
         $addFields: {
-            effectivePrice: {
-                $cond: [
-                    { $gt: ['$product.discountedPrice', 0] },
-                    '$product.discountedPrice',
-                    { 
-                        $cond: [
-                            { $gt: ['$product.discount', 0] },
-                            { $multiply: ['$items.price', { $subtract: [1, { $divide: ['$product.discount', 100] }] }] },
-                            '$items.price'
-                        ]
-                    }
+          itemRevenue: {
+            $ifNull: [
+              '$items.totalPrice',
+              {
+                $multiply: [
+                  '$items.quantity',
+                  { $ifNull: ['$items.discountedPrice', '$items.price'] }
                 ]
-            }
+              }
+            ]
+          }
         }
-    },
-    
-    {
+      },
+      {
         $group: {
-            _id: '$category._id',
-            name: { $first: '$category.name' },
-            image: { $first: '$category.image' },
-            revenue: { $sum: { $multiply: ['$items.quantity', '$effectivePrice'] } },
-            quantity_sold: { $sum: '$items.quantity' },
-            total_products: { $addToSet: '$product._id' }
+          _id: '$category._id',
+          name: { $first: '$category.name' },
+          image: { $first: '$category.image' },
+          revenue: { $sum: '$itemRevenue' },
+          quantity_sold: { $sum: '$items.quantity' },
+          total_products: { $addToSet: '$product._id' }
         }
-    },
-    
-    {
+      },
+      {
         $addFields: {
-            total_products: { $size: '$total_products' }
+          total_products: { $size: '$total_products' }
         }
-    },
-    
-    { $sort: { revenue: -1 } },
-    
-    { $facet: {
-        metadata: [{ $count: 'total' }],
-        data: [{ $skip: offset }, { $limit: limit }]
-    }}
-]);
+      },
+      { $sort: { revenue: -1 } },
+      {
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          data: [{ $skip: offset }, { $limit: limit }]
+        }
+      }
+    ]);
 
-    
     const total = result[0]?.metadata[0]?.total || 0;
     const categories = result[0]?.data || [];
-    
+
     const formattedCategories = categories.map(cat => ({
       id: cat._id,
       name: cat.name,
@@ -667,14 +823,13 @@ export const getTopCategoriesService = async (page = 1, limit = 4) => {
       revenue: cat.revenue || 0,
       quantity_sold: cat.quantity_sold || 0
     }));
-    
-    
+
     return {
       categories: formattedCategories,
       currentPage: page,
       totalPages: Math.ceil(total / limit) || 1,
       totalItems: total,
-      limit: limit
+      limit
     };
   } catch (error) {
     console.log("Error stack:", error.stack);

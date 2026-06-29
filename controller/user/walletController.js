@@ -9,6 +9,16 @@ export const getWallet=async(req,res)=>{
   const page=Number(req.query.page)||1;
   const limit=6;
 
+
+//filter parameters
+
+const searchTerm=req.query.search||'';
+const sortBy=req.query.sort||'date';
+const sortOrder=req.query.order||'desc';
+const filterType=req.query.type||'all';
+const filterStatus=req.query.status||'all';
+
+try{
   const wallet=await WalletService.getWallet(userId);
  if (!wallet) {
     return res.render("user/wallet", {
@@ -18,24 +28,70 @@ export const getWallet=async(req,res)=>{
       transactions: [],
       currentPage: page,
       totalPages: 0,
-      user: req.session.user
+      limit: limit,
+      user: req.session.user,
+      searchTerm:searchTerm,
+      sortBy:sortBy,
+      sortOrder:sortOrder,
+      filterType:filterType,
+      filterStatus:filterStatus
     });
   }
 
-  const sorted=[...wallet.transactions].sort(
-    (a,b)=>b.createdAt-a.createdAt
-  );
+  // const sorted=[...wallet.transactions].sort(
+  //   (a,b)=>b.createdAt-a.createdAt
+  // );
 
-  const paginated=sorted.slice((page-1)*limit,page*limit);
+  // const paginated=sorted.slice((page-1)*limit,page*limit);
+const transactions=await WalletService.getTransactionsWithFilters(
+  userId,
+  page,
+  limit,
+  searchTerm,
+  sortBy,
+  sortOrder,
+  filterType,
+  filterStatus
+);
+
+const totalTransactions=await WalletService.countTransactions(userId,searchTerm,filterType,filterStatus);
+const totalPages=Math.ceil(totalTransactions/limit);
+
+
  res.render("user/wallet", {
     pageCSS: "user/wallet.css",
     pageJS: "user/wallet.js",
     balance: wallet.balance,
-    transactions: paginated,
+    transactions: transactions,
     currentPage: page,
-    totalPages: Math.ceil(wallet.transactions.length / limit),
-    user: req.session.user
+    totalPages: totalPages,
+    limit: limit,
+    user: req.session.user,
+    searchTerm:searchTerm,
+    sortBy:sortBy,
+    sortOrder:sortOrder,
+    filterType:filterType,
+    filterStatus:filterStatus
   });
+}catch(error){
+logger.error("error loading wallet",error);
+console.log("error in the walllet page",error);
+return res.render('user/wallet',{
+   pageCSS: "user/wallet.css",
+      pageJS: "user/wallet.js",
+      balance: 0,
+      transactions: [],
+      currentPage: page,
+      totalPages: 0,
+      limit: limit,
+      user: req.session.user,
+      searchTerm: '',
+      sortBy: 'date',
+      sortOrder: 'desc',
+      filterType: 'all',
+      filterStatus: 'all'
+})
+}
 }
 
 // export const addFunds=async(req,res)=>{

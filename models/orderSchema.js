@@ -91,6 +91,11 @@ const orderSchema = new mongoose.Schema({
   discount: { type: Number, required: true },
   total: { type: Number, required: true },
 
+  // Preserved at order-creation time; never mutated.
+  // Used by the invoice so it always reflects the original order.
+  originalSubtotal: { type: Number },
+  originalTotal: { type: Number },
+
   status: {
     type: String,
     enum: [

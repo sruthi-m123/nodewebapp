@@ -865,3 +865,53 @@ Or, if you meant to create an async function, pass `async: true` as an option.
 [2026-06-26 18:06:31] [31merror[39m: POST /user/wallet/verify-payment-Payment verification failed
 [2026-06-26 18:09:15] [31merror[39m: POST /user/wallet/verify-payment-crypto.createHmac is not a function
 [2026-06-26 18:15:39] [31merror[39m: POST /user/wallet/verify-payment-crypto.createHmac is not a function
+[2026-06-26 21:10:06] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-26 21:10:06] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-26 23:16:31] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-26 23:16:31] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-27 00:26:28] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-27 00:26:28] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-29 09:01:12] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-29 09:01:12] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-29 10:47:39] [31merror[39m: GET /user/wallet-C:\Users\LENOVO\OneDrive\Desktop\first project\nodewebapp\views\user\wallet.ejs:31
+    29|     <div class="search-filter-container">
+    30|       <div class="search-box">
+ >> 31|         <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input" value="<%= searchTerm || '' %>">
+    32|         <button id="searchBtn" class="search-btn">Search</button>
+    33|       </div>
+    34|       
+
+searchTerm is not defined
+[2026-06-29 11:25:11] [31merror[39m: GET /user/wallet-C:\Users\LENOVO\OneDrive\Desktop\first project\nodewebapp\views\user\wallet.ejs:31
+    29|     <div class="search-filter-container">
+    30|       <div class="search-box">
+ >> 31|         <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input" value="<%= searchTerm || '' %>">
+    32|         <button id="searchBtn" class="search-btn">Search</button>
+    33|       </div>
+    34|       
+
+searchTerm is not defined
+[2026-06-29 13:08:46] [31merror[39m: GET /user/wallet-error is not defined
+[2026-06-29 13:09:34] [31merror[39m: error loading wallet Transaction is not defined
+[2026-06-29 13:10:49] [31merror[39m: error loading wallet Transaction is not defined
+[2026-06-29 13:32:45] [31merror[39m: error loading wallet wallet.tranactions is not iterable
+[2026-06-29 13:35:52] [31merror[39m: error loading wallet wallet.tranactions is not iterable
+[2026-06-29 13:38:20] [31merror[39m: error loading wallet wallet.tranactions is not iterable
+[2026-06-29 13:41:17] [31merror[39m: error loading wallet Assignment to constant variable.
+[2026-06-29 13:42:07] [31merror[39m: error loading wallet paginated is not defined
+[2026-06-29 21:01:47] [31merror[39m: POST /user/cart/add/6a30cf8d7f8000cb4051c1e0-Product out of stock
+[2026-06-29 21:06:44] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:06:55] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:07:14] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:07:53] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:08:18] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:09:23] [31merror[39m: POST /user/cart/remove-invalid-Cannot populate path `items.prodcuId` because it is not in your schema. Set the `strictPopulate` option to false to override.
+[2026-06-29 21:09:40] [31merror[39m: POST /user/cart/remove-invalid-Cannot populate path `items.prodcuId` because it is not in your schema. Set the `strictPopulate` option to false to override.
+[2026-06-29 21:10:02] [31merror[39m: POST /user/cart/remove-invalid-Cannot populate path `items.prodcuId` because it is not in your schema. Set the `strictPopulate` option to false to override.
+[2026-06-29 21:12:50] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:13:08] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:13:30] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:14:05] [31merror[39m: PUT /admin/products/6a30cf8d7f8000cb4051c1e0-Atleast minimum 3 images is required 
+[2026-06-29 21:16:21] [31merror[39m: PUT /admin/coupons/edit-coupon/6a3a136d91a26e8484da4d99-Coupon discount value cant be greater than minimum Cart Vale
+[2026-06-29 22:18:37] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-29 22:18:37] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net

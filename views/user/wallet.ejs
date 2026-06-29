@@ -10,8 +10,6 @@
         <p>Valid until: Never expires</p>
       </div>
     </div>
-    <!-- Optional: Add wallet logo -->
-    <!-- <img src="/path/to/wallet-logo.png" alt="Wallet Logo" class="wallet-logo"> -->
   </div>
 
   <div class="add-amount-form">
@@ -26,45 +24,104 @@
 
   <div class="transaction-history">
     <h2>Transaction History</h2>
-    <% if (transactions.length > 0) { %>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
+    
+    <!-- Search and Filter Section -->
+    <div class="search-filter-container">
+       <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input" value="<%= searchTerm || '' %>">
+    <button id="searchBtn" class="search-btn">Search</button>
+  </div>
+      
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label for="sortBy">Sort By:</label>
+          <select id="sortBy" class="filter-select">
+            <option value="date" <%= sortBy === 'date' ? 'selected' : '' %>>Date</option>
+            <option value="amount" <%= sortBy === 'amount' ? 'selected' : '' %>>Amount</option>
+            <option value="type" <%= sortBy === 'type' ? 'selected' : '' %>>Type</option>
+            <option value="status" <%= sortBy === 'status' ? 'selected' : '' %>>Status</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortOrder">Order:</label>
+          <select id="sortOrder" class="filter-select">
+            <option value="desc" <%= sortOrder === 'desc' ? 'selected' : '' %>>Descending</option>
+            <option value="asc" <%= sortOrder === 'asc' ? 'selected' : '' %>>Ascending</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="filterType">Filter Type:</label>
+          <select id="filterType" class="filter-select">
+            <option value="all" <%= filterType === 'all' ? 'selected' : '' %>>All</option>
+            <option value="deposit" <%= filterType === 'deposit' ? 'selected' : '' %>>Deposit</option>
+            <option value="withdrawal" <%= filterType === 'withdrawal' ? 'selected' : '' %>>Withdrawal</option>
+            <option value="refund" <%= filterType === 'refund' ? 'selected' : '' %>>Refund</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="filterStatus">Filter Status:</label>
+          <select id="filterStatus" class="filter-select">
+            <option value="all" <%= filterStatus === 'all' ? 'selected' : '' %>>All</option>
+            <option value="completed" <%= filterStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+            <option value="pending" <%= filterStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="failed" <%= filterStatus === 'failed' ? 'selected' : '' %>>Failed</option>
+          </select>
+        </div>
+        
+        <button id="clearFiltersBtn" class="clear-filters-btn">Clear Filters</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTableBody">
+        <% if (transactions && transactions.length > 0) { %>
           <% transactions.forEach((transaction, index) => { %>
-            <tr>
-              <td><%= (currentPage - 1) * 10 + index + 1 %></td>
+            <tr class="transaction-row" 
+                data-type="<%= transaction.type.toLowerCase() %>" 
+                data-status="<%= transaction.status.toLowerCase() %>"
+                data-date="<%= new Date(transaction.createdAt).getTime() %>"
+                data-amount="<%= transaction.amount %>">
+              <td><%= (currentPage - 1) * limit + index + 1 %></td>
               <td>Rs.<%= transaction.amount.toFixed(2) %></td>
               <td><span class="<%= transaction.type.toLowerCase() %>"><%= transaction.type %></span></td>
               <td><%= new Date(transaction.createdAt).toLocaleString() %></td>
-              <td><span class="status-<%= transaction.status %>"><%= transaction.status %></span></td>
+              <td><span class="status-<%= transaction.status.toLowerCase() %>"><%= transaction.status %></span></td>
             </tr>
           <% }); %>
-        </tbody>
-      </table>
+        <% } else { %>
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 20px; color: #5C4033;">No transactions found</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
 
+    <% if (transactions && transactions.length > 0) { %>
       <div class="pagination">
         <% if (currentPage > 1) { %>
-          <a href="/user/wallet?page=<%= currentPage - 1 %>">← Previous</a>
+          <a href="?page=<%= currentPage - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= sortBy && sortBy !== 'date' ? '&sort=' + sortBy : '' %><%= sortOrder && sortOrder !== 'desc' ? '&order=' + sortOrder : '' %><%= filterType && filterType !== 'all' ? '&type=' + filterType : '' %><%= filterStatus && filterStatus !== 'all' ? '&status=' + filterStatus : '' %>">← Previous</a>
         <% } %>
         
         <% for(let i = 1; i <= totalPages; i++) { %>
-          <a href="/user/wallet?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+          <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= sortBy && sortBy !== 'date' ? '&sort=' + sortBy : '' %><%= sortOrder && sortOrder !== 'desc' ? '&order=' + sortOrder : '' %><%= filterType && filterType !== 'all' ? '&type=' + filterType : '' %><%= filterStatus && filterStatus !== 'all' ? '&status=' + filterStatus : '' %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
         <% } %>
         
         <% if (currentPage < totalPages) { %>
-          <a href="/user/wallet?page=<%= currentPage + 1 %>">Next →</a>
+          <a href="?page=<%= currentPage + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= sortBy && sortBy !== 'date' ? '&sort=' + sortBy : '' %><%= sortOrder && sortOrder !== 'desc' ? '&order=' + sortOrder : '' %><%= filterType && filterType !== 'all' ? '&type=' + filterType : '' %><%= filterStatus && filterStatus !== 'all' ? '&status=' + filterStatus : '' %>">Next →</a>
         <% } %>
       </div>
-    <% } else { %>
-      <p class="no-transactions">No transactions found</p>
     <% } %>
   </div>
 </div>

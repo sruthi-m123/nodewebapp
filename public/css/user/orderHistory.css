@@ -47,11 +47,13 @@ body {
   background-color: var(--background-light);
   color: var(--text-dark);
   padding: 2rem;
+   margin: 0;
+  padding: 0;
 }
 
 .orders-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 2rem auto 0;
   overflow-x: auto;
 }
 
@@ -72,15 +74,16 @@ body {
 .search-form {
   display: flex;
   align-items: center;
+  gap:8px;
   max-width: 400px;
   width: 100%;
   position: relative;
 }
 
 .search-input {
+  flex:1;
   width: 100%;
   padding: 10px 15px;
-  padding-right: 114px;
   border: 1px solid var(--secondary-color);
   border-radius: 4px;
   font-size: 14px;
@@ -94,11 +97,13 @@ body {
 }
 
 .search-button {
-  position: absolute;
-  right: 10px;
-  background: none;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  background:  #5a4a42;
   border: none;
   cursor: pointer;
+  border-radius: 4px;
   color: #777;
   display: flex;
   align-items: center;
@@ -110,11 +115,17 @@ body {
 }
 
 .clear-search {
-  margin-left: 10px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--secondary-color);
+  border-radius: 4px;
   color: var(--primary-color);
   text-decoration: none;
   font-size: 14px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .clear-search:hover {

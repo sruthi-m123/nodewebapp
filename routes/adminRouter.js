@@ -45,10 +45,10 @@ router.post('/toggle_block', adminAuth, customerController.toggleBlockStatus);
 //category managment
 router.get('/categories', adminAuth, categoryController.getAllCategories);
 router.post('/addCategory', adminAuth,upload.category, handleMulterError,validate(V.categorySchema), categoryController.addCategory);
-router.delete('/categories/:id/delete', adminAuth,validate(V.getCategoryByIdSchema), categoryController.deleteCategory);
+router.delete('/categories/:id/delete', adminAuth,validate(V.getCategoryByIdSchema,"params"), categoryController.deleteCategory);
 router.put('/categories/status/:categoryId', adminAuth,validate(V.categoryStatusSchema), categoryController.updateCategoryStatus);
 router.put('/categories/:id/update', adminAuth, upload.category,handleMulterError,validate(V.getCategoryByIdSchema,"params"),validate(V.updateCategorySchema), categoryController.updateCategory);
-router.get('/categories/:id/details', adminAuth,validate(V.getCategoryByIdSchema), categoryController.getCategory);
+router.get('/categories/:id/details', adminAuth,validate(V.getCategoryByIdSchema,"params"), categoryController.getCategory);
 
 
 //product managment
@@ -59,8 +59,8 @@ router.put('/products/status/:productId', adminAuth,validate({
   params:V.getProductDetailSchema,
   body:V.updateProductStatusBodySchema
 }), productController.updateProductStatus);
-router.delete('/products/:id', adminAuth, validate(V.getProductDetailSchema),productController.deleteProduct);
-router.get('/products/:id/details', adminAuth,validate(V.getProductDetailSchema), productController.getProductDetails);
+router.delete('/products/:id', adminAuth, validate(V.getCategoryByIdSchema, "params"),productController.deleteProduct);
+router.get('/products/:id/details', adminAuth,validate(V.getCategoryByIdSchema, "params"), productController.getProductDetails);
 
 //order managment
 router.get('/orders', adminAuth, orderController.getOrderAdmin);
@@ -82,9 +82,9 @@ router.put('/offers/update-offer/:id', adminAuth, validate({params:V.getOfferByI
 //coupon managment
 router.get('/coupons', adminAuth, couponController.getCouponPage);
 router.post('/coupons/add-coupon', adminAuth, validate(V.createCouponSchema),couponController.createCoupon);
-router.get('/coupons/:id', adminAuth, validate(V.getCategoryByIdSchema),couponController.getCouponById);
+router.get('/coupons/:id', adminAuth, validate(V.getCategoryByIdSchema, "params"),couponController.getCouponById);
 router.put('/coupons/edit-coupon/:id', adminAuth,validate(V.createCouponSchema), couponController.updateCoupon);
-router.delete('/coupons/delete-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema), couponController.deleteCoupon);
+router.delete('/coupons/delete-coupon/:id', adminAuth,validate(V.getCategoryByIdSchema, "params"), couponController.deleteCoupon);
 
 
 

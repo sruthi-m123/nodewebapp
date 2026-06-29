@@ -864,3 +864,187 @@ input[type="submit"]:active {
 .checkbox-label:hover .checkmark {
   border-color: var(--primary-color);
 }
+
+/* =============================================
+   SHARED PAGE WRAPPER — categories & products
+   ============================================= */
+
+/* Both pages use the same wrapper, just different class names */
+.category-page,
+.product-page {
+  padding: 1.25rem 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ——— Page header (title + search bar row) ——— */
+.category-header,
+.product-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.category-header h2,
+.product-header h2 {
+  color: var(--primary-dark);
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* ——— Search bar (inside header) ——— */
+.category-header .search-bar,
+.product-header .search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ——— Table header ——— */
+.category-page table thead,
+.product-page table thead {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.category-page table thead th,
+.product-page table thead th {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 0.9rem 0.8rem;
+}
+
+/* ——— Table body cells ——— */
+.category-page table tbody td,
+.product-page table tbody td {
+  padding: 0.85rem 0.8rem;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.category-page table tbody tr:hover,
+.product-page table tbody tr:hover {
+  background-color: #fdf6f1;
+}
+
+/* ——— Action buttons in table (edit / delete / view) ——— */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.38rem 0.85rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  margin: 0.1rem;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* Edit — earthy-brown tint */
+.edit-btn {
+  background-color: #f0e6dc;
+  color: var(--primary-dark);
+  border: 1px solid #e0c9b8;
+}
+
+.edit-btn:hover {
+  background-color: #e5d4c4;
+}
+
+/* Delete — soft red */
+.delete-btn {
+  background-color: #fce8e6;
+  color: var(--danger-color);
+  border: 1px solid #f5c6c2;
+}
+
+.delete-btn:hover {
+  background-color: #f9d6d3;
+}
+
+/* View — soft teal */
+.view-btn {
+  background-color: #e6f0ed;
+  color: var(--secondary-color);
+  border: 1px solid #ccddd9;
+}
+
+.view-btn:hover {
+  background-color: #d6e0dd;
+}
+
+/* ——— New arrival badge ——— */
+.new-arrival-badge {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ——— Add-button ("Add Product +" / "Add Category +") ——— */
+.demo-button {
+  background: linear-gradient(135deg, var(--success-color) 0%, #3e8e41 100%);
+  color: var(--white);
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(62, 142, 65, 0.3);
+  white-space: nowrap;
+}
+
+.demo-button:hover {
+  background: linear-gradient(135deg, #3e8e41 0%, #2e6e31 100%);
+  box-shadow: 0 4px 10px rgba(62, 142, 65, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ——— Responsive: stack header on small screens ——— */
+@media (max-width: 640px) {
+  .category-header,
+  .product-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .category-header .search-bar,
+  .product-header .search-bar {
+    width: 100%;
+  }
+
+  .search-bar input {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}

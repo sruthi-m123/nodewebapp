@@ -68,11 +68,11 @@ async update(id,data={}){
     console.log("data inside service update:",data);
     const product=await Product.findById(id);
     if(!product)return null;
-    let updatedImages=[...product.images];
-    if(updatedImages<3){
-        throw new Error('Atleast minimum 3 images is required ')
+
+    if (data.images && data.images.length < 3) {
+        throw new Error('At least 3 product images are required');
     }
-      return Product.findByIdAndUpdate(id,data,{new:true});
+    return Product.findByIdAndUpdate(id,data,{new:true});
 },
 
 async delete(id){

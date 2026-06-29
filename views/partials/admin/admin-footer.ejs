@@ -25,13 +25,57 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-document.querySelectorAll('.submenu-toggle').forEach(toggle => {
-  toggle.addEventListener('click', function(e) {
-    e.preventDefault();
-    const submenu = this.closest('.has-submenu').querySelector('.submenu');
-    submenu.classList.toggle('active');
-    this.classList.toggle('fa-chevron-right');
-    this.classList.toggle('fa-chevron-down');
+document.addEventListener('DOMContentLoaded', () => {
+  const currentPath = window.location.pathname;
+
+  // 1. Highlight active menu items dynamically based on URL path
+  document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href || href === '#') return;
+
+    // Check if the current URL matches the link's href
+    const isExactMatch = currentPath === href;
+    const isSubPathMatch = currentPath.startsWith(href) && href !== '/admin/dashboard' && href !== '/admin';
+
+    if (isExactMatch || isSubPathMatch) {
+      link.classList.add('active');
+
+      // If it is inside a submenu, activate the submenu container and its parent menu item
+      const submenu = link.closest('.submenu');
+      if (submenu) {
+        submenu.classList.add('active');
+        const parentHasSubmenu = submenu.closest('.has-submenu');
+        if (parentHasSubmenu) {
+          const parentLink = parentHasSubmenu.querySelector('.menu-item');
+          if (parentLink) {
+            parentLink.classList.add('active');
+            const toggleIcon = parentLink.querySelector('.submenu-toggle');
+            if (toggleIcon) {
+              toggleIcon.classList.remove('fa-chevron-right');
+              toggleIcon.classList.add('fa-chevron-down');
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 2. Toggle submenus when clicking on the parent menu item itself
+  document.querySelectorAll('.has-submenu > .menu-item').forEach(parentLink => {
+    parentLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      const parentContainer = this.closest('.has-submenu');
+      const submenu = parentContainer.querySelector('.submenu');
+      const toggleIcon = this.querySelector('.submenu-toggle');
+
+      if (submenu) {
+        submenu.classList.toggle('active');
+      }
+      if (toggleIcon) {
+        toggleIcon.classList.toggle('fa-chevron-right');
+        toggleIcon.classList.toggle('fa-chevron-down');
+      }
+    });
   });
 });
 </script>

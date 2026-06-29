@@ -346,6 +346,10 @@ let buynow=orderData.session.buyNowItem
       tax,
       discount,
       total,
+      // Snapshot at order-creation time — used by the invoice PDF so it
+      // is never affected by later partial cancellations.
+      originalSubtotal: subtotal,
+      originalTotal: total,
       status,
       appliedOffers: appliedOffers.map(o => o.id),
       appliedCoupon

@@ -857,8 +857,7 @@
             '<td><img src="' + (category.image || '/images/default-category.png') + '" alt="' + category.name + '" class="category-image" onerror="this.src=\'/images/default-category.png\'"></td>' +
             '<td>' + category.name + '</td>' +
             '<td>' + (category.total_products || 0) + '</td>' +
-            '<td>₹' + formatPrice(category.revenue || 0) + '</td>' +
-            '<td>' + (category.quantity_sold || 0) + '</td>' +
+'<td>&#8377;' + formatPrice(category.revenue || 0) + '</td>' +            '<td>' + (category.quantity_sold || 0) + '</td>' +
             '</tr>';
         }).join('');
       }

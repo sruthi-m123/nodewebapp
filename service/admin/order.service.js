@@ -251,25 +251,37 @@ if(!order){
     }
 
 //refund amount
+const couponDiscount = order.appliedCoupon?.value || 0;
+let refundAmount = 0;
 
-const couponDiscount=order.appliedCoupon?.value||0;
-const totalPaid=order.total;
-let refundAmount=0;
+// Only include items that were actually paid for (not cancelled).
+// Cancelled items already got their own refund during cancellation,
+// so including them here would inflate the coupon-share denominator
+// and under-deduct the coupon — resulting in an over-refund.
+const paidItems = order.items.filter(i => i.status !== 'cancelled');
+const paidSubtotal = paidItems.reduce(
+    (sum, i) => sum + ((i.discountedPrice ?? i.price) * i.quantity), 0
+);
 
-const orderSubtotal = order.items.reduce((sum, i) => sum + ((i.discountedPrice ?? i.price) * i.quantity), 0);
+refundItems.forEach(item => {
+    const itemPrice = item.discountedPrice ?? item.price;
+    const itemTotal = itemPrice * item.quantity;
+    // Proportional coupon share based only on the paid (non-cancelled) subtotal
+    const itemCouponShare = paidSubtotal > 0
+        ? (itemTotal / paidSubtotal) * couponDiscount
+        : 0;
+    refundAmount += itemTotal - itemCouponShare;
+});
 
-if(totalPaid>0){
-    refundItems.forEach(item=>{
-        const itemPrice=item.discountedPrice??item.price;
-        const itemTotal=itemPrice*item.quantity;
-        const itemCouponShare= orderSubtotal > 0 ? (itemTotal / orderSubtotal) * couponDiscount : 0;
+refundAmount = Math.max(refundAmount, 0);
 
-        refundAmount += itemTotal - itemCouponShare;
-    })
-}
-    refundAmount = Math.max(refundAmount, 0);
+logger.debug('Refund calculation', {
+    refundAmount,
+    itemsCount: refundItems.length,
+    paidSubtotal,
+    couponDiscount
+});
 
-    logger.debug('Refund calculation', { refundAmount, itemsCount: refundItems.length });
 
 let wallet =await Wallet.findOne({user:order.userId})||
 new Wallet({user:order.userId,balance:0});
@@ -279,8 +291,11 @@ if(action==='approve'||action==='approve-all'){
 }else{
     await OrderService._processRejectedRetrun(order,refundItems,adminNotes,rejectionReason);
 }
-await OrderService._updateOrderStatus(order,refundItems);
-   order.returnDetails.type = refundItems.length === order.items.length ? 'full' : 'partial';
+await OrderService._updateOrderStatus(order, refundItems);
+
+   // Count only non-cancelled items to determine full vs partial return
+   const nonCancelledItems = order.items.filter(i => i.status !== 'cancelled');
+   order.returnDetails.type = refundItems.length === nonCancelledItems.length ? 'full' : 'partial';
 
     logger.info('Saving order updates', { orderId, status: order.status });
 
@@ -311,13 +326,16 @@ await order.save();
     };
 }
 static async _processApprovedReturn(order,refundItems,wallet,refundAmount,adminNotes){
-    refundItems.forEach(item=>{
-        item.status='returned';
-        item.returnDetails={
-            status:'completed',
-            processDate:new Date(),
-            processedBy:'admin',
-            notes:adminNotes
+    refundItems.forEach(item => {
+        // Only update items that were actually in return_requested status
+        // Never touch already-cancelled items
+        if (item.status === 'cancelled') return;
+        item.status = 'returned';
+        item.returnDetails = {
+            status: 'completed',
+            processDate: new Date(),
+            processedBy: 'admin',
+            notes: adminNotes
         }
     });
 
@@ -382,20 +400,42 @@ static async _processRejectedReturn(order,refundItems,adminNotes,rejectionReason
 }
 
 static async _updateOrderStatus(order,refundItems){
-    const allReturned=order.items.every(i=>i.status==='returned');
-    const hasSomeReturned=order.items.some(i=>i.status==='returned');
-    const noPendingRequests=order.items.filter(i=>i.status==='return_requested').length===0;
+    console.log("inside the update order status");
+    console.log("refundItems inside the update orderstatus",refundItems);
 
-    if(allReturned){
-        order.status="returned";
-        }else if(hasSomeReturned&&noPendingRequests){
-            order.status='partially_returned';
+   order.items.forEach((item) => {
+    const isRefunded = refundItems.some(
+        refundItem =>
+            refundItem._id.toString() === item._id.toString()
+    );
+    // Only update to 'returned' if the item was in refundItems AND is not already cancelled
+    if (isRefunded && item.status !== 'cancelled') {
+        item.status = 'returned';
+    }
+   });
 
-        }else if(noPendingRequests){
-            order.status='delivered';
-        }else{
-            order.status='partially_returned';
-        }
+    // For status calculation, only consider non-cancelled items
+    const activeItems = order.items.filter(i => i.status !== 'cancelled');
+    const allReturned = activeItems.length > 0 && activeItems.every(i => i.status === 'returned');
+    const hasSomeReturned = activeItems.some(i => i.status === 'returned');
+    const noPendingRequests = !activeItems.some(i => i.status === 'return_requested');
+
+    // If there were cancelled items alongside returned ones, the total count
+    // includes them, so even a 'full return of active items' is still only partial
+    const hasCancelledItems = order.items.some(i => i.status === 'cancelled');
+
+    if (allReturned && !hasCancelledItems) {
+        order.status = 'returned';
+    } else if (allReturned && hasCancelledItems) {
+        // All non-cancelled items returned, but some were cancelled — still full return of active items
+        order.status = 'returned';
+    } else if (hasSomeReturned && noPendingRequests) {
+        order.status = 'partially_returned';
+    } else if (noPendingRequests) {
+        order.status = 'delivered';
+    } else {
+        order.status = 'partially_returned';
+    }
 
         logger.debug('order status updated',{
             orderId:order.orderId,
