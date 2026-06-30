@@ -182,24 +182,49 @@ static async getReturnDetails(orderId){
   returnDetails.type ||
   (returnDetails.items?.length > 0 ? 'partial' : 'full');
 
-let items = returnDetails.items.map(returnItem => {
+// let items = returnDetails.items.map(returnItem => {
 
-  const matchedItem = order.items.find(i =>
-    i.productId &&
-    i.productId._id &&
-    returnItem.product &&
-    i.productId._id.toString() === returnItem.product.toString()
-  );
+//   const matchedItem = order.items.find(i =>
+//     i.productId &&
+//     i.productId._id &&
+//     returnItem.product &&
+//     i.productId._id.toString() === returnItem.product.toString()
+//   );
 
-  return {
-    _id: returnItem._id,
-    name: matchedItem?.name || returnItem.name || 'Unknown Item',
-    quantity: matchedItem?.quantity || returnItem.quantity || 0,
-    price: matchedItem?.totalPrice || returnItem.price || 'N/A',
-    reason: returnItem.reason || 'Not specified',
-    status: returnItem.status || matchedItem?.status || 'Pending',
-  };
-});   
+let items=[];
+if(returnType==='full'){
+    items=order.items
+    .filter(item=>item.status==='return_requested')
+    .map(item=>({
+        _id:item._id,
+        product:item.productId?._id,
+        name:item.name,
+        quantity:item.quantity,
+        price:item.totalPrice,
+        reason:returnDetails.reason||'Not specified',
+        status:item.status
+    }))
+}else{
+     items = returnDetails.items.map(returnItem => {
+    const matchedItem = order.items.find(i =>
+      i.productId &&
+      i.productId._id &&
+      returnItem.product &&
+      i.productId._id.toString() === returnItem.product.toString()
+    );
+    return {
+      _id: matchedItem?._id || returnItem._id,
+      product: returnItem.product,
+      name: matchedItem?.name || returnItem.name || 'Unknown Item',
+      quantity: matchedItem?.quantity || returnItem.quantity || 0,
+      price: matchedItem?.totalPrice || returnItem.price || 'N/A',
+      reason: returnItem.reason || returnDetails.reason || 'Not specified',
+      status: returnItem.status || matchedItem?.status || 'Pending',
+    };
+  });
+}
+
+  
     const globalReason = returnDetails.reason || 
       (returnType === 'partial' ? items[0]?.reason : 'Not specified');
 

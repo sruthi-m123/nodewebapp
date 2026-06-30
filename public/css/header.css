@@ -275,6 +275,27 @@ body.no-scroll {
   justify-content: center;
 }
 
+.wishlist-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #e3c67e;
+  color: #1f1f1f;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wishlist-icon {
+  position: relative;
+}
+
 @media (max-width: 768px) {
   .main-nav,
   .auth-links {

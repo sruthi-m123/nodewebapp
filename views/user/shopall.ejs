@@ -115,33 +115,7 @@
                 <% } %>
                 <span>(<%= product.reviews || 0 %>)</span>
               </div>
-<!-- 
-              <% 
-                let originalPrice = product.price;
-                let finalPrice = originalPrice;
-                let discountLabel = '';
-                let discountValue = 0;
 
-                if (product.bestOffer && product.bestOffer.discountValue != null) {
-                  discountValue = product.bestOffer.discountValue;
-
-                  if (product.bestOffer.type === 'percentage') {
-                    finalPrice = Math.round(originalPrice - (originalPrice * discountValue / 100));
-                    discountLabel = discountValue + '%OFF';
-                  } else if (product.bestOffer.type === 'fixed') {
-                    finalPrice = Math.max(0, originalPrice - discountValue);
-                    discountLabel = '₹' + discountValue.toLocaleString() + 'OFF';
-                  }
-                }
-              %> -->
-
-              <!-- <p class="product-pricing">
-                <span class="offer-price">₹<%= finalPrice.toLocaleString() %></span>
-                <% if (finalPrice < originalPrice) { %>
-                  <span class="mrp">₹<%= originalPrice.toLocaleString() %></span>
-                  <span class="discount">(<%= discountLabel %>)</span>
-                <% } %>
-              </p> -->
 
 <p class="product-pricing">
   <span class="offer-price">
@@ -165,7 +139,7 @@
                 <i class="<%= wishlist.includes(product._id.toString()) ? 'fas' : 'far' %> fa-heart"></i>
               </button>
 
-              <% if (product.stock === 0) { %>
+              <% if (product.stock <= 0) { %>
                 <p class="out-of-stock-message">Out of Stock</p>
               <% } else { %>
                 <button class="add-to-cart primary-btn" data-id="<%= product._id %>">

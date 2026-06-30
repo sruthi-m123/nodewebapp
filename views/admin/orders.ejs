@@ -400,9 +400,9 @@ function populateOrderDetails(customOrderId, customer, orderDate, orderTotal, da
   elements.returnReason.textContent = data.reason || 'Not specified';
   elements.returnNotes.textContent = data.notes || 'None';
 }
-
 function populateItemsSection(data) {
   console.log("inside the populate item");
+
   const itemsSection = document.querySelector('.return-items-section');
   const fullMsg = itemsSection.querySelector('.full-return-msg');
   const partialContainer = itemsSection.querySelector('.partial-items');
@@ -410,40 +410,86 @@ function populateItemsSection(data) {
   const partialList = document.getElementById('returnItemsListPartial');
   const globalBtns = document.querySelector('.modal-footer .global-btns');
 
-  const isFullReturn = data.type === 'full' || (data.items && data.items.length === 0);
-  console.log("Return type detected:", isFullReturn ? 'full' : 'partial', "Items count:", data.items?.length);
+  const isFullReturn = data.type === 'full';
+  console.log(
+    "Return type detected:",
+    isFullReturn ? 'full' : 'partial',
+    "Items count:",
+    data.items?.length
+  );
 
-  itemsSection.classList.remove('show-full', 'show-partial'); 
+  itemsSection.classList.remove('show-full', 'show-partial');
+
+  if (fullList) fullList.innerHTML = '';
+  if (partialList) partialList.innerHTML = '';
 
   if (isFullReturn) {
     itemsSection.classList.add('show-full');
-    if (partialContainer) partialContainer.style.display = 'none';
-    if (fullMsg) fullMsg.style.display = 'block'; 
-    if (globalBtns) globalBtns.classList.remove('hidden');
-    globalBtns.style.display = 'inline-block';
-  } else {
-    itemsSection.classList.add('show-partial');
-    if (fullMsg) fullMsg.style.display = 'none';
-    if (fullList) fullList.style.display = 'none';
-    if (partialContainer) partialContainer.style.display = 'block'; 
-if (globalBtns) {
-      globalBtns.classList.add('hidden');
-      globalBtns.style.display = 'none'; 
-    }    if (partialList) partialList.innerHTML = ''; 
 
-    if (data.items?.length > 0) {
+    if (partialContainer) partialContainer.style.display = 'none';
+    if (fullMsg) fullMsg.style.display = 'block';
+
+    if (globalBtns) {
+      globalBtns.classList.remove('hidden');
+      globalBtns.style.display = 'inline-block';
+    }
+
+    if (fullList) {
+      if (data.items && data.items.length > 0) {
+        data.items.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'return-item';
+
+          li.innerHTML = `
+            <div class="item-details">
+              <div class="item-name">${item.name}</div>
+              <div class="item-info">
+                <span><strong>Qty:</strong> ${item.quantity}</span> |
+                <span><strong>Price:</strong> ₹${item.price || 'N/A'}</span><br>
+                <span><strong>Reason:</strong> ${item.reason || data.reason || 'Not specified'}</span>
+              </div>
+            </div>
+            <div class="item-controls">
+              <span class="return-status badge-warning">Pending</span>
+            </div>
+          `;
+
+          fullList.appendChild(li);
+        });
+      } else {
+        fullList.innerHTML = '<li><em>Full order return requested</em></li>';
+      }
+    }
+
+    return;
+  }
+
+  itemsSection.classList.add('show-partial');
+
+  if (fullMsg) fullMsg.style.display = 'none';
+  if (partialContainer) partialContainer.style.display = 'block';
+
+  if (globalBtns) {
+    globalBtns.classList.add('hidden');
+    globalBtns.style.display = 'none';
+  }
+
+  if (partialList) {
+    if (data.items && data.items.length > 0) {
       data.items.forEach(item => {
         const li = document.createElement('li');
         li.className = 'return-item';
+
         const itemId = item._id || item.product;
         li.dataset.itemId = itemId;
+
         li.innerHTML = `
           <div class="item-details">
             <div class="item-name">${item.name}</div>
             <div class="item-info">
-              <span><strong>Qty:</strong> ${item.quantity}</span> | 
-              <span><strong>Price:</strong> ₹${item.price || 'N/A'}</span> <br>
-              <span><strong>Reason:</strong> ${item.reason || 'Not specified'}</span>
+              <span><strong>Qty:</strong> ${item.quantity}</span> |
+              <span><strong>Price:</strong> ₹${item.price || 'N/A'}</span><br>
+              <span><strong>Reason:</strong> ${item.reason || data.reason || 'Not specified'}</span>
             </div>
           </div>
           <div class="item-controls">
@@ -454,10 +500,11 @@ if (globalBtns) {
             </div>
           </div>
         `;
-        partialList.appendChild(li);  
+
+        partialList.appendChild(li);
       });
     } else {
-      if (partialList) partialList.innerHTML = '<li><em>No items specified</em></li>';
+      partialList.innerHTML = '<li><em>No items specified</em></li>';
     }
   }
 }

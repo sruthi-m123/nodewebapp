@@ -65,11 +65,12 @@ console.log("wishlist :",wishlist);
                         item=>item.productId.toString()===productId.toString()
                     );
 
-                    if(exists){
-                        const err=new Error("product already in wishlist");
-                        err.statusCode=STATUS_CODES.NOT_FOUND;
-                        throw err;
-                    }
+                  if (exists) {
+  const err = new Error("Product already in the wishlist.");
+  err.statusCode = STATUS_CODES.BAD_REQUEST;
+  err.status = STATUS_CODES.BAD_REQUEST;
+  throw err;
+}
                     wishlist.items.push({productId});
                     await wishlist.save();
                     console.log("wishlist.items:",wishlist.items);
@@ -179,5 +180,21 @@ return {wishlistCount,cartCount};
                     "items.productId":productId
                 });
                 return Boolean(exists);
-            }
+            },
+
+           async removeProductFromWishlist(userId, productId) {
+  const wishlist = await Wishlist.findOneAndUpdate(
+    { user: userId },
+    { $pull: { items: { productId } } },
+    { new: true }
+  );
+
+  if (!wishlist) {
+    const err = new Error("Wishlist not found");
+    err.status = STATUS_CODES.NOT_FOUND;
+    throw err;
+  }
+
+  return wishlist.items.length;
+}
 }

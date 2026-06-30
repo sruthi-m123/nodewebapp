@@ -1,0 +1,93 @@
+
+<main class="contact-page">
+  <div class="container">
+
+    <div class="contact-wrapper">
+
+      <!-- ===== CONTACT INFO ===== -->
+      <div class="contact-info">
+        <h2>Get In Touch</h2>
+
+        <div class="info-box">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>Address</h4>
+            <p>
+              198 West 21th Street<br>
+              Suite 721<br>
+              New York, NY 10016
+            </p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>Phone</h4>
+            <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h4>Email</h4>
+            <p><a href="mailto:support@chettinad.com">support@chettinad.com</a></p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="fas fa-globe"></i>
+          <div>
+            <h4>Website</h4>
+            <p><a href="#" target="_blank">www.chettinad.online</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CONTACT FORM ===== -->
+      <div class="contact-form">
+        <h2>
+          <i class="fas fa-pen-fancy"></i> Send Us a Message
+        </h2>
+
+        <form action="/contact" method="POST">
+          <input
+            type="text"
+            name="name"
+            placeholder="Your full name"
+            required
+            aria-label="Your name"
+          >
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Your email address"
+            required
+            aria-label="Your email"
+          >
+
+          <textarea
+            name="message"
+            placeholder="Tell us how we can help …"
+            rows="7"
+            required
+            aria-label="Your message"
+          ></textarea>
+
+          <!-- subtle hint (user friendly) -->
+          <div class="form-hint">
+            <i class="fas fa-info-circle"></i> We’ll reply within 24 hours.
+          </div>
+
+          <button type="submit">
+            <span>Send Message</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
+    </div> <!-- /contact-wrapper -->
+  </div> <!-- /container -->
+</main>

@@ -5,8 +5,8 @@
     <a href="/user/home" class="nav-link">Home</a>
     <a href="/user/shopall" class="nav-link">Shop all</a>
     <!-- <a href="/user/catergoryproduct" class="nav-link">Collections</a> -->
-    <a href="#" class="nav-link">About Us</a>
-    <a href="#" class="nav-link">Contact Us</a>
+    <a href="/user/aboutUs" class="nav-link">About Us</a>
+    <a href="/user/contactUs" class="nav-link">Contact Us</a>
   </nav>
   
   
@@ -20,7 +20,11 @@
   <% if (user && user.name) { %>
   <div class="desktop-icons">
     <!-- <a href="#" class="icon-link"><i class="fas fa-search"></i></a> -->
-    <a href="/user/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
+    <!-- <a href="/user/wishlist" class="icon-link"><i class="far fa-heart"></i></a> -->
+     <a href="/user/wishlist" class="icon-link wishlist-icon">
+  <i class="far fa-heart"></i>
+  <span class="wishlist-count"><%= wishlistCount || 0 %></span>
+</a>
     <!-- <% if (user && user.name) { %> -->
       <div class="profile-card-container">
         <a href="#" class="icon-link" id="profileIcon"><i class="fas fa-user"></i></a>
@@ -57,13 +61,21 @@
     <div class="auth-links">
       <a href="/user/signup" class="nav-link">Sign Up</a>
       <a href="/user/login" class="nav-link">Log In</a>
+      <a href="/user/aboutUs"  class="nav-link">About Us</a>
+      <a href="/user/contactUs" class="nav-link">Contact Us</a>
+
     </div>
   <% } %>
 
   <div class="mobile-icons">
-    <a href="#" class="icon-link"><i class="far fa-heart"></i></a>
+    <!-- <a href="#" class="icon-link"><i class="far fa-heart"></i></a> -->
+     <a href="/user/wishlist" class="icon-link wishlist-icon">
+  <i class="far fa-heart"></i>
+  <span class="wishlist-count"><%= wishlistCount || 0 %></span>
+</a>
     <% if (user) { %>
       <a href="/user/profile" class="icon-link"><i class="fas fa-user"></i></a>
+
    <a href="/user/cart" id="viewCartBtn" class="icon-link cart-icon">
   <i class="fas fa-shopping-bag"></i><span class="cart-count"><%= cartCount %></span>
 </a> 

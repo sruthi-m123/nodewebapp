@@ -70,16 +70,27 @@ export const cancelOrder = async (req, res) => {
 };
 
 export const returnOrder = async (req, res) => {
-  logger.info('Processing order return');
-  console.log("inside the controler",req.validatedData);
-  const {orderId,...returnData}=req.validatedData;
-  const order = await orderManagmentService.returnOrderService(req.session.user.id, orderId, returnData);
+  try {
+    logger.info('Processing order return');
 
-  res.status(STATUS_CODES.SUCCESS).json({
-    success: true,
-    message: 'Return request submitted successfully',
-    order
-  });
+    const { orderId, ...returnData } = req.validatedData;
+    const order = await orderManagmentService.returnOrderService(
+      req.session.user.id,
+      orderId,
+      returnData
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Return request submitted successfully',
+      order
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Unable to submit return request'
+    });
+  }
 };
 
 export const creditNote = async (req, res) => {

@@ -16,6 +16,8 @@ import * as wishlistController from "../controller/user/wishlistController.js";
 import * as walletController from "../controller/user/walletController.js";
 import * as couponController from "../controller/user/couponController.js";
 import * as razorpayController from "../controller/user/razorpayController.js";
+import * as aboutusController from "../controller/user/aboutUs.controller.js";
+import * as contactUsController from "../controller/user/contactUs.controller.js";
 
 import { isLoggedIn, checkBlocked } from "../middlewares/auth.js";
 import { upload } from "../config/multer.js";
@@ -159,13 +161,21 @@ router.post("/wishlist/add/:productId", isLoggedIn, validate(V.addToWishlistSche
 router.post("/wishlist/add-to-cart/:itemId", isLoggedIn, validate(V.addToCartFromWishlistSchema, "params"), wishlistController.addToCartFromWishlist);
 router.delete("/wishlist/remove/:itemId", isLoggedIn, validate(V.removeWishlistSchema), wishlistController.removeFromWishlist);
 router.get("/status/:productId", validate(V.objectIdSchema), wishlistController.checkWishlistStatus);
-
+router.delete(
+  "/wishlist/remove-product/:productId",
+  isLoggedIn,
+  wishlistController.removeProductFromWishlist
+);
 // Wallet routes
 
 router.get("/wallet",isLoggedIn, checkBlocked, walletController.getWallet);
 router.post("/wallet/create-order", checkBlocked, walletController.createWalletOrder);
 router.post("/wallet/verify-payment",checkBlocked,walletController.verifyWalletPayment);
 
-
+//About Us
+router.get("/aboutUs",checkBlocked,aboutusController.getAboutUsPage);
+//Contact Us
+router.get("/contactUs",checkBlocked,contactUsController.getContactUsPage);
+router.post("/contact",contactUsController.sendMessage);
 
 export default router;

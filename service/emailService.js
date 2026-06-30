@@ -60,3 +60,6 @@ console.log("otp:",otp);
     return false;
   }
 };
+export const sendMail=async(mailOptions)=>{
+  return transporter.sendMail(mailOptions);
+}

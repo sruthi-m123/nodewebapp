@@ -169,7 +169,6 @@ export const returnOrderService=async(userId,orderId,returnData)=>{
         throw new Error('Only delivered orders can be returned');
     }
 
-    order.returnRequested=true;
 
    const isPartialReturn=
    Array.isArray(finalItemIds)&& finalItemIds.length>0;
@@ -179,7 +178,7 @@ if(isPartialReturn){
 }else{
     processFullReturn(order,returnReason,notes);
 }
-
+order.returnRequested = true;
     await order.save();
     logger.info('return request sunmitted successfully',{orderId});
     return order;
@@ -577,10 +576,11 @@ console.log("order.userId",order.userId);
     }
 
     const processFullReturn=(order,reason,notes)=>{
-      const returnableItems=  order.items.forEach(item=>{
-            !['returned','return_requested','cancelled'].includes(item.status)
-            
-        });
+        console.log("order inside the full return",order);
+    const returnableItems = order.items.filter(item =>
+  !['returned', 'return_requested', 'cancelled'].includes(item.status)
+);
+        console.log("returnableItems",returnableItems);
 if(returnableItems.length===0){
     throw new Error('No returnable items founf in this order');
 }
@@ -633,6 +633,9 @@ order.status=eligibleCount===activeItems.length
                 if(["returned","return_requested"].includes(item.status)){
                     throw new Error('Item alreasy in return process');
                 }
+                if (item.status === 'cancelled') {
+  throw new Error('Cancelled item cannot be returned');
+}
 item.status="return_requested";
                eligibleCount++;
                 

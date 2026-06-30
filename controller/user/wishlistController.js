@@ -20,36 +20,59 @@ export const getWishlistPage=async(req,res)=>{
   })
 };
 
-export const addToWishlist=async (req,res)=>{
-  const userId=req.session.user.id;
-  if(!userId){
-    return res.status(STATUS_CODES.UNAUTHORIZED).json({success:false,message:"Please login to continue"});
+export const addToWishlist = async (req, res) => {
+  const userId = req.session.user?.id;
+  if (!userId) {
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "Please login to continue" });
   }
-  const {productId}=req.params;
+  const { productId } = req.params;
 
-  const count=
-  await WishlistService.addToWishlist(userId,productId);
-  res.status(STATUS_CODES.CREATED).json({
-    success:true,
-    message:MESSAGES.WISHLIST.ADD_SUCCESS,
-    wishlistCount:count
-  })
-}
+  try {
+    const count = await WishlistService.addToWishlist(userId, productId);
+    res.status(STATUS_CODES.CREATED).json({
+      success: true,
+      message: MESSAGES.WISHLIST.ADD_SUCCESS,
+      wishlistCount: count
+    });
+  } catch (err) {
+    const statusCode = err.status || err.statusCode || STATUS_CODES.INTERNAL_SERVER_ERROR;
+    res.status(statusCode).json({ success: false, message: err.message || 'Failed to add to wishlist' });
+  }
+};
 
 
-export const removeFromWishlist= async(req,res)=>{
-  const userId=req.session.user.id;
-  const {itemId}=req.params;
+export const removeFromWishlist = async (req, res) => {
+  const userId = req.session.user.id;
+  const { itemId } = req.params;
 
-  const count=
-  await WishlistService.removeFromWishlist(userId,itemId);
+  try {
+    const count = await WishlistService.removeFromWishlist(userId, itemId);
+    res.json({
+      success: true,
+      message: MESSAGES.WISHLIST.REMOVE_SUCCESS,
+      wishlistCount: count
+    });
+  } catch (err) {
+    const statusCode = err.status || err.statusCode || 500;
+    res.status(statusCode).json({ success: false, message: err.message || 'Failed to remove from wishlist' });
+  }
+};
+export const removeProductFromWishlist = async (req, res) => {
+  const userId = req.session.user.id;
+  const { productId } = req.params;
 
-  res.json({
-    success:true,
-    message:MESSAGES.WISHLIST.REMOVE_SUCCESS,
-    wishlistCount:count
-  })
-}
+  try {
+    const count = await WishlistService.removeProductFromWishlist(userId, productId);
+    res.json({
+      success: true,
+      message: "Removed from wishlist",
+      wishlistCount: count
+    });
+  } catch (err) {
+    const statusCode = err.status || err.statusCode || 500;
+    res.status(statusCode).json({ success: false, message: err.message || 'Failed to remove from wishlist' });
+  }
+};
 
 export const addToCartFromWishlist = async (req, res) => {
   const userId = req.session.user.id;

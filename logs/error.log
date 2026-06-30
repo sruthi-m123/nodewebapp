@@ -915,3 +915,24 @@ searchTerm is not defined
 [2026-06-29 21:16:21] [31merror[39m: PUT /admin/coupons/edit-coupon/6a3a136d91a26e8484da4d99-Coupon discount value cant be greater than minimum Cart Vale
 [2026-06-29 22:18:37] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
 [2026-06-29 22:18:37] [31merror[39m: Error in checkExpiredCoupons cron job: getaddrinfo ENOTFOUND ac-dejzbzo-shard-00-00.9d7kbbi.mongodb.net
+[2026-06-30 09:05:44] [31merror[39m: POST /user/orders/6a4339527d41cb3fd89fbe86/return-Cannot read properties of undefined (reading 'length')
+[2026-06-30 09:05:52] [31merror[39m: POST /user/orders/6a4339527d41cb3fd89fbe86/return-Cannot read properties of undefined (reading 'length')
+[2026-06-30 09:07:18] [31merror[39m: POST /user/orders/6a4339527d41cb3fd89fbe86/return-Cannot read properties of undefined (reading 'length')
+[2026-06-30 09:29:37] [31merror[39m: POST /user/orders/6a4339527d41cb3fd89fbe86/return-No returnable items founf in this order
+[2026-06-30 10:30:11] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-30 10:31:51] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-30 10:47:05] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0-product already in wishlist
+[2026-06-30 14:15:01] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f- product already in the wishlist.
+[2026-06-30 14:15:06] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0- product already in the wishlist.
+[2026-06-30 14:15:17] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f- product already in the wishlist.
+[2026-06-30 14:15:21] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0- product already in the wishlist.
+[2026-06-30 14:15:49] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0- product already in the wishlist.
+[2026-06-30 14:49:57] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0- product already in the wishlist.
+[2026-06-30 14:50:00] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f- product already in the wishlist.
+[2026-06-30 14:53:13] [31merror[39m: POST /user/wishlist/add/6a30cf8d7f8000cb4051c1e0- product already in the wishlist.
+[2026-06-30 14:53:20] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f- product already in the wishlist.
+[2026-06-30 15:13:13] [31merror[39m: POST /user/wishlist/add/6a2899b4741ff43e87a9739f- product already in the wishlist.
+[2026-06-30 15:13:24] [31merror[39m: POST /user/wishlist/add/6a284c6dafdb307290a545f1- product already in the wishlist.
+[2026-06-30 17:49:03] [31merror[39m: GET /user/aboutUs-ShopService.getUserWishlistCount is not a function
+[2026-06-30 18:50:12] [31merror[39m: POST /user/contact-No recipients defined
+[2026-06-30 19:06:08] [31merror[39m: POST /user/contact-resoponse is not defined

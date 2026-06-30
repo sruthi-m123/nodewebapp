@@ -337,15 +337,25 @@ document.getElementById('deleteConfirmModal').addEventListener('click', function
 
 
 function updateOrderSummary(orderSummary) {
-    const formatCurrency = (value, isNegative = false) =>
-        `${isNegative ? '-' : ''}₹${value.toFixed(2)}`;
+  const formatCurrency = (value, isNegative = false) => {
+    const amount = Number(value) || 0;
+    return `${isNegative ? '-' : ''}₹${amount.toFixed(2)}`;
+  };
 
-    document.getElementById("summary-subtotal").textContent = formatCurrency(orderSummary.subtotal);
-    document.getElementById("summary-delivery").textContent = formatCurrency(orderSummary.delivery);
-    document.getElementById("summary-tax").textContent = formatCurrency(orderSummary.tax);
-    document.getElementById("summary-couponDiscount").textContent=formatCurrency(orderSummary.couponDiscount);
-    // document.getElementById("summary-discount").textContent = formatCurrency(orderSummary.discount, true);
-    document.getElementById("summary-total").textContent = formatCurrency(orderSummary.total);
+  document.getElementById("summary-subtotal").textContent =
+    formatCurrency(orderSummary.subtotal);
+
+  document.getElementById("summary-delivery").textContent =
+    formatCurrency(orderSummary.delivery);
+
+  document.getElementById("summary-tax").textContent =
+    formatCurrency(orderSummary.tax);
+
+  document.getElementById("summary-couponDiscount").textContent =
+    formatCurrency(orderSummary.couponDiscount, true);
+
+  document.getElementById("summary-total").textContent =
+    formatCurrency(orderSummary.total);
 }
 
 
@@ -371,6 +381,21 @@ document.addEventListener('click', function(event) {
         document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
     }
 });
+
+function closeCouponDropdownAfterDelay() {
+  setTimeout(() => {
+    const couponDropdown = document.querySelector('.coupon-dropdown');
+    const couponList = document.querySelector('.coupon-dropdown-list');
+
+    if (couponDropdown) {
+      couponDropdown.classList.remove('active', 'open', 'show');
+    }
+
+    if (couponList) {
+      couponList.style.display = 'none';
+    }
+  }, 2000);
+}
 
 // Apply coupon from input field
 function applyCouponByCode() {
@@ -450,6 +475,15 @@ const bodyData=isRetry?{couponId,retryCartItems}:{couponId};
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
+                Swal.fire({
+    icon: 'success',
+    title: 'Coupon Applied',
+    text: data.message || 'Coupon applied successfully',
+    timer: 1500,
+    showConfirmButton: false
+  });
+
+  closeCouponDropdownAfterDelay();
             }else{
                                 showToast(data.message,'error')
    if (data.message === "You have already used this coupon") {

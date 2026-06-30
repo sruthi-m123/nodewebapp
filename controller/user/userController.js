@@ -307,7 +307,3 @@ export const logout = async (req, res) => {
   });
 
 };
-export const about = async(req,res)=>{
-  res.render('/user/aboutus')
-  console.log('Success')
-}
