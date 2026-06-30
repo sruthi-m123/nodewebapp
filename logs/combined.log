@@ -97852,3 +97852,323 @@ searchTerm is not defined
 [2026-06-30 01:46:59] [32minfo[39m: GET /user/cart/count 200 15 - 172.542 ms
 [2026-06-30 01:47:12] [32minfo[39m: Generating credit note
 [2026-06-30 01:47:13] [32minfo[39m: GET /user/orders/ORD-1782764083814-140/credit-note 200 1418 - 1006.046 ms
+[2026-06-30 07:44:25] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 07:44:40] [32minfo[39m: GET / 302 39 - 28.674 ms
+[2026-06-30 07:44:40] [32minfo[39m: loading homepage
+[2026-06-30 07:44:41] [32minfo[39m: GET /user/home 200 11139 - 224.895 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /css/common.css 200 2780 - 45.625 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /css/header.css 200 5759 - 98.387 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /css/home.css 200 6666 - 94.037 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /js/common.js 200 2095 - 75.150 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /css/footer.css 200 4817 - 220.953 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 131.064 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /img/customer.jpg 200 73230 - 233.369 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 126.234 ms
+[2026-06-30 07:44:41] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 127.188 ms
+[2026-06-30 07:44:42] [32minfo[39m: GET /user/cart/count 200 15 - 196.067 ms
+[2026-06-30 07:44:42] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 435.750 ms
+[2026-06-30 07:44:42] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 270.613 ms
+[2026-06-30 07:44:44] [32minfo[39m: Loading login page
+[2026-06-30 07:44:44] [32minfo[39m: GET /user/login 200 4028 - 25.774 ms
+[2026-06-30 07:44:44] [32minfo[39m: GET /css/login.css 200 6265 - 4.053 ms
+[2026-06-30 07:44:44] [32minfo[39m: GET /css/login-bg.jpg 404 7095 - 50.681 ms
+[2026-06-30 07:44:46] [32minfo[39m: GET /user/auth/google 302 0 - 3.861 ms
+[2026-06-30 07:44:51] [32minfo[39m: GET /user/auth/google/callback?iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AdkVLPyp4TsK0U4gfp3Li7qWZC5RmwXOo9CWF_e4bQTe_FTunLDDTcvFk9A4nAcMtpYtAw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=0&prompt=none 302 39 - 736.179 ms
+[2026-06-30 07:44:51] [32minfo[39m: loading homepage
+[2026-06-30 07:44:52] [32minfo[39m: GET /user/home 200 11910 - 523.524 ms
+[2026-06-30 07:44:52] [32minfo[39m: GET /css/common.css 200 2780 - 230.172 ms
+[2026-06-30 07:44:52] [32minfo[39m: GET /css/header.css 200 5759 - 198.439 ms
+[2026-06-30 07:44:52] [32minfo[39m: GET /css/home.css 200 6666 - 377.861 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /css/footer.css 200 4817 - 606.366 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/banner/banner3.jpg 200 132609 - 406.473 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/customer.jpg 200 73230 - 646.470 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 646.596 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 643.201 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 311.180 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /js/common.js 200 2095 - 1137.774 ms
+[2026-06-30 07:44:53] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 403.282 ms
+[2026-06-30 07:44:54] [32minfo[39m: GET /user/cart/count 200 15 - 120.161 ms
+[2026-06-30 07:44:55] [32minfo[39m: loading shopping page
+[2026-06-30 07:44:55] [32minfo[39m: categories fetched successfully
+[2026-06-30 07:44:55] [32minfo[39m: Products fetched successfully
+[2026-06-30 07:44:57] [32minfo[39m: GET /user/shopall 200 19727 - 1795.701 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /css/common.css 200 2780 - 172.523 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /css/header.css 200 5759 - 162.461 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /css/footer.css 200 4817 - 212.630 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /css/user/shopall.css 200 9510 - 230.476 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /js/common.js 200 2095 - 258.572 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 228.613 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 138.415 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 129.678 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 124.234 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /js/user/shopall.js 200 11749 - 108.434 ms
+[2026-06-30 07:44:57] [32minfo[39m: GET /user/cart/count 200 15 - 126.136 ms
+[2026-06-30 07:45:00] [32minfo[39m: Adding product to cart
+[2026-06-30 07:45:00] [32minfo[39m: Item added to cart
+[2026-06-30 07:45:00] [32minfo[39m: POST /user/cart/add/6a30cf8d7f8000cb4051c1e0 200 56 - 313.404 ms
+[2026-06-30 07:45:02] [32minfo[39m: Adding product to cart
+[2026-06-30 07:45:02] [32minfo[39m: Item added to cart
+[2026-06-30 07:45:02] [32minfo[39m: POST /user/cart/add/6a284c6dafdb307290a545f1 200 56 - 423.307 ms
+[2026-06-30 07:45:06] [32minfo[39m: loading cart page
+[2026-06-30 07:45:06] [32minfo[39m: cart items processed
+[2026-06-30 07:45:06] [32minfo[39m: GET /user/cart 200 10373 - 368.028 ms
+[2026-06-30 07:45:06] [32minfo[39m: GET /css/common.css 200 2780 - 248.489 ms
+[2026-06-30 07:45:06] [32minfo[39m: GET /css/header.css 200 5759 - 229.724 ms
+[2026-06-30 07:45:06] [32minfo[39m: GET /css/footer.css 200 4817 - 226.273 ms
+[2026-06-30 07:45:06] [32minfo[39m: GET /css/user/cart.css 200 5387 - 231.288 ms
+[2026-06-30 07:45:07] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 415.450 ms
+[2026-06-30 07:45:07] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 248.114 ms
+[2026-06-30 07:45:07] [32minfo[39m: GET /js/common.js 200 2095 - 1104.988 ms
+[2026-06-30 07:45:07] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 987.729 ms
+[2026-06-30 07:45:08] [32minfo[39m: GET /js/user/cart.js 200 13450 - 1232.376 ms
+[2026-06-30 07:45:08] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 1094.245 ms
+[2026-06-30 07:45:08] [32minfo[39m: GET /user/cart/count 200 15 - 422.230 ms
+[2026-06-30 07:45:08] [32minfo[39m: validating cart
+[2026-06-30 07:45:08] [32minfo[39m: cart validation completed
+[2026-06-30 07:45:09] [32minfo[39m: GET /user/cart/validate-cart 200 16 - 577.865 ms
+[2026-06-30 07:45:09] [32minfo[39m: GET /user/cart/count 200 15 - 276.981 ms
+[2026-06-30 07:45:10] [32minfo[39m: loading checkout page
+[2026-06-30 07:45:12] [32minfo[39m: GET /user/checkout 200 27989 - 1557.509 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /css/common.css 200 2780 - 140.834 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /css/header.css 200 5759 - 144.837 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /css/user/checkout.css 200 22316 - 142.950 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /css/footer.css 200 4817 - 312.728 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 311.541 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 334.743 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /js/common.js 200 2095 - 213.440 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 364.627 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 299.206 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /js/user/checkout.js 200 30731 - 301.897 ms
+[2026-06-30 07:45:12] [32minfo[39m: GET /user/cart/count 200 15 - 154.891 ms
+[2026-06-30 07:45:17] [32minfo[39m: inside Placing order
+[2026-06-30 07:45:18] [32minfo[39m: wallet debited
+[2026-06-30 07:45:19] [32minfo[39m: POST /user/orders-placed 200 160 - 1339.106 ms
+[2026-06-30 07:45:20] [32minfo[39m: Loading success page
+[2026-06-30 07:45:20] [32minfo[39m: GET /user/order-success/ORD-1782785718245-209 200 4746 - 254.255 ms
+[2026-06-30 07:45:21] [32minfo[39m: GET /css/user/successPage.css 200 6296 - 134.614 ms
+[2026-06-30 07:45:22] [32minfo[39m: loading order history page
+[2026-06-30 07:45:22] [32minfo[39m: orders fetched succcessfully
+[2026-06-30 07:45:22] [32minfo[39m: GET /user/orders 200 14021 - 390.784 ms
+[2026-06-30 07:45:23] [32minfo[39m: GET /css/header.css 200 5759 - 518.119 ms
+[2026-06-30 07:45:23] [32minfo[39m: GET /css/common.css 200 2780 - 529.355 ms
+[2026-06-30 07:45:23] [32minfo[39m: GET /js/common.js 200 2095 - 495.317 ms
+[2026-06-30 07:45:23] [32minfo[39m: GET /css/user/orderHistory.css 200 10228 - 515.828 ms
+[2026-06-30 07:45:24] [32minfo[39m: GET /css/footer.css 200 4817 - 821.805 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 1870.594 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 1414.462 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 836.882 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /js/user/orderHistory.js 200 724 - 1012.871 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 818.615 ms
+[2026-06-30 07:45:25] [32minfo[39m: GET /user/cart/count 200 15 - 251.099 ms
+[2026-06-30 07:45:26] [32minfo[39m: loading order details page
+[2026-06-30 07:45:26] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:45:26] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 13389 - 740.542 ms
+[2026-06-30 07:45:27] [32minfo[39m: GET /css/common.css 200 2780 - 813.072 ms
+[2026-06-30 07:45:27] [32minfo[39m: GET /css/header.css 200 5759 - 818.347 ms
+[2026-06-30 07:45:27] [32minfo[39m: GET /css/footer.css 200 4817 - 814.699 ms
+[2026-06-30 07:45:27] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 840.761 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 814.870 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 1269.517 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /js/common.js 200 2095 - 269.633 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 287.789 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 278.650 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 288.388 ms
+[2026-06-30 07:45:28] [32minfo[39m: GET /user/cart/count 200 15 - 138.551 ms
+[2026-06-30 07:45:32] [32minfo[39m: processing order cancellation
+[2026-06-30 07:45:32] [32minfo[39m: wallet refunded: 3540
+[2026-06-30 07:45:32] [32minfo[39m: order cancelled successfully
+[2026-06-30 07:45:32] [32minfo[39m: POST /user/orders/6a4326b6269de530055d7d69/cancel 200 1654 - 736.580 ms
+[2026-06-30 07:45:35] [32minfo[39m: loading order details page
+[2026-06-30 07:45:35] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:45:35] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 14355 - 641.899 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /css/footer.css 200 4817 - 303.696 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 314.567 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 319.935 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /css/header.css 200 5759 - 429.942 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /css/common.css 200 2780 - 455.800 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 352.040 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /js/common.js 200 2095 - 171.651 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 274.071 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 181.889 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 267.575 ms
+[2026-06-30 07:45:36] [32minfo[39m: GET /user/cart/count 200 15 - 141.825 ms
+[2026-06-30 07:45:39] [32minfo[39m: Loading wallet page
+[2026-06-30 07:45:40] [32minfo[39m: GET /user/wallet 200 13423 - 632.252 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /css/common.css 200 2780 - 84.703 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /css/header.css 200 5759 - 93.067 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /css/user/wallet.css 200 4461 - 118.864 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /css/footer.css 200 4817 - 168.069 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 153.976 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 164.235 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 255.059 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 275.418 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /js/common.js 200 2095 - 300.676 ms
+[2026-06-30 07:45:40] [32minfo[39m: GET /js/user/wallet.js 200 6039 - 278.306 ms
+[2026-06-30 07:45:41] [32minfo[39m: GET /user/cart/count 200 15 - 193.871 ms
+[2026-06-30 07:45:47] [32minfo[39m: loading order details page
+[2026-06-30 07:45:47] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:45:47] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 14355 - 397.717 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /css/common.css 200 2780 - 395.138 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /css/header.css 200 5759 - 382.768 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /css/footer.css 200 4817 - 341.763 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 424.337 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /js/common.js 200 2095 - 537.178 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 537.041 ms
+[2026-06-30 07:45:48] [32minfo[39m: GET /user/cart/count 200 15 - 121.638 ms
+[2026-06-30 07:45:51] [32minfo[39m: Generating credit note
+[2026-06-30 07:45:51] [32minfo[39m: GET /user/orders/ORD-1782785718245-209/credit-note 200 1417 - 343.747 ms
+[2026-06-30 07:46:34] [32minfo[39m: generating invoice
+[2026-06-30 07:46:35] [32minfo[39m: Invoice started generating
+[2026-06-30 07:46:35] [32minfo[39m: GET /user/orders/ORD-1782785718245-209/invoice 200 2108 - 428.962 ms
+[2026-06-30 07:48:22] [32minfo[39m: GET /admin/login 200 3183 - 86.041 ms
+[2026-06-30 07:48:22] [32minfo[39m: GET /css/admin/login.css 200 4742 - 80.420 ms
+[2026-06-30 07:48:22] [32minfo[39m: GET /img/admin-weaver.jpg 200 36006 - 72.570 ms
+[2026-06-30 07:48:29] [32minfo[39m: Admin logged in successfully.
+[2026-06-30 07:48:29] [32minfo[39m: POST /admin/login 302 45 - 284.260 ms
+[2026-06-30 07:48:29] [32minfo[39m: GET /admin/dashboard 200 43972 - 201.212 ms
+[2026-06-30 07:48:30] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 120.722 ms
+[2026-06-30 07:48:30] [32minfo[39m: GET /css/admin/dashboard.css 200 11311 - 127.474 ms
+[2026-06-30 07:48:30] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 135.072 ms
+[2026-06-30 07:48:30] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 298.618 ms
+[2026-06-30 07:48:31] [32minfo[39m: Fetching dashboard stats
+[2026-06-30 07:48:31] [32minfo[39m: Fetching top products
+[2026-06-30 07:48:31] [32minfo[39m: Fetching sales report
+[2026-06-30 07:48:31] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-30 07:48:31] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-30 07:48:31] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-30 07:48:31] [32minfo[39m: fetching top categories
+[2026-06-30 07:48:31] [32minfo[39m: Top products delivered successfully
+[2026-06-30 07:48:31] [32minfo[39m: GET /admin/api/top-products?page=1&limit=4 200 1049 - 810.626 ms
+[2026-06-30 07:48:32] [32minfo[39m: Top categories delivered successfully
+[2026-06-30 07:48:32] [32minfo[39m: Dashboard stats calculated
+[2026-06-30 07:48:32] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-30 07:48:32] [32minfo[39m: GET /admin/top-categories?page=1&limit=4 200 1088 - 1181.581 ms
+[2026-06-30 07:48:32] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-30 07:48:32] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 203 - 1932.025 ms
+[2026-06-30 07:48:33] [32minfo[39m: Sales report generated successfully
+[2026-06-30 07:48:33] [32minfo[39m: Sales report delivered successfully
+[2026-06-30 07:48:33] [32minfo[39m: GET /admin/api/sales-report?page=1&limit=10&dateRange=1m 200 2367 - 2226.361 ms
+[2026-06-30 07:48:33] [32minfo[39m: Fetching sales chart data for period: monthly
+[2026-06-30 07:48:33] [32minfo[39m: Generating chart data for period: monthly
+[2026-06-30 07:48:33] [32minfo[39m: Sales report generated successfully
+[2026-06-30 07:48:33] [32minfo[39m: Dashboard stats delivered successfully
+[2026-06-30 07:48:33] [32minfo[39m: GET /admin/api/stats 200 862 - 2434.042 ms
+[2026-06-30 07:48:33] [32minfo[39m: Sales chart data delivered successfully for period: monthly
+[2026-06-30 07:48:33] [32minfo[39m: GET /admin/api/sales-data?period=monthly 200 203 - 672.063 ms
+[2026-06-30 07:48:35] [32minfo[39m: fetching order with filters
+[2026-06-30 07:48:35] [32minfo[39m: GET /admin/orders 200 40378 - 292.403 ms
+[2026-06-30 07:48:36] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 142.063 ms
+[2026-06-30 07:48:36] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 150.559 ms
+[2026-06-30 07:48:36] [32minfo[39m: GET /css/admin/order.css 200 17704 - 218.704 ms
+[2026-06-30 07:48:36] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 202.107 ms
+[2026-06-30 07:48:45] [32minfo[39m: Updating order status
+[2026-06-30 07:48:45] [32minfo[39m: POST /admin/orders/6a4326b6269de530055d7d69/status 200 63 - 479.943 ms
+[2026-06-30 07:49:04] [32minfo[39m: loading order details page
+[2026-06-30 07:49:04] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:49:04] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 14669 - 218.080 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /css/common.css 200 2780 - 97.019 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /css/header.css 200 5759 - 87.180 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 106.840 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 116.020 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /css/footer.css 200 4817 - 142.577 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 170.810 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 115.687 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /js/common.js 200 2095 - 132.720 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 118.563 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 97.668 ms
+[2026-06-30 07:49:04] [32minfo[39m: GET /user/cart/count 200 15 - 127.286 ms
+[2026-06-30 07:49:14] [32minfo[39m: Processing order return
+[2026-06-30 07:49:14] [32minfo[39m: return request sunmitted successfully
+[2026-06-30 07:49:14] [32minfo[39m: POST /user/orders/6a4326b6269de530055d7d69/return 200 4211 - 278.169 ms
+[2026-06-30 07:49:18] [32minfo[39m: loading order details page
+[2026-06-30 07:49:18] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:49:18] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 14679 - 240.941 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /css/common.css 200 2780 - 81.928 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /css/header.css 200 5759 - 87.961 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 84.780 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /css/footer.css 200 4817 - 84.613 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 114.692 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 111.788 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 93.643 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /js/common.js 200 2095 - 94.631 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 80.983 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 85.360 ms
+[2026-06-30 07:49:18] [32minfo[39m: GET /user/cart/count 200 15 - 108.391 ms
+[2026-06-30 07:50:53] [32minfo[39m: fetching order with filters
+[2026-06-30 07:50:53] [32minfo[39m: GET /admin/orders 200 40488 - 242.528 ms
+[2026-06-30 07:50:54] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 73.230 ms
+[2026-06-30 07:50:54] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 78.065 ms
+[2026-06-30 07:50:54] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 77.881 ms
+[2026-06-30 07:50:54] [32minfo[39m: GET /css/admin/order.css 200 17704 - 85.852 ms
+[2026-06-30 07:50:55] [32minfo[39m: Fetching return details
+[2026-06-30 07:50:55] [32minfo[39m: GET /admin/orders/ORD-1782785718245-209/verify-return 200 87 - 220.662 ms
+[2026-06-30 07:50:59] [32minfo[39m: processing return request
+[2026-06-30 07:50:59] [32minfo[39m: return approved and processed
+[2026-06-30 07:50:59] [32minfo[39m: Saving order updates
+[2026-06-30 07:50:59] [32minfo[39m: Wallet updated for approved return
+[2026-06-30 07:50:59] [32minfo[39m: POST /admin/orders/ORD-1782785718245-209/verify-return 200 136 - 451.781 ms
+[2026-06-30 07:51:06] [32minfo[39m: fetching order with filters
+[2026-06-30 07:51:06] [32minfo[39m: GET /admin/orders 200 40332 - 287.501 ms
+[2026-06-30 07:51:06] [32minfo[39m: GET /css/admin/admin.css 200 19507 - 85.701 ms
+[2026-06-30 07:51:06] [32minfo[39m: GET /img/admin/logo.jpg 200 26279 - 106.612 ms
+[2026-06-30 07:51:06] [32minfo[39m: GET /css/admin/order.css 200 17704 - 96.002 ms
+[2026-06-30 07:51:06] [32minfo[39m: GET /img/admin/admin-avatar.jpg 200 114439 - 113.879 ms
+[2026-06-30 07:51:17] [32minfo[39m: loading order details page
+[2026-06-30 07:51:17] [32minfo[39m: order details fetched successfully
+[2026-06-30 07:51:17] [32minfo[39m: GET /user/orders-details/ORD-1782785718245-209 200 14919 - 218.357 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /css/common.css 200 2780 - 77.333 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /css/header.css 200 5759 - 84.248 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /css/user/orderDetail.css 200 13057 - 88.857 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /css/footer.css 200 4817 - 89.902 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /img/insta-post1.jpg 200 99817 - 95.494 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /img/insta-post2.jpg 200 64682 - 140.335 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /js/common.js 200 2095 - 95.098 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /img/insta-post3.jpg 200 169905 - 123.074 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /img/insta-post4.jpg 200 63176 - 87.090 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /js/user/orderDetail.js 200 12201 - 89.946 ms
+[2026-06-30 07:51:17] [32minfo[39m: GET /user/cart/count 200 15 - 129.191 ms
+[2026-06-30 08:03:29] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:03:29] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:23] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:23] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:29] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:29] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:35] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:35] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:45] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:57] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:04:57] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:09] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:09] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:12] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:13] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:37] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:37] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:43] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:05:43] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:03] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:03] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:19] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:21] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:33] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:33] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:54] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:54] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:59] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:06:59] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:04] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:04] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:12] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:12] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:19] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:19] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:24] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:25] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:55] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:07:55] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:08:05] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:08:05] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:09:01] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:09:01] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:09:31] [32minfo[39m: connected to mongodb atlas
+[2026-06-30 08:09:31] [32minfo[39m: connected to mongodb atlas

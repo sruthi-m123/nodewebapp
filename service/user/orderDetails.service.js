@@ -577,14 +577,24 @@ console.log("order.userId",order.userId);
     }
 
     const processFullReturn=(order,reason,notes)=>{
-        order.items.forEach(item=>{
-            if(!['returned','return_requested'].includes(item.status)){
-                item.status="return_requested";
-            }
+      const returnableItems=  order.items.forEach(item=>{
+            !['returned','return_requested','cancelled'].includes(item.status)
+            
         });
+if(returnableItems.length===0){
+    throw new Error('No returnable items founf in this order');
+}
 
-        const eligibleCount=order.items.filter(i=>i.status=='return_requested').length;
-        order.status=eligibleCount===order.items.length?"return_requested":"partially_returned";
+        // const eligibleCount=order.items.filter(i=>i.status=='return_requested').length;
+returnableItems.forEach(item=>{
+    item.status="return_requested";
+});
+
+const activeItems=order.items.filter(item=>item.status!=='cancelled');
+const eligibleCount=activeItems.filter(i=>i.status==='return_requested').length;
+order.status=eligibleCount===activeItems.length
+?"return_requested"
+:"partially_returned";
 
         order.returnDetails={
             reason,
