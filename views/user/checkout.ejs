@@ -221,7 +221,7 @@
       <% paymentMethods.forEach(method=> { %>
 
         <% const isCodDisabled=method.id==='cod' && netAmount> 1000; %>
-          <% const isWalletDisabled=method.id==='wallet' && wallet.balance < netAmount; %>
+          <% const isWalletDisabled=method.id==='wallet' && (!wallet || wallet.balance < netAmount); %>
 
             <div class="payment-option
           <%= method.id === selectedPayment ? 'selected' : '' %>
