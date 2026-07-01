@@ -342,8 +342,11 @@ function updateOrderSummary(orderSummary) {
     return `${isNegative ? '-' : ''}₹${amount.toFixed(2)}`;
   };
 
-  document.getElementById("summary-subtotal").textContent =
-    formatCurrency(orderSummary.subtotal);
+  // "Total" row = netAmount (subtotal + delivery - offerDiscount, before coupon & tax)
+  const netAmountEl = document.getElementById("summary-netAmount");
+  if (netAmountEl) {
+    netAmountEl.textContent = formatCurrency(orderSummary.netAmount ?? orderSummary.subtotal);
+  }
 
   document.getElementById("summary-delivery").textContent =
     formatCurrency(orderSummary.delivery);

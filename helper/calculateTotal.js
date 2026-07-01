@@ -59,9 +59,9 @@ console.log("subtotoal:",subtotal);
   console.log("net amount after discount :", netAmount);
 
 
-  const tax = netAmount * (taxRate / 100);
+  const tax = parseFloat((netAmount * (taxRate / 100)).toFixed(2));
   console.log("tax :",tax);
-  const total = netAmount + tax;
+  const total = parseFloat((netAmount + tax).toFixed(2));
 
   return {
     subtotal,

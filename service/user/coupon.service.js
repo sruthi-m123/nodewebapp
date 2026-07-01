@@ -207,16 +207,12 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
     }
 const subtotal=checkMinCartValueService(cartItems,coupon);
 
-var orderSummary=calculateOrder(cartItems,{coupon});
-const delivery=orderSummary.delivery||0;
-const tax=orderSummary.tax||0;
-const total=orderSummary.total||0;
-let discountToApply=0;
-if(coupon.discountType==='fixed'){
-    discountToApply=coupon.discountValue;
-}else if(coupon.discountType==='percentage'){
-      discountToApply=(coupon.discountValue/100)*subtotal;
-}
+const calculatedSummary=calculateOrder(cartItems,{coupon});
+const delivery=parseFloat((calculatedSummary.delivery||0).toFixed(2));
+const tax=parseFloat((calculatedSummary.tax||0).toFixed(2));
+const netAmount=parseFloat((calculatedSummary.netAmount||0).toFixed(2));
+const total=parseFloat((calculatedSummary.total||0).toFixed(2));
+const discountToApply=parseFloat((calculatedSummary.couponDiscount||0).toFixed(2));
 
 if(discountToApply>subtotal){
     logger.warn('discount exceeds subtotal',{discountToApply,subtotal});
@@ -238,12 +234,13 @@ const appliedCoupon={
     value:coupon.discountValue,
     discountApplied:discountToApply
 }
- orderSummary={
+ const orderSummary={
     items:cartItems,
     subtotal,
     delivery,
     tax,
     couponDiscount:discountToApply,
+    netAmount,
     total:finalPrice
 }
 
