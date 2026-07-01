@@ -1,13 +1,19 @@
 :root {
-  --primary-color: #9e6d4e; /* Earthy brown */
-  --primary-light: #d9c4b3; /* Light beige */
-  --primary-dark: #7d573e; /* Dark brown */
-  --secondary-color: #6d9e8e; /* Muted teal */
-  --accent-color: #e67e22; /* Warm orange */
+  --primary-color: #9e6d4e;
+  /* Earthy brown */
+  --primary-light: #d9c4b3;
+  /* Light beige */
+  --primary-dark: #7d573e;
+  /* Dark brown */
+  --secondary-color: #6d9e8e;
+  /* Muted teal */
+  --accent-color: #e67e22;
+  /* Warm orange */
   --text-dark: #333333;
   --text-light: #7f8c8d;
   --white: #ffffff;
-  --light-color: #faf5f2; /* Very light beige */
+  --light-color: #faf5f2;
+  /* Very light beige */
   --success-color: #4CAF50;
   --warning-color: #FF9800;
   --danger-color: #e74c3c;
@@ -15,6 +21,10 @@
   --border-color: #e0d6cc;
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* Base Styles */
@@ -92,7 +102,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.95rem;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -116,10 +126,13 @@ body {
 /* Table */
 .table-responsive {
   overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
   margin-top: 1.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   border: 1px solid var(--border-color);
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -164,7 +177,7 @@ table tbody tr:hover {
   font-weight: 500;
   font-size: 0.9rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .pagination button:hover {
@@ -200,8 +213,13 @@ table tbody tr:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -221,6 +239,7 @@ table tbody tr:hover {
     opacity: 0;
     transform: translate3d(0, 30px, 0) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
@@ -477,11 +496,11 @@ table tbody tr:hover {
   color: var(--text-dark);
 }
 
-.status-switch input[type="checkbox"]:checked + .switch-label {
+.status-switch input[type="checkbox"]:checked+.switch-label {
   background-color: var(--success-color);
 }
 
-.status-switch input[type="checkbox"]:checked + .switch-label .slider-round {
+.status-switch input[type="checkbox"]:checked+.switch-label .slider-round {
   transform: translateX(26px);
 }
 
@@ -540,7 +559,7 @@ table tbody tr:hover {
   justify-content: center;
   gap: 0.625rem;
   padding: 0.625rem;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .reset-btn {
@@ -559,6 +578,7 @@ table tbody tr:hover {
   background-color: var(--text-light);
   color: var(--white);
 }
+
 /* Add this to your existing CSS - Status Toggle Button Styles */
 #categoryTable button[id^="status-btn-"] {
   padding: 0.4rem 0.8rem;
@@ -654,7 +674,7 @@ input[type="submit"]:active {
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease,
-              box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow 0.2s ease, opacity 0.2s ease;
   letter-spacing: 0.3px;
   white-space: nowrap;
   user-select: none;
@@ -749,7 +769,7 @@ input[type="submit"]:active {
    ============================================= */
 
 /* Wrapper that holds each image thumbnail — must be position:relative */
-#previewArea > div,
+#previewArea>div,
 .existing-image {
   position: relative;
   display: inline-block;
@@ -837,14 +857,14 @@ input[type="submit"]:active {
 }
 
 /* Checked state */
-.checkbox-label input[type="checkbox"]:checked + .checkmark {
+.checkbox-label input[type="checkbox"]:checked+.checkmark {
   background: var(--primary-color);
   border-color: var(--primary-color);
   box-shadow: 0 2px 6px rgba(158, 109, 78, 0.35);
 }
 
 /* Tick mark via pseudo-element */
-.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+.checkbox-label input[type="checkbox"]:checked+.checkmark::after {
   content: "";
   width: 5px;
   height: 9px;
@@ -856,7 +876,7 @@ input[type="submit"]:active {
 }
 
 /* Focus ring for accessibility */
-.checkbox-label input[type="checkbox"]:focus + .checkmark {
+.checkbox-label input[type="checkbox"]:focus+.checkmark {
   box-shadow: 0 0 0 3px rgba(158, 109, 78, 0.2);
   border-color: var(--primary-color);
 }
@@ -957,7 +977,7 @@ input[type="submit"]:active {
 
 .action-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .action-btn:active {
@@ -1030,21 +1050,89 @@ input[type="submit"]:active {
   transform: translateY(-1px);
 }
 
+/* ——— Table Responsive min-width helper ——— */
+.table-responsive table {
+  min-width: 650px;
+}
+
 /* ——— Responsive: stack header on small screens ——— */
 @media (max-width: 640px) {
+  .id-col {
+    max-width: 60px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desc-col {
+    max-width: 120px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .table-responsive table {
+    min-width: 100% !important;
+  }
+
+  /* Shrink cell padding, text, and images inside table on mobile */
+  .category-page table tbody td,
+  .product-page table tbody td,
+  .category-page table thead th,
+  .product-page table thead th {
+    padding: 6px 4px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .category-page table tbody img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* Make table action buttons and status toggles compact on mobile */
+  .action-btn {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    margin: 0.05rem !important;
+  }
+
+  #categoryTable button[id^="status-btn-"] {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    min-width: 60px !important;
+  }
+
   .category-header,
   .product-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.75rem;
   }
 
   .category-header .search-bar,
   .product-header .search-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  #searchForm {
     width: 100%;
   }
 
   .search-bar input {
     max-width: 100% !important;
     width: 100% !important;
+    font-size: 14px;
   }
-}
+
+  .search-bar button[type="submit"],
+  .reset-btn,
+  .demo-button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}

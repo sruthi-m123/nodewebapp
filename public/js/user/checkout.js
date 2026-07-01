@@ -1,299 +1,299 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    const checkoutData = document.getElementById('checkout-data');
-    const offers = JSON.parse(checkoutData.dataset.offers || '[]');
-    const addresses = JSON.parse(checkoutData.dataset.addresses || '[]');
-    const cartItems = JSON.parse(checkoutData.dataset.cart || '[]');
-    const selectedPayment = checkoutData.dataset.payment || '';
+  const checkoutData = document.getElementById('checkout-data');
+  const offers = JSON.parse(checkoutData.dataset.offers || '[]');
+  const addresses = JSON.parse(checkoutData.dataset.addresses || '[]');
+  const cartItems = JSON.parse(checkoutData.dataset.cart || '[]');
+  const selectedPayment = checkoutData.dataset.payment || '';
 
-    const addressCards = document.querySelectorAll('.address-card');
-    addressCards.forEach((card, index) => {
-        const addressDocId = card.dataset.addressId;
-        card.addEventListener('click', () => {
-            setupAddressSelection(card, addressDocId, index);
-        });
+  const addressCards = document.querySelectorAll('.address-card');
+  addressCards.forEach((card, index) => {
+    const addressDocId = card.dataset.addressId;
+    card.addEventListener('click', () => {
+      setupAddressSelection(card, addressDocId, index);
     });
+  });
 
-    setupPaymentSelection();
-    setupFormValidation();
+  setupPaymentSelection();
+  setupFormValidation();
 
-    
-    if (window.location.hash === '#success') {
-        showSuccessPage();
-    }
+
+  if (window.location.hash === '#success') {
+    showSuccessPage();
+  }
 });
 ;
 
 // Address Modal Functions
 function openAddressModal(addressId = null) {
-    const modal = document.getElementById('addressModal');
-    const form = document.getElementById('addressForm');
-    const title = document.getElementById('modalTitle');
-    
-    form.reset();
-    if (addressId && addressId!=='new') {
-        title.textContent = 'Edit Address';
-        fetch(`/user/api/addresses/${addressId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const address = data.address;
-                    form.reset();
-                    document.getElementById('name').value = address.name;
-                  document.getElementById('building').value=address.building;
-                   document.getElementById('landmark').value=address.landmark;
-                    document.getElementById('city').value = address.city;
-                    document.getElementById('state').value = address.state;
-                    document.getElementById('pincode').value = address.pincode;
-                    document.getElementById('phone').value = address.phone;
-                    document.getElementById('altPhone').value=address.altPhone;
-                    document.getElementById('addressType').value = address.addressType || 'home';
-                    document.getElementById('setDefault').checked = address.isDefault || false;
-                    
-                    form.dataset.addressId = addressId;
-                }else{
-Swal.fire({
-    icon: 'error',
-    title: 'Oops...',
-    text: 'Failed to load address.'
-});     
-           }
-            })
-            .catch(error => {
-                console.error('Error fetching address:', error);
-Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: 'Error loading address details'
-});      
+  const modal = document.getElementById('addressModal');
+  const form = document.getElementById('addressForm');
+  const title = document.getElementById('modalTitle');
+
+  form.reset();
+  if (addressId && addressId !== 'new') {
+    title.textContent = 'Edit Address';
+    fetch(`/user/api/addresses/${addressId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const address = data.address;
+          form.reset();
+          document.getElementById('name').value = address.name;
+          document.getElementById('building').value = address.building;
+          document.getElementById('landmark').value = address.landmark;
+          document.getElementById('city').value = address.city;
+          document.getElementById('state').value = address.state;
+          document.getElementById('pincode').value = address.pincode;
+          document.getElementById('phone').value = address.phone;
+          document.getElementById('altPhone').value = address.altPhone;
+          document.getElementById('addressType').value = address.addressType || 'home';
+          document.getElementById('setDefault').checked = address.isDefault || false;
+
+          form.dataset.addressId = addressId;
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to load address.'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching address:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error loading address details'
+        });
       });
-    } else {
-        title.textContent = 'Add New Address';
-        
-        delete form.dataset.addressId;
-    }
-    
-    modal.style.display = 'block';
+  } else {
+    title.textContent = 'Add New Address';
+
+    delete form.dataset.addressId;
+  }
+
+  modal.style.display = 'block';
 }
 
 function closeAddressModal() {
-    document.getElementById('addressModal').style.display = 'none';
+  document.getElementById('addressModal').style.display = 'none';
 }
 
 function setupFormValidation() {
-    const form = document.getElementById('addressForm');
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = {
-            name: document.getElementById('name').value.trim(),
-            building: document.getElementById('building').value.trim(),
-                        landmark: document.getElementById('landmark').value.trim(),
-            city: document.getElementById('city').value.trim(),
-            state: document.getElementById('state').value.trim(),
-            pincode: document.getElementById('pincode').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-                      altPhone: document.getElementById('altPhone').value.trim(),
- addressType: document.getElementById('addressType').value,
-            isDefault: document.getElementById('setDefault').checked
-        };
-        
-        // Basic validation
-        if (!formData.name ||! formData.building  ||!formData.city || 
-            !formData.state || !formData.pincode|| !formData.phone||!formData.addressType) {
-Swal.fire({
-    toast:true,
-    position:'top-end',
-    icon:'error',
-    title:'Please fill in all required fields',
-    showConfirmationButton:false,
-    
-})
+  const form = document.getElementById('addressForm');
 
-            return;
-        }
-        
-        const addressId = form.dataset.addressId;
-       
-        if (addressId) {
-            updateAddress(addressId, formData);
-        } else {
-            addAddress(formData);
-        }
-    });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = {
+      name: document.getElementById('name').value.trim(),
+      building: document.getElementById('building').value.trim(),
+      landmark: document.getElementById('landmark').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      state: document.getElementById('state').value.trim(),
+      pincode: document.getElementById('pincode').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      altPhone: document.getElementById('altPhone').value.trim(),
+      addressType: document.getElementById('addressType').value,
+      isDefault: document.getElementById('setDefault').checked
+    };
+
+    // Basic validation
+    if (!formData.name || !formData.building || !formData.city ||
+      !formData.state || !formData.pincode || !formData.phone || !formData.addressType) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Please fill in all required fields',
+        showConfirmationButton: false,
+
+      })
+
+      return;
+    }
+
+    const addressId = form.dataset.addressId;
+
+    if (addressId) {
+      updateAddress(addressId, formData);
+    } else {
+      addAddress(formData);
+    }
+  });
 }
 function addAddress(addressData) {
-    fetch('/user/addresses/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(addressData)
-    })
+  fetch('/user/addresses/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(addressData)
+  })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Address added successfully',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message || 'Error adding address'
-            });
-        }
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Address added successfully',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: data.message || 'Error adding address'
+        });
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Error adding address'
-        });
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Error adding address'
+      });
     });
 }
 
 function updateAddress(addressId, addressData) {
-    fetch(`/user/addresses/edit/${addressId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(addressData)
-    })
+  fetch(`/user/addresses/edit/${addressId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(addressData)
+  })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Updated!',
-                text: 'Address updated successfully',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message || 'Error updating address'
-            });
-        }
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated!',
+          text: 'Address updated successfully',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: data.message || 'Error updating address'
+        });
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Error updating address'
-        });
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Error updating address'
+      });
     });
 }
 
 function editAddress(addressId) {
-    openAddressModal(addressId);
+  openAddressModal(addressId);
 }
 function setupAddressSelection(cardElement, addressDocId, addressIndex) {
-    const addressCards = document.querySelectorAll('.address-card');
-    
-    
-    addressCards.forEach(card => card.classList.remove('selected'));
-    
-    
-    cardElement.classList.add('selected');
-    
-   
-    const checkoutData = document.getElementById('checkout-data');
-    checkoutData.dataset.selectedAddressDoc = addressDocId;
-    checkoutData.dataset.selectedAddressIndex = addressIndex;
-    
-    
-    checkoutData.dataset.selectedAddress = `${addressDocId}_${addressIndex}`;
-document.getElementById("selectedAddressId").value = addressDocId;
+  const addressCards = document.querySelectorAll('.address-card');
+
+
+  addressCards.forEach(card => card.classList.remove('selected'));
+
+
+  cardElement.classList.add('selected');
+
+
+  const checkoutData = document.getElementById('checkout-data');
+  checkoutData.dataset.selectedAddressDoc = addressDocId;
+  checkoutData.dataset.selectedAddressIndex = addressIndex;
+
+
+  checkoutData.dataset.selectedAddress = `${addressDocId}_${addressIndex}`;
+  document.getElementById("selectedAddressId").value = addressDocId;
 
 }
 
 // Payment Selection
 function setupPaymentSelection() {
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    
-    paymentOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            paymentOptions.forEach(o => o.classList.remove('selected'));
-            
-            this.classList.add('selected');
-            
-            const radio = this.querySelector('input[type="radio"]');
-            radio.checked = true;
-            
-            const paymentId = this.dataset.payment;
-            const paymentTitle = this.querySelector('.payment-title').textContent;
-            
-            // Store the selected payment method
-            document.getElementById('checkout-data').dataset.payment = paymentId;
-       
-       document.getElementById('selectedPaymentId').value = paymentId;
+  const paymentOptions = document.querySelectorAll('.payment-option');
 
-        });
+  paymentOptions.forEach(option => {
+    option.addEventListener('click', function () {
+      paymentOptions.forEach(o => o.classList.remove('selected'));
+
+      this.classList.add('selected');
+
+      const radio = this.querySelector('input[type="radio"]');
+      radio.checked = true;
+
+      const paymentId = this.dataset.payment;
+      const paymentTitle = this.querySelector('.payment-title').textContent;
+
+      // Store the selected payment method
+      document.getElementById('checkout-data').dataset.payment = paymentId;
+
+      document.getElementById('selectedPaymentId').value = paymentId;
+
     });
+  });
 }
 //delete address
-var addressToDelete=null;
+var addressToDelete = null;
 
-function confirmDeleteAddress(addressId){
-    addressToDelete=addressId;
-    
-    const modal=document.getElementById('deleteConfirmModal');
-    modal.style.display='flex';
+function confirmDeleteAddress(addressId) {
+  addressToDelete = addressId;
+
+  const modal = document.getElementById('deleteConfirmModal');
+  modal.style.display = 'flex';
 }
 
-function closeDeleteModal(){
-    const modal=document.getElementById('deleteConfirmModal');
-    modal.style.display='none';
-    addressToDelete=null;
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteConfirmModal');
+  modal.style.display = 'none';
+  addressToDelete = null;
 }
 
-function deleteAddress(){
-    if(!addressToDelete) return;
-     const confirmBtn = document.querySelector('.delete-confirm-btn');
-    const originalText = confirmBtn.textContent;
-    confirmBtn.textContent = 'Deleting...';
-    confirmBtn.disabled = true;
+function deleteAddress() {
+  if (!addressToDelete) return;
+  const confirmBtn = document.querySelector('.delete-confirm-btn');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'Deleting...';
+  confirmBtn.disabled = true;
 
-    fetch(`/user/addresses/delete/${addressToDelete}`,{
-        method:'DELETE',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({addressId:addressToDelete})
-    })
-    .then(response=>response.json())
-.then(data => {
-    if (data.success) {
+  fetch(`/user/addresses/delete/${addressToDelete}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ addressId: addressToDelete })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
         const addressCard = document.querySelector(`.address-card[data-address-id="${addressToDelete}"]`);
         if (addressCard) {
-            addressCard.classList.add('deleted');
-            addressCard.onclick = null; 
-            
-            // Hide actions
-            const actions = addressCard.querySelector('.address-actions');
-            if (actions) {
-                actions.style.display = 'none';
-            }
-            
-       
-            const deletedBadge = document.createElement('span');
-            deletedBadge.className = 'deleted-badge';
-            deletedBadge.textContent = 'Deleted';
-            deletedBadge.style.cssText = `
+          addressCard.classList.add('deleted');
+          addressCard.onclick = null;
+
+          // Hide actions
+          const actions = addressCard.querySelector('.address-actions');
+          if (actions) {
+            actions.style.display = 'none';
+          }
+
+
+          const deletedBadge = document.createElement('span');
+          deletedBadge.className = 'deleted-badge';
+          deletedBadge.textContent = 'Deleted';
+          deletedBadge.style.cssText = `
                 position: absolute;
                 top: 10px;
                 right: 15px;
@@ -304,30 +304,30 @@ function deleteAddress(){
                 font-size: 11px;
                 font-weight: 500;
             `;
-            addressCard.appendChild(deletedBadge);
+          addressCard.appendChild(deletedBadge);
         }
-        
+
         showToast('Address deleted successfully', 'success');
-        
+
         closeDeleteModal();
-    } else {
+      } else {
         showToast(data.message || 'Failed to delete address', 'error');
         confirmBtn.textContent = originalText;
         confirmBtn.disabled = false;
-    }
-})
+      }
+    })
     .catch(error => {
-        console.error('Error deleting address:', error);
-        showToast('An error occurred while deleting the address', 'error');
-        confirmBtn.textContent = originalText;
-        confirmBtn.disabled = false;
+      console.error('Error deleting address:', error);
+      showToast('An error occurred while deleting the address', 'error');
+      confirmBtn.textContent = originalText;
+      confirmBtn.disabled = false;
     });
 
 }
-document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
+document.getElementById('deleteConfirmModal').addEventListener('click', function (e) {
+  if (e.target === this) {
+    closeDeleteModal();
+  }
 });
 
 
@@ -375,23 +375,23 @@ function updateOrderSummary(orderSummary) {
 var appliedCoupon = null;
 
 function toggleCouponDropdown() {
-    const dropdown = document.getElementById('couponDropdown');
-    const arrow = document.querySelector('.dropdown-arrow');
-    
-    dropdown.classList.toggle('show');
-    arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+  const dropdown = document.getElementById('couponDropdown');
+  const arrow = document.querySelector('.dropdown-arrow');
+
+  dropdown.classList.toggle('show');
+  arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 window.toggleCouponDropdown = toggleCouponDropdown;
 
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('couponDropdown');
-    const dropdownHeader = document.querySelector('.coupon-dropdown-header');
-    
-    if (dropdownHeader && !dropdownHeader.contains(event.target) && 
-        dropdown && !dropdown.contains(event.target)) {
-        dropdown.classList.remove('show');
-        document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
-    }
+document.addEventListener('click', function (event) {
+  const dropdown = document.getElementById('couponDropdown');
+  const dropdownHeader = document.querySelector('.coupon-dropdown-header');
+
+  if (dropdownHeader && !dropdownHeader.contains(event.target) &&
+    dropdown && !dropdown.contains(event.target)) {
+    dropdown.classList.remove('show');
+    document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+  }
 });
 
 function closeCouponDropdownAfterDelay() {
@@ -411,280 +411,280 @@ function closeCouponDropdownAfterDelay() {
 
 // Apply coupon from input field
 function applyCouponByCode() {
-    console.log("inside the apply coupon")
-    if (appliedCoupon) {
-        showToast('A coupon is already applied. Remove it first.', 'error');
-        return;
-    }
-    const couponCode = document.getElementById('couponCodeInput').value.trim();
-    
-    if (!couponCode) {
-        showToast('Please enter a coupon code', 'error');
-        return;
-    }
-   const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
-   console.log("isRetry:", isRetry);
-   const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
-    const applyButton = document.querySelector('.apply-coupon-input-btn');
-    setButtonLoadingState(applyButton, 'Applying...');
+  console.log("inside the apply coupon")
+  if (appliedCoupon) {
+    showToast('A coupon is already applied. Remove it first.', 'error');
+    return;
+  }
+  const couponCode = document.getElementById('couponCodeInput').value.trim();
 
-    const retryCartItems = window.retryCartItems || [];
-    const bodyData = isRetry ? { couponCode, retryCartItems } : { couponCode };
+  if (!couponCode) {
+    showToast('Please enter a coupon code', 'error');
+    return;
+  }
+  const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+  console.log("isRetry:", isRetry);
+  const url = isRetry ? '/user/checkout/apply-coupon-by-code?retry=true' : '/user/checkout/apply-coupon-by-code';
+  const applyButton = document.querySelector('.apply-coupon-input-btn');
+  setButtonLoadingState(applyButton, 'Applying...');
 
-    apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
-        .then(data => {
-            console.log("data by apply coupon code ",data);
-            if (data.success) {
-                
-  appliedCoupon = { 
-        id: data.appliedCoupon.couponId,
-        code: data.appliedCoupon.code,
-        type: data.appliedCoupon.type,
-        value: data.appliedCoupon.value
-    };
-                updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
-                   updateOrderSummary(data.orderSummary);
-                updateCouponButtons(data.couponId, data.couponCode);
-                
-            }else{
-                showToast(data.message,'error')
-            }
-        })
-        .catch(err => {
+  const retryCartItems = window.retryCartItems || [];
+  const bodyData = isRetry ? { couponCode, retryCartItems } : { couponCode };
+
+  apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
+    .then(data => {
+      console.log("data by apply coupon code ", data);
+      if (data.success) {
+
+        appliedCoupon = {
+          id: data.appliedCoupon.couponId,
+          code: data.appliedCoupon.code,
+          type: data.appliedCoupon.type,
+          value: data.appliedCoupon.value
+        };
+        updateAppliedCouponUI(data.couponCode, data.discountText, data.couponId);
+        updateOrderSummary(data.orderSummary);
+        updateCouponButtons(data.couponId, data.couponCode);
+
+      } else {
+        showToast(data.message, 'error')
+      }
+    })
+    .catch(err => {
       console.log("Error in applyCouponByCode:", err);
       showToast("Something went wrong", 'error');
     })
-        .finally(() => {
- if (!appliedCoupon) {
-                resetButtonState(applyButton, 'Apply');
-            }
-                });
+    .finally(() => {
+      if (!appliedCoupon) {
+        resetButtonState(applyButton, 'Apply');
+      }
+    });
 }
 
 // Apply coupon from dropdown
-function applyCouponFromDropdown(couponId, couponCode,couponType, couponValue) {
-    if (appliedCoupon) {
-        showToast('A coupon is already applied. Remove it first.', 'error');
-        return;
-    }
-    const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+function applyCouponFromDropdown(couponId, couponCode, couponType, couponValue) {
+  if (appliedCoupon) {
+    showToast('A coupon is already applied. Remove it first.', 'error');
+    return;
+  }
+  const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
 
-    const retryCartItems=window.retryCartItems||[];
-    console.log("retryCartItems:",retryCartItems);
-    console.log("isRetry:",isRetry);
-    const url=isRetry?'/user/checkout/apply-coupon?retry=true':'/user/checkout/apply-coupon';
-    const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
-    setButtonLoadingState(applyButton, 'Applying...');
-    
+  const retryCartItems = window.retryCartItems || [];
+  console.log("retryCartItems:", retryCartItems);
+  console.log("isRetry:", isRetry);
+  const url = isRetry ? '/user/checkout/apply-coupon?retry=true' : '/user/checkout/apply-coupon';
+  const applyButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
+  setButtonLoadingState(applyButton, 'Applying...');
 
-const bodyData=isRetry?{couponId,retryCartItems}:{couponId};
-    apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
-        .then(data => {
-            if (data.success) {
-                console.log("orderSummary",data.orderSummary)
-                 appliedCoupon = { id: couponId, code: couponCode,type:couponType,value:couponValue };
-                 console.log("appliedCoupon",appliedCoupon);
-                updateAppliedCouponUI(couponCode, data.discountText, couponId);
-                   updateOrderSummary(data.orderSummary);
-                updateCouponButtons(couponId, couponCode);
-                // Close the dropdown directly
-                const dropdown = document.getElementById('couponDropdown');
-                const arrow = document.querySelector('.dropdown-arrow');
-                if (dropdown) dropdown.classList.remove('show');
-                if (arrow) arrow.style.transform = 'rotate(0deg)';
-            }else{
-                                showToast(data.message,'error')
-   if (data.message === "You have already used this coupon") {
-                    applyButton.disabled = true;
-                    applyButton.textContent = 'Used';
-                    applyButton.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    resetButtonState(applyButton, 'Apply');
-                }
-            }
-        })
-        .catch(error=>{
-            console.log("error:",error)
-            resetButtonState(applyButton,'Apply');
-        })
-       
+
+  const bodyData = isRetry ? { couponId, retryCartItems } : { couponId };
+  apiCall(url, 'POST', bodyData, 'Coupon applied successfully')
+    .then(data => {
+      if (data.success) {
+        console.log("orderSummary", data.orderSummary)
+        appliedCoupon = { id: couponId, code: couponCode, type: couponType, value: couponValue };
+        console.log("appliedCoupon", appliedCoupon);
+        updateAppliedCouponUI(couponCode, data.discountText, couponId);
+        updateOrderSummary(data.orderSummary);
+        updateCouponButtons(couponId, couponCode);
+        // Close the dropdown directly
+        const dropdown = document.getElementById('couponDropdown');
+        const arrow = document.querySelector('.dropdown-arrow');
+        if (dropdown) dropdown.classList.remove('show');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+      } else {
+        showToast(data.message, 'error')
+        if (data.message === "You have already used this coupon") {
+          applyButton.disabled = true;
+          applyButton.textContent = 'Used';
+          applyButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          resetButtonState(applyButton, 'Apply');
+        }
+      }
+    })
+    .catch(error => {
+      console.log("error:", error)
+      resetButtonState(applyButton, 'Apply');
+    })
+
 }
 
 function removeCoupon() {
 
-    const removeBtn = document.querySelector('.remove-coupon-btn');
-    if (removeBtn) {
-        removeBtn.textContent = 'Removing...';
-        removeBtn.disabled = true;
-    }
+  const removeBtn = document.querySelector('.remove-coupon-btn');
+  if (removeBtn) {
+    removeBtn.textContent = 'Removing...';
+    removeBtn.disabled = true;
+  }
 
-    const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
-    const retryCartItems = window.retryCartItems || [];
-    const bodyData = isRetry ? { isRetry: true, retryCartItems } : null;
+  const isRetry = document.getElementById('isRetry')?.value === 'true' || window.isRetry || window.location.search.includes('retry=true') || document.body.dataset.isRetry === 'true';
+  const retryCartItems = window.retryCartItems || [];
+  const bodyData = isRetry ? { isRetry: true, retryCartItems } : null;
 
-    apiCall('/user/checkout/remove-coupon', 'POST', bodyData, 'Coupon removed successfully')
-        .then(data => {
-            console.log("coupon is going to be removed ",data)
-            if (data.success) {
-                appliedCoupon=null;
-                resetCouponUI();
-                resetCouponbutton();
-                console.log("data.orderSummary",data.orderSummary);
-                updateOrderSummary(data.orderSummary);
-               
-         
-            }
-        })
-    
-  
-        .catch((err) => {
-            console.log("remove coupon failed ");
-console.log("error",err);
-            if (removeBtn) {
-                removeBtn.textContent = 'Remove';
-                removeBtn.disabled = false;
-            }
-        })
-         .finally(() => {
-            if (removeBtn) {
-                removeBtn.textContent = 'Remove';
-                removeBtn.disabled = false;
-            }
-        });
+  apiCall('/user/checkout/remove-coupon', 'POST', bodyData, 'Coupon removed successfully')
+    .then(data => {
+      console.log("coupon is going to be removed ", data)
+      if (data.success) {
+        appliedCoupon = null;
+        resetCouponUI();
+        resetCouponbutton();
+        console.log("data.orderSummary", data.orderSummary);
+        updateOrderSummary(data.orderSummary);
+
+
+      }
+    })
+
+
+    .catch((err) => {
+      console.log("remove coupon failed ");
+      console.log("error", err);
+      if (removeBtn) {
+        removeBtn.textContent = 'Remove';
+        removeBtn.disabled = false;
+      }
+    })
+    .finally(() => {
+      if (removeBtn) {
+        removeBtn.textContent = 'Remove';
+        removeBtn.disabled = false;
+      }
+    });
 }
 
-      
+
 
 // updating the UI when updating the coupon 
 function updateAppliedCouponUI(couponCode, discountText, couponId) {
-    document.getElementById('appliedCouponText').textContent = `Applied: ${couponCode} - ${discountText}`;
-    document.getElementById('appliedCouponId').value = couponId;
-    document.getElementById('appliedCouponContainer').style.display = 'block';
-    document.getElementById('couponCodeInput').value = '';
-    
+  document.getElementById('appliedCouponText').textContent = `Applied: ${couponCode} - ${discountText}`;
+  document.getElementById('appliedCouponId').value = couponId;
+  document.getElementById('appliedCouponContainer').style.display = 'block';
+  document.getElementById('couponCodeInput').value = '';
+
 }
 
 // Reset coupon UI
 function resetCouponUI() {
-    document.getElementById('appliedCouponContainer').style.display = 'none';
-    document.getElementById('appliedCouponId').value = '';
-    appliedCoupon = null;
+  document.getElementById('appliedCouponContainer').style.display = 'none';
+  document.getElementById('appliedCouponId').value = '';
+  appliedCoupon = null;
 }
 
 function updateCouponButtons(couponId, couponCode) {
-    const dropdownButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
-    if (dropdownButton) {
-        dropdownButton.textContent = 'Applied';
-        dropdownButton.classList.add('applied');
-        dropdownButton.disabled = true;
-    }
-   
+  const dropdownButton = document.querySelector(`.coupon-dropdown-item[data-coupon-id="${couponId}"] .apply-coupon-dropdown-btn`);
+  if (dropdownButton) {
+    dropdownButton.textContent = 'Applied';
+    dropdownButton.classList.add('applied');
+    dropdownButton.disabled = true;
+  }
+
 }
 
 
-function resetCouponbutton(){
-    console.log("reset button");
-    document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn=>{
-        btn.textContent='Apply';
-        btn.classList.remove('applied','loading','btn-disabled');
-        btn.disabled=false;
+function resetCouponbutton() {
+  console.log("reset button");
+  document.querySelectorAll('.apply-coupon-dropdown-btn').forEach(btn => {
+    btn.textContent = 'Apply';
+    btn.classList.remove('applied', 'loading', 'btn-disabled');
+    btn.disabled = false;
 
-    })
+  })
 }
 
 
 
 // Set button to loading state
 function setButtonLoadingState(button, loadingText = 'Loading...') {
-    if (!button) return;
-    
-    button.setAttribute('data-original-text', button.textContent);
-    button.innerHTML = `<span class="button-loading-spinner"></span> ${loadingText}`;
-    button.disabled = true;
-    button.classList.add('loading');
+  if (!button) return;
+
+  button.setAttribute('data-original-text', button.textContent);
+  button.innerHTML = `<span class="button-loading-spinner"></span> ${loadingText}`;
+  button.disabled = true;
+  button.classList.add('loading');
 }
 
 // Reset button to normal state
 function resetButtonState(button, defaultText = null) {
-    if (!button) return;
-    
-    const originalText = button.getAttribute('data-original-text') || defaultText || button.textContent;
-    button.textContent = originalText;
-    button.disabled = false;
-    button.classList.remove('loading');
-    button.removeAttribute('data-original-text');
+  if (!button) return;
+
+  const originalText = button.getAttribute('data-original-text') || defaultText || button.textContent;
+  button.textContent = originalText;
+  button.disabled = false;
+  button.classList.remove('loading');
+  button.removeAttribute('data-original-text');
 }
 
 // API call with existing toast system
 function apiCall(url, method = 'GET', data = null, successMessage = null) {
-    console.log('apiCall request:', { url, method, data });  // NEW: Log outgoing request
+  console.log('apiCall request:', { url, method, data });  // NEW: Log outgoing request
 
-    const options = {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        credentials: 'same-origin'
-    };
+  const options = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    },
+    credentials: 'same-origin'
+  };
 
-    if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-        options.body = JSON.stringify(data);
-    }
+  if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+    options.body = JSON.stringify(data);
+  }
 
-    return fetch(url, options)
-        .then(async (response) => {
-            const errorClone = response.clone();
+  return fetch(url, options)
+    .then(async (response) => {
+      const errorClone = response.clone();
 
-            if (!response.ok) {
-                const errorData = await errorClone.json().catch(() => ({}));
-                console.error('HTTP Error in apiCall:', { status: response.status, errorData });  
-                throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
-            }
-           
-            const data = await response.json();
-            console.log('API Response:', data);  
-            return data;
-        })
-        .then(data => {
-            if (successMessage && data.success) {
-                showToast(successMessage, 'success');
-            }
-            return data;
-        })
-        .catch((error) => {
-            console.error('API call failed:', error);
-            showToast(error.message || 'Something went wrong. Please try again.', 'error');
-            throw error;
-        });
+      if (!response.ok) {
+        const errorData = await errorClone.json().catch(() => ({}));
+        console.error('HTTP Error in apiCall:', { status: response.status, errorData });
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+      return data;
+    })
+    .then(data => {
+      if (successMessage && data.success) {
+        showToast(successMessage, 'success');
+      }
+      return data;
+    })
+    .catch((error) => {
+      console.error('API call failed:', error);
+      showToast(error.message || 'Something went wrong. Please try again.', 'error');
+      throw error;
+    });
 }
 //applying coupon by input
-document.getElementById('couponCodeInput')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        applyCouponByCode();
-    }
+document.getElementById('couponCodeInput')?.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    applyCouponByCode();
+  }
 });
 
 // Initialize coupon section
 function initializeCoupons() {
-    // Close dropdown on outside click
-    document.addEventListener('click', function(event) {
-        const dropdown = document.getElementById('couponDropdown');
-        const dropdownHeader = document.querySelector('.coupon-dropdown-header');
-        
-        if (dropdownHeader && !dropdownHeader.contains(event.target) && 
-            dropdown && !dropdown.contains(event.target)) {
-            dropdown.classList.remove('show');
-            document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
-        }
-    });
+  // Close dropdown on outside click
+  document.addEventListener('click', function (event) {
+    const dropdown = document.getElementById('couponDropdown');
+    const dropdownHeader = document.querySelector('.coupon-dropdown-header');
+
+    if (dropdownHeader && !dropdownHeader.contains(event.target) &&
+      dropdown && !dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+      document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+    }
+  });
 }
 
 // Add to your existing initializeCheckout function
 function initializeCheckout() {
-    // ... existing code ...
-    initializeCoupons();
-    // ... existing code ...
+  // ... existing code ...
+  initializeCoupons();
+  // ... existing code ...
 }
 
 // Place Order Function
@@ -705,66 +705,66 @@ function placeOrder() {
     Swal.fire({ icon: 'warning', title: 'Select Payment Method', text: 'Please select a payment method to proceed', confirmButtonText: 'Continue' });
     btn.disabled = false; btn.textContent = 'Place Order'; return;
   }
-console.log("appliedCoupon in place order",appliedCoupon);
-const isRetry=document.getElementById('isRetry')?.value==='true';
+  console.log("appliedCoupon in place order", appliedCoupon);
+  const isRetry = document.getElementById('isRetry')?.value === 'true';
 
 
-const payload={
-    addressId:selectedAddress,
+  const payload = {
+    addressId: selectedAddress,
     paymentMethod,
     appliedOffers,
     isRetry
-   
-};
-console.log("payLoad in there:",payload);
-if(isRetry){
-    payload.isRetry=true;
+
+  };
+  console.log("payLoad in there:", payload);
+  if (isRetry) {
+    payload.isRetry = true;
     console.log('Adding isRetry:true to payload');
-}
-console.log("submiting payload:",payload);
+  }
+  console.log("submiting payload:", payload);
   // single fetch call
   fetch('/user/orders-placed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify( payload)
+    body: JSON.stringify(payload)
   })
-  .then(res => res.json())
-  .then(data => {
-    if (!data.success) {
-      Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Error placing order', confirmButtonText: 'Try Again' });
-      btn.disabled = false; btn.textContent = 'Place Order';
-      return;
-    }
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Error placing order', confirmButtonText: 'Try Again' });
+        btn.disabled = false; btn.textContent = 'Place Order';
+        return;
+      }
 
-    if (paymentMethod === 'netbanking') {
-      payWithRazorpay(data.order, data.key, data.dborderID);
-    } else {
-      Swal.fire({
-        icon: 'success',
-        title: 'Order Placed!',
-        text: 'Your order was placed successfully.',
-        confirmButtonText: 'View Order'
-      }).then(() => {
-        window.location.href = `/user/order-success/${data.orderId}`;
-      });
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    Swal.fire({ icon: 'error', title: 'Something went wrong', text: 'Please try again later.', confirmButtonText: 'Okay' });
-    btn.disabled = false; btn.textContent = 'Place Order';
-  });
+      if (paymentMethod === 'netbanking') {
+        payWithRazorpay(data.order, data.key, data.dborderID);
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Order Placed!',
+          text: 'Your order was placed successfully.',
+          confirmButtonText: 'View Order'
+        }).then(() => {
+          window.location.href = `/user/order-success/${data.orderId}`;
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire({ icon: 'error', title: 'Something went wrong', text: 'Please try again later.', confirmButtonText: 'Okay' });
+      btn.disabled = false; btn.textContent = 'Place Order';
+    });
 }
 
 
 
 
 // Close modal when clicking outside
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('addressModal');
-    if (event.target === modal) {
-        closeAddressModal();
-    }
+window.addEventListener('click', function (event) {
+  const modal = document.getElementById('addressModal');
+  if (event.target === modal) {
+    closeAddressModal();
+  }
 });
 window.addEventListener("DOMContentLoaded", () => {
   const successModal = document.getElementById("successModal");
@@ -782,13 +782,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 function showToast(message, type = "success") {
   if (!message) {
-    console.warn('showToast: No message provided');  
+    console.warn('showToast: No message provided');
     return;
   }
 
   const toast = document.createElement("div");
   toast.textContent = message;
-  
+
   toast.style.cssText = `
     position: fixed;
     top: 20px;  /* top-5 equivalent */
@@ -858,28 +858,39 @@ function payWithRazorpay(order, key, dborderId) {
           dborderId: dborderId
         })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Order Placed!',
-            text: 'Your order was placed successfully.',
-            confirmButtonText: 'View Order'
-          }).then(() => {
-            window.location.href = data.redirectUrl || `/user/order-success/${order.receipt}`;
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Payment Verification Failed',
-            text: 'Your payment could not be verified. Please try again.',
-            confirmButtonText: 'Retry'
-          }).then(() => {
-            window.location.href = `/user/order-failure/${order.receipt}`;
-          });
-        }
-      });
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            if (data.overbooked) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Item Out of Stock',
+                text: 'We are sorry, but this item sold out just as your payment was processed. We have cancelled the order and refunded the full amount to your wallet.',
+                confirmButtonText: 'View Orders'
+              }).then(() => {
+                window.location.href = '/user/orders';
+              });
+            } else {
+              Swal.fire({
+                icon: 'success',
+                title: 'Order Placed!',
+                text: 'Your order was placed successfully.',
+                confirmButtonText: 'View Order'
+              }).then(() => {
+                window.location.href = data.redirectUrl || `/user/order-success/${order.receipt}`;
+              });
+            }
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Payment Verification Failed',
+              text: 'Your payment could not be verified. Please try again.',
+              confirmButtonText: 'Retry'
+            }).then(() => {
+              window.location.href = `/user/order-failure/${order.receipt}`;
+            });
+          }
+        });
     },
     modal: {
       // Fired when user closes/dismisses the Razorpay popup without paying

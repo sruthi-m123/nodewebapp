@@ -1,184 +1,190 @@
 <%- include('../partials/admin/admin-header') %>
-<link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet"/>
-<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+  <link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
-<link rel="stylesheet" href="/css/admin/category.css">
-<div class="category-page">
-  <div class="category-header">
-    <h2>Categories</h2>
-   <div class="search-bar">
-  <form action="/admin/categories" method="GET" id="searchForm">
-    <input type="text" name="search" id="searchBox" placeholder="Search for categories" value="<%= search || '' %>">
- </form>
-    <button type="submit" id="searchBtn">Search</button>
-    <% if (search) { %>
-      <a href="/admin/categories" class="reset-btn" id="resetBtn">Reset</a>
-    <% } %>
-   
-    <button type="button" class="demo-button" onclick="openModal()">Add Category +</button>
-  
-</div>
+  <link rel="stylesheet" href="/css/admin/category.css">
+  <div class="category-page">
+    <div class="category-header">
+      <h2>Categories</h2>
+      <div class="search-bar">
+        <form action="/admin/categories" method="GET" id="searchForm">
+          <input type="text" name="search" id="searchBox" placeholder="Search for categories"
+            value="<%= search || '' %>">
+        </form>
+        <button type="submit" id="searchBtn">Search</button>
+        <% if (search) { %>
+          <a href="/admin/categories" class="reset-btn" id="resetBtn">Reset</a>
+          <% } %>
+
+            <button type="button" class="demo-button" onclick="openModal()">Add Category +</button>
+
+      </div>
 
 
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Category Image</th>
-          <th>Category Name</th>
-          <th>Description</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="categoryTable">
-        <% if (categories && categories.length > 0) { %>
-          <% categories.forEach((category, index) => { %>
+      <div class="table-responsive">
+        <table>
+          <thead>
             <tr>
-              <td><%= category._id.toString().slice(-6) %></td>
-              <td>
-                <% if (category.image) { %>
-                  <img src="<%= category.image %>" alt="<%= category.name %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                <% } else { %>
-                  <div style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                    📷
-                  </div>
-                <% } %>
-              </td>
-              <td><%= category.name %></td>
-              <td><%= category.description || '-' %></td>
-              <td>
-                <% const nextStatus = category.status === 'active' ? 'inactive' : 'active'; %>
-              <button 
-  id="status-btn-<%= category._id %>" 
-  data-status="<%=category.status%>"
-  onclick="toggleCategoryStatus('<%= category._id %>', '<%= nextStatus %>')">
-  <%= category.status === 'active' ? 'Active' : 'Inactive' %>
-</button>
-
-
-              </td>
-              <td>
-                <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
-              </td>
+              <th class="id-col">ID</th>
+              <th>Category Image</th>
+              <th>Category Name</th>
+              <th class="desc-col">Description</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 40px;">No categories found</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
+          </thead>
+          <tbody id="categoryTable">
+            <% if (categories && categories.length> 0) { %>
+              <% categories.forEach((category, index)=> { %>
+                <tr>
+                  <td class="id-col">
+                    <%= category._id.toString().slice(-6) %>
+                  </td>
+                  <td>
+                    <% if (category.image) { %>
+                      <img src="<%= category.image %>" alt="<%= category.name %>"
+                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                      <% } else { %>
+                        <div
+                          style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                          📷
+                        </div>
+                        <% } %>
+                  </td>
+                  <td>
+                    <%= category.name %>
+                  </td>
+                  <td class="desc-col">
+                    <%= category.description || '-' %>
+                  </td>
+                  <td>
+                    <% const nextStatus=category.status==='active' ? 'inactive' : 'active' ; %>
+                      <button id="status-btn-<%= category._id %>" data-status="<%=category.status%>"
+                        onclick="toggleCategoryStatus('<%= category._id %>', '<%= nextStatus %>')">
+                        <%= category.status==='active' ? 'Active' : 'Inactive' %>
+                      </button>
 
-  <div class="pagination">
-  <% if (totalPages > 0) { %>
-    <button id="prevPage" onclick="goToPrevPage()" <%= currentPage <= 1 ? 'disabled' : '' %>>&laquo;</button>
-  <% for (let i = 1; i <= totalPages; i++) { %>
-  <button 
-    class="<%= i === currentPage ? 'active' : '' %>" 
-    data-page="<%= i %>" 
-    class="pagination-btn">
-    <%= i %>
-  </button>
-<% } %>
 
-
-
-    <button id="nextPage" onclick="goToNextPage()" <%= currentPage >= totalPages ? 'disabled' : '' %>>&raquo;</button>
-  <% } else { %>
-    <button disabled>&laquo;</button>
-    <button class="active">1</button>
-    <button disabled>&raquo;</button>
-  <% } %>
-</div>
-
-
-  <!-- Category Modal -->
-  <div class="modal-overlay" id="categoryModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Add Category</h3>
-        <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
+                  </td>
+                  <td>
+                    <button class="action-btn edit-btn" onclick="editCategory('<%= category._id %>')">Edit</button>
+                    <button class="action-btn delete-btn"
+                      onclick="deleteCategory('<%= category._id %>')">Delete</button>
+                  </td>
+                </tr>
+                <% }) %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="6" style="text-align: center; padding: 40px;">No categories found</td>
+                    </tr>
+                    <% } %>
+          </tbody>
+        </table>
       </div>
-      <form id="categoryForm" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="categoryName">Category Name *</label>
-              <input type="text" id="categoryName" name="name" required>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4"></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="cropImageInput">Category Image (Crop & Upload)</label>
-            <input type="file" id="cropImageInput" name="categoryImage" accept="image/*">
-            <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
-            <div style="margin-top: 10px;">
-              <img id="cropPreview" style="display: none; max-width: 100%; max-height: 300px;" />
-            </div>
-            <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop & Add</button>
-          </div>
 
-          <div style="margin-top: 20px;">
-            <h4>Cropped Image:</h4>
-            <div id="croppedImageList" style="display: flex; flex-wrap: wrap;"></div>
+      <div class="pagination">
+        <% if (totalPages> 0) { %>
+          <button id="prevPage" onclick="goToPrevPage()" <%=currentPage <=1 ? 'disabled' : '' %>>&laquo;</button>
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <button class="<%= i === currentPage ? 'active' : '' %>" data-page="<%= i %>" class="pagination-btn">
+              <%= i %>
+            </button>
+            <% } %>
+
+
+
+              <button id="nextPage" onclick="goToNextPage()" <%=currentPage>= totalPages ? 'disabled' : ''
+                %>>&raquo;</button>
+              <% } else { %>
+                <button disabled>&laquo;</button>
+                <button class="active">1</button>
+                <button disabled>&raquo;</button>
+                <% } %>
+      </div>
+
+
+      <!-- Category Modal -->
+      <div class="modal-overlay" id="categoryModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Add Category</h3>
+            <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
           </div>
-          
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="isActive" name="isActive" value="true" checked>
-              <span class="checkmark"></span>
-              Active Category
-            </label>
+          <form id="categoryForm" enctype="multipart/form-data">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="categoryName">Category Name *</label>
+                  <input type="text" id="categoryName" name="name" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="cropImageInput">Category Image (Crop & Upload)</label>
+                <input type="file" id="cropImageInput" name="categoryImage" accept="image/*">
+                <div id="previewArea" style="display: flex; gap: 10px; margin-top: 10px;"></div>
+                <div style="margin-top: 10px;">
+                  <img id="cropPreview" style="display: none; max-width: 100%; max-height: 300px;" />
+                </div>
+                <button type="button" class="btn btn-primary" id="cropButton" style="display: none;">Crop & Add</button>
+              </div>
+
+              <div style="margin-top: 20px;">
+                <h4>Cropped Image:</h4>
+                <div id="croppedImageList" style="display: flex; flex-wrap: wrap;"></div>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="isActive" name="isActive" value="true" checked>
+                  <span class="checkmark"></span>
+                  Active Category
+                </label>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Category</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content small-modal">
+          <div class="modal-header">
+            <h3 class="modal-title">Confirm Delete</h3>
+            <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this category? This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
           </div>
         </div>
-        
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Category</button>
-        </div>
-      </form>
-    </div>
-  </div>
+      </div>
+      <script>
+        let currentCategoryId = null;
+        let deleteCategoryId = null;
+        let cropper;
+        let croppedImage = null;
+        let removeExistingImage = false;
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal-content small-modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Confirm Delete</h3>
-        <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this category? This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
-      </div>
-    </div>
-  </div>
-<script>
-  let currentCategoryId = null;
-  let deleteCategoryId = null;
-  let cropper;
-  let croppedImage = null;
-  let removeExistingImage = false;
-
-  // Toast Notification Function
-  function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    toast.style.cssText = `
+        // Toast Notification Function
+        function showToast(message, type = 'success') {
+          const toast = document.createElement('div');
+          toast.className = `toast ${type}`;
+          toast.textContent = message;
+          toast.style.cssText = `
       position: fixed;
       top: 20px;
       right: 20px;
@@ -191,11 +197,11 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       animation: slideIn 0.3s ease-out;
     `;
-    document.body.appendChild(toast);
+          document.body.appendChild(toast);
 
-    // Simple slide-in animation via CSS (add this to your stylesheet if needed)
-    const style = document.createElement('style');
-    style.textContent = `
+          // Simple slide-in animation via CSS (add this to your stylesheet if needed)
+          const style = document.createElement('style');
+          style.textContent = `
       @keyframes slideIn {
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
@@ -204,376 +210,376 @@
         animation: slideIn 0.3s ease-out;
       }
     `;
-    document.head.appendChild(style);
+          document.head.appendChild(style);
 
-    setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.parentNode.removeChild(toast);
+          setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+              document.head.removeChild(style);
+            }, 300);
+          }, 4000);
         }
-        document.head.removeChild(style);
-      }, 300);
-    }, 4000);
-  }
 
-  // Modal Functions
-  function openModal() {
-    document.getElementById('categoryModal').style.display = 'flex';
-    document.querySelector('.modal-title').textContent = 'Add Category';
-    document.getElementById('categoryForm').reset();
-    document.getElementById('croppedImageList').innerHTML = '';
-    document.getElementById('previewArea').innerHTML = '';
-    currentCategoryId = null;
-    croppedImage = null;
-    removeExistingImage = false;
-  }
-
-  function closeModal() {
-    document.getElementById('categoryModal').style.display = 'none';
-  }
-
-  function closeDeleteModal() {
-    document.getElementById('deleteModal').style.display = 'none';
-    deleteCategoryId = null;
-  }
-
-  // Category CRUD Operations
-  function editCategory(categoryId) {
-    currentCategoryId = categoryId;
-    document.getElementById('categoryForm').reset();
-    document.getElementById('croppedImageList').innerHTML = '';
-    document.getElementById('previewArea').innerHTML = '';
-    croppedImage = null;
-    removeExistingImage = false;
-
-    fetch(`/admin/categories/${categoryId}/details`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.category) {
-          const category = data.category;
-          
-          // Fill form fields
-          document.getElementById('categoryName').value = category.name || '';
-          document.getElementById('description').value = category.description || '';
-          document.getElementById('isActive').checked = category.isActive !== false;
-
-          // Show existing image
-          if (category.image) {
-            const wrapper = document.createElement("div");
-            wrapper.classList.add("existing-image");
-            wrapper.style.position = "relative";
-
-            const img = document.createElement("img");
-            img.src = `${category.image}`;
-            img.style.width = "60px";
-            img.style.height = "60px";
-            img.style.objectFit = "cover";
-            img.style.borderRadius = "4px";
-            img.style.marginRight = "10px";
-
-            const removeBtn = document.createElement("button");
-            removeBtn.innerHTML = "&times;";
-            removeBtn.classList.add("remove-existing-btn");
-            removeBtn.style.position = "absolute";
-            removeBtn.style.top = "-6px";
-            removeBtn.style.right = "-6px";
-
-            removeBtn.addEventListener("click", () => {
-              wrapper.remove();
-              croppedImage = null;
-              removeExistingImage=true;
-            });
-            
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            document.getElementById('previewArea').appendChild(wrapper);
-          }
-
-          document.querySelector('.modal-title').textContent = 'Edit Category';
+        // Modal Functions
+        function openModal() {
           document.getElementById('categoryModal').style.display = 'flex';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching category:', error);
-        showToast('Error loading category data', 'error');
-      });
-  }
-
-  function deleteCategory(categoryId) {
-    deleteCategoryId = categoryId;
-    document.getElementById('deleteModal').style.display = 'flex';
-  }
-
-  function confirmDelete() {
-    if (!deleteCategoryId) return;
-    
-    fetch(`/admin/categories/${deleteCategoryId}/delete`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    })
-    .then(async (response) => {
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Server Error: ${response.status}\n${text}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        showToast('Category deleted successfully!', 'success');
-        location.reload();
-      } else {
-        showToast(data.message || 'Error deleting category', 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error deleting category:', error);
-      showToast('Error deleting category', 'error');
-    })
-    .finally(() => {
-      closeDeleteModal();
-    });
-  }
-document.getElementById('categoryForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-
-    const isActive = document.getElementById('isActive').checked;
-    formData.set('isActive', isActive);
-
-    // if (currentCategoryId) {
-    //     formData.set('id', currentCategoryId);
-    // }
-
-    if (croppedImage) {
-        if (formData.has('categoryImage')) {
-            formData.delete('categoryImage');
+          document.querySelector('.modal-title').textContent = 'Add Category';
+          document.getElementById('categoryForm').reset();
+          document.getElementById('croppedImageList').innerHTML = '';
+          document.getElementById('previewArea').innerHTML = '';
+          currentCategoryId = null;
+          croppedImage = null;
+          removeExistingImage = false;
         }
 
-        const blob = croppedImage instanceof Blob ? croppedImage : dataURLtoBlob(croppedImage);
+        function closeModal() {
+          document.getElementById('categoryModal').style.display = 'none';
+        }
 
-        let fileExtension;
-        switch (blob.type) {
-            case 'image/png':
+        function closeDeleteModal() {
+          document.getElementById('deleteModal').style.display = 'none';
+          deleteCategoryId = null;
+        }
+
+        // Category CRUD Operations
+        function editCategory(categoryId) {
+          currentCategoryId = categoryId;
+          document.getElementById('categoryForm').reset();
+          document.getElementById('croppedImageList').innerHTML = '';
+          document.getElementById('previewArea').innerHTML = '';
+          croppedImage = null;
+          removeExistingImage = false;
+
+          fetch(`/admin/categories/${categoryId}/details`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.success && data.category) {
+                const category = data.category;
+
+                // Fill form fields
+                document.getElementById('categoryName').value = category.name || '';
+                document.getElementById('description').value = category.description || '';
+                document.getElementById('isActive').checked = category.isActive !== false;
+
+                // Show existing image
+                if (category.image) {
+                  const wrapper = document.createElement("div");
+                  wrapper.classList.add("existing-image");
+                  wrapper.style.position = "relative";
+
+                  const img = document.createElement("img");
+                  img.src = `${category.image}`;
+                  img.style.width = "60px";
+                  img.style.height = "60px";
+                  img.style.objectFit = "cover";
+                  img.style.borderRadius = "4px";
+                  img.style.marginRight = "10px";
+
+                  const removeBtn = document.createElement("button");
+                  removeBtn.innerHTML = "&times;";
+                  removeBtn.classList.add("remove-existing-btn");
+                  removeBtn.style.position = "absolute";
+                  removeBtn.style.top = "-6px";
+                  removeBtn.style.right = "-6px";
+
+                  removeBtn.addEventListener("click", () => {
+                    wrapper.remove();
+                    croppedImage = null;
+                    removeExistingImage = true;
+                  });
+
+                  wrapper.appendChild(img);
+                  wrapper.appendChild(removeBtn);
+                  document.getElementById('previewArea').appendChild(wrapper);
+                }
+
+                document.querySelector('.modal-title').textContent = 'Edit Category';
+                document.getElementById('categoryModal').style.display = 'flex';
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching category:', error);
+              showToast('Error loading category data', 'error');
+            });
+        }
+
+        function deleteCategory(categoryId) {
+          deleteCategoryId = categoryId;
+          document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function confirmDelete() {
+          if (!deleteCategoryId) return;
+
+          fetch(`/admin/categories/${deleteCategoryId}/delete`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          })
+            .then(async (response) => {
+              if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Server Error: ${response.status}\n${text}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                showToast('Category deleted successfully!', 'success');
+                location.reload();
+              } else {
+                showToast(data.message || 'Error deleting category', 'error');
+              }
+            })
+            .catch(error => {
+              console.error('Error deleting category:', error);
+              showToast('Error deleting category', 'error');
+            })
+            .finally(() => {
+              closeDeleteModal();
+            });
+        }
+        document.getElementById('categoryForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+
+          const isActive = document.getElementById('isActive').checked;
+          formData.set('isActive', isActive);
+
+          // if (currentCategoryId) {
+          //     formData.set('id', currentCategoryId);
+          // }
+
+          if (croppedImage) {
+            if (formData.has('categoryImage')) {
+              formData.delete('categoryImage');
+            }
+
+            const blob = croppedImage instanceof Blob ? croppedImage : dataURLtoBlob(croppedImage);
+
+            let fileExtension;
+            switch (blob.type) {
+              case 'image/png':
                 fileExtension = 'png';
                 break;
-            case 'image/webp':
+              case 'image/webp':
                 fileExtension = 'webp';
                 break;
-            case 'image/jpeg':
-            case 'image/jpg':
+              case 'image/jpeg':
+              case 'image/jpg':
                 fileExtension = 'jpg';
                 break;
-            default:
+              default:
                 fileExtension = 'jpg';
+            }
+
+            const fileName = `category-${Date.now()}.${fileExtension}`;
+            const file = new File([blob], fileName, { type: blob.type });
+            formData.append('categoryImage', file);
+          }
+          formData.set('removeExistingImage', removeExistingImage);
+          const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
+          const method = currentCategoryId ? 'PUT' : 'POST';
+
+          fetch(url, {
+            method,
+            body: formData
+          })
+            .then(async res => {
+              if (!res.ok) {
+                const err = await res.json();
+                throw err;
+              }
+              return res.json();
+            })
+            .then(data => {
+              if (data.success) {
+                const action = currentCategoryId ? 'updated' : 'added';
+                showToast(`Category ${action} successfully!`, 'success');
+                location.reload();
+              } else {
+                showToast(data.message || 'Error saving category', 'error');
+              }
+            })
+            .catch(error => {
+              showToast(error.message || 'Error saving category', 'error');
+            });
+        });
+
+
+
+        // Image Cropping Functionality
+        document.getElementById('cropImageInput').addEventListener('change', function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          document.getElementById('previewArea').innerHTML = '';
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById('cropPreview').src = event.target.result;
+            document.getElementById('cropPreview').style.display = "block";
+            document.getElementById('cropButton').style.display = "inline-block";
+
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(document.getElementById('cropPreview'), {
+              aspectRatio: 1,
+              viewMode: 1,
+              autoCropArea: 1,
+              responsive: true,
+              scalable: true,
+              zoomable: true
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('cropButton').addEventListener('click', function () {
+          const canvas = cropper.getCroppedCanvas();
+          canvas.toBlob(function (blob) {
+            const imageUrl = URL.createObjectURL(blob);
+
+            const container = document.createElement("div");
+            container.style.border = "1px solid #ccc";
+            container.style.borderRadius = "8px";
+            container.style.padding = "8px";
+            container.style.background = "#f9f9f9";
+            container.style.width = "120px";
+            container.style.textAlign = "center";
+
+            const img = document.createElement("img");
+            img.src = imageUrl;
+            img.style.width = "100%";
+            img.style.height = "100px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "4px";
+
+            const indexLabel = document.createElement("div");
+            indexLabel.textContent = `Image`;
+            indexLabel.style.marginTop = "5px";
+            indexLabel.style.fontSize = "12px";
+            indexLabel.style.color = "#333";
+
+            container.appendChild(img);
+            container.appendChild(indexLabel);
+            document.getElementById('croppedImageList').innerHTML = '';
+            document.getElementById('croppedImageList').appendChild(container);
+
+            croppedImage = blob;
+
+            cropper.destroy();
+            document.getElementById('cropPreview').style.display = "none";
+            document.getElementById('cropButton').style.display = "none";
+          });
+        });
+
+        // Toggle Category Status
+        function toggleCategoryStatus(categoryId, newStatus) {
+          const status = newStatus ? newStatus : 'active';
+          fetch(`/admin/categories/status/${categoryId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                const button = document.getElementById(`status-btn-${categoryId}`);
+                const updatedStatus = data.category.status;
+
+                // Update button text, attribute and onclick
+                if (button) {
+                  button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
+                  button.setAttribute('data-status', updatedStatus);
+                  button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
+                }
+                showToast(`Category status updated to ${updatedStatus}!`, 'success');
+              } else {
+                showToast('Failed to update status', 'error');
+              }
+            })
+            .catch(err => {
+              console.error('Error updating category status:', err);
+              showToast('Error occurred while updating the status', 'error');
+            });
         }
 
-        const fileName = `category-${Date.now()}.${fileExtension}`;
-        const file = new File([blob], fileName, { type: blob.type });
-        formData.append('categoryImage', file);
-    }
-formData.set('removeExistingImage',removeExistingImage);
-    const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update` : '/admin/addCategory';
-    const method = currentCategoryId ? 'PUT' : 'POST';
+        // Search Functionality
+        document.getElementById('searchBtn').addEventListener('click', function () {
+          const searchTerm = document.getElementById('searchBox').value;
+          if (searchTerm.trim()) {
+            window.location.href = `/admin/categories?search=${encodeURIComponent(searchTerm)}`;
+          }
+        });
 
-    fetch(url, {
-        method,
-        body: formData
-    })
-    .then(async res => {
-        if (!res.ok) {
-            const err = await res.json();
-            throw err;
-        }
-        return res.json();
-    })
-    .then(data => {
-        if (data.success) {
-            const action = currentCategoryId ? 'updated' : 'added';
-            showToast(`Category ${action} successfully!`, 'success');
-            location.reload();
-        } else {
-            showToast(data.message || 'Error saving category', 'error');
-        }
-    })
-    .catch(error => {
-        showToast(error.message || 'Error saving category', 'error');
-    });
-});
+        document.addEventListener('DOMContentLoaded', function () {
+          const resetBtn = document.getElementById('resetBtn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+              document.getElementById('searchBox').value = '';
+              window.location.href = '/admin/categories';
+            });
+          }
+        });
 
+        document.getElementById('searchBox').addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            document.getElementById('searchBtn').click();
+          }
+        });
 
- 
-  // Image Cropping Functionality
-  document.getElementById('cropImageInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    document.getElementById('previewArea').innerHTML = '';
-    
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      document.getElementById('cropPreview').src = event.target.result;
-      document.getElementById('cropPreview').style.display = "block";
-      document.getElementById('cropButton').style.display = "inline-block";
-      
-      if (cropper) cropper.destroy();
-      cropper = new Cropper(document.getElementById('cropPreview'), {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-        responsive: true,
-        scalable: true,
-        zoomable: true
-      });
-    };
-    reader.readAsDataURL(file);
-  });
+        // Pagination
 
-  document.getElementById('cropButton').addEventListener('click', function() {
-    const canvas = cropper.getCroppedCanvas();
-    canvas.toBlob(function(blob) {
-      const imageUrl = URL.createObjectURL(blob);
-      
-      const container = document.createElement("div");
-      container.style.border = "1px solid #ccc";
-      container.style.borderRadius = "8px";
-      container.style.padding = "8px";
-      container.style.background = "#f9f9f9";
-      container.style.width = "120px";
-      container.style.textAlign = "center";
+        //Initialize pagination variables
 
-      const img = document.createElement("img");
-      img.src = imageUrl;
-      img.style.width = "100%";
-      img.style.height = "100px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "4px";
-
-      const indexLabel = document.createElement("div");
-      indexLabel.textContent = `Image`;
-      indexLabel.style.marginTop = "5px";
-      indexLabel.style.fontSize = "12px";
-      indexLabel.style.color = "#333";
-
-      container.appendChild(img);
-      container.appendChild(indexLabel);
-      document.getElementById('croppedImageList').innerHTML = '';
-      document.getElementById('croppedImageList').appendChild(container);
-
-      croppedImage = blob;
-      
-      cropper.destroy();
-      document.getElementById('cropPreview').style.display = "none";
-      document.getElementById('cropButton').style.display = "none";
-    });
-  });
-
-  // Toggle Category Status
-  function toggleCategoryStatus(categoryId, newStatus) {
-    const status = newStatus ? newStatus : 'active';  
-    fetch(`/admin/categories/status/${categoryId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const button = document.getElementById(`status-btn-${categoryId}`);
-        const updatedStatus = data.category.status;
-
-        // Update button text, attribute and onclick
-        if (button) {
-          button.textContent = updatedStatus === 'active' ? 'Active' : 'Inactive';
-          button.setAttribute('data-status', updatedStatus);
-          button.setAttribute('onclick', `toggleCategoryStatus('${categoryId}', '${updatedStatus === 'active' ? 'inactive' : 'active'}')`);
-        }
-        showToast(`Category status updated to ${updatedStatus}!`, 'success');
-      } else {
-        showToast('Failed to update status', 'error');
-      }
-    })
-    .catch(err => {
-      console.error('Error updating category status:', err);
-      showToast('Error occurred while updating the status', 'error');
-    });
-  }
-
-  // Search Functionality
-  document.getElementById('searchBtn').addEventListener('click', function() {
-    const searchTerm = document.getElementById('searchBox').value;
-    if (searchTerm.trim()) {
-      window.location.href = `/admin/categories?search=${encodeURIComponent(searchTerm)}`;
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const resetBtn=document.getElementById('resetBtn');
-    if(resetBtn){
-      resetBtn.addEventListener('click',function(){
-        document.getElementById('searchBox').value = '';
-        window.location.href = '/admin/categories';
-      });
-    }
-  });
-
-  document.getElementById('searchBox').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      document.getElementById('searchBtn').click();
-    }
-  });
-
-  // Pagination
-
-  //Initialize pagination variables
- 
-  var currentPage = <%= currentPage %>
+        var currentPage = <%= currentPage %>
   var totalPages = <%= totalPages %>
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.pagination-btn');
+          document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.pagination-btn');
 
-    buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        const page = button.getAttribute('data-page');
-        if (page) {
-          goToPage(page);
+            buttons.forEach(button => {
+              button.addEventListener('click', () => {
+                const page = button.getAttribute('data-page');
+                if (page) {
+                  goToPage(page);
+                }
+              });
+            });
+          });
+        function goToPage(page) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('page', page);
+          window.location.href = url.toString();
         }
-      });
-    });
-  });
-  function goToPage(page) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('page', page);
-    window.location.href = url.toString();
-  }
 
-  function goToPrevPage() {
-    if (currentPage > 1) {
-      goToPage(currentPage - 1);
-    }
-  }
+        function goToPrevPage() {
+          if (currentPage > 1) {
+            goToPage(currentPage - 1);
+          }
+        }
 
-  function goToNextPage() {
-    if (currentPage < totalPages) {
-      goToPage(currentPage + 1);
-    }
-  }
+        function goToNextPage() {
+          if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+          }
+        }
 
-  // Close modals when clicking outside
-  window.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal-overlay')) {
-      if (e.target.id === 'categoryModal') closeModal();
-      if (e.target.id === 'deleteModal') closeDeleteModal();
-    }
-  });
+        // Close modals when clicking outside
+        window.addEventListener('click', function (e) {
+          if (e.target.classList.contains('modal-overlay')) {
+            if (e.target.id === 'categoryModal') closeModal();
+            if (e.target.id === 'deleteModal') closeDeleteModal();
+          }
+        });
 
-</script>
+      </script>
 
-  <%- include('../partials/admin/admin-footer') %>
+      <%- include('../partials/admin/admin-footer') %>

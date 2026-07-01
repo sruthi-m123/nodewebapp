@@ -5,7 +5,7 @@ import Cart from '../../models/cartSchema.js';
 import Product from '../../models/productSchema.js';
 import Offer from '../../models/offerSchema.js';
 import Coupon from '../../models/couponSchema.js';
-import Wallet  from '../../models/walletSchema.js';
+import Wallet from '../../models/walletSchema.js';
 import { addAddressService } from './address.service.js';
 import Razorpay from 'razorpay';
 import { calculateOrder } from '../../helper/calculateTotal.js';
@@ -21,7 +21,7 @@ export const getCheckoutData = async (userId, session) => {
   let fromCart = true;
   let stockValidationFailed = false;
   let outOfStockItems = [];
-  console.log("session:",session);
+  console.log("session:", session);
   if (session.buyNowItem) {
     fromCart = false;
     const product = await Product.findById(session.buyNowItem.productId);
@@ -81,7 +81,7 @@ export const getCheckoutData = async (userId, session) => {
         }))
     }
   }
-  console.log("cart items inside the checkout service:",cartItems);
+  console.log("cart items inside the checkout service:", cartItems);
   const coupons = await Coupon.find({ isActive: true }).lean();
   const usedOrders = await Order.find({
     userId,
@@ -108,9 +108,9 @@ export const getCheckoutData = async (userId, session) => {
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
     { id: 'wallet', title: 'Wallet', description: 'Purchase through your wallet amount' }
   ];
-    const wallet=await walletAmount(userId);
-  
-  return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData ,wallet};
+  const wallet = await walletAmount(userId);
+
+  return { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons: couponWithStatus, userData, wallet };
 
 }
 
@@ -155,7 +155,7 @@ export const getRetryCheckoutData = async (userId, orderId) => {
     { id: 'cod', title: 'Cash on Delivery', icon: '💰', description: 'Pay when you receive the order' },
     { id: 'wallet', title: 'Wallet', description: 'Pay via Wallet' }
   ];
-    const wallet=await walletAmount(userId);
+  const wallet = await walletAmount(userId);
   return {
     success: true,
     addresses,
@@ -225,13 +225,13 @@ export const applyOffer = async (userId, offerId) => {
 
 export const placeOrder = async (orderData) => {
   console.log("this is inside the placeorder");
-  console.log("orderData",orderData);
+  console.log("orderData", orderData);
   const { userId, addressId, paymentMethod, appliedOffers = [], isRetry = false, session } = orderData;
   let items = [];
   let isBuyNow = false;
   let orderId;
   let order;
-let buynow=orderData.session.buyNowItem
+  let buynow = orderData.session.buyNowItem
   if (buynow) {
     console.log("inside the buy now controller");
     const { productId, quantity = 1, variant = 'Default', price } = orderData.session.buyNowItem;
@@ -249,16 +249,16 @@ let buynow=orderData.session.buyNowItem
       name: product.productName,
       variant,
       quantity,
-      price:product.price,
-      discountedPrice:product.discountedPrice||null,
-       totalPrice: effectivePrice * quantity
+      price: product.price,
+      discountedPrice: product.discountedPrice || null,
+      totalPrice: effectivePrice * quantity
     }];
     isBuyNow = true;
 
   } else if (isRetry) {
     console.log("entering isretry condition");
     const failedOrder = await Order.findOne({ userId, status: 'payment_failed' }).populate('items.productId').sort({ createdAt: -1 });
-    console.log("failed Order:",failedOrder);
+    console.log("failed Order:", failedOrder);
     if (!failedOrder || failedOrder.items.length === 0) {
       return { success: false, message: 'No failed order found for retry' };
     }
@@ -328,10 +328,10 @@ let buynow=orderData.session.buyNowItem
   }));
   const orderSummary = calculateOrder(cartItemsForCalculation, { coupon: appliedCoupon, taxRate: 18 });
   const { subtotal, delivery, discount, tax, total } = orderSummary;
-  if( paymentMethod==='cod'&& total>1000){
-    return {success:false,message:'cash on delivery is not possible for orders above 1000 rupees'};
+  if (paymentMethod === 'cod' && total > 1000) {
+    return { success: false, message: 'cash on delivery is not possible for orders above 1000 rupees' };
   }
- 
+
   const status = paymentMethod === 'cod' ? 'pending' : (paymentMethod === 'wallet' ? 'processing' : 'payment_pending');
   if (!isRetry) {
     orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -354,7 +354,6 @@ let buynow=orderData.session.buyNowItem
       appliedOffers: appliedOffers.map(o => o.id),
       appliedCoupon
     });
-    await order.save();
   } else {
     // Update existing order details for retry payment
     order.shippingAddress = selectedAddress;
@@ -366,30 +365,58 @@ let buynow=orderData.session.buyNowItem
     order.total = total;
     order.status = status;
     order.appliedCoupon = appliedCoupon;
-    await order.save();
-  }
-  if (paymentMethod === 'wallet') {
-    const debitSuccess = await WalletService.debitWallet(userId, total, order._id, 'order');
-    if (!debitSuccess) {
-      if (!isRetry) await Order.findByIdAndDelete(order._id);
-      return { success: false, message: "insufficient balance" };
-    }
-    order.status = 'paid';
-    await order.save();
   }
 
+  // Stock check and debit verification
   if (paymentMethod === 'cod' || paymentMethod === 'wallet') {
-    const stockUpdates = items.map(item => ({
-      updateOne: {
-        filter: { _id: item.productId, stock: { $gte: item.quantity } },
-        update: { $inc: { stock: -item.quantity } }
+    const decrementedItems = [];
+    let stockOk = true;
+    for (const item of items) {
+      const updated = await Product.findOneAndUpdate(
+        { _id: item.productId, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true }
+      );
+      if (updated) {
+        decrementedItems.push({ productId: item.productId, quantity: item.quantity });
+      } else {
+        stockOk = false;
+        break;
       }
-    }));
-    await Product.bulkWrite(stockUpdates);
+    }
+
+    if (!stockOk) {
+      for (const rolledBackItem of decrementedItems) {
+        await Product.updateOne(
+          { _id: rolledBackItem.productId },
+          { $inc: { stock: rolledBackItem.quantity } }
+        );
+      }
+      return { success: false, message: "One or more items went out of stock. Please update your cart." };
+    }
+
+    if (paymentMethod === 'wallet') {
+      const debitSuccess = await WalletService.debitWallet(userId, total, order._id, 'order');
+      if (!debitSuccess) {
+        // Rollback stock
+        for (const rolledBackItem of decrementedItems) {
+          await Product.updateOne(
+            { _id: rolledBackItem.productId },
+            { $inc: { stock: rolledBackItem.quantity } }
+          );
+        }
+        return { success: false, message: "insufficient balance" };
+      }
+      order.status = 'paid';
+    }
+
     if (appliedCoupon) {
       await Coupon.findByIdAndUpdate(appliedCoupon.couponId, { $inc: { usedCount: 1 } });
     }
   }
+
+  // Save the order to DB now that all checks passed successfully
+  await order.save();
 
   if (!isBuyNow && !isRetry) {
     await Cart.updateOne({ userId }, { $pull: { items: { productId: { $in: items.map(i => i.productId) } } } });
@@ -454,8 +481,8 @@ export const getOrderForFailure = async (orderId) => {
     goToHomeUrl: '/user/shopAll'
   };
 };
-export const walletAmount=async(userId)=>{
-  const walletBalance= await Wallet.findOne({user:userId}).populate('balance');
+export const walletAmount = async (userId) => {
+  const walletBalance = await Wallet.findOne({ user: userId }).populate('balance');
   console.log(walletBalance);
   return walletBalance;
 }
