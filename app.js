@@ -3,6 +3,7 @@ import './config/env.js';
 import express from 'express';
 import path from 'path';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import methodOverride from 'method-override';
 import flash from 'connect-flash';
 import expressLayouts from 'express-ejs-layouts';
@@ -44,7 +45,12 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+      ttl: 72 * 60 * 60 // 72 hours
+    }),
     cookie: {
       secure: false,
       httpOnly: true,
