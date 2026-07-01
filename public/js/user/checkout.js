@@ -337,15 +337,24 @@ document.getElementById('deleteConfirmModal').addEventListener('click', function
 
 
 function updateOrderSummary(orderSummary) {
+  console.log('[updateOrderSummary] received:', orderSummary);
   const formatCurrency = (value, isNegative = false) => {
     const amount = Number(value) || 0;
-    return `${isNegative ? '-' : ''}₹${amount.toFixed(2)}`;
+    return `${isNegative ? '-' : ''}\u20b9${amount.toFixed(2)}`;
   };
 
-  // "Total" row = netAmount (subtotal + delivery - offerDiscount, before coupon & tax)
+  // "Total" row (pre-tax amount after all discounts)
+  // Prefer netAmount from API; fall back to deriving it from total - tax
   const netAmountEl = document.getElementById("summary-netAmount");
   if (netAmountEl) {
-    netAmountEl.textContent = formatCurrency(orderSummary.netAmount ?? orderSummary.subtotal);
+    let displayNetAmount;
+    if (orderSummary.netAmount !== undefined && orderSummary.netAmount !== null) {
+      displayNetAmount = orderSummary.netAmount;
+    } else {
+      // Derive: total = netAmount + tax  →  netAmount = total - tax
+      displayNetAmount = Number(orderSummary.total || 0) - Number(orderSummary.tax || 0);
+    }
+    netAmountEl.textContent = formatCurrency(displayNetAmount);
   }
 
   document.getElementById("summary-delivery").textContent =
@@ -478,15 +487,11 @@ const bodyData=isRetry?{couponId,retryCartItems}:{couponId};
                 updateAppliedCouponUI(couponCode, data.discountText, couponId);
                    updateOrderSummary(data.orderSummary);
                 updateCouponButtons(couponId, couponCode);
-                Swal.fire({
-    icon: 'success',
-    title: 'Coupon Applied',
-    text: data.message || 'Coupon applied successfully',
-    timer: 1500,
-    showConfirmButton: false
-  });
-
-  closeCouponDropdownAfterDelay();
+                // Close the dropdown directly
+                const dropdown = document.getElementById('couponDropdown');
+                const arrow = document.querySelector('.dropdown-arrow');
+                if (dropdown) dropdown.classList.remove('show');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
             }else{
                                 showToast(data.message,'error')
    if (data.message === "You have already used this coupon") {

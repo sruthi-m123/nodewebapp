@@ -11,35 +11,43 @@ export const removeCouponService=async(userId, isRetry = false, retryCartItems =
 
     let cartItems;
 
-    if (isRetry) {
-        // In retry mode, use the provided cart items from the frontend
-        if (retryCartItems && retryCartItems.length > 0) {
-            cartItems = retryCartItems.map(item => ({
-                id: item.id || item.productId,
-                name: item.name,
-                price: item.price,
-                originalPrice: item.originalPrice || item.price,
-                discountedPrice: item.discountedPrice || null,
-                quantity: item.quantity
-            }));
-        } else {
-            // Fallback: fetch from the most recent failed order
-            const failedOrder = await Order.findOne({
-                userId,
-                status: { $in: ['payment_failed', 'payment_pending'] }
-            }).populate('items.productId').sort({ createdAt: -1 });
+    if (isRetry && retryCartItems && retryCartItems.length > 0) {
+        // Retry mode with provided cart items
+        cartItems = retryCartItems.map(item => ({
+            id: item.id || item.productId,
+            name: item.name,
+            price: item.price,
+            originalPrice: item.originalPrice || item.price,
+            discountedPrice: item.discountedPrice || null,
+            quantity: item.quantity
+        }));
+    } else if (isRetry) {
+        // Retry mode but no cart items provided — try failed order first, then fall back to cart
+        const failedOrder = await Order.findOne({
+            userId,
+            status: { $in: ['payment_failed', 'payment_pending'] }
+        }).populate('items.productId').sort({ createdAt: -1 });
 
-            if (!failedOrder) {
-                logger.warn('No failed order found for retry coupon removal', { userId });
-                throw new Error('No order found for retry');
-            }
-
+        if (failedOrder) {
             cartItems = failedOrder.items.map(item => ({
                 id: item.productId._id,
                 name: item.productId.productName,
                 price: item.discountedPrice || item.price,
                 originalPrice: item.price,
                 discountedPrice: item.discountedPrice || null,
+                quantity: item.quantity
+            }));
+        } else {
+            // No failed order found — fall back to current cart (normal checkout scenario)
+            logger.warn('No failed order found for retry, falling back to cart', { userId });
+            const cart = await Cart.findOne({ userId }).populate('items.productId');
+            if (!cart || cart.items.length === 0) throw new Error('Cart not found');
+            cartItems = cart.items.map(item => ({
+                id: item.productId._id,
+                name: item.productId.productName,
+                price: item.productId.discountedPrice || item.productId.price,
+                originalPrice: item.productId.price,
+                discountedPrice: item.productId.discountedPrice || null,
                 quantity: item.quantity
             }));
         }
@@ -135,23 +143,28 @@ export const prepareCartItemsService=(cart)=>{
 
 
 export const checkMinCartValueService=(cartItems,coupon)=>{
+    console.log("inside the apply min car service");
     console.log("cartItems:",cartItems);
 
-    const subtotal=cartItems.reduce(
-        (sum,item)=>sum+item.originalPrice*item.quantity,0
+    // Use effective price (after offer discounts) — this matches what the customer sees on screen
+    const effectiveCartValue=cartItems.reduce(
+        (sum,item)=>{
+            const effectivePrice = item.discountedPrice || item.price || item.originalPrice;
+            return sum + effectivePrice * item.quantity;
+        },0
     );
-console.log("subtotal",subtotal);
-    if(subtotal<coupon.minCartValue){
-        const amountNeeded=parseFloat((coupon.minCartValue-subtotal).toFixed(2));
-        logger.warn('minimum cart value not met',{subtotal,minCartValue:coupon.minCartValue});
+console.log("effectiveCartValue for coupon check:",effectiveCartValue);
+    if(effectiveCartValue<coupon.minCartValue){
+        const amountNeeded=parseFloat((coupon.minCartValue-effectiveCartValue).toFixed(2));
+        logger.warn('minimum cart value not met',{effectiveCartValue,minCartValue:coupon.minCartValue});
 
         const err=new Error(
-            `Add ${amountNeeded} more to apply this coupon`
+            `Add ₹${amountNeeded} more to apply this coupon`
         );
         err.status=400;
         throw err;
     }
-    return subtotal;
+    return effectiveCartValue;
 }
 
 export const getRetryCartItemsService=async(userId)=>{
@@ -185,7 +198,7 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
 
     let cartItems=retryCartItems;
 
-    if(!cartItems){
+    if(!cartItems || cartItems.length === 0){
         const userCart=await Cart.findOne({userId}).populate('items.productId');
         if(!userCart||userCart.items.length===0){
             logger.warn('Empty cart during coupon application',{userId});
@@ -197,6 +210,7 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
             name:item.productId.productName,
             originalPrice:item.productId.price,
             discountedPrice:item.productId.discountedPrice||null,
+            price:item.productId.discountedPrice||item.productId.price,
             quantity:item.quantity
         }))
     } else {
@@ -249,7 +263,7 @@ logger.info('coupon applied suucessfully',{
     couponId:coupon._id,
     discountToApply
 });
-
+console.log('[applyCouponLogicService] returning orderSummary:', orderSummary);
 return {appliedCoupon,discountText,orderSummary};
 };
 

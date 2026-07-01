@@ -18,15 +18,15 @@ import { setUserAndCartCount } from './middlewares/global.js';
 import { startCronJobs } from './cron/offerExpiry.js';
 
 import { fileURLToPath } from 'url';
-import {dirname} from 'path';
+import { dirname } from 'path';
 
-const __filename=fileURLToPath(import.meta.url);
-const __dirname=dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 db();
 startCronJobs();
 
-const app=express();
+const app = express();
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
@@ -48,7 +48,7 @@ app.use(
     cookie: {
       secure: false,
       httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000, 
+      maxAge: 72 * 60 * 60 * 1000,
     },
   })
 );
@@ -67,7 +67,7 @@ app.use(methodOverride('_method'));
 
 app.use(expressLayouts);
 app.set("view engine", "ejs");
-app.set('layout', 'layout'); 
+app.set('layout', 'layout');
 app.set("views", path.join(__dirname, "views"));
 
 

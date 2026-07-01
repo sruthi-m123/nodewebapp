@@ -100,7 +100,7 @@
 
   <!-- Products in Cart -->
   <div class="product-section">
-    <div class="section-title">ORDER ITEMS</div>
+    <div class="section-title">ORDER ITEMS </div>
 
     <% cartItems.forEach(item=> { %>
       <div class="product-item">
@@ -116,12 +116,14 @@
           <div class="product-price-info">
             <div class="quantity-price">
               Qty: <%= item.quantity || 1 %> ×
-              <% if (item.discountedPrice && item.discountedPrice > 0 && item.discountedPrice < item.originalPrice) { %>
-                <span style="text-decoration:line-through; color:#999; font-size:13px;">₹<%= item.originalPrice %></span>
-                <span style="color:#28a745; font-weight:600;"> ₹<%= item.discountedPrice %></span>
-              <% } else { %>
-                ₹<%= item.price || 0 %>
-              <% } %>
+                <% if (item.discountedPrice && item.discountedPrice> 0 && item.discountedPrice < item.originalPrice) {
+                    %>
+                    <span style="text-decoration:line-through; color:#999; font-size:13px;">₹<%= item.originalPrice %>
+                        </span>
+                    <span style="color:#28a745; font-weight:600;"> ₹<%= item.discountedPrice %></span>
+                    <% } else { %>
+                      ₹<%= item.price || 0 %>
+                        <% } %>
             </div>
             <div class="item-total">₹<%= (item.quantity || 1) * (item.price || 0) %>
             </div>
@@ -151,7 +153,7 @@
           <% coupons.forEach(coupon=> {
             // Filter out expired coupons
             const isExpired = new Date(coupon.validTill) < new Date(); if (isExpired) return; // Skip expired coupons
-              const isApplicable=subtotal>= coupon.minCartValue;
+              const isApplicable= netAmount >= coupon.minCartValue;
               const isValid = isApplicable;
               %>
               <div class="coupon-dropdown-item <%= isValid ? '' : 'coupon-invalid' %>"
@@ -179,7 +181,7 @@
                   </div>
                   <% if (!isValid) { %>
                     <div class="coupon-dropdown-condition">
-                      Add ₹<%= (coupon.minCartValue - subtotal).toFixed(2) %> more to apply
+                      Add ₹<%= (coupon.minCartValue - netAmount).toFixed(2) %> more to apply
                     </div>
                     <% } %>
                 </div>
@@ -212,210 +214,192 @@
 
 
 
-<div class="payment-section">
-  <div class="section-title">PAYMENT OPTIONS</div>
+  <div class="payment-section">
+    <div class="section-title">PAYMENT OPTIONS</div>
 
-  <div class="payment-methods">
-    <% paymentMethods.forEach(method => { %>
+    <div class="payment-methods">
+      <% paymentMethods.forEach(method=> { %>
 
-      <% const isCodDisabled = method.id === 'cod' && netAmount > 1000; %>
-      <% const isWalletDisabled = method.id === 'wallet' && wallet.balance < netAmount; %>
+        <% const isCodDisabled=method.id==='cod' && netAmount> 1000; %>
+          <% const isWalletDisabled=method.id==='wallet' && wallet.balance < netAmount; %>
 
-      <div class="payment-option
+            <div class="payment-option
           <%= method.id === selectedPayment ? 'selected' : '' %>
-          <%= (isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>"
-          data-payment="<%= method.id %>">
+          <%= (isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>" data-payment="<%= method.id %>">
 
-        <div class="payment-radio">
+              <div class="payment-radio">
 
-          <input
-            type="radio"
-            name="paymentMethod"
-            id="<%= method.id %>"
-            value="<%= method.id %>"
-            <%= (isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>
-            <%= method.id === selectedPayment ? 'checked' : '' %>
-          >
+                <input type="radio" name="paymentMethod" id="<%= method.id %>" value="<%= method.id %>"
+                  <%=(isCodDisabled || isWalletDisabled) ? 'disabled' : '' %>
+                <%= method.id===selectedPayment ? 'checked' : '' %>
+                  >
 
-          <label
-            for="<%= method.id %>"
-            <%= isCodDisabled
-                ? 'title="COD not available for orders above ₹1000"'
-                : '' %>
-            <%= isWalletDisabled
-                ? 'title="Insufficient wallet balance"'
-                : '' %>>
-          </label>
+                  <label for="<%= method.id %>" <%=isCodDisabled ? 'title="COD not available for orders above ₹1000"'
+                    : '' %>
+                    <%= isWalletDisabled ? 'title="Insufficient wallet balance"' : '' %>>
+                  </label>
 
-        </div>
+              </div>
 
-        <div class="payment-info">
-          <div class="payment-icon">
-            <%= method.icon || '💳' %>
-          </div>
+              <div class="payment-info">
+                <div class="payment-icon">
+                  <%= method.icon || '💳' %>
+                </div>
 
-          <div class="payment-details">
-            <div class="payment-title">
-              <%= method.title || 'Payment Method' %>
+                <div class="payment-details">
+                  <div class="payment-title">
+                    <%= method.title || 'Payment Method' %>
+                  </div>
+
+                  <div class="payment-description">
+                    <%= method.description || 'No description' %>
+                  </div>
+
+                  <% if (isWalletDisabled) { %>
+                    <small style="color:red;">
+                      Insufficient wallet balance
+                    </small>
+                    <% } %>
+                </div>
+              </div>
+
             </div>
 
-            <div class="payment-description">
-              <%= method.description || 'No description' %>
-            </div>
+            <% }) %>
+    </div>
 
-            <% if (isWalletDisabled) { %>
-              <small style="color:red;">
-                Insufficient wallet balance
-              </small>
-            <% } %>
-          </div>
-        </div>
-
-      </div>
-
-    <% }) %>
+    <input type="hidden" id="selectedPaymentId" name="paymentMethod">
   </div>
 
-  <input type="hidden" id="selectedPaymentId" name="paymentMethod">
-</div>
 
-
-<div class="right-column">
-  <div class="order-summary">
-    <div class="summary-title">ORDER SUMMARY</div>
-    <!-- <div class="summary-row">
+  <div class="right-column">
+    <div class="order-summary">
+      <div class="summary-title">ORDER SUMMARY</div>
+      <!-- <div class="summary-row">
   <span>Subtotal</span>
   <span id="summary-subtotal">₹<%= subtotal || 0 %></span>
 </div> -->
 
-    <div class="summary-row">
-      <span>Total</span>
-      <span id="summary-netAmount">₹<%= netAmount %></span>
-    </div>
+      <div class="summary-row">
+        <span>Total</span>
+        <span id="summary-netAmount">₹<%= (netAmount || 0).toFixed(2) %></span>
+      </div>
 
 
 
 
-    <div class="summary-row">
-      <span>Delivery</span>
-      <span id="summary-delivery">₹<%= delivery || 0 %></span>
-    </div>
+      <div class="summary-row">
+        <span>Delivery</span>
+        <span id="summary-delivery">₹<%= (delivery || 0).toFixed(2) %></span>
+      </div>
 
-    <div class="summary-row">
-      <span>Tax (GST <%= taxRate || 0 %>%)</span>
-      <span id="summary-tax">₹<%= tax || 0 %></span>
-    </div>
+      <div class="summary-row">
+        <span>Tax (GST <%= taxRate || 0 %>%)</span>
+        <span id="summary-tax">₹<%= (tax || 0).toFixed(2) %></span>
+      </div>
 
-    <div class="summary-row">
-      <span>Coupon Discount</span>
-      <span id="summary-couponDiscount">₹<%= couponDiscount||0 %></span>
-    </div>
+      <div class="summary-row">
+        <span>Coupon Discount</span>
+        <span id="summary-couponDiscount">₹<%= (couponDiscount || 0).toFixed(2) %></span>
+      </div>
 
-    <!-- <div class="summary-row">
+      <!-- <div class="summary-row">
   <span> Total Discount</span>
   <span id="summary-discount" style="color: #28a745;">-₹<%= discount || 0 %></span>
 </div> -->
 
-    <div class="summary-row total">
-      <span>TOTAL</span>
-      <span id="summary-total">₹<%= total || 0 %></span>
+      <div class="summary-row total">
+        <span>TOTAL</span>
+        <span id="summary-total">₹<%= (total || 0).toFixed(2) %></span>
+      </div>
+      </form>
 
     </div>
-    </form>
+
 
   </div>
-
-
-</div>
-<input
-  type="hidden"
-  id="isRetry"
-  value="<%= typeof isRetry !== 'undefined' ? isRetry : false %>"
->
-<button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
+  <input type="hidden" id="isRetry" value="<%= typeof isRetry !== 'undefined' ? isRetry : false %>">
+  <button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
 
 
 
-<!-- Add/Edit Address Modal -->
-<div class="modal" id="addressModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title" id="modalTitle">Add New Address</h3>
-      <button class="close-btn" id="closeSuccessModal" onclick="closeAddressModal()">×</button>
+  <!-- Add/Edit Address Modal -->
+  <div class="modal" id="addressModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Add New Address</h3>
+        <button class="close-btn" id="closeSuccessModal" onclick="closeAddressModal()">×</button>
+      </div>
+
+      <form id="addressForm">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-input" id="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Building / House No. *</label>
+          <input type="text" class="form-input" id="building">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Landmark (optional)</label>
+          <input type="text" class="form-input" id="landmark">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">City *</label>
+          <input type="text" class="form-input" id="city">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">State *</label>
+          <input type="text" class="form-input" id="state">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pincode *</label>
+          <input type="number" class="form-input" id="pincode">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone *</label>
+          <input type="tel" class="form-input" id="phone">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alternate Phone (optional)</label>
+          <input type="tel" class="form-input" id="altPhone">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address Type *</label>
+          <select class="form-input" id="addressType">
+            <option value="home">Home</option>
+            <option value="work">Work</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="setDefault">
+          <label for="setDefault">Set as default address</label>
+        </div>
+
+        <button type="submit" class="save-btn">Save Address</button>
+      </form>
+
     </div>
-
-    <form id="addressForm">
-      <div class="form-group">
-        <label class="form-label">Full Name *</label>
-        <input type="text" class="form-input" id="name" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Building / House No. *</label>
-        <input type="text" class="form-input" id="building" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Landmark (optional)</label>
-        <input type="text" class="form-input" id="landmark">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">City *</label>
-        <input type="text" class="form-input" id="city" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">State *</label>
-        <input type="text" class="form-input" id="state" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Pincode *</label>
-        <input type="number" class="form-input" id="pincode" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Phone *</label>
-        <input type="tel" class="form-input" id="phone" >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Alternate Phone (optional)</label>
-        <input type="tel" class="form-input" id="altPhone">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Address Type *</label>
-        <select class="form-input" id="addressType" >
-          <option value="home">Home</option>
-          <option value="work">Work</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="setDefault">
-        <label for="setDefault">Set as default address</label>
-      </div>
-
-      <button type="submit" class="save-btn">Save Address</button>
-    </form>
-
   </div>
+  <div id="checkout-data" data-offers='<%- JSON.stringify(appliedOffers || []) %>'
+    data-addresses='<%- JSON.stringify(addresses || []) %>' data-cart='<%- JSON.stringify(cartItems || []) %>'
+    data-payment="<%= selectedPayment || '' %>">
+  </div>
+
+  <script>
+    // Expose server-side variables to frontend JS
+    window.isRetry = <%= typeof isRetry !== 'undefined' ? isRetry : false %>;
+    window.retryCartItems = <% - JSON.stringify(typeof retryCartItems !== 'undefined' ? retryCartItems : []) %>;
+  </script>
+
 </div>
-<div id="checkout-data" data-offers='<%- JSON.stringify(appliedOffers || []) %>'
-  data-addresses='<%- JSON.stringify(addresses || []) %>' data-cart='<%- JSON.stringify(cartItems || []) %>'
-  data-payment="<%= selectedPayment || '' %>">
-</div>
-
-<script>
-  // Expose server-side variables to frontend JS
-  window.isRetry = <%= typeof isRetry !== 'undefined' ? isRetry : false %>;
-  window.retryCartItems = <%- JSON.stringify(typeof retryCartItems !== 'undefined' ? retryCartItems : []) %>;
-</script>
-
-      </div>
-  
-
-
