@@ -34,9 +34,9 @@
               <span class="item-name"><%= item.productId.productName %></span>
             </td>
             <% if (item.productId.isActive) { %>
-              <td>Rs. <span class="item-price"><%= item.unitPrice %></span></td>
+              <td><span class="price-amount">Rs. <span class="item-price"><%= item.unitPrice %></span></span></td>
             <% } else { %>
-              <td>Rs. <span class="item-price">0</span></td>
+              <td><span class="price-amount">Rs. <span class="item-price">0</span></span></td>
             <% } %>
             <td>
               <div class="quantity-selector" data-id="<%= item._id %>" data-stock="<%= item.productId.stock %>">
@@ -46,7 +46,7 @@
                 <button onclick="updateQuantity('<%= item._id %>', 1)">+</button>
               </div>
             </td>
-            <td>Rs. <span class="item-total"><%= item.totalPrice %></span></td>
+            <td><span class="total-amount">Rs. <span class="item-total"><%= item.totalPrice %></span></span></td>
           </tr>
         <% }); %>
       </tbody>

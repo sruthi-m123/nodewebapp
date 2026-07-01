@@ -18,14 +18,25 @@
   box-sizing: border-box;
 }
 
+html {
+  background-color: var(--dark-color);
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
+  overflow-x: hidden;
+  max-width: 100%;
   font-family: var(--font-primary);
   color: var(--text-color);
   background: var(--white);
   line-height: 1.6;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
   color: var(--dark-color);
 }
@@ -140,6 +151,7 @@ img {
   color: var(--text-color);
   font-size: 16px;
 }
+
 /* Add this to your common.css */
 :root {
   /* ... existing variables ... */
@@ -147,6 +159,9 @@ img {
 }
 
 /* Add smooth transitions for all interactive elements */
-a, button, i, .menu-toggle {
+a,
+button,
+i,
+.menu-toggle {
   transition: var(--transition);
 }

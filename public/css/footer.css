@@ -2,7 +2,7 @@
 footer {
   background: var(--dark-color);
   color: var(--white);
-  padding: 80px 0 30px;
+  padding: 80px 0 calc(30px + env(safe-area-inset-bottom));
   font-family: var(--font-secondary);
 }
 
@@ -41,7 +41,12 @@ footer .container {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  aspect-ratio: 5/6;
+  aspect-ratio: 1/1;
+  /* Square layout is cleaner for Instagram previews */
+  max-height: 220px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .insta-post img {
@@ -52,7 +57,7 @@ footer .container {
 }
 
 .insta-post:hover img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .insta-overlay {
@@ -231,9 +236,11 @@ footer .container {
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
   }
-  
+
   .insta-gallery {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 columns on tablet */
+    gap: 12px;
   }
 }
 
@@ -241,23 +248,23 @@ footer .container {
   .newsletter form {
     flex-direction: column;
   }
-  
+
   .newsletter input {
     border-radius: 30px;
     margin-bottom: 10px;
   }
-  
+
   .newsletter button {
     border-radius: 30px;
     width: 100%;
   }
-  
+
   .copyright {
     flex-direction: column;
     text-align: center;
     gap: 20px;
   }
-  
+
   .payment-methods {
     margin-top: 15px;
   }
@@ -265,17 +272,34 @@ footer .container {
 
 @media (max-width: 576px) {
   .footer-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2-column grid */
+    gap: 30px 20px;
   }
-  
+
+  .footer-column:first-child {
+    grid-column: span 2;
+    /* About Us takes full width */
+  }
+
+  .footer-column:last-child {
+    grid-column: span 2;
+    /* Contact Us takes full width */
+    margin-top: 10px;
+  }
+
   .insta-gallery {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 columns on mobile to keep a tight row */
+    gap: 8px;
+    margin-top: 20px;
   }
-  
+
   .footer-column h4 {
     margin-bottom: 15px;
+    font-size: 16px;
   }
-  
+
   .footer-column h4::after {
     bottom: -5px;
   }

@@ -175,29 +175,48 @@
   color: var(--primary-color);
 }
 
-.mobile-icons {
+.mobile-auth-links {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.mobile-icon-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-secondary);
-  color: var(--dark-color);
-  padding: 10px 0;
-  transition: color 0.3s ease;
-}
-
-.mobile-icon-link:hover {
-  color: var(--primary-color);
-}
-
-.mobile-icon-link i {
-  width: 24px;
+.mobile-auth-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
   text-align: center;
+  border-radius: 8px;
+  font-family: var(--font-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.mobile-auth-btn.login-btn {
+  border: 1px solid var(--primary-color, #9e6d4e);
+  color: var(--primary-color, #9e6d4e);
+  background: transparent;
+}
+
+.mobile-auth-btn.login-btn:hover {
+  background-color: var(--light-bg, #f9f4f1);
+}
+
+.mobile-auth-btn.signup-btn {
+  background-color: var(--primary-color, #9e6d4e);
+  color: var(--white, #ffffff);
+  border: 1px solid var(--primary-color, #9e6d4e);
+  box-shadow: 0 4px 10px rgba(158, 109, 78, 0.15);
+}
+
+.mobile-auth-btn.signup-btn:hover {
+  background-color: #8c5d41;
+  border-color: #8c5d41;
 }
 
 body.mobile-menu-open::before {

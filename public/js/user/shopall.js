@@ -1,19 +1,76 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // ── Elements ────────────────────────────────────────────────────────────────
-  const searchInput         = document.getElementById('product-search');
-  const sortSelect          = document.getElementById('sort');
-  const checkboxes          = document.querySelectorAll('input[type="checkbox"]');
-  const clearBtn            = document.querySelector('.clear-btn');
-  const minPriceInput       = document.querySelector('input[placeholder="Min"]');
-  const maxPriceInput       = document.querySelector('input[placeholder="Max"]');
-  const applyPriceBtn       = document.querySelector('.price-apply');
-  const categoryCheckboxes  = document.querySelectorAll('input[name="category"]');
-  const colorOptions        = document.querySelectorAll('.color-option');
+  // ── Custom Select Dropdown ──────────────────────────────────────────────────
+  const customSelect = document.getElementById('custom-sort-select');
+  const customTrigger = document.getElementById('custom-sort-trigger');
+  const customOptions = document.getElementById('custom-sort-options');
+  const actualSortSelect = document.getElementById('sort');
+
+  if (customTrigger && customOptions) {
+    customTrigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      customSelect.classList.toggle('open');
+    });
+
+    customOptions.querySelectorAll('.custom-option').forEach(option => {
+      option.addEventListener('click', function () {
+        const val = this.dataset.value;
+        const text = this.textContent;
+
+        customTrigger.querySelector('span').textContent = text;
+        customOptions.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+
+        if (actualSortSelect) {
+          actualSortSelect.value = val;
+          actualSortSelect.dispatchEvent(new Event('change'));
+        }
+        customSelect.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (customSelect && !customSelect.contains(e.target)) {
+        customSelect.classList.remove('open');
+      }
+    });
+  }
+
+  // ── Mobile Filter Sidebar Drawer ──────────────────────────────────────────────
+  const filterToggleBtn = document.getElementById('filter-toggle-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const sidebar = document.querySelector('.filters-sidebar');
+
+  if (filterToggleBtn && sidebar) {
+    filterToggleBtn.addEventListener('click', () => {
+      sidebar.classList.add('active');
+      if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  }
+
+  function closeMobileSidebar() {
+    if (sidebar) sidebar.classList.remove('active');
+    if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+  if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+  const searchInput = document.getElementById('product-search');
+  const sortSelect = document.getElementById('sort');
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const clearBtn = document.querySelector('.clear-btn');
+  const minPriceInput = document.querySelector('input[placeholder="Min"]');
+  const maxPriceInput = document.querySelector('input[placeholder="Max"]');
+  const applyPriceBtn = document.querySelector('.price-apply');
+  const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
+  const colorOptions = document.querySelectorAll('.color-option');
   const availabilityCheckboxes = document.querySelectorAll('input[name="availability"]');
 
   let serverWishlist = window.wishlist || [];
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
   function debounce(func, delay) {
     let timeout;
     return function (...args) {
@@ -50,9 +107,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function updateCounts(showing, total) {
     const showingEl = document.getElementById('showing-count');
-    const totalEl   = document.getElementById('total-count');
+    const totalEl = document.getElementById('total-count');
     if (showingEl) showingEl.textContent = showing;
-    if (totalEl)   totalEl.textContent   = total;
+    if (totalEl) totalEl.textContent = total;
   }
 
   // ── Wishlist button listeners ─────────────────────────────────────────────────
@@ -65,11 +122,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
       btn.addEventListener('click', async function (e) {
         e.stopPropagation();
-        const productId        = this.dataset.productId;
-        const icon             = this.querySelector('i');
+        const productId = this.dataset.productId;
+        const icon = this.querySelector('i');
         const isCurrentlyActive = this.classList.contains('active');
 
-        const url    = isCurrentlyActive
+        const url = isCurrentlyActive
           ? `/user/wishlist/remove-product/${productId}`
           : `/user/wishlist/add/${productId}`;
         const method = isCurrentlyActive ? 'DELETE' : 'POST';
@@ -119,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── Product grid ─────────────────────────────────────────────────────────────
   function updateProductGrid(products, wishlist = serverWishlist) {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = '';
@@ -133,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!product.isActive) return;
 
       let originalPrice = product.price;
-      let finalPrice    = originalPrice;
+      let finalPrice = originalPrice;
       let discountLabel = '';
 
       if (product.bestOffer && product.bestOffer.discountValue > 0) {
@@ -144,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
           discountLabel = `${product.bestOffer.discountValue}%OFF`;
         } else if (product.bestOffer.type === 'fixed') {
-          finalPrice    = Math.max(0, originalPrice - product.bestOffer.discountValue);
+          finalPrice = Math.max(0, originalPrice - product.bestOffer.discountValue);
           discountLabel = `₹${product.bestOffer.discountValue.toLocaleString()} OFF`;
         }
       }
@@ -161,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const isInWishlist = Array.isArray(wishlist) && wishlist.includes(product._id.toString());
       const wishlistClass = isInWishlist ? 'active' : '';
-      const wishlistIcon  = isInWishlist ? 'fas' : 'far';
+      const wishlistIcon = isInWishlist ? 'fas' : 'far';
 
       const card = document.createElement('div');
       card.className = 'product-card';
@@ -189,9 +245,9 @@ document.addEventListener('DOMContentLoaded', function () {
               <i class="${wishlistIcon} fa-heart"></i>
             </button>
             ${product.stock === 0
-              ? `<p class="out-of-stock-message">Out of Stock</p>`
-              : `<button class="add-to-cart primary-btn" data-id="${product._id}">Add to Cart</button>`
-            }
+          ? `<p class="out-of-stock-message">Out of Stock</p>`
+          : `<button class="add-to-cart primary-btn" data-id="${product._id}">Add to Cart</button>`
+        }
           </div>
         </div>
       `;
@@ -201,17 +257,16 @@ document.addEventListener('DOMContentLoaded', function () {
     attachDynamicListeners();
   }
 
-  // ── Filters ───────────────────────────────────────────────────────────────────
   function getAllFilters() {
     return {
-      search:       searchInput.value.trim(),
-      sort:         sortSelect.value,
-      categories:   [...categoryCheckboxes].filter(cb => cb.checked).map(cb => cb.value),
+      search: searchInput.value.trim(),
+      sort: sortSelect.value,
+      categories: [...categoryCheckboxes].filter(cb => cb.checked).map(cb => cb.value),
       availability: [...availabilityCheckboxes].filter(cb => cb.checked).map(cb => cb.value),
-      colors:       [...colorOptions].filter(el => el.classList.contains('selected')).map(el => el.dataset.color),
-      minPrice:     minPriceInput.value ? Number(minPriceInput.value) : undefined,
-      maxPrice:     maxPriceInput.value ? Number(maxPriceInput.value) : undefined,
-      page:  1,
+      colors: [...colorOptions].filter(el => el.classList.contains('selected')).map(el => el.dataset.color),
+      minPrice: minPriceInput.value ? Number(minPriceInput.value) : undefined,
+      maxPrice: maxPriceInput.value ? Number(maxPriceInput.value) : undefined,
+      page: 1,
       limit: 12
     };
   }
@@ -222,16 +277,16 @@ document.addEventListener('DOMContentLoaded', function () {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(filters)
     })
-    .then(res => res.json())
-    .then(data => {
-      serverWishlist = data.wishlist || serverWishlist;
-      updateProductGrid(data.products, data.wishlist);
-      updateCounts(data.products.length, data.total || data.products.length);
-    })
-    .catch(err => {
-      console.error('Filter fetch error:', err);
-      loadAllProducts();
-    });
+      .then(res => res.json())
+      .then(data => {
+        serverWishlist = data.wishlist || serverWishlist;
+        updateProductGrid(data.products, data.wishlist);
+        updateCounts(data.products.length, data.total || data.products.length);
+      })
+      .catch(err => {
+        console.error('Filter fetch error:', err);
+        loadAllProducts();
+      });
   }, 300);
 
   function handleFilterChange() {
@@ -244,18 +299,17 @@ document.addEventListener('DOMContentLoaded', function () {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ page: 1, limit: 12 })
     })
-    .then(res => res.json())
-    .then(data => {
-      serverWishlist = data.wishlist || serverWishlist;
-      updateProductGrid(data.products, data.wishlist);
-      updateCounts(data.products.length, data.total || data.products.length);
-    })
-    .catch(err => console.error('Error loading all products:', err));
+      .then(res => res.json())
+      .then(data => {
+        serverWishlist = data.wishlist || serverWishlist;
+        updateProductGrid(data.products, data.wishlist);
+        updateCounts(data.products.length, data.total || data.products.length);
+      })
+      .catch(err => console.error('Error loading all products:', err));
   }
 
-  // ── Event listeners ───────────────────────────────────────────────────────────
-  if (searchInput)      searchInput.addEventListener('input', handleFilterChange);
-  if (sortSelect)       sortSelect.addEventListener('change', handleFilterChange);
+  if (searchInput) searchInput.addEventListener('input', handleFilterChange);
+  if (sortSelect) sortSelect.addEventListener('change', handleFilterChange);
   availabilityCheckboxes.forEach(cb => cb.addEventListener('change', handleFilterChange));
   categoryCheckboxes.forEach(cb => cb.addEventListener('change', handleFilterChange));
   colorOptions.forEach(colorBox => {
@@ -270,23 +324,29 @@ document.addEventListener('DOMContentLoaded', function () {
     clearBtn.addEventListener('click', function () {
       checkboxes.forEach(cb => cb.checked = false);
       colorOptions.forEach(c => c.classList.remove('selected'));
-      if (searchInput)  searchInput.value  = '';
+      if (searchInput) searchInput.value = '';
       if (minPriceInput) minPriceInput.value = '';
       if (maxPriceInput) maxPriceInput.value = '';
-      if (sortSelect)   sortSelect.value   = 'price-asc';
+      if (sortSelect) sortSelect.value = 'price-asc';
+
+      if (customTrigger) customTrigger.querySelector('span').textContent = 'Price: Low to High';
+      if (customOptions) {
+        customOptions.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        const defaultOpt = customOptions.querySelector('[data-value="price-asc"]');
+        if (defaultOpt) defaultOpt.classList.add('selected');
+      }
+
       loadAllProducts();
     });
   }
 
-  // Attach listeners to cards already rendered server-side on first page load
   attachDynamicListeners();
 });
 
-// ── Add to cart (outside DOMContentLoaded to allow event delegation) ──────────
 document.addEventListener('click', async (e) => {
   if (!e.target.closest('.add-to-cart')) return;
 
-  const button    = e.target.closest('.add-to-cart');
+  const button = e.target.closest('.add-to-cart');
   const productId = button.dataset.id;
 
   try {

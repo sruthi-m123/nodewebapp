@@ -52,37 +52,18 @@
 <!-- Mobile Menu -->
 <div class="mobile-menu">
   <nav class="mobile-nav">
-    <a href="/" class="nav-link mobile-nav-link">Home</a>
+    <a href="/user/home" class="nav-link mobile-nav-link">Home</a>
     <a href="/user/shopall" class="nav-link mobile-nav-link">Shop All</a>
-   
+    <a href="/user/aboutUs" class="nav-link mobile-nav-link">About Us</a>
+    <a href="/user/contactUs" class="nav-link mobile-nav-link">Contact Us</a>
   </nav>
 
-  <% if (!user ) { %>
-    <div class="auth-links">
-      <a href="/user/signup" class="nav-link">Sign Up</a>
-      <a href="/user/login" class="nav-link">Log In</a>
-      <a href="/user/aboutUs"  class="nav-link">About Us</a>
-      <a href="/user/contactUs" class="nav-link">Contact Us</a>
-
+  <% if (!user) { %>
+    <div class="mobile-auth-links">
+      <a href="/user/login" class="mobile-auth-btn login-btn">Log In</a>
+      <a href="/user/signup" class="mobile-auth-btn signup-btn">Sign Up</a>
     </div>
   <% } %>
-
-  <div class="mobile-icons">
-    <!-- <a href="#" class="icon-link"><i class="far fa-heart"></i></a> -->
-     <a href="/user/wishlist" class="icon-link wishlist-icon">
-  <i class="far fa-heart"></i>
-  <span class="wishlist-count"><%= wishlistCount || 0 %></span>
-</a>
-    <% if (user) { %>
-      <a href="/user/profile" class="icon-link"><i class="fas fa-user"></i></a>
-
-   <a href="/user/cart" id="viewCartBtn" class="icon-link cart-icon">
-  <i class="fas fa-shopping-bag"></i><span class="cart-count"><%= cartCount %></span>
-</a> 
-      <% } else { %>
-      <a href="/user/login" class="icon-link"><i class="fas fa-user-circle"></i></a>
-    <% } %>
- </div>
 </div>
 
     
