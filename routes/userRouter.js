@@ -97,7 +97,7 @@ router.post("/verify-email-change", checkBlocked, validate(V.verifyOtpSchema), p
 router.get("/shopAll", shopController.loadShopping);
 router.post("/shopall/filter", shopController.applyFilters);
 router.get("/shopall/category/:id", shopController.getProductsByCategory);
-router.get("/product/:id", productController.productDetail);
+router.get("/product/:id", isLoggedIn, checkBlocked, productController.productDetail);
 
 // Address routes
 router.get("/address", isLoggedIn, addressController.getAddressPage);
@@ -154,7 +154,7 @@ router.get("/orders-details/:orderId", isLoggedIn, checkBlocked, validate(V.getO
 router.post("/orders/:orderId/return", isLoggedIn, checkBlocked, validate(V.returnOrderSchema), orderdetailController.returnOrder);
 router.get("/orders/:orderId/invoice", validate(V.getOrderDetailsSchema), orderdetailController.invoice);
 router.post("/orders/:orderId/cancel", isLoggedIn, checkBlocked, validate(V.cancelOrderSchema), orderdetailController.cancelOrder);
-router.get("/orders/:orderId/credit-note",orderdetailController.creditNote);
+router.get("/orders/:orderId/credit-note", orderdetailController.creditNote);
 // Wishlist routes
 router.get("/wishlist", isLoggedIn, checkBlocked, wishlistController.getWishlistPage);
 router.post("/wishlist/add/:productId", isLoggedIn, validate(V.addToWishlistSchema, "params"), wishlistController.addToWishlist);
@@ -168,14 +168,14 @@ router.delete(
 );
 // Wallet routes
 
-router.get("/wallet",isLoggedIn, checkBlocked, walletController.getWallet);
+router.get("/wallet", isLoggedIn, checkBlocked, walletController.getWallet);
 router.post("/wallet/create-order", checkBlocked, walletController.createWalletOrder);
-router.post("/wallet/verify-payment",checkBlocked,walletController.verifyWalletPayment);
+router.post("/wallet/verify-payment", checkBlocked, walletController.verifyWalletPayment);
 
 //About Us
-router.get("/aboutUs",checkBlocked,aboutusController.getAboutUsPage);
+router.get("/aboutUs", checkBlocked, aboutusController.getAboutUsPage);
 //Contact Us
-router.get("/contactUs",checkBlocked,contactUsController.getContactUsPage);
-router.post("/contact",contactUsController.sendMessage);
+router.get("/contactUs", checkBlocked, contactUsController.getContactUsPage);
+router.post("/contact", contactUsController.sendMessage);
 
 export default router;

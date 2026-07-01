@@ -10,17 +10,9 @@
     --info-color: #2196F3;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--background-light);
-    color: var(--text-dark);
-    margin: 0;
-    padding: 2rem;
-}
-
-.container {
+.order-details-container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 2rem auto;
     background-color: white;
     padding: 2.5rem;
     border-radius: 12px;
@@ -28,19 +20,19 @@ body {
     border: 1px solid var(--secondary-color);
 }
 
-h1, h2 {
+.order-details-container h1, .order-details-container h2 {
     font-family: 'Playfair Display', serif;
     color: var(--primary-color);
 }
 
-h1 {
+.order-details-container h1 {
     font-size: 2rem;
     margin-bottom: 1.5rem;
     border-bottom: 2px solid var(--secondary-color);
     padding-bottom: 0.5rem;
 }
 
-h2 {
+.order-details-container h2 {
     font-size: 1.5rem;
     margin: 1.5rem 0 1rem;
 }
@@ -545,11 +537,7 @@ button.disabled:hover {
 }
 
 @media (max-width: 480px) {
-    body {
-        padding: 1rem;
-    }
-
-    .container {
+    .order-details-container {
         padding: 1.5rem;
     }
 

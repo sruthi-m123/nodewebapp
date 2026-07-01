@@ -190,7 +190,8 @@ h1 {
     width: 60px;
     height: 60px;
     border-radius: 6px;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #faf6f0;
     border: 1px solid #d9c4b3;
 }
 
@@ -764,15 +765,18 @@ h1 {
 
 @media (max-width: 480px) {
     .product-item {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 12px;
     }
 
     .product-image {
-        width: 100%;
-        height: auto;
-        max-height: 150px;
-        margin: 0 auto;
+        width: 65px;
+        height: 65px;
+        flex-shrink: 0;
+        object-fit: contain;
+        background-color: #faf6f0;
     }
     
     .address-card {

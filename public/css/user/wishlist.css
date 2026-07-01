@@ -257,6 +257,27 @@
   color: #8a7b6d;
 }
 
+.continue-shopping-btn {
+  display: inline-block;
+  margin-top: 24px;
+  background-color: #e3c67e;
+  color: #4d2e2e;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-family: 'Georgia', serif;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(227, 198, 126, 0.25);
+}
+
+.continue-shopping-btn:hover {
+  background-color: #d8b865;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(216, 184, 101, 0.35);
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 768px) {

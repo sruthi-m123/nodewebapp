@@ -48,6 +48,14 @@ export const isLoggedIn=(req,res,next)=>{
     if (req.session && req.session.user && req.session.user.id) {
       return next();
     }
+    // Check if AJAX/API request
+    if (req.xhr || 
+        (req.headers.accept && req.headers.accept.includes('json')) || 
+        (req.headers['content-type'] && req.headers['content-type'].includes('json')) ||
+        req.path.startsWith('/wishlist/') || 
+        req.path.startsWith('/cart/')) {
+      return res.status(401).json({ success: false, message: "Please login to continue" });
+    }
     return res.redirect('/user/login')
 }
 export const isNotLoggedIn = (req, res, next) => {

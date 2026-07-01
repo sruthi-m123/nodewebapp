@@ -191,3 +191,100 @@ buyNowBtn?.addEventListener('click',async(e)=>{
       });
   }
 })
+
+// ── Wishlist management ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  const productId = document.querySelector('[data-product-id]')?.getAttribute('data-product-id');
+
+  if (!wishlistBtn || !productId) return;
+
+  function updateWishlistCount(count) {
+    document.querySelectorAll('.wishlist-count').forEach(el => {
+      el.textContent = count ?? 0;
+    });
+  }
+
+  // 1. Fetch current wishlist status of the product on load
+  try {
+    const response = await fetch(`/user/status/${productId}`);
+    const data = await response.json();
+    if (data.inWishlist) {
+      wishlistBtn.classList.add('active');
+      wishlistBtn.innerHTML = '<i class="fas fa-heart"></i> Remove from Wishlist';
+    }
+  } catch (err) {
+    console.error('Failed to check wishlist status:', err);
+  }
+
+  // 2. Add click event listener to toggle status
+  wishlistBtn.addEventListener('click', async () => {
+    const isCurrentlyActive = wishlistBtn.classList.contains('active');
+    const url = isCurrentlyActive
+      ? `/user/wishlist/remove-product/${productId}`
+      : `/user/wishlist/add/${productId}`;
+    const method = isCurrentlyActive ? 'DELETE' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.status === 401) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Login Required',
+          text: 'Please login to manage your wishlist.',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (isCurrentlyActive) {
+          wishlistBtn.classList.remove('active');
+          wishlistBtn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Removed from wishlist',
+            showConfirmButton: false,
+            timer: 2000
+          });
+        } else {
+          wishlistBtn.classList.add('active');
+          wishlistBtn.innerHTML = '<i class="fas fa-heart"></i> Remove from Wishlist';
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Added to wishlist',
+            showConfirmButton: false,
+            timer: 2000
+          });
+        }
+        // Update header wishlist count badge
+        if (data.wishlistCount !== undefined) {
+          updateWishlistCount(data.wishlistCount);
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Failed to update wishlist.'
+        });
+      }
+    } catch (err) {
+      console.error('Wishlist toggle error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.'
+      });
+    }
+  });
+});

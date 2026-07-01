@@ -112,10 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (totalEl) totalEl.textContent = total;
   }
 
-  // ── Wishlist button listeners ─────────────────────────────────────────────────
   function attachDynamicListeners() {
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
-      // Remove any previously attached listener to avoid duplicates after grid refresh
       btn.replaceWith(btn.cloneNode(true));
     });
 
@@ -137,6 +135,16 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Content-Type': 'application/json' }
           });
 
+          if (response.status === 401) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Login Required',
+              text: 'Please login to manage your wishlist.',
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
           const data = await response.json();
           console.log('Wishlist response:', data);
 
@@ -157,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updateWishlistCount(data.wishlistCount ?? serverWishlist.length);
 
           } else if (response.status === 400) {
-            // Already in wishlist — sync the UI to reflect this
             this.classList.add('active');
             icon.classList.replace('far', 'fas');
             if (!serverWishlist.includes(productId)) serverWishlist.push(productId);
@@ -234,10 +241,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <a href="/user/product/${product._id}" class="product-link-name">${product.productName}</a>
           </h4>
           <div class="product-meta">
-            <div class="product-rating">
-              ${generateStarRating(product.rating)}
-              <span>(${product.reviews || 0})</span>
-            </div>
             ${pricingHTML}
           </div>
           <div class="product-actions">

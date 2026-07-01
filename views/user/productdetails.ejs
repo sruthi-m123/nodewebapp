@@ -1,150 +1,154 @@
-
-
-  <!-- Product Details -->
-  <section class="product-details">
-    <div class="product-container">
-      <div class="product-gallery">
-        <div class="main-image">
-<img id="mainImage" src="<%= product.images[0] %>" alt="<%= product.productName %>">
-        </div>
-        <div class="thumbnail-images">
-          <% product.images.forEach((img, index) => { %>
-            <div class="thumbnail <%= index === 0 ? 'active' : '' %>">
-              <img src="<%= img %>" alt="Thumbnail <%= index + 1 %>">
-            </div>
-          <% }) %>
-        </div>
+<!-- Product Details -->
+<section class="product-details">
+  <div class="product-container">
+    <div class="product-gallery">
+      <div class="main-image">
+        <img id="mainImage" src="<%= product.images[0] %>" alt="<%= product.productName %>">
       </div>
-
-      <div class="product-info">
-        <h1><%= product.productName %></h1>
-
-        <div class="rating">
-          <div class="stars">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
+      <div class="thumbnail-images">
+        <% product.images.forEach((img, index)=> { %>
+          <div class="thumbnail <%= index === 0 ? 'active' : '' %>">
+            <img src="<%= img %>" alt="Thumbnail <%= index + 1 %>">
           </div>
-          <span class="review-count">4.5 (60 reviews)</span>
-        </div>
-
-        <!-- <p class="price">₹<%= product.price.toLocaleString('en-IN') %></p> -->
-
-
-      <!-- Updated Price Display -->
-      <% if (product.bestOffer ) { %>
-        <div class="price-container">
-          <p class="original-price">₹<%= product.price.toLocaleString('en-IN') %></p>
-          <p class="discounted-price">₹<%= product.discountedPrice.toLocaleString('en-IN') %></p>
- <p class="discount-percent">
-    <% if (product.bestOffer.type === 'percentage') { %>
-      (<%= product.bestOffer.discountValue %>% OFF)
-    <% } else if (product.bestOffer.type === 'flat') { %>
-      (₹<%= product.bestOffer.discountValue.toLocaleString('en-IN') %> OFF)
-    <% } %>
-  </p>
-        </div>
-      <% } else { %>
-        <p class="price">₹<%= product.price.toLocaleString('en-IN') %></p>
-      <% } %>
-       <p class="availability <%= product.stock <= 0 ? 'out-of-stock' : 'in-stock' %>">
-  <i class="fas fa-check-circle"></i> 
-  <%= product.stock <= 0 ? "Out of Stock" : "In Stock" %>
-</p>
-
-
-
-        <div class="color-options">
-          <h3>Color</h3>
-          <div class="colors">
-            <div class="color-option active">
-              <div class="color-swatch" style="background-color: <%= product.color %>"></div>
-              <span><%= product.color %></span>
-            </div>
-          </div>
-        </div>
-
-        
-  
-
-<% if (isProductDetail) { %>
-  <!-- Product Detail Page -->
-  <button id="minus-btn">-</button>
-  <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
-  <button id="plus-btn">+</button>
-<% } else { %>
-  <!-- All Products Page (inside loop) -->
-  <% products.forEach((product) => { %>
-    <div class="qty-control">
-      <button class="qty-btn minus">-</button>
-      <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
-      <button class="qty-btn plus">+</button>
+          <% }) %>
+      </div>
     </div>
-  <% }) %>
-<% } %>
 
-<div class="product" data-product-id="<%= product._id %>">
+    <div class="product-info">
+      <h1><%= product.productName %></h1>
+
+      <% if (product.bestOffer) { %>
+        <div class="price-container">
+              <p class="original-price">₹<%= product.price.toLocaleString('en-IN') %>
+              </p>
+              <p class="discounted-price">₹<%= product.discountedPrice.toLocaleString('en-IN') %>
+              </p>
+              <p class="discount-percent">
+                <% if (product.bestOffer.type==='percentage' ) { %>
+                  (<%= product.bestOffer.discountValue %>% OFF)
+                    <% } else if (product.bestOffer.type==='flat' ) { %>
+                      (₹<%= product.bestOffer.discountValue.toLocaleString('en-IN') %> OFF)
+                        <% } %>
+              </p>
+            </div>
+            <% } else { %>
+              <p class="price">₹<%= product.price.toLocaleString('en-IN') %>
+              </p>
+              <% } %>
+                <p class="availability <%= product.stock <= 0 ? 'out-of-stock' : 'in-stock' %>">
+                  <i class="fas fa-check-circle"></i>
+                  <%= product.stock <=0 ? "Out of Stock" : "In Stock" %>
+                </p>
+
+
+
+                <div class="color-options">
+                  <h3>Color</h3>
+                  <div class="colors">
+                    <div class="color-option active">
+                      <div class="color-swatch" style="background-color: <%= product.color %>"></div>
+                      <span>
+                        <%= product.color %>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                <% if (isProductDetail) { %>
+                  <!-- Product Detail Page -->
+                  <button id="minus-btn">-</button>
+                  <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
+                  <button id="plus-btn">+</button>
+                  <% } else { %>
+                    <!-- All Products Page (inside loop) -->
+                    <% products.forEach((product)=> { %>
+                      <div class="qty-control">
+                        <button class="qty-btn minus">-</button>
+                        <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>"
+                          data-limit="<%=limit%>">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                      <% }) %>
+                        <% } %>
+
+                          <div class="product" data-product-id="<%= product._id %>">
   <div class="actions">
     <% if (product.stock > 0) { %>
       <button class="add-to-cart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-<button class="btn buy-now" id="buyNowBtn" data-product-id="<%= product._id %>">
-  <i class="fas fa-bolt"></i> Buy Now
-</button>
+      <button class="btn buy-now" id="buyNowBtn" data-product-id="<%= product._id %>">
+        <i class="fas fa-bolt"></i> Buy Now
+      </button>
     <% } else { %>
       <button class="add-to-cart out-of-stock" disabled><i class="fas fa-shopping-cart"></i> Out of Stock</button>
       <button class="buy-now out-of-stock" disabled><i class="fas fa-bolt"></i> Unavailable</button>
     <% } %>
+    <button class="wishlist-btn-detail" id="wishlistBtn" data-product-id="<%= product._id %>" title="Add to Wishlist">
+      <i class="far fa-heart"></i> Add to Wishlist
+    </button>
   </div>
 </div>
 
-  <ul class="message-area"></ul>
-</div>
+                          <ul class="message-area"></ul>
+      </div>
 
 
-        <div class="product-tabs">
-          <div class="tab-header">
-            <div class="tab-link active" data-tab="description">Description</div>
-            <div class="tab-link" data-tab="details">Details</div>
-            <div class="tab-link" data-tab="shipping">Shipping</div>
-          </div>
-          <div class="tab-content active" id="description">
-            <p><%= product.description %></p>
-          </div>
-          <div class="tab-content" id="details">
-            <ul>
-              <li><strong>Category:</strong> <%= product.productName%></li>
-              <li><strong>Color:</strong> <%= product.color %></li>
-              <li><strong>Stock:</strong> <%= product.stock %></li>
-              <li><strong>New Arrival:</strong> <%= product.isNewArrival ? "Yes" : "No" %></li>
-              <li><strong>Status:</strong> <%= product.status %></li>
-              <!-- <li><strong>Created At:</strong> <%= product.createdAt.toDateString() %></li> -->
-            </ul>
-          </div>
-          <div class="tab-content" id="shipping">
-            <ul>
-              <li><strong>Delivery:</strong> 3–5 business days</li>
-              <li><strong>Shipping:</strong> Free across India</li>
-              <li><strong>Returns:</strong> 7-day easy returns</li>
-              <li><strong>Packaging:</strong> Premium gift box</li>
-            </ul>
-          </div>
+      <div class="product-tabs">
+        <div class="tab-header">
+          <div class="tab-link active" data-tab="description">Description</div>
+          <div class="tab-link" data-tab="details">Details</div>
+          <div class="tab-link" data-tab="shipping">Shipping</div>
+        </div>
+        <div class="tab-content active" id="description">
+          <p>
+            <%= product.description %>
+          </p>
+        </div>
+        <div class="tab-content" id="details">
+          <ul>
+            <li><strong>Category:</strong>
+              <%= product.productName%>
+            </li>
+            <li><strong>Color:</strong>
+              <%= product.color %>
+            </li>
+            <li><strong>Stock:</strong>
+              <%= product.stock %>
+            </li>
+            <li><strong>New Arrival:</strong>
+              <%= product.isNewArrival ? "Yes" : "No" %>
+            </li>
+            <li><strong>Status:</strong>
+              <%= product.status %>
+            </li>
+            <!-- <li><strong>Created At:</strong> <%= product.createdAt.toDateString() %></li> -->
+          </ul>
+        </div>
+        <div class="tab-content" id="shipping">
+          <ul>
+            <li><strong>Delivery:</strong> 3–5 business days</li>
+            <li><strong>Shipping:</strong> Free across India</li>
+            <li><strong>Returns:</strong> 7-day easy returns</li>
+            <li><strong>Packaging:</strong> Premium gift box</li>
+          </ul>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Related Products -->
- <% if (relatedProducts && relatedProducts.some(prod => prod.isNewArrival)) { %>
+<!-- Related Products -->
+<% if (relatedProducts && relatedProducts.some(prod=> prod.isNewArrival)) { %>
   <section class="related-products">
     <div class="section-header">
       <h2>You May Also Like</h2>
       <p>Complement your collection with these exquisite pieces</p>
     </div>
     <div class="products-grid">
-      <% relatedProducts.forEach(prod => { 
-           if (prod.isNewArrival) { %>
+      <% relatedProducts.forEach(prod=> {
+        if (prod.isNewArrival) { %>
         <div class="product-card">
           <div class="product-image">
             <img src="<%= prod.images[0] %>" alt="<%= prod.productName %>">
@@ -153,37 +157,40 @@
             </div>
           </div>
           <div class="product-info">
-            <h3><%= prod.productName %></h3>
-            <p class="price">₹<%= prod.price.toLocaleString('en-IN') %></p>
+            <h3>
+              <%= prod.productName %>
+            </h3>
+            <p class="price">₹<%= prod.price.toLocaleString('en-IN') %>
+            </p>
           </div>
         </div>
-      <% } }) %>
+        <% } }) %>
     </div>
   </section>
-<% } %>
+  <% } %>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const mainImageContainer = document.querySelector('.main-image');
-  const mainImage = document.getElementById('mainImage');
-  
-  if (mainImageContainer && mainImage) {
-    mainImageContainer.addEventListener('mousemove', function(e) {
-      const rect = mainImageContainer.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const xPercent = (x / rect.width) * 100;
-      const yPercent = (y / rect.height) * 100;
-      
-      mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-      mainImage.style.transform = 'scale(2)';
-    });
-    
-    mainImageContainer.addEventListener('mouseleave', function() {
-      mainImage.style.transformOrigin = 'center center';
-      mainImage.style.transform = 'scale(1)';
-    });
-  }
-});
-</script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const mainImageContainer = document.querySelector('.main-image');
+        const mainImage = document.getElementById('mainImage');
+
+        if (mainImageContainer && mainImage) {
+          mainImageContainer.addEventListener('mousemove', function (e) {
+            const rect = mainImageContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const xPercent = (x / rect.width) * 100;
+            const yPercent = (y / rect.height) * 100;
+
+            mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            mainImage.style.transform = 'scale(2)';
+          });
+
+          mainImageContainer.addEventListener('mouseleave', function () {
+            mainImage.style.transformOrigin = 'center center';
+            mainImage.style.transform = 'scale(1)';
+          });
+        }
+      });
+    </script>

@@ -90,7 +90,10 @@ export const addToCartFromWishlist = async (req, res) => {
 
 
 export const checkWishlistStatus = async (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
+  if (!userId) {
+    return res.json({ inWishlist: false });
+  }
   const { productId } = req.params;
 
   const inWishlist =

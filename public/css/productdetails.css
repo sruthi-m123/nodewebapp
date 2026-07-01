@@ -499,3 +499,51 @@
   color: var(--primary-color);
   margin: 20px 0;
 }
+
+/* Wishlist Button on Details Page */
+.wishlist-btn-detail {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid var(--primary-color, #9e6d4e);
+  border-radius: 30px;
+  background-color: var(--white, #ffffff);
+  color: var(--primary-color, #9e6d4e);
+  font-family: var(--font-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(158, 109, 78, 0.05);
+}
+
+.wishlist-btn-detail:hover {
+  background-color: #faf6f0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(158, 109, 78, 0.1);
+}
+
+.wishlist-btn-detail i {
+  font-size: 1.1rem;
+  color: var(--primary-color, #9e6d4e);
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Active State (When product is in wishlist) */
+.wishlist-btn-detail.active {
+  background-color: var(--primary-color, #9e6d4e);
+  color: var(--white, #ffffff);
+  border-color: var(--primary-color, #9e6d4e);
+}
+
+.wishlist-btn-detail.active i {
+  color: #ff4d4d !important; /* Warm red heart when liked */
+  transform: scale(1.15);
+}
+
+.wishlist-btn-detail.active:hover {
+  background-color: #8c5d41;
+  border-color: #8c5d41;
+}
