@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export const addAddressSchema = Joi.object({
-  name: Joi.string().min(2).max(100).required().messages({ 'string.empty': 'Name is required' }),
+  name: Joi.string().pattern(/^[a-zA-Z\s.]+$/).min(2).max(100).required().messages({ 'string.empty': 'Name is required', 'string.pattern.base': 'Name must contain only letters, dots and spaces' }),
   building: Joi.string().min(1).required().messages({ 'string.empty': 'Building is required' }),
   landmark: Joi.string().optional().allow(''),
   city: Joi.string().min(2).required().messages({ 'string.empty': 'City is required' }),
@@ -23,21 +23,21 @@ export const placeOrderSchema = Joi.object({
     .messages({ 'any.only': 'Valid payment method is required' }),
   appliedOffers: Joi.array().items(Joi.string()).optional(),
   isRetry: Joi.boolean().optional(),
-   cartItems:Joi.array().items(
+  cartItems: Joi.array().items(
 
     Joi.object({
-id:Joi.string().required(),
-quantity:Joi.number().required(),
-name:Joi.string(),
-image:Joi.string(),
-price:Joi.string(),
-price: Joi.number(),
-    originalPrice: Joi.number(),
-    discountedPrice: Joi.allow(null),
-    isBuyNow: Joi.boolean()
+      id: Joi.string().required(),
+      quantity: Joi.number().required(),
+      name: Joi.string(),
+      image: Joi.string(),
+      price: Joi.string(),
+      price: Joi.number(),
+      originalPrice: Joi.number(),
+      discountedPrice: Joi.allow(null),
+      isBuyNow: Joi.boolean()
 
     })
-   )
+  )
 });
 
 export const applyOfferSchema = Joi.object({

@@ -155,9 +155,9 @@
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-width: 301px;
-height:300px;
-
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .product-card:hover {
@@ -167,16 +167,16 @@ height:300px;
 
 .product-card img {
   width: 100%;
-  height: 400px;
+  height: 350px;
   object-fit: cover;
 }
 
 .product-info {
-  padding: 20px;
+  padding: 15px 20px;
 }
 
 .product-info p {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   font-family: var(--font-secondary);
 }
 
@@ -190,7 +190,8 @@ height:300px;
 .product-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  padding: 0 20px 15px 20px;
+  align-items: center;
 }
 
 /* Testimonial Section */
@@ -310,12 +311,12 @@ height:300px;
     flex-direction: column;
     text-align: center;
   }
-  
+
   .hero-text {
     margin-bottom: 50px;
     max-width: 100%;
   }
-  
+
   .hero-img {
     width: 100%;
     max-width: 500px;
@@ -331,16 +332,18 @@ height:300px;
   .hero {
     padding: 60px 30px;
   }
-  
+
   .hero-text h1 {
     font-size: 36px;
   }
-  
+
   .hero-text p {
     font-size: 16px;
   }
 
-  .categories, .new-arrivals, .testimonial {
+  .categories,
+  .new-arrivals,
+  .testimonial {
     padding: 60px 30px;
   }
 
@@ -357,8 +360,9 @@ height:300px;
   .hero-text h1 {
     font-size: 28px;
   }
-  
-  .category-grid, .arrival-grid {
+
+  .category-grid,
+  .arrival-grid {
     grid-template-columns: 1fr;
   }
 

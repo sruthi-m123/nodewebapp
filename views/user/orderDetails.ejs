@@ -1,263 +1,267 @@
 <div class="order-details-container">
-    <h1>ORDER DETAILS</h1>
-    <div class="order-header">
-      
-        <p><strong>Order #</strong> <%= order.orderId %></p>
-            <%
-          /* Invoice is locked to order-creation state.
-             Show the Download Invoice button from 'shipped' onwards
-             (including cancelled / returned / partially_* statuses).
-             Cancellations & returns are reflected in Credit Notes, NOT the invoice. */
-          const invoiceVisibleStatuses = [
-            'shipped', 'delivered',
-            'cancelled', 'partially_cancelled',
-            'return_requested', 'returned', 'partially_returned'
-          ];
-          const showInvoiceBtn = invoiceVisibleStatuses.includes(order.status.toLowerCase());
-        %>
-        <% if (showInvoiceBtn) { %>
+  <h1>ORDER DETAILS</h1>
+  <div class="order-header">
+
+    <p><strong>Order #</strong>
+      <%= order.orderId %>
+    </p>
+    <% /* Invoice is locked to order-creation state. Show the Download Invoice button from 'shipped' onwards (including
+      cancelled / returned / partially_* statuses). Cancellations & returns are reflected in Credit Notes, NOT the
+      invoice. */ const invoiceVisibleStatuses=[ 'shipped' , 'delivered' , 'cancelled' , 'partially_cancelled'
+      , 'return_requested' , 'returned' , 'partially_returned' ]; const
+      showInvoiceBtn=invoiceVisibleStatuses.includes(order.status.toLowerCase()); %>
+      <% if (showInvoiceBtn) { %>
         <button class="download-invoice" onclick="downloadInvoice('<%= order.orderId %>')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
-            Download Invoice
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path
+              d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+            <path
+              d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+          </svg>
+          Download Invoice
         </button>
         <% } %>
-        <% if (order.creditNotes && order.creditNotes.length > 0) { %>
-        <button class="download-credit-note"
-                onclick="downloadCreditNote('<%= order.orderId %>')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
-            Download Credit Note
-        </button>
-        <% } %>
-    </div>
-  
-<div class="order-info">
-  <% order.items.forEach(item => { %>
+          <% if (order.creditNotes && order.creditNotes.length> 0) { %>
+            <button class="download-credit-note" onclick="downloadCreditNote('<%= order.orderId %>')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                  d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                <path
+                  d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+              </svg>
+              Download Credit Note
+            </button>
+            <% } %>
+  </div>
+
+  <div class="order-info">
+    <% order.items.forEach(item=> { %>
       <script>
-    console.log("item.imageUrl:", "<%= item.imageUrl %>");
-  </script>
+        console.log("item.imageUrl:", "<%= item.imageUrl %>");
+      </script>
 
 
-    <div class="product-details">
-      <img src="<%= item.imageUrl || '/images/default-product.jpg' %>" alt="<%= item.name %>">
+      <div class="product-details">
+        <img src="<%= item.imageUrl || '/images/default-product.jpg' %>" alt="<%= item.name %>">
 
-      <div>
-        <p><strong><%= item.name %></strong></p>
-        <p><strong>₹<%= item.totalPrice.toLocaleString('en-IN') %></strong></p>
+        <div>
+          <p><strong>
+              <%= item.name %>
+            </strong></p>
+          <p><strong>₹<%= item.totalPrice.toLocaleString('en-IN') %></strong></p>
 
-        <% if (item.color) { %>
-          <p><strong>Color: </strong> <%= item.color %></p>
-        <% } %>
+          <% if (item.color) { %>
+            <p><strong>Color: </strong>
+              <%= item.color %>
+            </p>
+            <% } %>
 
-        <p><strong>Quantity: </strong> <%= item.quantity %></p>
-        <p><strong>Item Total: </strong> ₹<%=(item.totalPrice * item.quantity).toLocaleString('en-IN')%></p>
-<!-- /          JSON.stringify({ "<%= order %>" }) -->
-
-
-        <!-- Action buttons for each item -->
-        <div class="item-actions">
-          <% const activeItems = order.items.filter(i => i.status !== 'cancelled'&&i.status!=='returned'&& i.status!=='return_requested'); %>
-          <% const activeCount = activeItems.length; %>
-          <% if (activeCount>1 &&
-                 order.status !== 'cancelled' &&
-                 order.status !== 'delivered' &&
-                 order.status!=='return_requested'&&
-                 order.status!=='partially_returned'&&
-                 order.status!=='payment_failed'&&
-                 item.status !== 'cancelled'&&
-                 item.status!=='returned'&& 
-                 item.status!=='partially_returned'&&
-                item.status!=='return_requested') { %>
-            <button class="cancel-item-btn" 
-                    data-order-id="<%= order._id %>" 
-                    data-item-id="<%= item._id %>"
-                    onclick="openModal('cancel', '<%= order._id %>', '<%= item._id %>')">
-              Cancel Item
-            </button>
-          <% } %>
+              <p><strong>Quantity: </strong>
+                <%= item.quantity %>
+              </p>
+              <!-- <p><strong>Item Total: </strong> ₹<%=(item.totalPrice * item.quantity).toLocaleString('en-IN')%></p> -->
+              <!-- /          JSON.stringify({ "<%= order %>" }) -->
 
 
-
-          
-          <% if (activeCount > 1 &&
-            (order.status === 'delivered' || order.status === 'partially_returned') &&
-            order.status!=='payment_failed'&&
-           item.status !== 'returned' &&
-           item.status!=='return_requested'&&
-            item.status !=='cancelled'&&
-                        item.status!=='partially_cancelled') { %>
-            <button class="return-item-btn" 
-                    data-order-id="<%= order._id%>" 
-                    data-item-id="<%= item._id %>"
-                    onclick="openModal('return', '<%= order._id %>', '<%= item._id %>')">
-              Return Item
-            </button>
-          <% } %>
-
-          <!-- Status indicators -->
-    <% if (item.status === 'cancelled') { %>
-          <span class="status-badge cancelled">Cancelled</span>
-        <% } else if (item.status === 'return_requested') { %>
-          <span class="status-badge return-requested">Return Requested</span>
-        <% } else if (item.status === 'returned') { %>
-          <span class="status-badge returned">Returned</span> 
-        <% } %>
-  
- 
+              <!-- Action buttons for each item -->
+              <div class="item-actions">
+                <% const activeItems=order.items.filter(i=> i.status !== 'cancelled'&&i.status!=='returned'&&
+                  i.status!=='return_requested'); %>
+                  <% const activeCount=activeItems.length; %>
+                    <% if (activeCount>1 &&
+                      order.status !== 'cancelled' &&
+                      order.status !== 'delivered' &&
+                      order.status!=='return_requested'&&
+                      order.status!=='partially_returned'&&
+                      order.status!=='payment_failed'&&
+                      item.status !== 'cancelled'&&
+                      item.status!=='returned'&&
+                      item.status!=='partially_returned'&&
+                      item.status!=='return_requested') { %>
+                      <button class="cancel-item-btn" data-order-id="<%= order._id %>" data-item-id="<%= item._id %>"
+                        onclick="openModal('cancel', '<%= order._id %>', '<%= item._id %>')">
+                        Cancel Item
+                      </button>
+                      <% } %>
 
 
 
+
+                        <% if (activeCount> 1 &&
+                          (order.status === 'delivered' || order.status === 'partially_returned') &&
+                          order.status!=='payment_failed'&&
+                          item.status !== 'returned' &&
+                          item.status!=='return_requested'&&
+                          item.status !=='cancelled'&&
+                          item.status!=='partially_cancelled') { %>
+                          <button class="return-item-btn" data-order-id="<%= order._id%>" data-item-id="<%= item._id %>"
+                            onclick="openModal('return', '<%= order._id %>', '<%= item._id %>')">
+                            Return Item
+                          </button>
+                          <% } %>
+
+                            <!-- Status indicators -->
+                            <% if (item.status==='cancelled' ) { %>
+                              <span class="status-badge cancelled">Cancelled</span>
+                              <% } else if (item.status==='return_requested' ) { %>
+                                <span class="status-badge return-requested">Return Requested</span>
+                                <% } else if (item.status==='returned' ) { %>
+                                  <span class="status-badge returned">Returned</span>
+                                  <% } %>
+
+
+
+
+
+              </div>
         </div>
       </div>
-    </div>
-    <hr class="product-divider">
-  <% }); %>
+      <hr class="product-divider">
+      <% }); %>
 
-  <div class="order-total">
-    <p><strong>Order Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %></p>
+        <div class="order-total">
+          <p><strong>Order Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %>
+          </p>
+        </div>
   </div>
-</div>
 
-<div class="shipping-details">
-  <h2>SHIPPING DETAILS</h2>
-  <p><strong><%= order.shippingAddress.name %></strong></p>
-  <p>
-    <%= order.shippingAddress.building %>, 
-    <%= order.shippingAddress.city %>, 
-    <%= order.shippingAddress.state %>, 
-    <%= order.shippingAddress.pincode %>, 
-    <%= order.shippingAddress.addressType %>
-  </p>
-  <p><strong>Phone: </strong> <%= order.shippingAddress.phone %></p>
-</div>
+  <div class="shipping-details">
+    <h2>SHIPPING DETAILS</h2>
+    <p><strong>
+        <%= order.shippingAddress.name %>
+      </strong></p>
+    <p>
+      <%= order.shippingAddress.building %>,
+        <%= order.shippingAddress.city %>,
+          <%= order.shippingAddress.state %>,
+            <%= order.shippingAddress.pincode %>,
+              <%= order.shippingAddress.addressType %>
+    </p>
+    <p><strong>Phone: </strong>
+      <%= order.shippingAddress.phone %>
+    </p>
+  </div>
 
-<%
-  const steps = ['PLACED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
-  const stepLabels = ['ORDER PLACED', 'PROCESSING', 'OUT FOR DELIVERY', 'DELIVERED'];
-
-  // Default active step
-  let activeStep = 0;
-
-  if (order.status === 'PLACED') {
-    activeStep = 0;
-  } else if (order.status === 'PROCESSING') {
-    activeStep = 1;
-  } else if (order.status === 'SHIPPED') {
-    activeStep = 2;
-  } else if (order.status === 'DELIVERED') {
-    activeStep = 3;
-  }
-%>
+  <% const steps=['PLACED', 'PROCESSING' , 'SHIPPED' , 'DELIVERED' ]; 
+     const stepLabels=['ORDER PLACED', 'PROCESSING' , 'OUT FOR DELIVERY' , 'DELIVERED' ]; 
+     /* Default active step */
+     let activeStep=0; 
+     if (order.status==='PLACED') {
+       activeStep=0; 
+     } else if (order.status==='PROCESSING') { 
+       activeStep=1; 
+     } else if (order.status==='SHIPPED') {
+       activeStep=2; 
+     } else if (order.status==='DELIVERED') { 
+       activeStep=3; 
+     } %>
 
 
-<% if (order.status.toUpperCase() === 'PENDING' || 
-       order.status.toUpperCase() === 'PROCESSING' || 
-       order.status.toUpperCase()==='PAID'||
-       order.status.toUpperCase() === 'PARTIALLY_CANCELLED') { %>
-    <div class="action-buttons">
-        <button class="action-btn cancel-btn"
-                data-order-id="<%= order._id %>"
-                data-status="<%= order.status %>"
-                onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
-    </div>
-<% } else if (order.status.toUpperCase() === 'PAYMENT_FAILED') { %>
-    <div class="action-buttons">
-        <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">
+    <% if (order.status.toUpperCase()==='PENDING' || order.status.toUpperCase()==='PROCESSING' ||
+      order.status.toUpperCase()==='PAID' || order.status.toUpperCase()==='PARTIALLY_CANCELLED' ) { %>
+      <div class="action-buttons">
+        <button class="action-btn cancel-btn" data-order-id="<%= order._id %>" data-status="<%= order.status %>"
+          onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
+      </div>
+      <% } else if (order.status.toUpperCase()==='PAYMENT_FAILED' ) { %>
+        <div class="action-buttons">
+          <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">
             Retry Payment
-        </a>
-    </div>
-<% } %>
-
-<% 
-// Compute activeCount once for reuse (eligible items for return)
-const activeItems = order.items.filter(i => i.status !== 'cancelled' && i.status !== 'returned' && i.status !== 'return_requested'); 
-const activeCount = activeItems.length; 
-%>
-
-<% if ((order.status.toUpperCase() === 'DELIVERED' || order.status.toUpperCase() === 'PARTIALLY_RETURNED') && 
-      order.status !== 'payment_failed' && activeCount > 0) { %>
-    <div class="action-buttons">
-        <% if (order.items.length === 1) { %>
-            <button class="action-btn return-btn"
-                    data-order-id="<%= order._id %>"
-                    data-status="<%= order.status %>"
-                    onclick="openModal('return', '<%= order._id %>')">
-                Return Order
-            </button>
-        <% } else { %>
-            <button class="action-btn return-order-btn"
-                    data-order-id="<%= order._id %>"
-                    data-status="<%= order.status %>"
-                    onclick="openModal('return', '<%= order._id %>')">
-                Return Order
-            </button>
+          </a>
+        </div>
         <% } %>
-    </div>
-<% } %>
+
+          <% /* Compute activeCount once for reuse (eligible items for return) */ 
+             const activeItems=order.items.filter(i=>
+             i.status !== 'cancelled' && i.status !== 'returned' && i.status !== 'return_requested');
+             const activeCount = activeItems.length;
+             %>
+
+            <% if ((order.status.toUpperCase()==='DELIVERED' || order.status.toUpperCase()==='PARTIALLY_RETURNED' ) &&
+              order.status !=='payment_failed' && activeCount> 0) { %>
+              <div class="action-buttons">
+                <% if (order.items.length===1) { %>
+                  <button class="action-btn return-btn" data-order-id="<%= order._id %>"
+                    data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">
+                    Return Order
+                  </button>
+                  <% } else { %>
+                    <button class="action-btn return-order-btn" data-order-id="<%= order._id %>"
+                      data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">
+                      Return Order
+                    </button>
+                    <% } %>
+              </div>
+              <% } %>
 
 
 
-    <p class="inquiries">Any inquiries? <a href="/user/contact">Contact us</a></p> 
+                <p class="inquiries">Any inquiries? <a href="/user/contact">Contact us</a></p>
 
-    <div class="order-status">
-        <p><%= getStatusmessage(order.status) %></p>
-        <ul>
-            <% order.statusHistory.forEach(history => { %>
-                <li>
-                    <strong><%= history.message %></strong>
-                    <br>
-                    <small style="color: #777;"><%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></small>
-                    <span><%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
-                </li>
-            <% }) %>
-        </ul>
-    </div>
+                <div class="order-status">
+                  <p>
+                    <%= getStatusmessage(order.status) %>
+                  </p>
+                  <ul>
+                    <% order.statusHistory.forEach(history=> { %>
+                      <li>
+                        <strong>
+                          <%= history.message %>
+                        </strong>
+                        <br>
+                        <small style="color: #777;">
+                          <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short' , month: 'short' ,
+                            day: 'numeric' }) %>
+                        </small>
+                        <span>
+                          <%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit' , minute: '2-digit'
+                            }) %>
+                        </span>
+                      </li>
+                      <% }) %>
+                  </ul>
+                </div>
 </div>
 
 <!-- Cancel Order Modal -->
 <div id="cancelModal" class="modal">
-    <div class="modal-content">
-        <h3>Cancel Order</h3>
-        <p>Please tell us why you're canceling this order:</p>
-          <div class="reason-suggestions">
-            <div class="reason-chip" data-reason="Changed my mind">Changed my mind</div>
-            <div class="reason-chip" data-reason="Found a better price">Found a better price</div>
-            <div class="reason-chip" data-reason="Ordered by mistake">Ordered by mistake</div>
-            <div class="reason-chip" data-reason="Delivery time too long">Delivery time too long</div>
-            <div class="reason-chip" data-reason="Other reason">Other reason</div>
-        </div>
-        <textarea id="cancelReason" placeholder="Your reason..."></textarea>
-        <div class="modal-actions">
-            <button class="modal-btn modal-cancel" type="button"  onclick="closeModal()">Cancel</button>
-            <button class="modal-btn modal-submit" type="button" onclick="submitCancel(event)">Submit Request</button>
-        </div>
+  <div class="modal-content">
+    <h3>Cancel Order</h3>
+    <p>Please tell us why you're canceling this order:</p>
+    <div class="reason-suggestions">
+      <div class="reason-chip" data-reason="Changed my mind">Changed my mind</div>
+      <div class="reason-chip" data-reason="Found a better price">Found a better price</div>
+      <div class="reason-chip" data-reason="Ordered by mistake">Ordered by mistake</div>
+      <div class="reason-chip" data-reason="Delivery time too long">Delivery time too long</div>
+      <div class="reason-chip" data-reason="Other reason">Other reason</div>
     </div>
+    <textarea id="cancelReason" placeholder="Your reason..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-submit" type="button" onclick="submitCancel(event)">Submit Request</button>
+    </div>
+  </div>
 </div>
 <!-- Return Order Modal -->
 <div id="returnModal" class="modal">
-    <div class="modal-content">
-        <h3>Return Item</h3>
-        <p>Please tell us why you're returning this item:</p>
-           <div class="reason-suggestions">
-            <div class="reason-chip" data-reason="Item damaged">Item damaged</div>
-            <div class="reason-chip" data-reason="Wrong item received">Wrong item received</div>
-            <div class="reason-chip" data-reason="Not as described">Not as described</div>
-            <div class="reason-chip" data-reason="Size doesn't fit">Size doesn't fit</div>
-            <div class="reason-chip" data-reason="Other reason">Other reason</div>
-        </div>
-        <textarea id="returnReason" placeholder="Your reason..."></textarea>
-        <div class="modal-actions">
-            <!-- <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
+  <div class="modal-content">
+    <h3>Return Item</h3>
+    <p>Please tell us why you're returning this item:</p>
+    <div class="reason-suggestions">
+      <div class="reason-chip" data-reason="Item damaged">Item damaged</div>
+      <div class="reason-chip" data-reason="Wrong item received">Wrong item received</div>
+      <div class="reason-chip" data-reason="Not as described">Not as described</div>
+      <div class="reason-chip" data-reason="Size doesn't fit">Size doesn't fit</div>
+      <div class="reason-chip" data-reason="Other reason">Other reason</div>
+    </div>
+    <textarea id="returnReason" placeholder="Your reason..."></textarea>
+    <div class="modal-actions">
+      <!-- <button class="modal-btn modal-cancel"   type="button" data-order-id="<%= order._id %>" onclick="closeModal()">Cancel</button>
             <button class="modal-btn modal-submit"  type="button"  data-order-id="<%= order._id %>" onclick="submitReturn(event)">Submit Request</button> -->
 
-<button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
-<button class="modal-btn modal-submit" type="button" onclick="submitReturn(event)">Submit Request</button>
+      <button class="modal-btn modal-cancel" type="button" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-submit" type="button" onclick="submitReturn(event)">Submit Request</button>
 
-        </div>
     </div>
+  </div>
 </div>
