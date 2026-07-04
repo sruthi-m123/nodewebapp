@@ -19,7 +19,7 @@ import * as razorpayController from "../controller/user/razorpayController.js";
 import * as aboutusController from "../controller/user/aboutUs.controller.js";
 import * as contactUsController from "../controller/user/contactUs.controller.js";
 
-import { isLoggedIn, checkBlocked } from "../middlewares/auth.js";
+import { isLoggedIn, checkBlocked, isNotLoggedIn } from "../middlewares/auth.js";
 import { upload } from "../config/multer.js";
 import { validate } from "../middlewares/validate.js";
 import * as V from "../validators/index.js";
@@ -27,11 +27,11 @@ import * as V from "../validators/index.js";
 const router = express.Router();
 
 router.get("/home", userController.loadHomepage);
-router.get("/signup", userController.loadSignup);
-router.get("/shop", shopController.loadShopping);
+router.get("/signup", isNotLoggedIn, userController.loadSignup);
+router.get("/shop", isNotLoggedIn, shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);
 
-router.post("/signup", userController.signup);
+router.post("/signup", isNotLoggedIn, validate(V.signupSchema), userController.signup);
 router.post("/send-otp", userController.sendOtp);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
@@ -145,8 +145,8 @@ router.post("/verifyPayment", checkBlocked, validate(V.verifyPaymentSchema), raz
 router.post("/mark-payment-failed", checkBlocked, validate(V.markPaymentFailedSchema), razorpayController.markPaymentFailed);
 
 // Order success/failure
-router.get("/order-success/:orderId", checkBlocked, validate(V.getOrderDetailsSchema), checkoutController.successPage);
-router.get("/order-failure/:orderId", validate(V.getOrderDetailsSchema), checkoutController.failurePage);
+router.get("/order-success/:orderId", isLoggedIn, checkBlocked, validate(V.getOrderDetailsSchema), checkoutController.successPage);
+router.get("/order-failure/:orderId", isLoggedIn, checkBlocked, validate(V.getOrderDetailsSchema), checkoutController.failurePage);
 
 // Order history and details
 router.get("/orders", isLoggedIn, checkBlocked, orderController.getOrderHistory);

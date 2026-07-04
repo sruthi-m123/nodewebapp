@@ -151,11 +151,20 @@ export const handleLogin=async(email,password)=>{
 
     if(findUser.isBlocked){
         return {success:false,message:'User is blocked by admin'};
-            }
-            const passwordMatch=await bcrypt.compare(password,findUser.password);
-            if(!passwordMatch){
-                return {success:false,message:'Incorrect password'}
-            }
+    }
+
+    if(!findUser.password && findUser.googleId){
+        return {success:false,message:'This account is linked with Google. Please log in using Google.'}
+    }
+
+    if(!findUser.password){
+        return {success:false,message:'Incorrect password'}
+    }
+
+    const passwordMatch=await bcrypt.compare(password,findUser.password);
+    if(!passwordMatch){
+        return {success:false,message:'Incorrect password'}
+    }
 
            const userSessionData = {
     id: findUser._id,

@@ -347,6 +347,12 @@
         document.getElementById('categoryForm').addEventListener('submit', function (e) {
           e.preventDefault();
 
+          const hasExistingImage = document.getElementById('previewArea').querySelector('.existing-image') !== null;
+          if (!hasExistingImage && !croppedImage) {
+            showToast('Category image is required', 'error');
+            return;
+          }
+
           const formData = new FormData(this);
 
           const isActive = document.getElementById('isActive').checked;
@@ -404,11 +410,11 @@
                 showToast(`Category ${action} successfully!`, 'success');
                 location.reload();
               } else {
-                showToast(data.message || 'Error saving category', 'error');
+                showToast(data.message || (data.alert && data.alert.text) || 'Error saving category', 'error');
               }
             })
             .catch(error => {
-              showToast(error.message || 'Error saving category', 'error');
+              showToast(error.message || (error.alert && error.alert.text) || 'Error saving category', 'error');
             });
         });
 
@@ -418,6 +424,13 @@
         document.getElementById('cropImageInput').addEventListener('change', function (e) {
           const file = e.target.files[0];
           if (!file) return;
+
+          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+          if (!allowedTypes.includes(file.type)) {
+            showToast('Please select a valid image file (PNG, JPEG, GIF, WEBP)', 'error');
+            e.target.value = '';
+            return;
+          }
 
           document.getElementById('previewArea').innerHTML = '';
 
@@ -441,8 +454,17 @@
         });
 
         document.getElementById('cropButton').addEventListener('click', function () {
+          if (!cropper) return;
           const canvas = cropper.getCroppedCanvas();
+          if (!canvas) {
+            showToast('Failed to crop image. Make sure it is a valid image.', 'error');
+            return;
+          }
           canvas.toBlob(function (blob) {
+            if (!blob) {
+              showToast('Failed to crop image. Make sure it is a valid image.', 'error');
+              return;
+            }
             const imageUrl = URL.createObjectURL(blob);
 
             const container = document.createElement("div");
@@ -474,6 +496,7 @@
             croppedImage = blob;
 
             cropper.destroy();
+            cropper = null;
             document.getElementById('cropPreview').style.display = "none";
             document.getElementById('cropButton').style.display = "none";
           });

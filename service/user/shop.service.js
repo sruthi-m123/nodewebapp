@@ -132,7 +132,7 @@ static async applyOffersToProducts(products){
 
         let newDiscountedPrice;
         if(bestOffer.discount>0){
-            product.bestOffer=bestOffer._id;
+            product.bestOffer=bestOffer;
             newDiscountedPrice=Math.round((product.price-bestOffer.discount)*100)/100;
             product.discountedPrice=newDiscountedPrice;
         }else{
@@ -147,7 +147,7 @@ static async applyOffersToProducts(products){
                 filter:{_id:product._id},
                 update:{$set:{
                     discountedPrice:newDiscountedPrice,
-                    bestOffer:product.bestOffer||null
+                    bestOffer:bestOffer._id||null
                 }}
             }
         });

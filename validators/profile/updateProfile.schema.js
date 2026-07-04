@@ -8,9 +8,6 @@ export const updateProfileSchema = Joi.object({
     phone: Joi.string().pattern(/^[0-9]{10}$/).required().messages({
         'string.pattern.base': 'Phone must be 10 digits',
         'string.empty': 'Phone is required'
-    }),
-    gender: Joi.string().valid('Male', 'Female', 'Other', 'Prefer not say').default('Prefer not say').messages({
-        'any.only': 'Invalid gender selection'
     })
 })
 .options({ stripUnknown: true })

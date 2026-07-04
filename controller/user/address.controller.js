@@ -1,5 +1,4 @@
 import * as addressService from "../../service/user/address.service.js";
-import { addressSchema } from "../../validators/address/address.schema.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 import { MESSAGES } from "../../utils/messages.js";
 import logger from "../../utils/logger.js";
@@ -33,12 +32,8 @@ export const addAddress = async (req, res) => {
     return res.status(404).json({success:false,message:"please login to continue ."})
   }
   logger.info('Adding new address', { userId });
-  const { error, value } = addressSchema.validate(req.body, { abortEarly: false });
+  const value = req.validatedData;
   console.log("value inside the address controller:",value);
-  if (error) {
-    const messages = error.details.map((err) => err.message).join(", ");
-    throw Object.assign(new Error(messages), { status: STATUS_CODES.BAD_REQUEST })
-  }
   const result = await addressService.addAddressService(userId, value);
   res.status(STATUS_CODES.SUCCESS).json({
     success: true,
@@ -79,16 +74,7 @@ export const updateAddress = async (req, res) => {
 
   logger.info('updating address', { userId, addressId });
 
-  const updates = {
-    ...req.body,
-  }
-
-  const { error, value } = addressSchema.validate(updates, { abortEarly: false });
-  if (error) {
-    const messages = error.details.map((err) => err.message).join(",");
-    throw Object.assign(new Error(messages),
-      { status: STATUS_CODES.BAD_REQUEST });
-  }
+  const value = req.validatedData;
 
   await addressService.updateAddressService(userId, addressId, value);
 

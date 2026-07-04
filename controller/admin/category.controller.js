@@ -40,6 +40,10 @@ export const addCategory = async (req, res) => {
   if (exists) throw Object.assign(new Error("category already exists"), { status: STATUS_CODES.CONFLICT }); // Changed to CONFLICT for duplicate
 
   const imageUrl = req.file?.path || null;
+  if (!imageUrl) {
+    throw Object.assign(new Error("Category image is required"), { status: STATUS_CODES.BAD_REQUEST });
+  }
+
   const category = await categoryService.create({ ...req.validatedData, image: imageUrl });
 
   logger.info(`New category added: ${category.name}`);
@@ -49,15 +53,29 @@ export const addCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   console.log("inside the update category controler ");
   const { id } = req.params;
-  const { name, description,removeExistingImage } = req.validatedData; 
-  console.log("removeExistingImage",removeExistingImage);
+  const { name, description, removeExistingImage } = req.validatedData; 
+  console.log("removeExistingImage", removeExistingImage);
   const duplicate = await categoryService.existsByName(name, id);
   if (duplicate) throw Object.assign(new Error("category name already exists"), { status: STATUS_CODES.CONFLICT });
 
+  const category = await categoryService.getById(id);
+  if (!category) throw Object.assign(new Error("category not found"), { status: STATUS_CODES.NOT_FOUND });
+
+  if (removeExistingImage && !req.file) {
+    throw Object.assign(new Error("Category image is required"), { status: STATUS_CODES.BAD_REQUEST });
+  }
+
   const updateData = { ...req.validatedData };
+
+  if (removeExistingImage) {
+    if (category.image) {
+      await deleteFromCloudinary(category.image, "categories");
+    }
+    updateData.image = null;
+  }
+
   if (req.file) {
-    const category = await categoryService.getById(id);
-    if (category?.image) {
+    if (category.image) {
       await deleteFromCloudinary(category.image, "categories");
     }
     updateData.image = req.file.path;

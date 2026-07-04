@@ -39,35 +39,15 @@
       </a>
 
       <div class="menu-title">Management</div>
-      <div class="has-submenu">
-        <a href="#" class="menu-item">
-          <i class="fas fa-th-large"></i>
-          <span class="menu-text">Categories</span>
-          <i class="fas fa-chevron-right submenu-toggle"></i>
-        </a>
-        <div class="submenu">
-          <a href="/admin/categories" class="menu-item">
-            <span class="menu-text">All Categories</span>
-          </a>
-          <!-- <a href="/admin/addCategories" class="menu-item">
-            <span class="menu-text">Add New</span>
-          </a> -->
-        </div>
-      </div>
+      <a href="/admin/categories" class="menu-item">
+        <i class="fas fa-th-large"></i>
+        <span class="menu-text">Categories</span>
+      </a>
 
-      <div class="has-submenu">
-        <a href="#" class="menu-item">
-          <i class="fas fa-box"></i>
-          <span class="menu-text">Products</span>
-          <i class="fas fa-chevron-right submenu-toggle"></i>
-        </a>
-        <div class="submenu">
-          <a href="/admin/products" class="menu-item">
-            <span class="menu-text">All Products</span>
-          </a>
-
-        </div>
-      </div>
+      <a href="/admin/products" class="menu-item">
+        <i class="fas fa-box"></i>
+        <span class="menu-text">Products</span>
+      </a>
 
       <a href="/admin/orders" class="menu-item">
         <i class="fas fa-shopping-cart"></i>
@@ -175,10 +155,6 @@
           }
         }
 
-        :root {
-          --primary-color: unset;
-
-        }
       </style>
       <script>
         document.addEventListener('DOMContentLoaded', () => {

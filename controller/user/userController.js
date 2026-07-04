@@ -10,6 +10,8 @@ import Category from "../../models/categorySchema.js";
 import Product from "../../models/productSchema.js";
 import Testimonial from "../../models/testimonialSchema.js";
 import Wallet from "../../models/walletSchema.js";
+import { signupSchema } from "../../validators/index.js";
+
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -91,23 +93,34 @@ export const loadSignup = async (req, res) => {
 
 export const signup = async (req, res) => {
   logger.info('Processing signUp');
-  console.log("req body inside the signup:",req.body)
-  const { name, phone, email, password, confirmPassword, referralCode } = req.body;
-  
-  if (password !== confirmPassword) {
-    return res.render('user/signup', { layout: false, pageCSS: 'signup.css', message: MESSAGES.SIGNUP_PASSWORD_MISMATCH });
+  const { error, value } = signupSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    const firstErrorMessage = error.details[0].message;
+    return res.render('user/signup', {
+      layout: false,
+      pageCSS: 'signup.css',
+      message: firstErrorMessage,
+      formData: req.body
+    });
   }
+  const { name, phone, email, password, referralCode } = value;
+
 
   const result = await userService.handleSingup({ name, phone, email, password, referralCode });
 
   if (!result.success) {
     logger.warn('Signup failed', { error: result.message });
-    return res.render('user/signup', { layout: false, pageCSS: 'signup.css', message: result.message });
+    return res.render('user/signup', {
+      layout: false,
+      pageCSS: 'signup.css',
+      message: result.message,
+      formData: req.body
+    });
   }
 
   req.session.userData = result.sessionUserData;
   req.session.userOtp = result.otp;
-  req.session.otpExpires = Date.now() + 5 * 60 * 1000;
+  req.session.otpExpires = Date.now() + 60 * 1000;
   req.session.referralInfo = result.referralInfo;
 
   await req.session.save();
@@ -135,7 +148,7 @@ export const verifyOtp = async (req, res) => {
   const { otp } = req.body;
   const session = req.session;
   const result = await userService.verifySignupOtp(otp, session);
-  
+
   if (!result.success) {
     logger.warn('OTP verification failed', { error: result.message });
     return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.message });
@@ -154,10 +167,10 @@ export const resendOtp = async (req, res) => {
   const result = await userService.resendSignupOtp(email);
   if (!result.success) {
     logger.warn('OTP resend failed', { error: result.message });
-    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: result.message });
+    return res.status(STATUS_CODES.INTERNAL_ERROR).json({ success: false, message: result.message });
   }
-  req.session.userOtp=result.otp;
-  req.session.otpExpires=Date.now()+60*1000;
+  req.session.userOtp = result.otp;
+  req.session.otpExpires = Date.now() + 60 * 1000;
 
   await req.session.save();
   res.json({ success: true, message: MESSAGES.OTP_RESENT_SUCCESS });
@@ -176,7 +189,7 @@ export const login = async (req, res) => {
   const trimmedPassword = password.trim();
 
   const result = await userService.handleLogin(trimmedEmail, trimmedPassword);
-  
+
   if (!result.success) {
     logger.warn('Login failed', { error: result.message });
     return res.render('user/login', { layout: false, message: result.message });
@@ -257,7 +270,7 @@ export const loadResetPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   logger.info('Processing password reset');
   const { userId, newPassword, confirmPassword } = req.body;
-  
+
   if (newPassword !== confirmPassword) {
     return res.render('user/resetPassword', {
       layout: false,
@@ -282,7 +295,7 @@ export const resetPassword = async (req, res) => {
 export const resetforgotPassword = async (req, res) => {
   logger.info('Processing forgot password reset');
   const { newPassword, confirmPassword, userId } = req.body;
-  
+
   if (newPassword !== confirmPassword) {
     return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.RESET_PASSWORD_MISMATCH });
   }

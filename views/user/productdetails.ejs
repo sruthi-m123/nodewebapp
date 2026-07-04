@@ -26,7 +26,7 @@
               <p class="discount-percent">
                 <% if (product.bestOffer.type==='percentage' ) { %>
                   (<%= product.bestOffer.discountValue %>% OFF)
-                    <% } else if (product.bestOffer.type==='flat' ) { %>
+                    <% } else if (product.bestOffer.type==='flat' || product.bestOffer.type==='fixed' ) { %>
                       (₹<%= product.bestOffer.discountValue.toLocaleString('en-IN') %> OFF)
                         <% } %>
               </p>

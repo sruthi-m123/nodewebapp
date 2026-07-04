@@ -13,8 +13,8 @@
         <button type="submit" id="searchBtn">Search</button>
         <% if (search) { %>
           <a href="/admin/products" class="reset-btn" id="resetBtn">Reset</a>
-        <% } %>
-        <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
+          <% } %>
+            <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
       </div>
     </div>
 
@@ -78,7 +78,8 @@
                       <% } %>
                 </td>
                 <td>
-                  <button id="product-status-btn-<%= product._id %>" class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>"
+                  <button id="product-status-btn-<%= product._id %>"
+                    class="action-btn <%= product.isActive ? 'unblock-btn' : 'block-btn' %>"
                     onclick="toggleProductStatus('<%= product._id %>', <%= !product.isActive %>)">
                     <%= product.isActive ? 'Active' : 'Inactive' %>
                   </button>
@@ -647,27 +648,50 @@
           method,
           body: formData
         })
-          .then(res => res.json())
+          .then(async res => {
+            if (!res.ok) {
+              const err = await res.json();
+              throw err;
+            }
+            return res.json();
+          })
           .then(data => {
             if (data.success) {
               resetImageState();
               showToast(currentProductId ? 'Product updated successfully' : 'Product added successfully', 'success');
               setTimeout(() => location.reload(), 2000);
             } else {
-              showToast(data.message || 'Error saving product', 'error');
+              showToast(data.message || (data.alert && data.alert.text) || 'Error saving product', 'error');
             }
           })
           .catch(error => {
             console.error('Error saving product:', error);
             resetImageState();
-            showToast('Error saving product', 'error');
+            showToast(error.message || (error.alert && error.alert.text) || 'Error saving product', 'error');
           });
       });
 
       // Image selection listener
       document.getElementById('cropImageInput').addEventListener('change', function (e) {
         const newFiles = Array.from(e.target.files);
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+
+        let hasInvalid = false;
+        const validFiles = [];
+
         newFiles.forEach(file => {
+          if (allowedTypes.includes(file.type)) {
+            validFiles.push(file);
+          } else {
+            hasInvalid = true;
+          }
+        });
+
+        if (hasInvalid) {
+          showToast('Some files were ignored. Only images (PNG, JPEG, GIF, WEBP) are allowed.', 'error');
+        }
+
+        validFiles.forEach(file => {
           const id = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
           imageItems.push({
             id,
@@ -688,7 +712,15 @@
         if (!activeImageId || !cropper) return;
 
         const canvas = cropper.getCroppedCanvas();
+        if (!canvas) {
+          showToast('Failed to crop image. Make sure it is a valid image.', 'error');
+          return;
+        }
         canvas.toBlob(function (blob) {
+          if (!blob) {
+            showToast('Failed to crop image. Make sure it is a valid image.', 'error');
+            return;
+          }
           const item = imageItems.find(i => i.id === activeImageId);
           if (item) {
             if (item.croppedUrl) URL.revokeObjectURL(item.croppedUrl);

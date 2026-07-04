@@ -168,27 +168,6 @@
         </div>
       </div>
 
-      <!-- Gender Field -->
-      <div class="form-group">
-        <label>Gender</label>
-        <div class="radio-group">
-          <label class="radio-option">
-            <input type="radio" name="gender" value="Male" <%= user.gender === 'Male' ? 'checked' : '' %>>
-            <span class="radio-checkmark"></span>
-            <span class="radio-label">Male</span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="gender" value="Female" <%= user.gender === 'Female' ? 'checked' : '' %>>
-            <span class="radio-checkmark"></span>
-            <span class="radio-label">Female</span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="gender" value="Other" <%= !['Male', 'Female'].includes(user.gender) ? 'checked' : '' %>>
-            <span class="radio-checkmark"></span>
-            <span class="radio-label">Prefer Not to Say</span>
-          </label>
-        </div>
-      </div>
 
       <!-- Email Field -->
       <div class="form-group email-box">
@@ -282,7 +261,10 @@
       <form id="emailChangeForm">
         <div class="form-group">
           <label for="newEmail">New Email Address</label>
-          <input type="email" id="newEmail" name="newEmail" required>
+          <div style="display: flex; gap: 8px;">
+            <input type="email" id="newEmail" name="newEmail" required style="flex: 1;">
+            <button type="button" id="editEmailBtn" style="display: none; padding: 4px 10px; font-size: 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+          </div>
         </div>
         <div class="form-group" id="otpField" style="display:none;">
           <label for="otp">Verification Code</label>
@@ -415,13 +397,20 @@ document.addEventListener('DOMContentLoaded', function() {
   // Close Modals
   closeButtons.forEach(button => {
     button.addEventListener('click', function() {
-      this.closest('.modal').style.display = 'none';
+      const modal = this.closest('.modal');
+      modal.style.display = 'none';
+      if (modal.id === 'emailModal') {
+        resetEmailModal();
+      }
     });
   });
 
   window.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal')) {
       e.target.style.display = 'none';
+      if (e.target.id === 'emailModal') {
+        resetEmailModal();
+      }
     }
   });
 
@@ -488,6 +477,52 @@ document.addEventListener('DOMContentLoaded', function() {
   // Email Change Form
   let emailChangeStep = 'request'; // 'request' or 'verify'
   let tempEmail = '';
+  const editEmailBtn = document.getElementById('editEmailBtn');
+
+  function resetEmailModal() {
+    if (emailForm) emailForm.reset();
+    const errorElement = document.getElementById('email-error-msg');
+    if (errorElement) errorElement.textContent = '';
+    const otpField = document.getElementById('otpField');
+    const newEmailInput = document.getElementById('newEmail');
+    const otpInput = document.getElementById('otp');
+    const emailSubmitBtn = document.getElementById('emailSubmitBtn');
+    if (otpField) otpField.style.display = 'none';
+    if (otpInput) otpInput.removeAttribute('required');
+    if (newEmailInput) newEmailInput.readOnly = false;
+    if (editEmailBtn) editEmailBtn.style.display = 'none';
+    if (emailSubmitBtn) {
+      emailSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Code';
+    }
+    emailChangeStep = 'request';
+    tempEmail = '';
+  }
+
+  if (editEmailBtn) {
+    editEmailBtn.addEventListener('click', function() {
+      emailChangeStep = 'request';
+      tempEmail = '';
+      const newEmailInput = document.getElementById('newEmail');
+      const otpField = document.getElementById('otpField');
+      const otpInput = document.getElementById('otp');
+      const emailSubmitBtn = document.getElementById('emailSubmitBtn');
+      const errorElement = document.getElementById('email-error-msg');
+      if (newEmailInput) {
+        newEmailInput.readOnly = false;
+        newEmailInput.focus();
+      }
+      if (otpField) otpField.style.display = 'none';
+      if (otpInput) {
+        otpInput.removeAttribute('required');
+        otpInput.value = '';
+      }
+      editEmailBtn.style.display = 'none';
+      if (emailSubmitBtn) {
+        emailSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Code';
+      }
+      if (errorElement) errorElement.textContent = '';
+    });
+  }
 
   emailForm?.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -525,8 +560,9 @@ document.addEventListener('DOMContentLoaded', function() {
           tempEmail = newEmail;
           emailChangeStep = 'verify';
           otpField.style.display = 'block';
-           otpInput.setAttribute('required', true);
+          otpInput.setAttribute('required', true);
           newEmailInput.readOnly = true;
+          if (editEmailBtn) editEmailBtn.style.display = 'inline-block';
           emailSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verify Code';
           Swal.fire('Verification code sent', 'Please check your email for the verification code.', 'info');
         } else {
@@ -601,12 +637,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = e.target;
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
-    const genderInput = form.querySelector('input[name="gender"]:checked');
-    const gender = genderInput ? genderInput.value : null;
     const errorElement = document.getElementById('error-msg');
     
     const phoneRegex = /^[6-9]\d{9}$/;
-    const allowedGenders = ["Male", "Female", "Other"];
 
     // Validation
     if (name.length === 0) {
@@ -616,11 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (phone && !phoneRegex.test(phone)) {
       errorElement.textContent = 'Please enter a valid 10-digit Indian phone number';
-      return;
-    }
-
-    if (!gender || !allowedGenders.includes(gender)) {
-      errorElement.textContent = 'Please select a valid gender';
       return;
     }
 
