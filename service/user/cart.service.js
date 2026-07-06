@@ -260,7 +260,6 @@ export const validateCartService=async(userId)=>{
         const product=item.productId;
         if(!product||
             !product.isActive||
-            product.isBlocked ||
             product.isDeleted ||
             product.stock<item.quantity){
                 invalidItems.push(product?product.productName:"Unknown Product");

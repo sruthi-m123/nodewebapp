@@ -49,7 +49,6 @@ if(existing && existing.isDeleted){
         images:imageUrls.length?imageUrls:existing.images,
         isDeleted:false,
         isActive:true,
-        isBlocked:false
     });
     await existing.save();
     return {type:"RESTORED",product:existing};

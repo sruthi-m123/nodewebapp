@@ -62,17 +62,7 @@
                   <button id="minus-btn">-</button>
                   <input type="text" id="quantity" value="1" data-stock="<%= product.stock %>" data-limit="<%=limit%>">
                   <button id="plus-btn">+</button>
-                  <% } else { %>
-                    <!-- All Products Page (inside loop) -->
-                    <% products.forEach((product)=> { %>
-                      <div class="qty-control">
-                        <button class="qty-btn minus">-</button>
-                        <input type="text" class="quantity-input" value="1" data-stock="<%= product.stock %>"
-                          data-limit="<%=limit%>">
-                        <button class="qty-btn plus">+</button>
-                      </div>
-                      <% }) %>
-                        <% } %>
+                <% } %>
 
                           <div class="product" data-product-id="<%= product._id %>">
   <div class="actions">
@@ -109,7 +99,7 @@
         <div class="tab-content" id="details">
           <ul>
             <li><strong>Category:</strong>
-              <%= product.productName%>
+              <%= product.category?.name || 'N/A' %>
             </li>
             <li><strong>Color:</strong>
               <%= product.color %>
@@ -121,7 +111,7 @@
               <%= product.isNewArrival ? "Yes" : "No" %>
             </li>
             <li><strong>Status:</strong>
-              <%= product.status %>
+              <%= product.isActive ? 'Active' : 'Inactive' %>
             </li>
             <!-- <li><strong>Created At:</strong> <%= product.createdAt.toDateString() %></li> -->
           </ul>

@@ -15,8 +15,8 @@ console.log("req.validateData",req.validatedData);
   const { offers, totalPages } = await offerService.getOffersService(currentPage, 6, offerType);
   console.log("offers:",offers);
 
-  const products = await Product.find({});
-  const categories = await Category.find({ status: 'active' }).sort({ name: 1 });
+  const products = await Product.find({ isActive: true, isDeleted: false }).select('productName price images');
+  const categories = await Category.find({ status: 'active', isDeleted: false }).sort({ name: 1 });
 
   res.render("admin/offer", {
     layout: false,

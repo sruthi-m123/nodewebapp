@@ -43,7 +43,7 @@ console.log("wishlist :",wishlist);
                  const product=await Product.findOne({
                     _id:productId,
                     isDeleted:false,
-                    isBlocked:false,
+                    isActive:true,
                     status:"In Stock"
                  })
                 if(!product){

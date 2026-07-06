@@ -61,10 +61,6 @@ const productSchema= new Schema({
     type: Boolean,
     default: true,
   },
-    isBlocked:{
-        type:Boolean,
-        default:false
-    },
      isDeleted: { type: Boolean, default: false },
     status:{
 type:String,

@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   setupCartEventListeners();
-  
+
   calculateGrandTotal();
-  
+
   fetchCartCount();
-  
+
   checkFor401Message();
 });
 
@@ -15,32 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
 function checkFor401Message() {
   const urlParams = new URLSearchParams(window.location.search);
   const errorMessage = urlParams.get('error');
-  
-if(errorMessage){
-  try {
-    const errorData=JSON.parse(errorMessage);
-    if(errorData.message){
-    showAlert('Unauthorized', errorData.message, 'error');
 
-    }else{
-    showAlert('Unauthorized', errorMessage, 'error');
+  if (errorMessage) {
+    try {
+      const errorData = JSON.parse(errorMessage);
+      if (errorData.message) {
+        showAlert('Unauthorized', errorData.message, 'error');
 
+      } else {
+        showAlert('Unauthorized', errorMessage, 'error');
+
+      }
+    } catch (error) {
+      showAlert('Unauthorized', errorMessage, 'error');
     }
-  } catch (error) {
-       showAlert('Unauthorized', errorMessage, 'error');
   }
+
+
+
+
+  const cleanUrl = window.location.pathname;
+  window.history.replaceState({}, document.title, cleanUrl);
+
 }
 
-
-
-    
-    // Clean URL without reloading page
-    const cleanUrl = window.location.pathname;
-    window.history.replaceState({}, document.title, cleanUrl);
-  
-}
-
-// Set up all cart event listeners
 function setupCartEventListeners() {
   // Add to cart buttons
   document.querySelectorAll('.add-to-cart').forEach(button => {
@@ -113,7 +111,7 @@ function updateQuantity(itemId, change) {
 // Update quantity with direct input
 function updateQuantityInput(itemId, value) {
   value = parseInt(value);
-  if(isNaN(value)) value = 1;
+  if (isNaN(value)) value = 1;
   const container = document.querySelector(`.quantity-selector[data-id="${itemId}"]`);
   const maxStock = parseInt(container.dataset.stock);
   const limit = 10;
@@ -180,7 +178,7 @@ async function addToCart(productId, quantity = 1) {
     }
 
     const data = await response.json();
-    
+
     if (response.ok) {
       handleAddToCart(data);
     } else {
@@ -209,7 +207,7 @@ async function removeItem(itemId) {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include' 
+      credentials: 'include'
     });
 
     // Handle 401 responses
@@ -218,7 +216,7 @@ async function removeItem(itemId) {
       showAlert('Unauthorized', errorData.message || 'Please log in to manage your cart.', 'error');
       return;
     }
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to remove item');
@@ -228,7 +226,7 @@ async function removeItem(itemId) {
     document.querySelector(`tr[data-id="${itemId}"]`).remove();
     calculateGrandTotal();
     updateCartCount(data.cartCount);
-    
+
     if (document.querySelectorAll('#cart-items tr').length === 0) {
       window.location.reload();
     }
@@ -264,7 +262,7 @@ async function updateCart() {
       showAlert('Unauthorized', errorData.message || 'Please log in to update your cart.', 'error');
       return;
     }
-    
+
     if (response.ok) {
       const data = await response.json();
       updateCartCount(data.cartCount);
@@ -287,7 +285,7 @@ async function fetchCartCount() {
       showAlert('Unauthorized', errorData.message || 'Please log in to view your cart.', 'error');
       return;
     }
-    
+
     if (response.ok) {
       const data = await response.json();
       updateCartCount(data.cartCount);
@@ -316,7 +314,6 @@ function showAlert(title, text, icon) {
     showConfirmButton: false
   });
 }
-// Proceed to checkout (now with optional flag to avoid re-prompt after removal)
 async function checkout(justRemoved = false) {
   try {
     const response = await fetch('/user/cart/validate-cart', { method: 'GET' });
@@ -324,16 +321,8 @@ async function checkout(justRemoved = false) {
     console.log("Validation result:", { success: data.success, invalidIds: data.invalidProductIds?.length, message: data.message });
 
     if (data.success) {
-      Swal.fire({
-        title: 'All Good!',
-        text: 'Your cart has been validated successfully.',
-        icon: 'success',
-        confirmButtonText: 'Proceed to Checkout',
-        confirmButtonColor: '#3085d6',
-      }).then(() => {
-        window.location.href = '/user/checkout';
-      });
-      return;  // Exit early
+      window.location.href = '/user/checkout';
+      return;
     }
 
     // If cart empty
@@ -348,9 +337,7 @@ async function checkout(justRemoved = false) {
       return;
     }
 
-    // Check if partial invalid
     if (data.invalidProductIds && data.invalidProductIds.length > 0) {
-      // If just removed, don't re-offer removal—assume user wants to proceed or manual fix
       if (justRemoved) {
         Swal.fire({
           title: 'Still Issues!',
@@ -362,7 +349,6 @@ async function checkout(justRemoved = false) {
         return;
       }
 
-      // Normal partial invalid prompt
       Swal.fire({
         title: 'Hold on!',
         text: `${data.message} Would you like to remove them and proceed?`,
@@ -374,9 +360,8 @@ async function checkout(justRemoved = false) {
         cancelButtonColor: '#3085d6',
       }).then(async (result) => {
         if (result.isConfirmed) {
-          return;  // Close, no action
+          return;
         }
-        // Remove and re-call with flag
         try {
           const removeResponse = await fetch('/user/cart/remove-invalid', {
             method: 'POST',
@@ -384,11 +369,9 @@ async function checkout(justRemoved = false) {
             body: JSON.stringify({ invalidProductIds: data.invalidProductIds }),
           });
           const removeData = await removeResponse.json();
-          console.log('Removal result:', removeData);  // Debug
+          console.log('Removal result:', removeData);
           if (removeData.success) {
-            // Optional UI update
-            // document.getElementById('cartTotal').textContent = `$${removeData.newCartTotal.toFixed(2)}`;
-            
+
             Swal.fire({
               title: 'Updated!',
               text: `${removeData.message} (${removeData.removedCount} item(s) removed). Proceeding to checkout...`,
@@ -396,7 +379,6 @@ async function checkout(justRemoved = false) {
               timer: 2000,
               showConfirmButton: false,
             }).then(() => {
-              // Re-run with flag to avoid re-prompt
               checkout(true);
             });
           } else {

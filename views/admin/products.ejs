@@ -4,18 +4,29 @@
 
   <link rel="stylesheet" href="/css/admin/category.css">
   <div class="category-page">
-    <div class="product-header">
-      <h2>Products</h2>
-      <div class="search-bar">
-        <form action="/admin/products" method="GET">
-          <input type="text" name="search" id="searchBox" placeholder="Search for products" value="<%= search || '' %>">
-        </form>
-        <button type="submit" id="searchBtn">Search</button>
-        <% if (search) { %>
-          <a href="/admin/products" class="reset-btn" id="resetBtn">Reset</a>
-          <% } %>
-            <button type="button" class="demo-button" onclick="openModal()">Add Product +</button>
+    <!-- Page Top Bar: Title + Add Button -->
+    <div class="page-topbar">
+      <div class="page-title-group">
+        <h2>🛍️ Products</h2>
+        <span class="page-subtitle">Manage your product catalogue</span>
       </div>
+      <button type="button" class="add-product-btn" onclick="openModal()">
+        + Add Product
+      </button>
+    </div>
+
+    <!-- Search Row -->
+    <div class="search-row">
+      <form action="/admin/products" method="GET" class="search-form">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" name="search" id="searchBox" placeholder="Search products by name…" value="<%= search || '' %>">
+        </div>
+        <button type="submit" id="searchBtn" class="search-submit-btn">Search</button>
+        <% if (search) { %>
+          <a href="/admin/products" class="reset-btn" id="resetBtn">✕ Clear</a>
+        <% } %>
+      </form>
     </div>
 
     <div class="table-responsive">
@@ -60,7 +71,7 @@
                   <%= product.sku || 'N/A' %>
                 </td>
                 <td>
-                  <%= product.category.name %>
+                  <%= product.category?.name || 'N/A' %>
                 </td>
                 <td>
                   <%= product.color %>
@@ -102,14 +113,13 @@
 
     <div class="pagination">
       <% if (typeof currentPage !=='undefined' && typeof totalPages !=='undefined' && totalPages> 0) { %>
-        <button id="prevPage" onclick="goToPrevPage()" <%=currentPage <=1 ? disabled="disabled" : '' %>>&laquo;</button>
+        <button id="prevPage" onclick="goToPrevPage()" <%=currentPage <=1 ? 'disabled' : '' %>>&laquo;</button>
         <% for (let i=1; i <=totalPages; i++) { %>
-          <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage('<%- i %>')">
+          <button class="<%= i === currentPage ? 'active' : '' %>" onclick="goToPage('<%= i %>')">
             <%= i %>
           </button>
           <% } %>
-            <button id="nextPage" onclick="goToNextPage()" <%=currentPage>= totalPages ? disabled="disabled" : ''
-              %>>&raquo;</button>
+            <button id="nextPage" onclick="goToNextPage()" <%=currentPage>= totalPages ? 'disabled' : '' %>>&raquo;</button>
             <% } else { %>
               <button disabled>&laquo;</button>
               <button class="active">1</button>

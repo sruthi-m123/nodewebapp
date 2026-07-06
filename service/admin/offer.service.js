@@ -35,11 +35,10 @@ export const getOffersService = async (currentPage = 1, limit = 6, offerType = '
 export const getApplicableItemService = async (type) => {
     logger.debug('fetching applicable items', { type });
     let items = [];
-
     if (type === 'category') {
-        items = await Category.find({}, 'name');
+        items = await Category.find({ isActive: true, isDeleted: false }, 'name');
     } else if (type === 'product') {
-        items = await Product.find({}, 'productName price images');
+        items = await Product.find({ isActive: true, isDeleted: false }, 'productName price images');
     }
 
     logger.info('Applicable items fetched', { type, count: items.length })

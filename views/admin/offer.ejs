@@ -480,13 +480,11 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
 
       const $modal = $('#addOfferModal');
       const $form = $('#offerForm');
-      
+
       // Basic info
       $form.find('input[name="title"]').val(offer.title);
-      // $form.find('input[name="code"]').val(offer.code);
       
-      // Discount settings
-      $form.find('select[name="type"]').val(offer.type).trigger('change');
+      // Discount value (set now, type will be set after modal is shown)
       $form.find('input[name="discountValue"]').val(offer.discountValue);
       if (offer.maxDiscount) {
         $form.find('input[name="maxDiscount"]').val(offer.maxDiscount);
@@ -496,8 +494,8 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       $form.find('input[name="startDate"]').val(offer.startDate || '');
       $form.find('input[name="endDate"]').val(offer.endDate || '');
 
-      // Applicability
-      $form.find('select[name="applicableTo"]').val(offer.applicableTo).trigger('change');
+      // Applicability (set value now, Select2 init happens in setTimeout)
+      $form.find('select[name="applicableTo"]').val(offer.applicableTo);
       
       // Additional options
       $form.find('input[name="minOrderValue"]').val(offer.minOrderValue || '');
@@ -514,16 +512,24 @@ ${imgSrc ? `<img src="${imgSrc}" class="me-2" width="30" height="30" style="obje
       // Show the modal
       $modal.modal('show');
       
-      // Wait for modal to be shown, then set values and initialize Select2
+      // Wait for modal to be shown, then set type + prefix + Select2
       setTimeout(() => {
+        // ── Set Discount Type & update prefix symbol ──────────────
+        const offerType = offer.type === 'fixed' ? 'flat' : offer.type; // normalize
+        $form.find('select[name="type"]').val(offerType);
+        $('.discount-prefix').text(offerType === 'percentage' ? '%' : '₹');
+
+        // ── Applicability containers + Select2 ────────────────────
+        $('#categorySelectionContainer, #productSelectionContainer').hide();
+
         if (offer.applicableTo === 'category') {
-          // Set selected values BEFORE initializing Select2
+          $('#categorySelectionContainer').show();
           $('#categorySelect').val(offer.applicableItems);
           initializeCategorySelect2();
         } else if (offer.applicableTo === 'product') {
+          $('#productSelectionContainer').show();
           $('#productSelect').val(offer.applicableItems);
           initializeProductSelect2();
-          // Calculate total for selected products
           setTimeout(() => calculateTotal(), 100);
         }
       }, 300);
