@@ -11,7 +11,7 @@ export const productDetail = async (req, res) => {
     product.category
   );
   const availability = productService.checkProductAvailabilityService(product);
-  let limit = 5;
+  let limit = 10;
   res.render('user/productdetails', {
     product,
     limit,

@@ -134,8 +134,15 @@ if (!wishlistItem) {
     );
     if(cartItem){
         if(cartItem.quantity+1>product.stock){
-            const err=new Error("Not enough stock");
-            err.statusCode=STATUS_CODES.NOT_FOUND;
+            const remaining = product.stock - cartItem.quantity;
+            let msg;
+            if (remaining <= 0) {
+                msg = `You already have all ${product.stock} available units in your cart.`;
+            } else {
+                msg = `Only ${product.stock} units available. You can only add ${remaining} more unit(s) to your cart.`;
+            }
+            const err=new Error(msg);
+            err.statusCode=STATUS_CODES.BAD_REQUEST;
             throw err;
         };
         cartItem.quantity+=1;
@@ -143,10 +150,9 @@ if (!wishlistItem) {
 
     }else{
         if(product.stock<=0){
-            const err=new Error("product out of stock");
-            err.statusCode=STATUS_CODES.NOT_FOUND;
+            const err=new Error(`Product ${product.productName} is currently out of stock`);
+            err.statusCode=STATUS_CODES.BAD_REQUEST;
             throw err;
-
         }
 
         cart.items.push({

@@ -30,14 +30,14 @@ export const getCheckoutData = async (userId, session) => {
       if (product.stock < requestedQty) {
         stockValidationFailed = true;
         outOfStockItems.push({
-          productId: product.productId,
+          productId: product._id,
           name: product.productName,
           available: product.stock,
           requested: requestedQty
         })
       }
       cartItems = [{
-        id: product.productId,
+        id: product._id,
         name: product.productName,
         image: product.images[0],
         price: product.discountedPrice || product.price,
@@ -57,12 +57,11 @@ export const getCheckoutData = async (userId, session) => {
           if (product.stock < item.quantity) {
             stockValidationFailed = true;
             outOfStockItems.push({
-              productId: product.productId,
+              productId: product._id,
               name: product.productName,
               available: product.stock,
               requested: item.quantity
             })
-
           }
         }
       }

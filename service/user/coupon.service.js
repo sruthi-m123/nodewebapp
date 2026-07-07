@@ -1,13 +1,13 @@
-import Coupon  from '../../models/couponSchema.js';
+import Coupon from '../../models/couponSchema.js';
 import Cart from '../../models/cartSchema.js';
 import Order from '../../models/orderSchema.js';
-import {calculateOrder} from '../../helper/calculateTotal.js';
+import { calculateOrder } from '../../helper/calculateTotal.js';
 // import { MESSAGES } from '../../utils/messages.js';
 import logger from '../../utils/logger.js';
 // import items from 'razorpay/dist/types/items';
 
-export const removeCouponService=async(userId, isRetry = false, retryCartItems = null)=>{
-    logger.debug('Removing applied coupon',{userId, isRetry});
+export const removeCouponService = async (userId, isRetry = false, retryCartItems = null) => {
+    logger.debug('Removing applied coupon', { userId, isRetry });
 
     let cartItems;
 
@@ -73,29 +73,32 @@ export const removeCouponService=async(userId, isRetry = false, retryCartItems =
     const orderSummary = calculateOrder(cartItems, {});
     logger.info('coupon removed successfully', { userId });
     return orderSummary;
-    
+
 };
 
-export const getDiscountTextService=(coupon)=>{
-    return coupon.discountType==='percentage'
-    ?`${coupon.discountValue}% off`
-    :`₹${coupon.discountValue} off`;
+export const getDiscountTextService = (coupon) => {
+    return coupon.discountType === 'percentage'
+        ? `${coupon.discountValue}% off`
+        : `₹${coupon.discountValue} off`;
 };
 
-export const checkCouponUsageService=async(userId,coupon)=>{
-    logger.debug('Checking coupon usage limit',{userId,couponId:coupon._id
-        
-    });
-    const usageCount=await Order.countDocuments({
+export const checkCouponUsageService = async (userId, coupon) => {
+    logger.debug('Checking coupon usage limit', { userId, couponId: coupon._id });
+
+    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+        logger.warn('global coupon usage limit reached', { couponId: coupon._id, usedCount: coupon.usedCount });
+        throw new Error('Coupon usage limit reached');
+    }
+
+    const usageCount = await Order.countDocuments({
         userId,
-        'appliedCoupon.couponId':coupon._id,
-        status:{$nin:['cancelled','returned']}
+        'appliedCoupon.couponId': coupon._id,
+        status: { $nin: ['cancelled', 'returned', 'payment_failed', 'payment_pending'] }
     });
- 
 
-    if(coupon.usageLimit&&usageCount>=coupon.usageLimit){
-        logger.warn('coupon usage limit reached',{userId,couponId:coupon._id,usageCount});
-        throw new Error(`You cannot use this coupon only ${coupon.usageLimit} time(s`)
+    if (usageCount >= 1) {
+        logger.warn('user coupon usage limit reached', { userId, couponId: coupon._id, usageCount });
+        throw new Error(`You have already used this coupon`);
     }
     return true;
 }
@@ -113,105 +116,111 @@ export const checkCouponUsageService=async(userId,coupon)=>{
 //     }))
 // }
 
-export const prepareCartItemsService=(cart)=>{
+export const prepareCartItemsService = (cart) => {
     return cart.items
-    .filter(item=>item.productId&& item.productId.isActive)
-    .map(item=>{
-        const product=item.productId;
+        .filter(item => item.productId && item.productId.isActive)
+        .map(item => {
+            const product = item.productId;
 
-        const  isOfferValid=
-        product.offer&&
-        product.offer.isActive&& 
-        new Date(product.offer.validTill)>new Date();
+            const isOfferValid =
+                product.offer &&
+                product.offer.isActive &&
+                new Date(product.offer.validTill) > new Date();
 
-        const finalPrice=isOfferValid
-        ?product.discountedPrice
-        :product.price;
+            const finalPrice = isOfferValid
+                ? product.discountedPrice
+                : product.price;
 
-        return {
-            id:product._id,
-            name:product.productName,
-            price: finalPrice,
-        originalPrice: product.price,
-        discountedPrice: isOfferValid ? product.discountedPrice : null,
-        quantity: item.quantity
-        }
-    })
+            return {
+                id: product._id,
+                name: product.productName,
+                price: finalPrice,
+                originalPrice: product.price,
+                discountedPrice: isOfferValid ? product.discountedPrice : null,
+                quantity: item.quantity
+            }
+        })
 }
 
 
 
 
-export const checkMinCartValueService=(cartItems,coupon)=>{
+export const checkMinCartValueService = (cartItems, coupon) => {
     console.log("inside the apply min car service");
-    console.log("cartItems:",cartItems);
+    console.log("cartItems:", cartItems);
 
     // Use effective price (after offer discounts) — this matches what the customer sees on screen
-    const effectiveCartValue=cartItems.reduce(
-        (sum,item)=>{
+    const effectiveCartValue = cartItems.reduce(
+        (sum, item) => {
             const effectivePrice = item.discountedPrice || item.price || item.originalPrice;
             return sum + effectivePrice * item.quantity;
-        },0
+        }, 0
     );
-console.log("effectiveCartValue for coupon check:",effectiveCartValue);
-    if(effectiveCartValue<coupon.minCartValue){
-        const amountNeeded=parseFloat((coupon.minCartValue-effectiveCartValue).toFixed(2));
-        logger.warn('minimum cart value not met',{effectiveCartValue,minCartValue:coupon.minCartValue});
+    console.log("effectiveCartValue for coupon check:", effectiveCartValue);
+    if (effectiveCartValue < coupon.minCartValue) {
+        const amountNeeded = parseFloat((coupon.minCartValue - effectiveCartValue).toFixed(2));
+        logger.warn('minimum cart value not met', { effectiveCartValue, minCartValue: coupon.minCartValue });
 
-        const err=new Error(
+        const err = new Error(
             `Add ₹${amountNeeded} more to apply this coupon`
         );
-        err.status=400;
+        err.status = 400;
         throw err;
     }
     return effectiveCartValue;
 }
 
-export const getRetryCartItemsService=async(userId)=>{
-    logger.debug('Getting retry cart items from failed order',{userId});
+export const getRetryCartItemsService = async (userId) => {
+    logger.debug('Getting retry cart items from failed order', { userId });
 
-    const failedOrder=await Order.findOne({
+    const failedOrder = await Order.findOne({
         userId,
-        status:'payment_failed'
-    }).populate('items.productId').sort({createdAt:-1});
+        status: 'payment_failed'
+    }).populate('items.productId').sort({ createdAt: -1 });
 
-    if(!failedOrder){
-        logger.warn('No failed order found for retry',{userId});
+    if (!failedOrder) {
+        logger.warn('No failed order found for retry', { userId });
         throw new Error('No failed order for retry');
     }
 
-    const retryCartItems=failedOrder.items.map(item=>({
-        id:item.productId._id,
-        name:item.productId.productName,
-        price:item.discountedPrice||item.price,
-        originalPrice:item.price,
-        discountedPrice:item.discountedPrice||null,
-        quantity:item.quantity
+    const retryCartItems = failedOrder.items.map(item => ({
+        id: item.productId._id,
+        name: item.productId.productName,
+        price: item.discountedPrice || item.price,
+        originalPrice: item.price,
+        discountedPrice: item.discountedPrice || null,
+        quantity: item.quantity
     }));
 
-    logger.info('retry cart items fetched',{userId,itemCount:retryCartItems.length});
+    logger.info('retry cart items fetched', { userId, itemCount: retryCartItems.length });
     return retryCartItems;
 }
 
-export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=>{
-    logger.debug('Applying coupon logic',{userId,couponId:coupon._id,isRetry:!!retryCartItems});
+export const applyCouponLogicService = async ({ userId, coupon, retryCartItems = null }) => {
+    logger.debug('Applying coupon logic', { userId, couponId: coupon._id, isRetry: !!retryCartItems });
 
-    let cartItems=retryCartItems;
+    let cartItems = retryCartItems;
 
-    if(!cartItems || cartItems.length === 0){
-        const userCart=await Cart.findOne({userId}).populate('items.productId');
-        if(!userCart||userCart.items.length===0){
-            logger.warn('Empty cart during coupon application',{userId});
+    if (!cartItems || cartItems.length === 0) {
+        const userCart = await Cart.findOne({ userId }).populate('items.productId');
+        if (!userCart || userCart.items.length === 0) {
+            logger.warn('Empty cart during coupon application', { userId });
             throw new Error('cart is empty');
         }
 
-        cartItems=userCart.items.map(item=>({
-            id:item.productId._id,
-            name:item.productId.productName,
-            originalPrice:item.productId.price,
-            discountedPrice:item.productId.discountedPrice||null,
-            price:item.productId.discountedPrice||item.productId.price,
-            quantity:item.quantity
+        const activeCartItems = userCart.items.filter(item => item.productId && item.productId.isActive && !item.productId.isDeleted);
+        if (activeCartItems.length === 0) {
+            logger.warn('No active products in cart during coupon application', { userId });
+            throw new Error('Cart has no active products');
+        }
+
+        cartItems = activeCartItems.map(item => ({
+            id: item.productId._id,
+            name: item.productId.productName,
+            originalPrice: item.productId.price,
+            discountedPrice: item.productId.discountedPrice || null,
+            price: item.productId.discountedPrice || item.productId.price,
+            quantity: item.quantity
         }))
     } else {
         cartItems = retryCartItems.map(item => ({
@@ -219,80 +228,80 @@ export const applyCouponLogicService=async({userId,coupon,retryCartItems=null})=
             originalPrice: item.originalPrice || item.price,
         }));
     }
-const subtotal=checkMinCartValueService(cartItems,coupon);
+    const subtotal = checkMinCartValueService(cartItems, coupon);
 
-const calculatedSummary=calculateOrder(cartItems,{coupon});
-const delivery=parseFloat((calculatedSummary.delivery||0).toFixed(2));
-const tax=parseFloat((calculatedSummary.tax||0).toFixed(2));
-const netAmount=parseFloat((calculatedSummary.netAmount||0).toFixed(2));
-const total=parseFloat((calculatedSummary.total||0).toFixed(2));
-const discountToApply=parseFloat((calculatedSummary.couponDiscount||0).toFixed(2));
+    const calculatedSummary = calculateOrder(cartItems, { coupon });
+    const delivery = parseFloat((calculatedSummary.delivery || 0).toFixed(2));
+    const tax = parseFloat((calculatedSummary.tax || 0).toFixed(2));
+    const netAmount = parseFloat((calculatedSummary.netAmount || 0).toFixed(2));
+    const total = parseFloat((calculatedSummary.total || 0).toFixed(2));
+    const discountToApply = parseFloat((calculatedSummary.couponDiscount || 0).toFixed(2));
 
-if(discountToApply>subtotal){
-    logger.warn('discount exceeds subtotal',{discountToApply,subtotal});
-    throw new Error("this coupon cannot be applied because the coupon value exceeds the subtaotal");
+    if (discountToApply > subtotal) {
+        logger.warn('discount exceeds subtotal', { discountToApply, subtotal });
+        throw new Error("this coupon cannot be applied because the coupon value exceeds the subtaotal");
 
-}
-console.log("dicount to apply here :",discountToApply);
-console.log("total:",total);
-const finalPrice=total;
-console.log("finalPrice inside the applycoupon service logic:",finalPrice);
-const discountText=getDiscountTextService(coupon);
-const appliedCoupon={
-    couponId:coupon._id,
-    id:coupon._id,
-    code:coupon.code,
-    discountType:coupon.discountType,
-    type:coupon.discountType,
-    discountValue:coupon.discountValue,
-    value:coupon.discountValue,
-    discountApplied:discountToApply
-}
- const orderSummary={
-    items:cartItems,
-    subtotal,
-    delivery,
-    tax,
-    couponDiscount:discountToApply,
-    netAmount,
-    total:finalPrice
-}
+    }
+    console.log("dicount to apply here :", discountToApply);
+    console.log("total:", total);
+    const finalPrice = total;
+    console.log("finalPrice inside the applycoupon service logic:", finalPrice);
+    const discountText = getDiscountTextService(coupon);
+    const appliedCoupon = {
+        couponId: coupon._id,
+        id: coupon._id,
+        code: coupon.code,
+        discountType: coupon.discountType,
+        type: coupon.discountType,
+        discountValue: coupon.discountValue,
+        value: coupon.discountValue,
+        discountApplied: discountToApply
+    }
+    const orderSummary = {
+        items: cartItems,
+        subtotal,
+        delivery,
+        tax,
+        couponDiscount: discountToApply,
+        netAmount,
+        total: finalPrice
+    }
 
-logger.info('coupon applied suucessfully',{
-    userId,
-    couponId:coupon._id,
-    discountToApply
-});
-console.log('[applyCouponLogicService] returning orderSummary:', orderSummary);
-return {appliedCoupon,discountText,orderSummary};
+    logger.info('coupon applied suucessfully', {
+        userId,
+        couponId: coupon._id,
+        discountToApply
+    });
+    console.log('[applyCouponLogicService] returning orderSummary:', orderSummary);
+    return { appliedCoupon, discountText, orderSummary };
 };
 
-export const validateAndApplyCouponService=async(userId,couponIdentifier,isRetry=false,provideRetryItems=null)=>{
-    logger.debug('validating and applying coupon',{userId,couponIdentifier,isRetry});
-    console.log("userId",userId);
-    console.log("couponIdentifier",couponIdentifier);
-    console.log("provide retry items:",provideRetryItems);
+export const validateAndApplyCouponService = async (userId, couponIdentifier, isRetry = false, provideRetryItems = null) => {
+    logger.debug('validating and applying coupon', { userId, couponIdentifier, isRetry });
+    console.log("userId", userId);
+    console.log("couponIdentifier", couponIdentifier);
+    console.log("provide retry items:", provideRetryItems);
 
     // Determine if couponIdentifier is a MongoDB ObjectId or a coupon code string
     const isObjectId = /^[a-f\d]{24}$/i.test(String(couponIdentifier));
 
     const query = isObjectId
-        ? { _id: couponIdentifier, isActive: true, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } }
-        : { code: String(couponIdentifier).toUpperCase(), isActive: true, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } };
+        ? { _id: couponIdentifier, isActive: true, isDeleted: { $ne: true }, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } }
+        : { code: String(couponIdentifier).toUpperCase(), isActive: true, isDeleted: { $ne: true }, validFrom: { $lte: new Date() }, validTill: { $gte: new Date() } };
 
     const coupon = await Coupon.findOne(query);
-    if(!coupon){
-        logger.warn('coupon not found or expired',{couponIdentifier});
+    if (!coupon) {
+        logger.warn('coupon not found or expired', { couponIdentifier });
         throw new Error('Invalid or expired coupon');
     }
 
-    let retryCartItems=provideRetryItems;
-    if(isRetry&&!retryCartItems){
-        retryCartItems=await getRetryCartItemsService(userId);
+    let retryCartItems = provideRetryItems;
+    if (isRetry && !retryCartItems) {
+        retryCartItems = await getRetryCartItemsService(userId);
     }
-    await checkCouponUsageService(userId,coupon);
-    console.log("userId inside the apply coupon :",userId);
-    const result=await applyCouponLogicService({userId,coupon,retryCartItems});
+    await checkCouponUsageService(userId, coupon);
+    console.log("userId inside the apply coupon :", userId);
+    const result = await applyCouponLogicService({ userId, coupon, retryCartItems });
 
     return {
         coupon,

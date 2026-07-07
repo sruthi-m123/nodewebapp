@@ -24,21 +24,20 @@ console.log("cart ",cart);
 
         if(!product||product.stock<1){
             outOfStockItems.push({
-                productId:item.productId,
-                name:product?.productName,
-                availble:0,
+                productId:product?._id : item.productId,
+                name:product?.productName || "Unknown Product",
+                available:0,
                 requested:item.quantity
             });
             continue;
         }
         const allowedQty=Math.min(item.quantity,product.stock);
-        if(allowedQty>item.quantity){
+        if(allowedQty<item.quantity){
             outOfStockItems.push({
-                productId:product.productId,
+                productId:product._id,
                 name:product.productName,
                 available:product.stock,
                 requested:item.quantity
-
             })
         }
         const unitPrice=(product.discountedPrice&&product.discountedPrice>0)
@@ -115,8 +114,18 @@ const price=product.discountedPrice&&product.discountedPrice>0?product.discounte
 
 if(existingItem){
    const newQty=existingItem.quantity+quantity;
+   
+   if (newQty > product.stock) {
+       const remaining = product.stock - existingItem.quantity;
+       if (remaining <= 0) {
+           throw new Error(`You already have all ${product.stock} available units in your cart.`);
+       } else {
+           throw new Error(`Only ${product.stock} units available. You can only add ${remaining} more unit(s) to your cart.`);
+       }
+   }
+
    if(newQty>limit){
-    throw new Error(`you can add a maximum of${limit} units `);
+    throw new Error(`you can add a maximum of ${limit} units `);
    }
 
    existingItem.quantity=newQty;
@@ -288,7 +297,7 @@ export const removeInvalidCartItemsSerivce=async(userId,invalidProductIds)=>{
         throw new Error("No invalid items provided");
     }
     const stringProductIds=invalidProductIds.map(id=>id.toString());
-    const cart=await Cart.findOne({userId}).populate('items.prodcuId');
+    const cart=await Cart.findOne({userId}).populate('items.productId');
 
     if(!cart||cart.items.length===0){
         throw new Error('Cart not found.'); 

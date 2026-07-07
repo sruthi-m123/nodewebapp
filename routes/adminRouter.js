@@ -24,7 +24,7 @@ router.use((req, res, next) => {
 
 router.get('/page_error', adminController.page_error);
 router.get('/login', adminController.loadAdminLogin);
-router.post('/login', adminController.login);
+router.post('/login', validate(V.adminLoginSchema), adminController.login);
 router.get('/', adminAuth, adminController.loadDashboard);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
 router.get('/logout', adminController.logout);
@@ -39,7 +39,7 @@ router.get('/top-categories', adminAuth,dashboardController.getTopCategories);
 
 //user managment
 router.get('/users', adminAuth, customerController.customerInfo);
-router.post('/toggle_block', adminAuth, customerController.toggleBlockStatus);
+router.post('/toggle_block', adminAuth, validate(V.toggleBlockSchema), customerController.toggleBlockStatus);
 
 
 //category managment
@@ -65,10 +65,10 @@ router.get('/products/:id/details', adminAuth,validate(V.getCategoryByIdSchema, 
 //order managment
 router.get('/orders', adminAuth, orderController.getOrderAdmin);
 router.get('/order-details', adminAuth, orderController.getOrder);
-router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
+router.post('/orders/:orderId/status', adminAuth, validate(V.updateOrderStatusSchema), orderController.updateOrderStatus);
 // router.post('/orders/:orderId/verify-return', adminAuth, orderController.verifyReturnedRequest);
 router.get('/orders/:orderId/verify-return', adminAuth, orderController.getReturnDetails);
-router.post('/orders/:orderId/verify-return',adminAuth,orderController.verifyReturnRequest);
+router.post('/orders/:orderId/verify-return', adminAuth, validate(V.verifyReturnRequestSchema), orderController.verifyReturnRequest);
 router.get('/orders/:orderId/view', adminAuth, orderController.getOrderDetails);
 
 //offer managment

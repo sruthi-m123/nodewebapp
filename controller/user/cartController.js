@@ -56,28 +56,36 @@ const total = validItems.reduce((sum, item) => sum + item.totalPrice, 0);
     }
 };
 
-export const addToCart=async(req,res)=>{
-  logger.info('Adding product to cart');
-  if(!req.session.user){
-    logger.warn('Unathorized cart add attempt ');
-    return res.status(STATUS_CODES.UNAUTHORIZED).json({
-      message:MESSAGES.CART.LOGIN_REQUIRED
-    })
+export const addToCart = async (req, res) => {
+  try {
+    logger.info('Adding product to cart');
+    if (!req.session.user) {
+      logger.warn('Unauthorized cart add attempt');
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({
+        message: MESSAGES.CART.LOGIN_REQUIRED
+      });
+    }
+
+    const userId = req.session.user.id;
+    const productId = req.params.productId;
+    const quantity = parseInt(req.body.quantity);
+
+    const result = await cartService.addToCartService(userId, productId, quantity);
+
+    res.status(STATUS_CODES.SUCCESS).json({
+      success: true,
+      message: MESSAGES.CART.ADD_SUCCESS,
+      stock: result.stock,
+      cartCount: result.cartCount
+    });
+  } catch (error) {
+    logger.error('Error adding to cart:', error);
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: error.message || 'Failed to add product to cart'
+    });
   }
-
-  const userId=req.session.user.id;
-  const productId=req.params.productId;
-  const quantity=parseInt(req.body.quantity)
-
-const result=await cartService.addToCartService(userId,productId,quantity)
-
-res.status(STATUS_CODES.SUCCESS).json({
-  success:true,
-  message:MESSAGES.CART.ADD_SUCCESS,
-  stock:result.stock,
-  cartCount:result.cartCount
-})
-}
+};
 
 export const removeCartItem=async(req,res)=>{
   logger.info('removing item form cart');
@@ -144,14 +152,17 @@ export const validateCart=async(req,res)=>{
     const userId=req.session.user.id;
     const{invalidItems,invalidProductIds,validItems}=await cartService.validateCartService(userId);
 
-    if(invalidItems.length===validItems.length+invalidItems.length){
+    if (invalidItems.length > 0) {
+      const isAllInvalid = invalidItems.length === (validItems.length + invalidItems.length);
       return res.json({
-        success:false,
-        message:`All selected products are currently unvaliable :${invalidItems.join(', ')}`,
-        invalidProductIds:invalidProductIds
+        success: false,
+        message: isAllInvalid 
+          ? `All selected products are currently unavailable: ${invalidItems.join(', ')}`
+          : `Some products in your cart are currently unavailable: ${invalidItems.join(', ')}`,
+        invalidProductIds: invalidProductIds
       });
     }
- res.json({success:true});
+    res.json({success:true});
 }
 export const removeInvalidCartItems = async (req, res) => {
     logger.info('Removing invalid cart items');

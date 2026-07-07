@@ -42,6 +42,12 @@ console.log("subtotoal:",subtotal);
     ) {
       couponDiscount = coupon.discountValue;
     }
+
+    // Cap the coupon discount to the remaining subtotal value (after offer discounts)
+    const maxAllowedDiscount = Math.max(0, subtotal - offerDiscount);
+    if (couponDiscount > maxAllowedDiscount) {
+      couponDiscount = maxAllowedDiscount;
+    }
   }
 
   console.log("Calculated couponDiscount:", couponDiscount);

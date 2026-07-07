@@ -75,17 +75,25 @@ export const removeProductFromWishlist = async (req, res) => {
 };
 
 export const addToCartFromWishlist = async (req, res) => {
-  const userId = req.session.user.id;
-  const { itemId } = req.params;
+  try {
+    const userId = req.session.user.id;
+    const { itemId } = req.params;
 
-  const result =
-    await WishlistService.addToCartFromWishlist(userId, itemId);
+    const result =
+      await WishlistService.addToCartFromWishlist(userId, itemId);
 
-  res.json({
-    success: true,
-    message: MESSAGES.WISHLIST.MOVED_TO_CART,
-    ...result
-  });
+    res.json({
+      success: true,
+      message: MESSAGES.WISHLIST.MOVED_TO_CART,
+      ...result
+    });
+  } catch (err) {
+    const statusCode = err.status || err.statusCode || 500;
+    res.status(statusCode).json({
+      success: false,
+      message: err.message || 'Failed to add item to cart'
+    });
+  }
 };
 
 

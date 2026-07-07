@@ -32,23 +32,23 @@ router.get("/shop", isNotLoggedIn, shopController.loadShopping);
 router.get("/pageNotFound", userController.pageNotFound);
 
 router.post("/signup", isNotLoggedIn, validate(V.signupSchema), userController.signup);
-router.post("/send-otp", userController.sendOtp);
-router.post("/verify-otp", userController.verifyOtp);
-router.post("/resend-otp", userController.resendOtp);
+router.post("/send-otp", validate(V.emailOtpSchema), userController.sendOtp);
+router.post("/verify-otp", validate(V.otpVerifySchema), userController.verifyOtp);
+router.post("/resend-otp", validate(V.emailOtpSchema), userController.resendOtp);
 
 router.get("/login", userController.loadLogin);
-router.post("/login", userController.login);
+router.post("/login", validate(V.loginSchema), userController.login);
 
 router.get("/generateotp", userController.loadGenerateotp);
 router.get("/forgotpassword", userController.loadForgotPassword);
 router.get("/validationotp", userController.loadOTPPage);
 
-router.post("/forgotpassword", userController.sendOTP);
-router.post("/validationotp", userController.verifyOTP);
+router.post("/forgotpassword", validate(V.forgotPasswordSchema), userController.sendOTP);
+router.post("/validationotp", validate(V.otpVerifySchema), userController.verifyOTP);
 router.post("/resend-forgot-otp", userController.resendForgotOtp);
 
 router.get("/resetpassword", userController.loadResetPassword);
-router.post("/reset-password", userController.resetPassword);
+router.post("/reset-password", validate(V.resetPasswordSchema), userController.resetPassword);
 
 router.get("/error", (req, res) => {
   const message = req.query.msg || "Something went wrong!";
