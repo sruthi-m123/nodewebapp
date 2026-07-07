@@ -12,3 +12,10 @@ export const addFundsSchema=Joi.object({
       "any.required": "Amount is required"
     })   
 })
+
+export const verifyWalletPaymentSchema = Joi.object({
+  amount: Joi.number().positive().required(),
+  razorpay_order_id: Joi.string().required(),
+  razorpay_payment_id: Joi.string().required(),
+  razorpay_signature: Joi.string().required()
+}).options({ stripUnknown: true });

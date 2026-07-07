@@ -169,13 +169,13 @@ router.delete(
 // Wallet routes
 
 router.get("/wallet", isLoggedIn, checkBlocked, walletController.getWallet);
-router.post("/wallet/create-order", checkBlocked, walletController.createWalletOrder);
-router.post("/wallet/verify-payment", checkBlocked, walletController.verifyWalletPayment);
+router.post("/wallet/create-order", checkBlocked, validate(V.addFundsSchema), walletController.createWalletOrder);
+router.post("/wallet/verify-payment", checkBlocked, validate(V.verifyWalletPaymentSchema), walletController.verifyWalletPayment);
 
 //About Us
 router.get("/aboutUs", checkBlocked, aboutusController.getAboutUsPage);
 //Contact Us
 router.get("/contactUs", checkBlocked, contactUsController.getContactUsPage);
-router.post("/contact", contactUsController.sendMessage);
+router.post("/contact", validate(V.contactMessageSchema), contactUsController.sendMessage);
 
 export default router;

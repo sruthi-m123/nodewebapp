@@ -107,3 +107,16 @@ export const verifyReturnRequestSchema = Joi.object({
     itemIds: Joi.array().items(Joi.string()).optional(),
     rejectReason: Joi.string().allow('', null).optional()
 }).options({ stripUnknown: true });
+
+export const contactMessageSchema = Joi.object({
+    name: Joi.string().trim().required().messages({
+        'string.empty': 'Name is required'
+    }),
+    email: Joi.string().trim().email().required().messages({
+        'string.empty': 'Email is required',
+        'string.email': 'Invalid email format'
+    }),
+    message: Joi.string().trim().required().messages({
+        'string.empty': 'Message is required'
+    })
+}).options({ stripUnknown: true });

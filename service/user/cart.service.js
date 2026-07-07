@@ -24,7 +24,7 @@ console.log("cart ",cart);
 
         if(!product||product.stock<1){
             outOfStockItems.push({
-                productId:product?._id : item.productId,
+                productId: product ? product._id : item.productId,
                 name:product?.productName || "Unknown Product",
                 available:0,
                 requested:item.quantity
