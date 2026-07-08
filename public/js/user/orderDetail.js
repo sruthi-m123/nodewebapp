@@ -99,7 +99,15 @@ function openModal(type, orderId, itemId = null) {
             console.log("orderId",orderId);
           
             if (!reason) {
-                alert('Please provide a reason for cancellation');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Reason Required',
+                    text: 'Please provide a reason for cancellation',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
                 return;
             }
             
@@ -161,7 +169,15 @@ function submitReturn(event) {
     console.log("reason", reason);
 
     if (!reason) {
-        alert('Please provide a reason for return');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Reason Required',
+            text: 'Please provide a reason for return',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
         return;
     }
 
@@ -327,7 +343,13 @@ function downloadCreditNote(orderId) {
     })
     .catch(error => {
         console.error('Error downloading credit note:', error);
-        alert('Failed to download credit note. Please try again later.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Download Failed',
+            text: 'Failed to download credit note. Please try again later.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
         
         if (button) {
             button.disabled = false;
