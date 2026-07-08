@@ -85,6 +85,15 @@ function setupFormValidation() {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('.submit-btn');
+    if (submitBtn) {
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
+      submitBtn.dataset.originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Saving...';
+    }
+
     const formData = {
       name: document.getElementById('name').value.trim(),
       building: document.getElementById('building').value.trim(),
@@ -107,22 +116,25 @@ function setupFormValidation() {
         icon: 'error',
         title: 'Please fill in all required fields',
         showConfirmationButton: false,
+      });
 
-      })
-
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.originalText;
+      }
       return;
     }
 
     const addressId = form.dataset.addressId;
 
     if (addressId) {
-      updateAddress(addressId, formData);
+      updateAddress(addressId, formData, submitBtn);
     } else {
-      addAddress(formData);
+      addAddress(formData, submitBtn);
     }
   });
 }
-function addAddress(addressData) {
+function addAddress(addressData, submitBtn) {
   fetch('/user/addresses/add', {
     method: 'POST',
     headers: {
@@ -143,6 +155,10 @@ function addAddress(addressData) {
           window.location.reload();
         });
       } else {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = submitBtn.dataset.originalText;
+        }
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -151,6 +167,10 @@ function addAddress(addressData) {
       }
     })
     .catch(error => {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.originalText;
+      }
       console.error('Error:', error);
       Swal.fire({
         icon: 'error',
@@ -160,7 +180,7 @@ function addAddress(addressData) {
     });
 }
 
-function updateAddress(addressId, addressData) {
+function updateAddress(addressId, addressData, submitBtn) {
   fetch(`/user/addresses/edit/${addressId}`, {
     method: 'PUT',
     headers: {
@@ -181,6 +201,10 @@ function updateAddress(addressId, addressData) {
           window.location.reload();
         });
       } else {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = submitBtn.dataset.originalText;
+        }
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -189,6 +213,10 @@ function updateAddress(addressId, addressData) {
       }
     })
     .catch(error => {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.originalText;
+      }
       console.error('Error:', error);
       Swal.fire({
         icon: 'error',

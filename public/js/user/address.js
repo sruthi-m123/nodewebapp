@@ -52,6 +52,14 @@ document.querySelectorAll('.edit-btn').forEach((btn) => {
 addressForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const submitBtn = addressForm.querySelector('button[type="submit"]') || addressForm.querySelector('.submit-btn');
+  if (submitBtn) {
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+    submitBtn.dataset.originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Saving...';
+  }
+
   try {
     const formData = new FormData(addressForm);
     const jsonData = {};
@@ -83,6 +91,10 @@ addressForm.addEventListener('submit', async (e) => {
         location.reload();
       });
     } else {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.originalText;
+      }
       console.log("message:", data.message);
       Swal.fire({
         icon: 'error',
@@ -91,6 +103,10 @@ addressForm.addEventListener('submit', async (e) => {
       });
     }
   } catch (error) {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = submitBtn.dataset.originalText;
+    }
     console.log(error)
     Swal.fire({
       icon: 'error',

@@ -72,7 +72,7 @@ const totalPages=Math.ceil(totalOrders/limit);
 
 const formattedOrders=orders.map(order=>({
    id: order._id,
-      user: order.userId.name,
+      user: order.userId?.name || "Deleted User",
       date: order.createdAt.toISOString().split('T')[0],
       total: order.total,
       status: order.status,
