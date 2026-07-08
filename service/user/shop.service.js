@@ -34,7 +34,7 @@ static async removeAllProductsService(userId){
       sort = "createdAt",
       direction = -1
     } = filters;
-
+console.log("limit:",limit);
     logger.debug("fetching products with filters", { query, page, limit });
 
     let searchQuery = {};

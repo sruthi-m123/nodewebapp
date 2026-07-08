@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
       minPrice: minPriceInput.value ? Number(minPriceInput.value) : undefined,
       maxPrice: maxPriceInput.value ? Number(maxPriceInput.value) : undefined,
       page: 1,
-      limit: 12
+      limit: 6
     };
   }
 
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('/user/shopall/filter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page: 1, limit: 12 })
+      body: JSON.stringify({ page: 1, limit: 6})
     })
       .then(res => res.json())
       .then(data => {

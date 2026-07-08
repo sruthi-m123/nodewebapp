@@ -49,7 +49,8 @@ export const loadShopping = async (req, res) => {
     const userData = req.session.user ? await ShopService.getUserData(req.session.user.id) : null;
     const categories = await ShopService.getCategories();
 
-    const itemsPerPage = limit ? parseInt(limit) : 6;
+    const itemsPerPage = limit ? parseInt(limit) :6;
+    
     const currentPage = page ? parseInt(page) : 1;
 
     const { products, totalPages, currentPage: pageResult } = await ShopService.getProductsWithFilters({

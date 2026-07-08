@@ -207,7 +207,7 @@ export const loadGenerateotp = async (req, res) => {
 
 export const loadForgotPassword = async (req, res) => {
   logger.info('Loading forgot password page');
-  res.render('user/forgotPassword', { layout: false, pageTitle: 'Chettinad' });
+  res.render('user/forgotpassword', { layout: false, pageTitle: 'Chettinad' });
 };
 
 export const sendOTP = async (req, res) => {
