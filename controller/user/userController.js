@@ -281,7 +281,7 @@ export const loadResetPassword = async (req, res) => {
     return res.redirect('/user/forgotpassword');
   }
   const userId = req.query.id;
-  res.render('user/resetPassword', {
+  res.render('user/resetpassword', {
     layout: false,
     userId,
     pageCSS: 'resetPassword.css',
@@ -294,7 +294,7 @@ export const resetPassword = async (req, res) => {
   const { userId, newPassword, confirmPassword } = req.body;
 
   if (newPassword !== confirmPassword) {
-    return res.render('user/resetPassword', {
+    return res.render('user/resetpassword', {
       layout: false,
       error: MESSAGES.RESET_PASSWORD_MISMATCH,
       pageTitle: 'Chettinad - Premium Sarees'
