@@ -36,18 +36,18 @@ router.post("/send-otp", validate(V.emailOtpSchema), userController.sendOtp);
 router.post("/verify-otp", validate(V.otpVerifySchema), userController.verifyOtp);
 router.post("/resend-otp", validate(V.emailOtpSchema), userController.resendOtp);
 
-router.get("/login", userController.loadLogin);
+router.get("/login", isNotLoggedIn, userController.loadLogin);
 router.post("/login", validate(V.loginSchema), userController.login);
 
-router.get("/generateotp", userController.loadGenerateotp);
-router.get("/forgotpassword", userController.loadForgotPassword);
-router.get("/validationotp", userController.loadOTPPage);
+router.get("/generateotp", isNotLoggedIn, userController.loadGenerateotp);
+router.get("/forgotpassword", isNotLoggedIn, userController.loadForgotPassword);
+router.get("/validationotp", isNotLoggedIn, userController.loadOTPPage);
 
 router.post("/forgotpassword", validate(V.forgotPasswordSchema), userController.sendOTP);
 router.post("/validationotp", validate(V.otpVerifySchema), userController.verifyOTP);
 router.post("/resend-forgot-otp", userController.resendForgotOtp);
 
-router.get("/resetpassword", userController.loadResetPassword);
+router.get("/resetpassword", isNotLoggedIn, userController.loadResetPassword);
 router.post("/reset-password", validate(V.resetPasswordSchema), userController.resetPassword);
 
 router.get("/error", (req, res) => {

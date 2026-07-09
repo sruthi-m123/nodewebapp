@@ -1,10 +1,11 @@
-import  ProfileService  from "../../service/user/profile.service.js";
+import ProfileService from "../../service/user/profile.service.js";
 import { STATUS_CODES } from "../../utils/statusCodes.js";
 import { MESSAGES } from "../../utils/messages.js";
 import logger from "../../utils/logger.js";
 
 export const getProfile = async (req, res) => {
   logger.info("Loading user profile page");
+  console.log("req.session in profile:", req.session);
 
   const userId = req.session?.user?.id;
 
@@ -24,6 +25,7 @@ export const getProfile = async (req, res) => {
       phone: user.phone,
       gender: user.gender || "Prefer not say",
       avatar: user.avatar || "/img/admin-products.png",
+      referralCode: user.referralCode || "",
     },
   });
 };
@@ -40,7 +42,7 @@ export const getEditProfile = async (req, res) => {
   }
 
   const user = await ProfileService.getUserProfile(userId);
-  console.log("user inside the edit profile:",user);
+  console.log("user inside the edit profile:", user);
 
   res.render("user/editProfile", {
     activeTab: "profile",
@@ -66,7 +68,7 @@ export const updateProfile = async (req, res) => {
     throw error;
   }
 
-  
+
   const user = await ProfileService.updateUserProfile(userId, req.body, req.file);
 
   res.json({
@@ -87,7 +89,7 @@ export const requestEmailChangeOTP = async (req, res) => {
     throw error;
   }
 
- 
+
   const { otp, newEmail } = await ProfileService.requestEmailChange(
     userId,
     req.body.newEmail
@@ -121,7 +123,7 @@ export const verifyEmailChange = async (req, res) => {
 
   await ProfileService.verifyEmailChange(
     userId,
-    req.body.enteredOtp,          
+    req.body.enteredOtp,
     req.session.emailChangeOTP,
     req.session.emailChangeTarget
   );
@@ -148,8 +150,8 @@ export const changePassword = async (req, res) => {
 
   await ProfileService.changePassword(
     userId,
-    req.body.currentPassword,     
-    req.body.newPassword          
+    req.body.currentPassword,
+    req.body.newPassword
   );
 
   res.status(STATUS_CODES.SUCCESS).json({

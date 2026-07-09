@@ -218,6 +218,9 @@ export const sendOTP = async (req, res) => {
     logger.warn('Forgot password OTP send failed', { error: result.message });
     return res.render('user/forgotPassword', { layout: false, error: result.message });
   }
+  req.session.forgotOtp = result.otp;
+  req.session.email = email;
+  req.session.forgotOtpExpires = Date.now() + 60 * 1000;
   res.redirect('/user/validationotp');
 };
 
@@ -228,10 +231,27 @@ export const loadOTPPage = async (req, res) => {
 
 export const verifyOTP = async (req, res) => {
   logger.info('Verifying forgot password OTP');
+  console.log("session in fp:", req.session)
   const { otp } = req.body;
-  const result = await userService.verifyForgotPassword(otp, req.session.resetEmail);
+
+  if (!req.session.forgotOtpExpires || Date.now() > req.session.forgotOtpExpires) {
+    return res.render('user/validationotp', {
+      layout: false,
+      error: 'OTP expired. Please resend the code.',
+      otpExpired: true,
+      pageTitle: 'Chettinad'
+    });
+  }
+
+  const result = await userService.verifyForgotPassword(
+    otp,
+    req.session.forgotOtp,
+    req.session.email
+  );
+  console.log("result in the otp:", result);
   if (!result.success) {
     logger.warn('Forgot password OTP verification failed', { error: result.message });
+    console.log("error in the forgot password:", result.message);
     return res.render('user/validationotp', {
       layout: false,
       error: result.message,
@@ -243,18 +263,20 @@ export const verifyOTP = async (req, res) => {
 
 export const resendForgotOtp = async (req, res) => {
   logger.info('Resending forgot password OTP');
-  const email = req.session.resetEmail;
+  const email = req.session.email;
   const result = await userService.resendForgotPasswordOtp(email);
   if (!result.success) {
     logger.warn('Forgot password OTP resend failed', { error: result.message });
     return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.message });
   }
+  req.session.forgotOtp = result.otp;
+  req.session.forgotOtpExpires = Date.now() + 60 * 1000;
   res.json({ success: true, message: MESSAGES.OTP_RESENT_SUCCESS });
 };
 
 export const loadResetPassword = async (req, res) => {
   logger.info('Loading reset password page');
-  const userEmail = req.session.resetEmail;
+  const userEmail = req.session.email;
   if (!userEmail) {
     return res.redirect('/user/forgotpassword');
   }
@@ -303,7 +325,7 @@ export const resetforgotPassword = async (req, res) => {
   const result = await userService.handlePasswordReset(userId, newPassword);
   if (!result.success) {
     logger.warn('Forgot password reset failed', { error: result.message });
-    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: result.message });
+    return res.status(STATUS_CODES.INTERNAL_ERROR).json({ success: false, message: result.message });
   }
   res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.RESET_PASSWORD_SUCCESS });
 };

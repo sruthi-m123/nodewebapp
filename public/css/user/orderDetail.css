@@ -11,16 +11,80 @@
 }
 
 .order-details-container {
-    max-width: 800px;
-    margin: 2rem auto;
+    max-width: 1100px;
+    margin: 1.5rem auto;
     background-color: white;
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(158, 109, 78, 0.1);
     border: 1px solid var(--secondary-color);
 }
 
-.order-details-container h1, .order-details-container h2 {
+.order-content-grid {
+    display: flex;
+    gap: 2.5rem;
+    align-items: flex-start;
+}
+
+.order-left-column {
+    flex: 1;
+}
+
+.order-right-column {
+    width: 380px;
+    position: sticky;
+    top: 2rem;
+}
+
+.order-summary-card {
+    background-color: var(--background-light);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(158, 109, 78, 0.05);
+}
+
+.order-summary-card h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    border-bottom: 1px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.summary-row.total {
+    border-top: 1px dashed var(--secondary-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-dark);
+}
+
+/* Make sure mobile layout stacks them */
+@media (max-width: 900px) {
+    .order-content-grid {
+        flex-direction: column;
+    }
+
+    .order-right-column {
+        width: 100%;
+        position: static;
+    }
+}
+
+.order-details-container h1,
+.order-details-container h2 {
     font-family: 'Playfair Display', serif;
     color: var(--primary-color);
 }
@@ -37,24 +101,33 @@
     margin: 1.5rem 0 1rem;
 }
 
-.order-info, .shipping-details, .order-status {
-    margin-bottom: 2rem;
+.order-info,
+.shipping-details {
+    margin-bottom: 1.5rem;
+}
+
+.order-status {
+    background-color: var(--background-light);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
 }
 
 .product-details {
     display: flex;
-    gap: 2rem;
+    gap: 1.2rem;
     align-items: center;
-    margin: 1.5rem 0;
-    padding: 1.5rem;
+    margin: 0.8rem 0;
+    padding: 1rem;
     background-color: var(--background-light);
     border-radius: 8px;
     border: 1px solid var(--secondary-color);
 }
 
 .product-details img {
-    width: 180px;
-    height: 180px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     border-radius: 6px;
     border: 1px solid var(--secondary-color);
@@ -71,13 +144,13 @@
 
 .shipping-details {
     background-color: rgba(255, 235, 59, 0.2);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: 8px;
     border: 1px solid var(--secondary-color);
 }
 
 .status-timeline {
-    margin: 2rem 0;
+    margin: 1.5rem 0;
 }
 
 .status-timeline ul {
@@ -133,7 +206,7 @@
 .action-buttons {
     display: flex;
     gap: 1rem;
-    margin: 2rem 0;
+    margin: 1rem 0;
 }
 
 .action-btn {
@@ -330,7 +403,8 @@
     flex-wrap: wrap;
 }
 
-.cancel-item-btn, .return-item-btn {
+.cancel-item-btn,
+.return-item-btn {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
@@ -530,7 +604,8 @@ button.disabled:hover {
         width: 100%;
     }
 
-    .cancel-item-btn, .return-item-btn {
+    .cancel-item-btn,
+    .return-item-btn {
         width: 100%;
         text-align: center;
     }
@@ -572,17 +647,21 @@ button.disabled:hover {
         padding: 6px 10px;
     }
 }
+
 .status-badge.returned {
-  background-color: #d4edda;  /* Light green */
-  color: #155724;
+    background-color: #d4edda;
+    /* Light green */
+    color: #155724;
 }
+
 /* Credit Note Button Styles */
 .download-credit-note {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #6c757d; /* Grey color to differentiate from invoice */
+    background-color: #6c757d;
+    /* Grey color to differentiate from invoice */
     color: white;
     border: none;
     border-radius: 4px;
@@ -604,7 +683,8 @@ button.disabled:hover {
 
 /* Alternative styling with accent color */
 .download-credit-note.primary {
-    background-color: #9e6d4e; /* Matches your primary color */
+    background-color: #9e6d4e;
+    /* Matches your primary color */
 }
 
 .download-credit-note.primary:hover {

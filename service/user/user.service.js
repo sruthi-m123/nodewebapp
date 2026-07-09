@@ -108,13 +108,7 @@ if(existingUser){
      await Wallet.create({
     user: newUser._id,
     balance: 0,
-    transactions: [{
-      amount: 0,
-      type: 'initial',
-      description: 'Wallet created',
-      status: 'completed',
-      reference: `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-    }]
+    transactions: []
   });
   const refferalInfo=session.referralInfo;
   console.log("refferalInfo:",refferalInfo);
@@ -190,15 +184,27 @@ export const sendForgotPasswordOtp=async(email)=>{
     return {success:true,otp,userId:user._id};
 }
 
-export const verifyForgotPassword=async(userOtp,email)=>{
+export const verifyForgotPassword=async(userOtp,sessionOtp,email)=>{
+    console.log("email in forgot password:",email);
+    console.log("userOtp in the fp:",userOtp);
+    console.log("sessionotp in fp:",sessionOtp);
+
     if(!userOtp||userOtp.length!==6||isNaN(userOtp)){
         return {success:false,message:'Please enter a valid 6  digit OTP'};
     }
-    // Assume sessionOTP from session in controller call
   const user = await User.findOne({ email });
-  if (!user || parseInt(userOtp) !== parseInt(/* sessionOTP from param or session */)) { // Integrate sessionOTP
-    return { success: false, message: 'Invalid OTP' };
-  }
+   if (!user) {
+        return {
+            success: false,
+            message: "User not found"
+        };
+    }
+    if (parseInt(userOtp) !== parseInt(sessionOtp)) {
+        return {
+            success: false,
+            message: "Invalid OTP"
+        };
+    }
 
   // Clear session in controller
   return { success: true, userId: user._id };

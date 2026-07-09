@@ -86,6 +86,22 @@
 <script>
 
   async function toggleUserStatus(userId, shouldBlock) {
+    const actionText = shouldBlock ? 'block' : 'unblock';
+    
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you really want to ${actionText} this user?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: shouldBlock ? '#d33' : '#3085d6',
+      cancelButtonColor: '#888',
+      confirmButtonText: `Yes, ${actionText} them!`
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
     try {
       const response = await fetch("/admin/toggle_block", {
         method: "POST",
@@ -97,7 +113,7 @@
         window.location.reload();
       } else {
         const data = await response.json();
-        alert(data.message || "Failed to update user status");
+        Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: data.message || "Failed to update user status" });
       }
     } catch (error) {
       console.error("Error:", error);

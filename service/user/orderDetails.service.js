@@ -362,43 +362,48 @@ const generateInvoiceContent = (doc, order) => {
     
     // Show ALL items as they were at order creation, regardless of current status.
     // Cancellations / returns are reflected in a separate Credit Note document.
+    let cartTotal = 0;
     order.items.forEach(item => {
-        const price = validateNumber(item.price);
+        const price = validateNumber(item.discountedPrice || item.price);
         const quantity = validateNumber(item.quantity);
         const total = price * quantity;
+        cartTotal += total;
 
         doc.text(item.name || 'Product', colPositions[0], y);
         doc.text(quantity.toString(), colPositions[1], y, { width: colWidths[1], align: 'right' });
-        doc.text(`₹${price.toFixed(2)}`, colPositions[2], y, { width: colWidths[2], align: 'right' });
-        doc.text(`₹${total.toFixed(2)}`, colPositions[3], y, { width: colWidths[3], align: 'right' });
+        doc.text(`Rs.${price.toFixed(2)}`, colPositions[2], y, { width: colWidths[2], align: 'right' });
+        doc.text(`Rs.${total.toFixed(2)}`, colPositions[3], y, { width: colWidths[3], align: 'right' });
         y += 20;
     });
 
     const summaryTop = y + 20;
 
-    // Use the original totals captured at order creation time.
-    // For legacy orders that don't have originalSubtotal/originalTotal yet,
-    // fall back to the current subtotal/total.
-    const subtotal  = validateNumber(order.originalSubtotal ?? order.subtotal);
+    // Use the exact breakdown logic from checkout:
+    // Subtotal is the Cart Total (after product offers)
     const delivery  = validateNumber(order.delivery);
-    const discount  = validateNumber(order.discount);
     const total     = validateNumber(order.originalTotal  ?? order.total);
     const tax       = validateNumber(order.tax);
+    
+    // Only show coupon discount in the summary (product offers are already reflected in the item prices)
+    let couponDiscount = 0;
+    if (order.appliedCoupon && order.appliedCoupon.value) {
+        couponDiscount = validateNumber(order.appliedCoupon.value);
+    }
 
     doc.moveTo(colPositions[2], summaryTop - 10).lineTo(colPositions[3] + colWidths[3], summaryTop - 10).stroke();
 
-    doc.text('Subtotal:', colPositions[2], summaryTop, { width: colWidths[2], align: 'right' });
-    doc.text(`₹${subtotal.toFixed(2)}`, colPositions[3], summaryTop, { width: colWidths[3], align: 'right' });
+    doc.text('Cart Total:', colPositions[2], summaryTop, { width: colWidths[2], align: 'right' });
+    doc.text(`Rs.${cartTotal.toFixed(2)}`, colPositions[3], summaryTop, { width: colWidths[3], align: 'right' });
 
     doc.text('Delivery:', colPositions[2], summaryTop + 20, { width: colWidths[2], align: 'right' });
-    doc.text(`₹${delivery.toFixed(2)}`, colPositions[3], summaryTop + 20, { width: colWidths[3], align: 'right' });
+    doc.text(`Rs.${delivery.toFixed(2)}`, colPositions[3], summaryTop + 20, { width: colWidths[3], align: 'right' });
 
     doc.text('Tax:', colPositions[2], summaryTop + 40, { width: colWidths[2], align: 'right' });
-    doc.text(`₹${tax.toFixed(2)}`, colPositions[3], summaryTop + 40, { width: colWidths[3], align: 'right' });
+    doc.text(`Rs.${tax.toFixed(2)}`, colPositions[3], summaryTop + 40, { width: colWidths[3], align: 'right' });
 
-    if (discount > 0) {
-        doc.text('Discount:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });
-        doc.text(`-₹${discount.toFixed(2)}`, colPositions[3], summaryTop + 60, { width: colWidths[3], align: 'right' });
+    if (couponDiscount > 0) {
+        doc.text('Coupon:', colPositions[2], summaryTop + 60, { width: colWidths[2], align: 'right' });
+        doc.text(`-Rs.${couponDiscount.toFixed(2)}`, colPositions[3], summaryTop + 60, { width: colWidths[3], align: 'right' });
     }
 
     doc.font('Helvetica-Bold');
@@ -453,19 +458,14 @@ const calculateFullRefund=(order, newlyCancelledItems, deliveryCharge,couponAmou
     console.log(newlyCancelledItems)
     
     const totalOriginalSubtotal = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
-    const totalPaidExcludingDelivery = totalOriginalSubtotal - couponAmount + tax;
-    console.log(totalOriginalSubtotal,totalPaidExcludingDelivery,'------------------')
+    const totalPaidExcludingDelivery = order.originalTotal - deliveryCharge;
     
     let refundAmount = 0;
     newlyCancelledItems.forEach(item => {
-        const itemProportion = item.totalPrice / totalOriginalSubtotal;
+        const itemProportion = totalOriginalSubtotal > 0 ? item.totalPrice / totalOriginalSubtotal : 0;
         refundAmount += itemProportion * totalPaidExcludingDelivery;
-console.log("refund amount",refundAmount);
-console.log("itempropotion",itemProportion);
-console.log("excluding delivey:",totalPaidExcludingDelivery);
     });
     
-    console.log("refund amount:",refundAmount);
     return Math.max(0, refundAmount);
 }
 
@@ -496,19 +496,20 @@ const processPartialCancellation = async (order, itemId, reason, cancelledItems,
     order.status = allCancelled ? 'cancelled' : 'partially_cancelled';
 
     const totalOriginalSubtotal = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
-    console.log("totalOriginalSubtotal", totalOriginalSubtotal);
-
-    const totalPaidExcludingDelivery = order.subtotal + order.tax - (order.appliedCoupon?.value || 0);
+    const totalPaidExcludingDelivery = order.originalTotal - (order.delivery || 0);
     
-    const itemProportion = item.totalPrice / totalOriginalSubtotal;
-    
+    const itemProportion = totalOriginalSubtotal > 0 ? item.totalPrice / totalOriginalSubtotal : 0;
     const refundAmount = Math.round((itemProportion * totalPaidExcludingDelivery) * 100) / 100;
 
-    // Update order totals
-    order.subtotal = Math.round((order.subtotal - item.totalPrice) * 100) / 100;
+    // Update order totals proportionally to maintain UI correctness
+    const itemOriginalPrice = (item.price || 0) * item.quantity;
+    order.subtotal = Math.max(0, Math.round((order.subtotal - itemOriginalPrice) * 100) / 100);
     
-    // Recalculate total: subtotal + delivery + tax - discount
-    order.total = Math.round((order.subtotal + order.delivery + order.tax - (order.appliedCoupon?.value || 0)) * 100) / 100;
+    const taxReduction = itemProportion * (order.tax || 0);
+    order.tax = Math.max(0, Math.round((order.tax - taxReduction) * 100) / 100);
+    
+    order.total = Math.max(0, Math.round((order.total - refundAmount) * 100) / 100);
+    order.discount = Math.max(0, Math.round((order.subtotal + (order.delivery || 0) + order.tax - order.total) * 100) / 100);
 
     // Store cancellation details
     order.cancellation = {

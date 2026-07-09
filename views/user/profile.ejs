@@ -6,7 +6,9 @@
       <!-- <div class="user-avatar">
         <img src="<%= user.avatar || '/images/user-avatar.jpg' %>" alt="User Avatar">
       </div> -->
-      <h3><%= user.name %></h3>
+      <h3>
+        <%= user.name %>
+      </h3>
     </div>
     <ul class="sidebar-menu">
       <li class="<%= activeTab === 'profile' ? 'active' : '' %>">
@@ -50,45 +52,79 @@
         <span>Edit Profile</span>
       </a>
     </div>
-    
-   <div class="profile-box">
-  <div class="form-group profile-image">
-    <label>Profile Image</label>
-    <div class="image-display">
-      <img  src="<%= user.avatar || '/img/admin-products.png' %>"
-       alt="Profile Image" 
-       class="profile-img">
 
+    <div class="profile-box">
+      <div class="form-group profile-image">
+        <label>Profile Image</label>
+        <div class="image-display">
+          <img src="<%= user.avatar || '/img/admin-products.png' %>" alt="Profile Image" class="profile-img">
+
+        </div>
+      </div>
     </div>
+
+
+    <div class="form-group">
+      <label> Name</label>
+      <div class="input-field">
+        <input type="text" value="<%= user.name %>" readonly>
+        <i class="fas fa-user"></i>
+      </div>
+    </div>
+
+
+
+    <div class="form-group">
+      <label>Phone Number</label>
+      <div class="input-field">
+        <input type="text" value="<%= user.phone || 'Not provided' %>" readonly>
+        <i class="fas fa-phone"></i>
+      </div>
+    </div>
+    <div class="form-group email-box">
+      <label>Email Address</label>
+      <div class="input-field">
+        <input type="email" value="<%= user.email %>" readonly>
+        <i class="fas fa-envelope"></i>
+      </div>
+    </div>
+
+    <% if (user.referralCode) { %>
+      <div class="form-group">
+        <label>My Referral Code</label>
+        <div class="input-field" style="position: relative;">
+          <input type="text" id="referralCodeInput" value="<%= user.referralCode %>" readonly
+            style="font-weight: 600; color: var(--primary-color); letter-spacing: 1px; padding-right: 40px;">
+          <i class="fas fa-gift"></i>
+          <button type="button" onclick="copyReferralCode()"
+            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9e6d4e; font-size: 1.1rem; padding: 5px;"
+            title="Copy to clipboard">
+            <span class="fas fa-copy" style="position: static; transform: none;"></span>
+          </button>
+        </div>
+        <small style="color: #666; display: block; margin-top: 5px;">Share this code with your friends!</small>
+      </div>
+      <% } %>
   </div>
-</div>
-
-
-      <div class="form-group">
-        <label> Name</label>
-        <div class="input-field">
-          <input type="text" value="<%= user.name %>" readonly>
-          <i class="fas fa-user"></i>
-        </div>
-      </div>
-      
-      
-      
-      <div class="form-group">
-        <label>Phone Number</label>
-        <div class="input-field">
-          <input type="text" value="<%= user.phone || 'Not provided' %>" readonly>
-          <i class="fas fa-phone"></i>
-        </div>
-      </div>
-      <div class="form-group email-box">
-        <label>Email Address</label>
-        <div class="input-field">
-          <input type="email" value="<%= user.email %>" readonly>
-          <i class="fas fa-envelope"></i>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
+<script>
+  function copyReferralCode() {
+    const referralInput = document.getElementById('referralCodeInput');
+    referralInput.select();
+    referralInput.setSelectionRange(0, 99999);
+
+    navigator.clipboard.writeText(referralInput.value)
+      .then(() => {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, icon: 'success', title: 'Referral code copied!' });
+        } else {
+          alert('Referral code copied!');
+        }
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+  }
+</script>

@@ -34,7 +34,9 @@
             <% } %>
   </div>
 
-  <div class="order-info">
+  <div class="order-content-grid">
+    <div class="order-left-column">
+      <div class="order-info">
     <% order.items.forEach(item=> { %>
       <script>
         console.log("item.imageUrl:", "<%= item.imageUrl %>");
@@ -118,109 +120,113 @@
       </div>
       <hr class="product-divider">
       <% }); %>
-
-        <div class="order-total">
-          <p><strong>Order Total: </strong> ₹<%= order.total.toLocaleString('en-IN') %>
-          </p>
-        </div>
   </div>
 
-  <div class="shipping-details">
-    <h2>SHIPPING DETAILS</h2>
-    <p><strong>
-        <%= order.shippingAddress.name %>
-      </strong></p>
-    <p>
-      <%= order.shippingAddress.building %>,
-        <%= order.shippingAddress.city %>,
-          <%= order.shippingAddress.state %>,
-            <%= order.shippingAddress.pincode %>,
-              <%= order.shippingAddress.addressType %>
+  <div class="order-status">
+    <p><strong>Tracking History:</strong> <%= getStatusmessage(order.status) %></p>
+    <ul>
+      <% order.statusHistory.forEach(history=> { %>
+        <li>
+          <strong><%= history.message %></strong><br>
+          <small style="color: #777;">
+            <%= new Date(history.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric' }) %>
+          </small>
+          <span>
+            <%= new Date(history.date).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) %>
+          </span>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <div class="shipping-details" style="max-width: 500px; padding: 1rem;">
+    <h3 style="margin-top:0; font-size: 1.1rem; color: var(--primary-color);">SHIPPING DETAILS</h3>
+    <p style="margin-bottom: 0.2rem;"><strong><%= order.shippingAddress.name %></strong></p>
+    <p style="margin: 0.2rem 0; font-size: 0.9rem; color: #555;">
+      <%= order.shippingAddress.building %>, <%= order.shippingAddress.city %>,<br>
+      <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %><br>
+      (<span style="text-transform: capitalize;"><%= order.shippingAddress.addressType %></span>)
     </p>
-    <p><strong>Phone: </strong>
-      <%= order.shippingAddress.phone %>
-    </p>
+    <p style="margin-top: 0.2rem; font-size: 0.9rem;"><strong>Phone: </strong><%= order.shippingAddress.phone %></p>
   </div>
 
   <% const steps=['PLACED', 'PROCESSING' , 'SHIPPED' , 'DELIVERED' ]; 
      const stepLabels=['ORDER PLACED', 'PROCESSING' , 'OUT FOR DELIVERY' , 'DELIVERED' ]; 
-     /* Default active step */
      let activeStep=0; 
-     if (order.status==='PLACED') {
-       activeStep=0; 
-     } else if (order.status==='PROCESSING') { 
-       activeStep=1; 
-     } else if (order.status==='SHIPPED') {
-       activeStep=2; 
-     } else if (order.status==='DELIVERED') { 
-       activeStep=3; 
-     } %>
+     if (order.status==='PLACED') { activeStep=0; }
+     else if (order.status==='PROCESSING') { activeStep=1; }
+     else if (order.status==='SHIPPED') { activeStep=2; }
+     else if (order.status==='DELIVERED') { activeStep=3; } %>
 
+  <% if (order.status.toUpperCase()==='PENDING' || order.status.toUpperCase()==='PROCESSING' ||
+    order.status.toUpperCase()==='PAID' || order.status.toUpperCase()==='PARTIALLY_CANCELLED' ) { %>
+    <div class="action-buttons">
+      <button class="action-btn cancel-btn" data-order-id="<%= order._id %>" data-status="<%= order.status %>"
+        onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
+    </div>
+  <% } else if (order.status.toUpperCase()==='PAYMENT_FAILED' ) { %>
+    <div class="action-buttons">
+      <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">Retry Payment</a>
+    </div>
+  <% } %>
 
-    <% if (order.status.toUpperCase()==='PENDING' || order.status.toUpperCase()==='PROCESSING' ||
-      order.status.toUpperCase()==='PAID' || order.status.toUpperCase()==='PARTIALLY_CANCELLED' ) { %>
-      <div class="action-buttons">
-        <button class="action-btn cancel-btn" data-order-id="<%= order._id %>" data-status="<%= order.status %>"
-          onclick="openModal('cancel', '<%= order._id %>')">Cancel Order</button>
-      </div>
-      <% } else if (order.status.toUpperCase()==='PAYMENT_FAILED' ) { %>
-        <div class="action-buttons">
-          <a href="/user/retry-checkout/<%= order.orderId %>" class="retry-payment-btn">
-            Retry Payment
-          </a>
+  <% const activeItems=order.items.filter(i=> i.status !== 'cancelled' && i.status !== 'returned' && i.status !== 'return_requested');
+     const activeCount = activeItems.length; %>
+
+  <% if ((order.status.toUpperCase()==='DELIVERED' || order.status.toUpperCase()==='PARTIALLY_RETURNED' ) &&
+    order.status !=='payment_failed' && activeCount> 0) { %>
+    <div class="action-buttons">
+      <% if (order.items.length===1) { %>
+        <button class="action-btn return-btn" data-order-id="<%= order._id %>"
+          data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">Return Order</button>
+      <% } else { %>
+        <button class="action-btn return-order-btn" data-order-id="<%= order._id %>"
+          data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">Return Order</button>
+      <% } %>
+    </div>
+  <% } %>
+
+  <p class="inquiries" style="margin-top: 1.5rem; font-size: 0.9rem;">Any inquiries? <a href="/user/contact">Contact us</a></p>
+
+    </div> <!-- /order-left-column -->
+
+    <div class="order-right-column">
+      <div class="order-summary-card">
+        <h3>ORDER SUMMARY</h3>
+        <% 
+          // Reconstruct original totals to display a static receipt
+          const originalCartTotal = order.originalSubtotal || order.items.reduce((sum, i) => sum + (i.totalPrice || (i.discountedPrice || i.price) * i.quantity), 0);
+          const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) - (order.appliedCoupon ? order.appliedCoupon.value : 0));
+        %>
+        <div class="summary-row">
+          <span>Cart Total</span>
+          <span>₹<%= originalCartTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+        </div>
+        
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span>₹<%= (order.delivery || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+        </div>
+        
+        <div class="summary-row">
+          <span>Tax</span>
+          <span>₹<%= (order.tax || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+        </div>
+        
+        <% if (order.appliedCoupon && order.appliedCoupon.value > 0) { %>
+        <div class="summary-row coupon-row">
+          <span>Coupon Discount</span>
+          <span style="color: #28a745;">-₹<%= order.appliedCoupon.value.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
         </div>
         <% } %>
 
-          <% /* Compute activeCount once for reuse (eligible items for return) */ 
-             const activeItems=order.items.filter(i=>
-             i.status !== 'cancelled' && i.status !== 'returned' && i.status !== 'return_requested');
-             const activeCount = activeItems.length;
-             %>
-
-            <% if ((order.status.toUpperCase()==='DELIVERED' || order.status.toUpperCase()==='PARTIALLY_RETURNED' ) &&
-              order.status !=='payment_failed' && activeCount> 0) { %>
-              <div class="action-buttons">
-                <% if (order.items.length===1) { %>
-                  <button class="action-btn return-btn" data-order-id="<%= order._id %>"
-                    data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">
-                    Return Order
-                  </button>
-                  <% } else { %>
-                    <button class="action-btn return-order-btn" data-order-id="<%= order._id %>"
-                      data-status="<%= order.status %>" onclick="openModal('return', '<%= order._id %>')">
-                      Return Order
-                    </button>
-                    <% } %>
-              </div>
-              <% } %>
-
-
-
-                <p class="inquiries">Any inquiries? <a href="/user/contact">Contact us</a></p>
-
-                <div class="order-status">
-                  <p>
-                    <%= getStatusmessage(order.status) %>
-                  </p>
-                  <ul>
-                    <% order.statusHistory.forEach(history=> { %>
-                      <li>
-                        <strong>
-                          <%= history.message %>
-                        </strong>
-                        <br>
-                        <small style="color: #777;">
-                          <%= new Date(history.date).toLocaleDateString('en-US', { weekday: 'short' , month: 'short' ,
-                            day: 'numeric' }) %>
-                        </small>
-                        <span>
-                          <%= new Date(history.date).toLocaleTimeString('en-US', { hour: '2-digit' , minute: '2-digit'
-                            }) %>
-                        </span>
-                      </li>
-                      <% }) %>
-                  </ul>
-                </div>
+        <div class="summary-row total">
+          <span>TOTAL</span>
+          <span>₹<%= origTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+        </div>
+      </div>
+    </div> <!-- /order-right-column -->
+  </div> <!-- /order-content-grid -->
 </div>
 
 <!-- Cancel Order Modal -->

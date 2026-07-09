@@ -82,9 +82,16 @@
       </div>
 
       <div class="shop-controls">
-        <div class="search-bar">
+        <div class="search-bar" style="position: relative;">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search products..." id="product-search">
+          <input type="text" placeholder="Search products..." id="product-search"
+            oninput="document.getElementById('clear-search-btn').style.display = this.value ? 'block' : 'none';"
+            style="padding-right: 35px;">
+          <button id="clear-search-btn" type="button" title="Clear Search"
+            onclick="document.getElementById('product-search').value = ''; document.getElementById('product-search').dispatchEvent(new Event('input')); this.style.display='none';"
+            style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; padding: 0;">
+            &times;
+          </button>
         </div>
 
         <div class="sort-dropdown">

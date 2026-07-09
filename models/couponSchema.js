@@ -118,9 +118,6 @@ couponSchema.statics.validateCoupon = async function (code, cartValue) {
     };
   }
 
-  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-    return { valid: false, message: 'Coupon usage limit reached' };
-  }
 
   return { valid: true, coupon };
 };

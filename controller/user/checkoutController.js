@@ -9,6 +9,9 @@ export const getCheckoutPage = async (req, res) => {
   }
   const userId = req.session.user.id;
 
+  // Clear any residual coupon from previous attempts so it's not silently applied
+  delete req.session.appliedCoupon;
+
   const { addresses, cartItems, fromCart, taxRate, orderSummary, offers, paymentMethods, coupons,wallet } = await checkoutService.getCheckoutData(userId, req.session);
   console.log("items inside the cart :",cartItems);
 if(!cartItems||cartItems.length===0){
@@ -51,6 +54,10 @@ export const getRetryCheckoutPage = async (req, res) => {
   if (!userId) {
     return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: "please login to continue" });
   }
+
+  // Clear any residual coupon from previous attempts
+  delete req.session.appliedCoupon;
+
   const orderId = req.params.orderId;
   console.log("orderId",orderId);
   const retryData = await checkoutService.getRetryCheckoutData(userId, orderId);

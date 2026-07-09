@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Chettivan - OTP Validation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/css/validationotp.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
   <div class="otp-container">
@@ -17,55 +22,77 @@
         <p>We're verifying your identity to protect your Chettivan account.</p>
         <div class="security-tips">
           <p><i class="fas fa-shield-alt"></i> Never share your OTP with anyone</p>
-          <p><i class="fas fa-clock"></i> OTP expires in 30 seconds</p>
+          <p><i class="fas fa-clock"></i> OTP expires in 60 seconds</p>
           <p><i class="fas fa-envelope"></i> Check spam folder if not received</p>
         </div>
       </div>
     </div>
-    
+
     <div class="otp-form-section">
       <div class="form-header">
         <h1>CHETTINAD</h1>
         <p class="tagline">A Fort of Timeless Weaves</p>
       </div>
-      
+
       <div class="otp-content">
         <h3>Enter OTP</h3>
         <p class="instruction">We've sent a 6-digit verification code to your registered email</p>
-        
-        <div class="timer-container">
-          <span id="otp-timer" class="timer">00:30</span>
-          <span>remaining</span>
-        </div>
-        <form action="/user/validationotp" method="POST" id="otp-form">
-        <div  class="otp-inputs">
-          <input type="text" name="otp1" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code">
-          <input type="text" name="otp2" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text"name="otp3" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text"name="otp4" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text"name="otp5" maxlength="1" pattern="[0-9]" inputmode="numeric">
-          <input type="text" name="otp6"maxlength="1" pattern="[0-9]" inputmode="numeric">
-        </div>
-        <input type="hidden" name="otp" id="combined-otp">
-        <button  type="submit" class="verify-btn">Verify <code></code></button>
-      </form>
-        <p class="resend-text">Didn't receive the code? <a href="#" id="resend-link">Resend OTP</a></p>
+
+        <% if (locals.error) { %>
+          <div id="error-message-block" class="alert alert-danger"
+            style="color: #d9534f; margin-bottom: 15px; font-weight: 500; text-align: center; padding: 10px; background-color: #f2dede; border-radius: 5px; border: 1px solid #ebccd1;">
+            <%= error %>
+          </div>
+          <% } %>
+
+            <div class="timer-container">
+              <span id="otp-timer" class="timer">01:00</span>
+              <span>remaining</span>
+            </div>
+            <form action="/user/validationotp" method="POST" id="otp-form">
+              <div class="otp-inputs">
+                <input type="text" name="otp1" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                  autocomplete="one-time-code">
+                <input type="text" name="otp2" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" name="otp3" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" name="otp4" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" name="otp5" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" name="otp6" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              </div>
+              <input type="hidden" name="otp" id="combined-otp">
+              <button type="submit" class="verify-btn">Verify <code></code></button>
+            </form>
+            <p class="resend-text">Didn't receive the code? <a href="#" id="resend-link">Resend OTP</a></p>
       </div>
     </div>
   </div>
 
   <script>
     // Countdown timer functionality
-    let seconds = 30;
+    const isExpired = <%= locals.otpExpired ? 'true' : 'false' %>;
+    let seconds = isExpired ? 0 : 60;
     const timer = document.getElementById('otp-timer');
     const resendLink = document.getElementById('resend-link');
-    let timerActive = true;
-    
+    let timerActive = !isExpired;
+
+    if (isExpired) {
+      timer.textContent = '00:00';
+      resendLink.style.color = "var(--primary-color)";
+      resendLink.style.fontWeight = "600";
+      resendLink.style.cursor = "pointer";
+      resendLink.style.textDecoration = "underline";
+    }
+
     const interval = setInterval(() => {
+      if (!timerActive) {
+        clearInterval(interval);
+        return;
+      }
+
       seconds--;
       timer.textContent = `00:${seconds < 10 ? '0' : ''}${seconds}`;
-      
-      if (seconds === 0) {
+
+      if (seconds <= 0) {
         clearInterval(interval);
         timerActive = false;
         resendLink.style.color = "var(--primary-color)";
@@ -74,10 +101,10 @@
         resendLink.style.textDecoration = "underline";
       }
     }, 1000);
-    
+
     // Auto-focus between OTP inputs
     const inputs = document.querySelectorAll('.otp-inputs input');
-    
+
     inputs.forEach((input, index) => {
       input.addEventListener('input', (e) => {
         if (e.target.value.length === 1) {
@@ -86,7 +113,7 @@
           }
         }
       });
-      
+
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace' && e.target.value.length === 0) {
           if (index > 0) {
@@ -95,41 +122,56 @@
         }
       });
     });
-    
-    // Resend OTP functionality
+
+    // Toast configuration for SweetAlert
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+
     resendLink.addEventListener('click', (e) => {
       if (!timerActive) {
         e.preventDefault();
-        seconds = 30;
+
+        // Hide error message if present
+        const errorBlock = document.getElementById('error-message-block');
+        if (errorBlock) {
+          errorBlock.style.display = 'none';
+        }
+
+        seconds = 60;
         timerActive = true;
         resendLink.style.color = "var(--text-color)";
         resendLink.style.fontWeight = "400";
         resendLink.style.cursor = "default";
         resendLink.style.textDecoration = "none";
-        
-       fetch("/user/resend-forgot-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert("OTP resent successfully");
-      } else {
-        alert("Failed to resend OTP");
-      }
-    })
-    .catch(error => {
-      console.error("Error resending OTP:", error);
-      alert("An error occurred while resending OTP.");
-    });
-        
+
+        fetch("/user/resend-forgot-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Toast.fire({ icon: 'success', title: 'OTP resent successfully' });
+            } else {
+              Toast.fire({ icon: 'error', title: 'Failed to resend OTP' });
+            }
+          })
+          .catch(error => {
+            console.error("Error resending OTP:", error);
+            Toast.fire({ icon: 'error', title: 'An error occurred while resending OTP.' });
+          });
+
         const newInterval = setInterval(() => {
           seconds--;
           timer.textContent = `00:${seconds < 10 ? '0' : ''}${seconds}`;
-          
+
           if (seconds === 0) {
             clearInterval(newInterval);
             timerActive = false;
@@ -141,20 +183,21 @@
         }, 1000);
       }
     });
-const form=document.getElementById('otp-form');
-const otpInputs =document.querySelectorAll('.otp-inputs input');
-const combinedOtpField=document.getElementById('combined-otp');
-   form.addEventListener('submit',function(e){
-    let otp='';
-    otpInputs.forEach(input=>{
-      otp+=input.value;
+    const form = document.getElementById('otp-form');
+    const otpInputs = document.querySelectorAll('.otp-inputs input');
+    const combinedOtpField = document.getElementById('combined-otp');
+    form.addEventListener('submit', function (e) {
+      let otp = '';
+      otpInputs.forEach(input => {
+        otp += input.value;
 
-    })
-    combinedOtpField.value=otp;
-   });
+      })
+      combinedOtpField.value = otp;
+    });
 
 
 
   </script>
 </body>
+
 </html>

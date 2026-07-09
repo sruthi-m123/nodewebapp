@@ -85,20 +85,16 @@ export const getDiscountTextService = (coupon) => {
 export const checkCouponUsageService = async (userId, coupon) => {
     logger.debug('Checking coupon usage limit', { userId, couponId: coupon._id });
 
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-        logger.warn('global coupon usage limit reached', { couponId: coupon._id, usedCount: coupon.usedCount });
-        throw new Error('Coupon usage limit reached');
-    }
-
     const usageCount = await Order.countDocuments({
         userId,
         'appliedCoupon.couponId': coupon._id,
         status: { $nin: ['cancelled', 'returned', 'payment_failed', 'payment_pending'] }
     });
 
-    if (usageCount >= 1) {
+    const limit = coupon.usageLimit || Infinity;
+    if (usageCount >= limit) {
         logger.warn('user coupon usage limit reached', { userId, couponId: coupon._id, usageCount });
-        throw new Error(`You have already used this coupon`);
+        throw new Error(`Coupon usage limit reached. You can only use this coupon ${limit} time(s).`);
     }
     return true;
 }

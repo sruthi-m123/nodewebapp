@@ -75,6 +75,7 @@ const formattedOrders=orders.map(order=>({
       user: order.userId?.name || "Deleted User",
       date: order.createdAt.toISOString().split('T')[0],
       total: order.total,
+      originalTotal: order.originalTotal,
       status: order.status,
       statusClass: order.status.toLowerCase().replace(/\s+/g, '-'),
       returnRequest: order.returnRequested || false,
@@ -469,13 +470,18 @@ static async _updateOrderStatus(order,refundItems){
 }
 static async getOrderDetails(orderId){
     console.log("getOrder detail controller ")
-    let order=await Order.findOne({orderId}).populate('items.productId');
+    let order=await Order.findOne({orderId}).populate('items.productId').lean();
     console.log("order inside the getOrder details:",order);
     if(!order){
         throw new Error('no order avilable for this Id');
     }
+    
+    order.statusHistory = [{ date: order.createdAt, message: 'Order Placed' }];
+    if (order.processingAt) order.statusHistory.push({ date: order.processingAt, message: 'Processing' });
+    if (order.shippedAt) order.statusHistory.push({ date: order.shippedAt, message: 'Shipped' });
+    if (order.deliveredAt) order.statusHistory.push({ date: order.deliveredAt, message: 'Delivered' });
+    
     return order;
-
 }
 }
 

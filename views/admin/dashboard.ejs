@@ -305,12 +305,19 @@
           endDate = document.getElementById('modal-end-date').value;
 
           if (!startDate || !endDate) {
-            showNotification('Please select both start and end dates', 'error');
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: 'Please select both start and end dates' });
             return;
           }
 
           if (new Date(startDate) > new Date(endDate)) {
-            showNotification('Start date cannot be after end date', 'error');
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: 'Start date cannot be after end date' });
+            return;
+          }
+          
+          const today = new Date();
+          today.setHours(23, 59, 59, 999);
+          if (new Date(endDate) > today) {
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: 'End date cannot be in the future' });
             return;
           }
         }

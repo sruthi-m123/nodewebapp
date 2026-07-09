@@ -281,16 +281,13 @@
 </div> -->
 
       <div class="summary-row">
-        <span>Total</span>
-        <span id="summary-netAmount">₹<%= (netAmount || 0).toFixed(2) %></span>
+        <span>Cart Total</span>
+        <span id="summary-cartTotal">₹<%= ((subtotal || 0) - (offerDiscount || 0)).toFixed(2) %></span>
       </div>
 
-
-
-
       <div class="summary-row">
-        <span>Delivery</span>
-        <span id="summary-delivery">₹<%= (delivery || 0).toFixed(2) %></span>
+        <span>Coupon Discount</span>
+        <span id="summary-couponDiscount" style="color: #28a745;">-₹<%= (couponDiscount || 0).toFixed(2) %></span>
       </div>
 
       <div class="summary-row">
@@ -299,28 +296,23 @@
       </div>
 
       <div class="summary-row">
-        <span>Coupon Discount</span>
-        <span id="summary-couponDiscount">₹<%= (couponDiscount || 0).toFixed(2) %></span>
+        <span>Delivery</span>
+        <span id="summary-delivery">₹<%= (delivery || 0).toFixed(2) %></span>
       </div>
-
-      <!-- <div class="summary-row">
-  <span> Total Discount</span>
-  <span id="summary-discount" style="color: #28a745;">-₹<%= discount || 0 %></span>
-</div> -->
 
       <div class="summary-row total">
         <span>TOTAL</span>
         <span id="summary-total">₹<%= (total || 0).toFixed(2) %></span>
       </div>
       </form>
+      
+      <input type="hidden" id="isRetry" value="<%= typeof isRetry !== 'undefined' ? isRetry : false %>">
+      <button type="submit" class="continue-btn" onclick="placeOrder()" style="width: 100%; margin-top: 20px;">Place Order</button>
 
     </div>
 
 
   </div>
-  <input type="hidden" id="isRetry" value="<%= typeof isRetry !== 'undefined' ? isRetry : false %>">
-  <button type="submit" class="continue-btn" onclick="placeOrder()">Place Order</button>
-
 
 
   <!-- Add/Edit Address Modal -->

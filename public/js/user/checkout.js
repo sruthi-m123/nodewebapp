@@ -371,18 +371,10 @@ function updateOrderSummary(orderSummary) {
     return `${isNegative ? '-' : ''}\u20b9${amount.toFixed(2)}`;
   };
 
-  // "Total" row (pre-tax amount after all discounts)
-  // Prefer netAmount from API; fall back to deriving it from total - tax
-  const netAmountEl = document.getElementById("summary-netAmount");
-  if (netAmountEl) {
-    let displayNetAmount;
-    if (orderSummary.netAmount !== undefined && orderSummary.netAmount !== null) {
-      displayNetAmount = orderSummary.netAmount;
-    } else {
-      // Derive: total = netAmount + tax  →  netAmount = total - tax
-      displayNetAmount = Number(orderSummary.total || 0) - Number(orderSummary.tax || 0);
-    }
-    netAmountEl.textContent = formatCurrency(displayNetAmount);
+  const cartTotalEl = document.getElementById("summary-cartTotal");
+  if (cartTotalEl) {
+    const cartTotal = Number(orderSummary.subtotal || 0) - Number(orderSummary.offerDiscount || 0);
+    cartTotalEl.textContent = formatCurrency(cartTotal);
   }
 
   document.getElementById("summary-delivery").textContent =

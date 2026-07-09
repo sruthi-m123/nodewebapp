@@ -1,308 +1,156 @@
 <%- include('../partials/admin/admin-header') %>
-<link rel="stylesheet" href="/css/admin/viewDetailAdmin.css">
-<div class="order-page-container">
-  <div class="top-info">
-    <div class="order-id">Order Id: <%= order.orderId %></div>
-    <div class="order-date">
-      <% const displayDate = order.orderDate || order.createdAt %>
-      Order Date: <%= displayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+  <link rel="stylesheet" href="/css/admin/viewDetailAdmin.css">
+  <div class="order-page-container">
+    <div class="top-info">
+      <div class="order-id">Order Id: <%= order.orderId %>
+      </div>
+      <div class="order-date">
+        <% const displayDate=order.orderDate || order.createdAt %>
+          Order Date: <%= displayDate.toLocaleDateString('en-US', { month: 'short' , day: 'numeric' , year: 'numeric' })
+            %>
+      </div>
     </div>
-  </div>
 
-  <div class="main-content">
-    <div class="left-section">
-      <div class="order-summary card">
-        <h3>Order Summary</h3>
-        <div class="summary-item">
-          <span class="label">Total Amount:</span>
-          <span class="value">Rs.<%= order.total%></span>
-        </div>
-        <div class="summary-item">
-          <span class="label">Payment Method:</span>
-          <span class="value"><%= order.paymentMethod %></span>
-        </div>
-
-        <div class="status-actions">
-          <%
-            const currentStatus = order.status || 'pending';
-            let forwardStatuses = [];
-            const statusLower = currentStatus.toLowerCase();
-            if (statusLower === 'pending') {
-              forwardStatuses = ['processing', 'shipped', 'delivered'];
-            } else if (statusLower === 'processing') {
-              forwardStatuses = ['shipped', 'delivered'];
-            } else if (statusLower === 'shipped') {
-              forwardStatuses = ['delivered'];
-            } else if (statusLower === 'delivered') {
-              forwardStatuses = [];
-            }
+    <div class="main-content">
+      <div class="left-section">
+        <div class="order-summary card">
+          <h3>Order Summary</h3>
+          <% 
+            const originalCartTotal = order.originalSubtotal || order.items.reduce((sum, i) => sum + (i.totalPrice || (i.discountedPrice || i.price) * i.quantity), 0);
+            const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) - (order.appliedCoupon ? order.appliedCoupon.value : 0));
           %>
-          <div class="dropdown">
-            <button class="dropdown-btn" type="button" <%= forwardStatuses.length === 0 ? 'disabled' : '' %>>
-              <%= currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1) %>
-              <% if (forwardStatuses.length > 0) { %>
-                <i class="fas fa-chevron-down" style="margin-left: 8px;"></i>
-              <% } %>
-            </button>
-            <% if (forwardStatuses.length > 0) { %>
-              <ul class="dropdown-list">
-                <% forwardStatuses.forEach(status => { %>
-                  <li data-value="<%= status %>"><%= status.charAt(0).toUpperCase() + status.slice(1) %></li>
-                <% }); %>
-              </ul>
-            <% } %>
+          <div class="summary-item">
+            <span class="label">Total Amount:</span>
+            <span class="value">Rs.<%= origTotal %></span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Payment Method:</span>
+            <span class="value">
+              <%= order.paymentMethod %>
+            </span>
           </div>
 
-          <p id="selected-status" style="margin: 0; font-size: 13px; font-weight: bold; color: #555;">Selected: None</p>
+          <div class="status-actions">
+            <div class="status-select">
+              <button class="status-btn">
+                <%= order.status %>
+              </button>
+              <select name="status" class="dropdown">
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <button class="update-btn" data-order-id="<%= order._id %>">
+              Update Status
+            </button>
+          </div>
+        </div>
 
-          <button class="update-btn" data-order-id="<%= order._id %>" <%= forwardStatuses.length === 0 ? 'disabled' : '' %>>
-            Update Status
-          </button>
+        <!-- Updated Products Section -->
+        <div class="products-container card">
+          <h3>Products (<%= order.items.length %>)</h3>
+          <% order.items.forEach((item, index)=> { %>
+            <div class="product-card">
+              <div class="product-image">
+                <img src="/<%= item.productId.images[0] %>" alt="Product Image">
+              </div>
+              <div class="product-details">
+                <div class="detail-row">
+                  <span class="label">Product Name:</span>
+                  <span class="value">
+                    <%= item.productId.productName %>
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Quantity:</span>
+                  <span class="value">
+                    <%= item.quantity %>
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Price:</span>
+                  <span class="value">Rs.<%= item.price %></span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Subtotal:</span>
+                  <span class="value">Rs.<%= (item.price * item.quantity).toFixed(2) %></span>
+                </div>
+              </div>
+              <% if (index < order.items.length - 1) { %>
+                <hr class="product-divider">
+                <% } %>
+            </div>
+            <% }); %>
         </div>
       </div>
 
-      <!-- Updated Products Section -->
-      <div class="products-container card">
-        <h3>Products (<%= order.items.length %>)</h3>
-        <% order.items.forEach((item, index) => { %>
-          <div class="product-card">
-            <div class="product-image">
-              <img src="<%= item.productId.images[0] %>" alt="Product Image">
-            </div>
-            <div class="product-details">
-              <div class="detail-row">
-                <span class="label">Product Name:</span>
-                <span class="value"><%= item.productId.productName %></span>
-              </div>
-              <div class="detail-row">
-                <span class="label">Quantity:</span>
-                <span class="value"><%= item.quantity %></span>
-              </div>
-              <div class="detail-row">
-                <span class="label">Price:</span>
-                <span class="value">Rs.<%= item.price %></span>
-              </div>
-               <div class="detail-row">
-                <span class="label">Status:</span>
-                <span class="value"><%= item.status %></span>
-              </div>
-              <div class="detail-row">
-                <span class="label">Subtotal:</span>
-                <span class="value">Rs.<%= (item.price * item.quantity).toFixed(2) %></span>
-              </div>
-            </div>
-            <% if (index < order.items.length - 1) { %>
-              <hr class="product-divider">
-            <% } %>
-          </div>
-        <% }); %>
-      </div>
-    </div>
-
-    <div class="shipping-address card">
-      <h3>Shipping Address</h3>
-      <div class="address-item">
-        <span class="label">Name:</span>
-        <span class="value"><%= order.shippingAddress.name %></span>
-      </div>
-      <div class="address-item">
-        <span class="label">Address:</span>
-        <span class="value">
-          <%= order.shippingAddress.building %>,
-          <%= order.shippingAddress.landmark %>,
-          <%= order.shippingAddress.city %>,
-          <%= order.shippingAddress.state %> -
-          <%= order.shippingAddress.pincode %>
-        </span>
-      </div>
-      <div class="address-item">
-        <span class="label">Phone:</span>
-        <span class="value"><%= order.shippingAddress.phone %></span>
+      <div class="shipping-address card">
+        <h3>Shipping Address</h3>
+        <div class="address-item">
+          <span class="label">Name:</span>
+          <span class="value">
+            <%= order.shippingAddress.name %>
+          </span>
+        </div>
+        <div class="address-item">
+          <span class="label">Address:</span>
+          <span class="value">
+            <%= order.shippingAddress.building %>,
+              <%= order.shippingAddress.landmark %>,
+                <%= order.shippingAddress.city %>,
+                  <%= order.shippingAddress.state %> -
+                    <%= order.shippingAddress.pincode %>
+          </span>
+        </div>
+        <div class="address-item">
+          <span class="label">Phone:</span>
+          <span class="value">
+            <%= order.shippingAddress.phone %>
+          </span>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<%- include('../partials/admin/admin-footer') %>
-
-<style>
-/* Dropdown container */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-btn {
-  background: #f8f9fa;
-  color: #333;
-  border: 1px solid #ced4da;
-  padding: 6px 12px;
-  font-size: 13px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 130px;
-  justify-content: space-between;
-  transition: all 0.2s ease;
-}
-
-.dropdown-btn:hover:not([disabled]) {
-  background: #e2e6ea;
-  border-color: #dae0e5;
-}
-
-.dropdown-btn[disabled] {
-  background: #e9ecef;
-  color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.8;
-  border-color: #dee2e6;
-}
-
-.dropdown-list {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  margin-top: 4px;
-  list-style: none;
-  padding: 0;
-  width: 140px;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-  z-index: 100;
-}
-
-.dropdown-list.show {
-  display: block;
-}
-
-.dropdown-list li {
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #333;
-  transition: background 0.2s;
-}
-
-.dropdown-list li:hover {
-  background: #f1f3f5;
-}
-
-.update-btn {
-  background: var(--primary-color); 
-  color: white;
-  padding: 6px 12px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;  
-  transition: all 0.3s ease;
-}
-
-.update-btn:hover:not([disabled]) {
-  background: var(--primary-dark); 
-}
-
-.update-btn[disabled] {
-  background: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.75;
-}
-
-#selected-status {
-  margin-top: 0;
-  font-weight: bold;
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".status-actions").forEach((container) => {
-    const dropdownBtn = container.querySelector(".dropdown-btn");
-    const dropdownList = container.querySelector(".dropdown-list");
-    const selectedText = container.querySelector("#selected-status");
-    const updateBtn = container.querySelector(".update-btn");
-
-    let selectedStatus = null;
-
-    // Toggle dropdown
-    if (dropdownBtn && dropdownList) {
-      dropdownBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dropdownList.classList.toggle("show");
-      });
-    }
-
-    // Select status
-    if (dropdownList) {
-      dropdownList.querySelectorAll("li").forEach((li) => {
-        li.addEventListener("click", (e) => {
-          e.stopPropagation();
-          selectedStatus = li.dataset.value;
-          const statusText = selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1);
-          if (selectedText) {
-            selectedText.textContent = "Selected: " + statusText;
-          }
-          if (dropdownBtn) {
-            dropdownBtn.innerHTML = statusText + ' <i class="fas fa-chevron-down" style="margin-left: 8px;"></i>';
-          }
-          dropdownList.classList.remove("show");
-        });
-      });
-    }
-
-    // Update status POST
-    if (updateBtn) {
-      updateBtn.addEventListener("click", async () => {
-        if (!selectedStatus) {
-          alert("Please select a status first!");
-          return;
-        }
-
-        const orderId = updateBtn.dataset.orderId;
-
-        try {
-          updateBtn.disabled = true;
-          updateBtn.textContent = "Updating...";
-
-          const res = await fetch("/admin/orders/" + orderId + "/status", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: selectedStatus }),
-          });
-
-          const data = await res.json();
-
-          if (res.ok && data.success) {
-            alert("Status updated to " + selectedStatus);
-            window.location.reload();
-          } else {
-            alert("Error: " + (data.message || data.error || "Failed to update"));
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const updateBtn = document.querySelector('.update-btn');
+      const statusSelect = document.querySelector('select.dropdown');
+      
+      if (updateBtn && statusSelect) {
+        updateBtn.addEventListener('click', async () => {
+          const selectedStatus = statusSelect.value;
+          const orderId = updateBtn.dataset.orderId;
+          
+          try {
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            
+            const res = await fetch('/admin/orders/' + orderId + '/status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: selectedStatus })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok && data.success) {
+              Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'success', title: 'Status updated to ' + selectedStatus });
+              setTimeout(() => window.location.reload(), 1000);
+            } else {
+              Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: data.message || 'Failed to update' });
+              updateBtn.disabled = false;
+              updateBtn.textContent = 'Update Status';
+            }
+          } catch (error) {
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'error', title: 'Something went wrong' });
             updateBtn.disabled = false;
-            updateBtn.textContent = "Update Status";
+            updateBtn.textContent = 'Update Status';
           }
-        } catch (err) {
-          console.error(err);
-          alert("Something went wrong");
-          updateBtn.disabled = false;
-          updateBtn.textContent = "Update Status";
-        }
-      });
-    }
-  });
-
-  // Close dropdown if clicked outside
-  document.addEventListener("click", (e) => {
-    document.querySelectorAll(".dropdown-list").forEach((list) => {
-      if (!list.parentElement.contains(e.target)) {
-        list.classList.remove("show");
+        });
       }
     });
-  });
-});
-</script>
-
+  </script>
+  <%- include('../partials/admin/admin-footer') %>
