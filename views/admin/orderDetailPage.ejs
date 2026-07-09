@@ -11,41 +11,79 @@
       </div>
     </div>
 
-    <div class="main-content">
+    <div class="content-wrapper">
       <div class="left-section">
         <div class="order-summary card">
           <h3>Order Summary</h3>
-          <% 
-            const originalCartTotal = order.originalSubtotal || order.items.reduce((sum, i) => sum + (i.totalPrice || (i.discountedPrice || i.price) * i.quantity), 0);
-            const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) - (order.appliedCoupon ? order.appliedCoupon.value : 0));
-          %>
-          <div class="summary-item">
-            <span class="label">Total Amount:</span>
-            <span class="value">Rs.<%= origTotal %></span>
-          </div>
-          <div class="summary-item">
-            <span class="label">Payment Method:</span>
-            <span class="value">
-              <%= order.paymentMethod %>
-            </span>
-          </div>
-
-          <div class="status-actions">
-            <div class="status-select">
-              <button class="status-btn">
-                <%= order.status %>
-              </button>
-              <select name="status" class="dropdown">
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+          <% const originalCartTotal=order.originalSubtotal || order.items.reduce((sum, i)=> sum + (i.totalPrice ||
+            (i.discountedPrice || i.price) * i.quantity), 0);
+            const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) -
+            (order.appliedCoupon ? order.appliedCoupon.value : 0));
+            %>
+            <div class="summary-item">
+              <span class="label">Cart Total:</span>
+              <span class="value">₹<%= originalCartTotal.toLocaleString('en-IN', {minimumFractionDigits: 2,
+                  maximumFractionDigits: 2}) %></span>
             </div>
-            <button class="update-btn" data-order-id="<%= order._id %>">
-              Update Status
-            </button>
-          </div>
+            <div class="summary-item">
+              <span class="label">Delivery:</span>
+              <span class="value">₹<%= (order.delivery || 0).toLocaleString('en-IN', {minimumFractionDigits: 2,
+                  maximumFractionDigits: 2}) %></span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Tax:</span>
+              <span class="value">₹<%= (order.tax || 0).toLocaleString('en-IN', {minimumFractionDigits: 2,
+                  maximumFractionDigits: 2}) %></span>
+            </div>
+            <% if (order.appliedCoupon && order.appliedCoupon.value> 0) { %>
+              <div class="summary-item" style="color: #28a745;">
+                <span class="label">Coupon Discount:</span>
+                <span class="value">-₹<%= order.appliedCoupon.value.toLocaleString('en-IN', {minimumFractionDigits: 2,
+                    maximumFractionDigits: 2}) %></span>
+              </div>
+              <% } %>
+                <div class="summary-item"
+                  style="font-weight: bold; font-size: 1.1em; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+                  <span class="label">TOTAL:</span>
+                  <span class="value">₹<%= origTotal.toLocaleString('en-IN', {minimumFractionDigits: 2,
+                      maximumFractionDigits: 2}) %></span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Payment Method:</span>
+                  <span class="value">
+                    <%= order.paymentMethod %>
+                  </span>
+                </div>
+
+                <div class="status-actions">
+                  <% 
+                    const currentStatus = order.status ? order.status.toLowerCase() : 'pending';
+                    let forwardStatuses = [];
+                    if (currentStatus === 'pending') {
+                      forwardStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
+                    } else if (currentStatus === 'processing') {
+                      forwardStatuses = ['shipped', 'delivered', 'cancelled'];
+                    } else if (currentStatus === 'shipped') {
+                      forwardStatuses = ['delivered'];
+                    }
+                  %>
+                  <% if (forwardStatuses.length > 0) { %>
+                    <div style="display: flex; gap: 10px; flex-direction: column; width: 100%;">
+                      <select name="status" id="status-select-native" style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 100%; font-size: 14px;">
+                        <% forwardStatuses.forEach(status => { %>
+                          <option value="<%= status %>"><%= status.charAt(0).toUpperCase() + status.slice(1) %></option>
+                        <% }) %>
+                      </select>
+                      <button id="update-status-btn" class="update-btn" data-order-id="<%= order._id %>" style="padding: 10px; background-color: #8d6e63; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px;">
+                        Update Status
+                      </button>
+                    </div>
+                  <% } else { %>
+                    <div style="background-color: #6c757d; width: 100%; border: none; padding: 10px; color: white; border-radius: 6px; font-weight: 500; font-size: 14px; text-align: center;">
+                      Status: <%= currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1).replace('_', ' ') %>
+                    </div>
+                  <% } %>
+                </div>
         </div>
 
         <!-- Updated Products Section -->
@@ -54,13 +92,21 @@
           <% order.items.forEach((item, index)=> { %>
             <div class="product-card">
               <div class="product-image">
-                <img src="/<%= item.productId.images[0] %>" alt="Product Image">
+                <%
+                  let imgSrc = '/images/default-product.jpg';
+                  if (item.imageUrl) {
+                    imgSrc = item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? item.imageUrl : '/img/admin/products/' + item.imageUrl;
+                  } else if (item.productId && item.productId.images && item.productId.images.length > 0) {
+                    imgSrc = item.productId.images[0].startsWith('http') || item.productId.images[0].startsWith('/') ? item.productId.images[0] : '/img/admin/products/' + item.productId.images[0];
+                  }
+                %>
+                <img src="<%= imgSrc %>" alt="Product Image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
               </div>
               <div class="product-details">
                 <div class="detail-row">
                   <span class="label">Product Name:</span>
                   <span class="value">
-                    <%= item.productId.productName %>
+                    <%= item.name || (item.productId ? item.productId.productName : 'Unknown Product' ) %>
                   </span>
                 </div>
                 <div class="detail-row">
@@ -71,11 +117,11 @@
                 </div>
                 <div class="detail-row">
                   <span class="label">Price:</span>
-                  <span class="value">Rs.<%= item.price %></span>
+                  <span class="value">₹<%= (item.discountedPrice || item.price).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
                 </div>
                 <div class="detail-row">
                   <span class="label">Subtotal:</span>
-                  <span class="value">Rs.<%= (item.price * item.quantity).toFixed(2) %></span>
+                  <span class="value">₹<%= (item.totalPrice || ((item.discountedPrice || item.price) * item.quantity)).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
                 </div>
               </div>
               <% if (index < order.items.length - 1) { %>
@@ -86,8 +132,40 @@
         </div>
       </div>
 
-      <div class="shipping-address card">
-        <h3>Shipping Address</h3>
+      <div class="shipping-address card" style="margin-top: 20px;">
+        <h3>Tracking History</h3>
+        <div class="timeline" style="margin-top: 15px; margin-bottom: 25px; padding-left: 10px;">
+          <ul style="list-style: none; padding: 0; margin: 0; border-left: 2px solid #ddd; padding-left: 20px;">
+            <% if (order.statusHistory) { order.statusHistory.forEach(history=> { %>
+              <li style="position: relative; margin-bottom: 15px;">
+                <div
+                  style="position: absolute; left: -26px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #4caf50;">
+                </div>
+                <strong style="color: #333;">
+                  <%= history.message %>
+                </strong><br>
+                <small style="color: #777;">
+                  <%= new Date(history.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' , weekday: 'short' ,
+                    month: 'short' , day: 'numeric' }) %> - <%= new Date(history.date).toLocaleTimeString('en-US', {
+                      timeZone: 'Asia/Kolkata' , hour: '2-digit' , minute: '2-digit' }) %>
+                </small>
+              </li>
+              <% }) } else { %>
+                <li style="position: relative; margin-bottom: 15px;">
+                  <div
+                    style="position: absolute; left: -26px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #4caf50;">
+                  </div>
+                  <strong style="color: #333;">Order Placed</strong><br>
+                  <small style="color: #777;">
+                    <%= new Date(order.createdAt).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' ,
+                      weekday: 'short' , month: 'short' , day: 'numeric' }) %>
+                  </small>
+                </li>
+                <% } %>
+          </ul>
+        </div>
+
+        <h3 style="border-top: 1px solid #eee; padding-top: 20px;">Shipping Address</h3>
         <div class="address-item">
           <span class="label">Name:</span>
           <span class="value">
@@ -116,26 +194,32 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const updateBtn = document.querySelector('.update-btn');
-      const statusSelect = document.querySelector('select.dropdown');
-      
+      console.log("DOM loaded, attaching status update listener...");
+      const updateBtn = document.querySelector('#update-status-btn');
+      const statusSelect = document.querySelector('#status-select-native');
+      console.log("Found button:", !!updateBtn, "Found select:", !!statusSelect);
+
       if (updateBtn && statusSelect) {
         updateBtn.addEventListener('click', async () => {
+          console.log("Update button clicked!");
           const selectedStatus = statusSelect.value;
           const orderId = updateBtn.dataset.orderId;
-          
+          console.log("Updating order:", orderId, "to status:", selectedStatus);
+
           try {
             updateBtn.disabled = true;
             updateBtn.textContent = 'Updating...';
-            
+
             const res = await fetch('/admin/orders/' + orderId + '/status', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ status: selectedStatus })
             });
-            
+
+            console.log("Fetch response status:", res.status);
             const data = await res.json();
-            
+            console.log("Fetch response data:", data);
+
             if (res.ok && data.success) {
               Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, icon: 'success', title: 'Status updated to ' + selectedStatus });
               setTimeout(() => window.location.reload(), 1000);

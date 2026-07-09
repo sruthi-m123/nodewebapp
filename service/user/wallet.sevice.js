@@ -154,7 +154,7 @@ export const WalletService ={
                 amount,
                 type:"credit",
                 status:"completed",
-                reference:referenceType,
+                reference: `${referenceType}-${orderId}`,
                 description:"Credited by system",
                 order:orderId
             });
@@ -177,7 +177,7 @@ export const WalletService ={
                 amount,
                 type:"withdrawal",
                 status:"completed",
-                reference:referenceType,
+                reference: `${referenceType}-${orderId}`,
                 description:`Debited for ${referenceType}`,
                 order:orderId
             });
