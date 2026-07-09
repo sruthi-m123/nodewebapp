@@ -195,8 +195,8 @@
         <h3>ORDER SUMMARY</h3>
         <% 
           // Reconstruct original totals to display a static receipt
-          const originalCartTotal = order.originalSubtotal || order.items.reduce((sum, i) => sum + (i.totalPrice || (i.discountedPrice || i.price) * i.quantity), 0);
-          const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) - (order.appliedCoupon ? order.appliedCoupon.value : 0));
+          const originalCartTotal = order.items.reduce((sum, i) => sum + (i.totalPrice || (i.discountedPrice || i.price) * i.quantity), 0);
+          const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) - (order.appliedCoupon ? (order.appliedCoupon.value || order.appliedCoupon.discount || 0) : 0));
         %>
         <div class="summary-row">
           <span>Cart Total</span>
@@ -213,10 +213,13 @@
           <span>₹<%= (order.tax || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
         </div>
         
-        <% if (order.appliedCoupon && order.appliedCoupon.value > 0) { %>
+        <% 
+          const couponDiscount = order.appliedCoupon ? (order.appliedCoupon.value || order.appliedCoupon.discount || 0) : 0;
+          if (couponDiscount > 0) { 
+        %>
         <div class="summary-row coupon-row">
           <span>Coupon Discount</span>
-          <span style="color: #28a745;">-₹<%= order.appliedCoupon.value.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+          <span style="color: #28a745;">-₹<%= couponDiscount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
         </div>
         <% } %>
 

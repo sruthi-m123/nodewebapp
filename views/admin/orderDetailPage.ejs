@@ -15,10 +15,10 @@
       <div class="left-section">
         <div class="order-summary card">
           <h3>Order Summary</h3>
-          <% const originalCartTotal=order.originalSubtotal || order.items.reduce((sum, i)=> sum + (i.totalPrice ||
-            (i.discountedPrice || i.price) * i.quantity), 0);
+          <% const originalCartTotal=order.items.reduce((sum, i)=> sum + (i.totalPrice || (i.discountedPrice || i.price)
+            * i.quantity), 0);
             const origTotal = order.originalTotal || (originalCartTotal + (order.tax || 0) + (order.delivery || 0) -
-            (order.appliedCoupon ? order.appliedCoupon.value : 0));
+            (order.appliedCoupon ? (order.appliedCoupon.value || order.appliedCoupon.discount || 0) : 0));
             %>
             <div class="summary-item">
               <span class="label">Cart Total:</span>
@@ -56,33 +56,32 @@
                 </div>
 
                 <div class="status-actions">
-                  <% 
-                    const currentStatus = order.status ? order.status.toLowerCase() : 'pending';
-                    let forwardStatuses = [];
-                    if (currentStatus === 'pending') {
-                      forwardStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
-                    } else if (currentStatus === 'processing') {
-                      forwardStatuses = ['shipped', 'delivered', 'cancelled'];
-                    } else if (currentStatus === 'shipped') {
-                      forwardStatuses = ['delivered'];
-                    }
-                  %>
-                  <% if (forwardStatuses.length > 0) { %>
-                    <div style="display: flex; gap: 10px; flex-direction: column; width: 100%;">
-                      <select name="status" id="status-select-native" style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 100%; font-size: 14px;">
-                        <% forwardStatuses.forEach(status => { %>
-                          <option value="<%= status %>"><%= status.charAt(0).toUpperCase() + status.slice(1) %></option>
-                        <% }) %>
-                      </select>
-                      <button id="update-status-btn" class="update-btn" data-order-id="<%= order._id %>" style="padding: 10px; background-color: #8d6e63; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px;">
-                        Update Status
-                      </button>
-                    </div>
-                  <% } else { %>
-                    <div style="background-color: #6c757d; width: 100%; border: none; padding: 10px; color: white; border-radius: 6px; font-weight: 500; font-size: 14px; text-align: center;">
-                      Status: <%= currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1).replace('_', ' ') %>
-                    </div>
-                  <% } %>
+                  <% const currentStatus=order.status ? order.status.toLowerCase() : 'pending' ; let forwardStatuses=[];
+                    if (currentStatus==='pending' ) { forwardStatuses=['processing', 'shipped' , 'delivered'
+                    , 'cancelled' ]; } else if (currentStatus==='processing' ) { forwardStatuses=['shipped', 'delivered'
+                    , 'cancelled' ]; } else if (currentStatus==='shipped' ) { forwardStatuses=['delivered']; } %>
+                    <% if (forwardStatuses.length> 0) { %>
+                      <div style="display: flex; gap: 10px; flex-direction: column; width: 100%;">
+                        <select name="status" id="status-select-native"
+                          style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 100%; font-size: 14px;">
+                          <% forwardStatuses.forEach(status=> { %>
+                            <option value="<%= status %>">
+                              <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                            </option>
+                            <% }) %>
+                        </select>
+                        <button id="update-status-btn" class="update-btn" data-order-id="<%= order._id %>"
+                          style="padding: 10px; background-color: #8d6e63; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px;">
+                          Update Status
+                        </button>
+                      </div>
+                      <% } else { %>
+                        <div
+                          style="background-color: #6c757d; width: 100%; border: none; padding: 10px; color: white; border-radius: 6px; font-weight: 500; font-size: 14px; text-align: center;">
+                          Status: <%= currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1).replace('_', ' ' )
+                            %>
+                        </div>
+                        <% } %>
                 </div>
         </div>
 
@@ -92,15 +91,16 @@
           <% order.items.forEach((item, index)=> { %>
             <div class="product-card">
               <div class="product-image">
-                <%
-                  let imgSrc = '/images/default-product.jpg';
-                  if (item.imageUrl) {
-                    imgSrc = item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? item.imageUrl : '/img/admin/products/' + item.imageUrl;
-                  } else if (item.productId && item.productId.images && item.productId.images.length > 0) {
-                    imgSrc = item.productId.images[0].startsWith('http') || item.productId.images[0].startsWith('/') ? item.productId.images[0] : '/img/admin/products/' + item.productId.images[0];
+                <% let imgSrc='/images/default-product.jpg' ; if (item.imageUrl) {
+                  imgSrc=item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? item.imageUrl
+                  : '/img/admin/products/' + item.imageUrl; } else if (item.productId && item.productId.images &&
+                  item.productId.images.length> 0) {
+                  imgSrc = item.productId.images[0].startsWith('http') || item.productId.images[0].startsWith('/') ?
+                  item.productId.images[0] : '/img/admin/products/' + item.productId.images[0];
                   }
-                %>
-                <img src="<%= imgSrc %>" alt="Product Image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                  %>
+                  <img src="<%= imgSrc %>" alt="Product Image"
+                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
               </div>
               <div class="product-details">
                 <div class="detail-row">
@@ -117,11 +117,13 @@
                 </div>
                 <div class="detail-row">
                   <span class="label">Price:</span>
-                  <span class="value">₹<%= (item.discountedPrice || item.price).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
+                  <span class="value">₹<%= (item.discountedPrice || item.price).toLocaleString('en-IN',
+                      {minimumFractionDigits: 2}) %></span>
                 </div>
                 <div class="detail-row">
                   <span class="label">Subtotal:</span>
-                  <span class="value">₹<%= (item.totalPrice || ((item.discountedPrice || item.price) * item.quantity)).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
+                  <span class="value">₹<%= (item.totalPrice || ((item.discountedPrice || item.price) *
+                      item.quantity)).toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
                 </div>
               </div>
               <% if (index < order.items.length - 1) { %>
